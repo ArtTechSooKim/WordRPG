@@ -62,7 +62,7 @@ namespace WordRPG.UI
         private void Update()
         {
             if (FieldScreen.BackPressed()) HandleBack();
-            // 떠다니는 영단어·별이 천천히 오르내린다
+            // 끼운 성유물 배지가 천천히 오르내린다
             float t = Time.unscaledTime;
             foreach (var (rt, baseY, phase) in floaters)
                 rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, baseY + Mathf.Sin(t * 1.2f + phase) * 10f);
@@ -87,33 +87,13 @@ namespace WordRPG.UI
             root = UiKit.Stretch("SafeArea", canvasGo.transform);
             UiKit.ApplySafeArea(root);
 
-            // 떠다니는 영단어 (Figma 'word-chip')
-            var chips = new (string word, float x, float y, float rotation)[]
-            {
-                ("apple", 64, 170, -8), ("brave", 800, 200, 7), ("memory", 70, 640, -4),
-                ("friend", 840, 660, 5), ("dream", 64, 1190, 6), ("magic", 850, 1200, -6),
-            };
-            for (int i = 0; i < chips.Length; i++)
-            {
-                var (word, x, y, rotation) = chips[i];
-                var chip = UiKit.Pill(UiKit.Panel($"Word_{word}", root, new Color(Palette.PanelLight.r, Palette.PanelLight.g, Palette.PanelLight.b, 0.55f), 0, 1, 0, 1));
-                chip.raycastTarget = false;
-                var rt = chip.rectTransform;
-                rt.pivot = new Vector2(0, 1);
-                rt.sizeDelta = new Vector2(48 + word.Length * 17, 54);
-                Place(rt, x, y);
-                rt.localEulerAngles = new Vector3(0, 0, -rotation);
-                UiKit.Label("Text", chip.transform, word, 30, new Color(Palette.TextDim.r, Palette.TextDim.g, Palette.TextDim.b, 0.8f), 0, 0, 1, 1);
-                floaters.Add((rt, -y, i * 1.3f));
-            }
-
             // 로고 (게임 이름: 영단어RPG) — 풍경 위에서도 또렷하게 그림자
             var logo = UiKit.Display(UiKit.Label("Logo", root, "영단어RPG", 168, Palette.Gold, 0, 0.7f, 1, 0.86f,
                 TextAnchor.MiddleCenter, FontStyle.Normal, true, 96));
             var logoShadow = logo.gameObject.AddComponent<Shadow>();
             logoShadow.effectColor = new Color(0, 0, 0, 0.6f);
             logoShadow.effectDistance = new Vector2(0, -8);
-            var subtitle = UiKit.Label("Subtitle", root, "성유물과 함께하는 영단어 모험", 40, Palette.Text, 0, 0.655f, 1, 0.7f,
+            var subtitle = UiKit.Label("Subtitle", root, "영단어와 함께 떠나는 모험", 40, Palette.Text, 0, 0.655f, 1, 0.7f,
                 TextAnchor.MiddleCenter, FontStyle.Bold);
             subtitle.gameObject.AddComponent<Shadow>().effectColor = new Color(0, 0, 0, 0.7f);
 

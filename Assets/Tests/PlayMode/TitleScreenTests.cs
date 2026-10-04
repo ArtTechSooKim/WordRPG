@@ -65,6 +65,8 @@ namespace WordRPG.Tests
             var root = title.transform;
 
             Assert.IsFalse(manager.HasSave);
+            Assert.AreEqual("영단어와 함께 떠나는 모험", root.Find("TitleCanvas/SafeArea/Subtitle").GetComponent<UnityEngine.UI.Text>().text);
+            Assert.IsNull(root.Find("TitleCanvas/SafeArea/Word_apple"), "떠다니는 영단어(apple·memory 등)는 없앰 (2026-10-04)");
             Assert.IsNull(ActiveButton(root, "ContinueButton"), "저장이 없으면 이어하기 없음");
             Assert.AreEqual("시작하기", UiKit.LabelOf(FindButton(root, "NewGameButton")).text);
 
