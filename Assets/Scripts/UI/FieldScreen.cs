@@ -17,8 +17,8 @@ namespace WordRPG.UI
     // 탑다운 필드: 한 칸씩 이동, 풀숲 조우 → 전투(BattleScreen을 위에 덮음) → 원래 자리로 복귀.
     // 출입구(D)를 밟으면 다른 지역으로 (같은 씬에서 맵만 바꿔 그림). 보스를 물리쳐야 열리는 출입구는 그 전까지 막혀 있고,
     // 보스를 물리치면 카메라가 그 출입구로 가서 길이 열리는 모습을 보여 준 뒤 돌아온다 (RevealGates).
-    // 보물상자·회복의 샘·성유물 제단·상점·보스는 옆에 서서 패드 가운데 [확인](키보드 Space·Enter·Z)으로 사용.
-    // 가까이 가면 오브젝트 위에 이름표가 뜬다. 입력은 화면 아래 가상 패드 + 키보드(방향키/WASD).
+    // 보물상자·회복의 샘·성유물 제단·상점·보스는 옆에 서서 왼쪽 아래 [확인](키보드 Space·Enter·Z)으로 사용.
+    // 가까이 가면 오브젝트 위에 이름표가 뜬다. 입력은 오른쪽 아래 가상 스틱(끝까지 밀면 달리기) + 키보드(방향키/WASD, Shift = 달리기).
     // 이동·조우 규칙은 FieldWalker / EncounterCounter(순수 C#)가 하고 여기서는 화면과 입력만 다룬다
     public class FieldScreen : MonoBehaviour
     {
@@ -26,6 +26,8 @@ namespace WordRPG.UI
         [SerializeField] private BattleConfig battleConfig = new BattleConfig();
         [Tooltip("한 칸 이동에 걸리는 시간(초)")]
         [SerializeField] private float stepDuration = 0.16f;
+        [Tooltip("달릴 때 한 칸 시간 = 걷기 시간 × 이 값")]
+        [SerializeField] private float runStepRatio = 0.55f;
         [Tooltip("화면 가로에 보이는 타일 수")]
         [SerializeField] private float tilesAcross = 11f;
         [Tooltip("연출 시간 배율. 테스트에서는 아주 작게")]
@@ -49,6 +51,9 @@ namespace WordRPG.UI
         private bool transitioning;
         private float moveT;
         private float walkTime; // 걷기 애니메이션 시계 (멈추면 서 있는 모습)
+        private float currentStep; // 지금 칸을 가는 데 걸리는 시간 (걷기/달리기)
+        private bool running;
+        private Direction? stickDirection; // 스틱으로 가던 방향 (대각선 근처에서 떨리지 않게)
         private Vector3 moveFrom, moveTo;
         private float interactCooldown;
         private bool confirmRequested;  // [확인]을 눌렀다 (걷는 중이면 걸음이 끝난 뒤 처리)
@@ -77,7 +82,7 @@ namespace WordRPG.UI
         private GameObject toastPanel;
         private float toastUntil;
         private Image flash;
-        private HoldButton padUp, padDown, padLeft, padRight;
+        private VirtualStick stick;
         private DexView dexView;
         private RelicAltarView altarView;
         private ShopView shopView;
@@ -94,6 +99,8 @@ namespace WordRPG.UI
         public Vector2Int PlayerCell => walker.Position;
         public Direction Facing => walker.Facing;
         public bool IsMoving => moving;
+        public bool IsRunning => moving && running; // 지금 칸을 달리는 중
+        public VirtualStick Stick => stick;
         public bool IsInBattle => inBattle || transitioning;
         public BattleScreen Battle => battle;
         public GameSession Session => session;
@@ -193,7 +200,7 @@ namespace WordRPG.UI
             EnterArea(area, spawn);
 
             if (!string.IsNullOrEmpty(statusMessage)) ShowToast(statusMessage, 3f);
-            if (!loadedFromSave) ShowToast("진한 풀숲을 걸으면 야생 몬스터가 나타나요!\n제단·상점·샘 앞에서 가운데 [확인]을 눌러요", 4f);
+            if (!loadedFromSave) ShowToast("오른쪽 아래를 끌어 움직이고, 끝까지 밀면 달려요!\n제단·상점·샘 앞에서는 왼쪽 [확인]을 눌러요", 4f);
             return true;
         }
 
@@ -215,15 +222,27 @@ namespace WordRPG.UI
 
             if (moving)
             {
-                moveT += Time.deltaTime / Mathf.Max(0.001f, stepDuration);
+                moveT += Time.deltaTime / Mathf.Max(0.001f, currentStep);
                 player.position = Vector3.Lerp(moveFrom, moveTo, Mathf.Clamp01(moveT));
-                walkTime += Time.deltaTime;
+                walkTime += Time.deltaTime * (running ? 1.8f : 1f); // 달리면 발도 빠르게
                 playerRenderer.sprite = PlayerArt.Get(walker.Facing, Mathf.FloorToInt(walkTime * PlayerArt.FramesPerSecond));
                 if (moveT >= 1f)
                 {
+                    float leftover = (moveT - 1f) * currentStep;
                     moving = false;
                     player.position = moveTo;
-                    OnStepFinished();
+                    if (!OnStepFinished()) return;
+                    // 계속 밀고 있으면 서지 않고 바로 다음 칸으로 (칸마다 한 프레임씩 멈칫하던 끊김 없애기)
+                    var (next, run) = ReadMove();
+                    if (next.HasValue && !IsPanelOpen)
+                    {
+                        TryStep(next.Value, run);
+                        if (moving)
+                        {
+                            moveT = leftover / Mathf.Max(0.001f, currentStep);
+                            player.position = Vector3.Lerp(moveFrom, moveTo, Mathf.Clamp01(moveT));
+                        }
+                    }
                 }
                 return;
             }
@@ -236,8 +255,8 @@ namespace WordRPG.UI
                 if (TryInteract()) return;
             }
 
-            var direction = ReadDirection();
-            if (direction.HasValue) TryStep(direction.Value);
+            var (direction, runInput) = ReadMove();
+            if (direction.HasValue) TryStep(direction.Value, runInput);
             else if (walkTime > 0f)
             {
                 walkTime = 0f;
@@ -247,15 +266,17 @@ namespace WordRPG.UI
 
         // ------------------------------------------------------------------ 이동·상호작용
 
-        private void TryStep(Direction direction)
+        private void TryStep(Direction direction, bool run = false)
         {
             var outcome = walker.TryStep(direction);
-            playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
+            if (outcome.Kind != StepKind.Moved) playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
 
             switch (outcome.Kind)
             {
                 case StepKind.Moved:
                     moving = true;
+                    running = run;
+                    currentStep = stepDuration * (run ? runStepRatio : 1f);
                     moveT = 0f;
                     moveFrom = player.position;
                     moveTo = CellCenter(outcome.Target);
@@ -380,7 +401,8 @@ namespace WordRPG.UI
             RefreshHud();
         }
 
-        private void OnStepFinished()
+        // 한 칸 도착. 출입구·조우로 화면이 바뀌기 시작하면 false (계속 걷지 않음)
+        private bool OnStepFinished()
         {
             session.World.SetPosition(area.AreaId, walker.Position);
             minimap.SetPlayer(walker.Position);
@@ -392,9 +414,14 @@ namespace WordRPG.UI
                 var exit = area.GetExit(walker.Position);
                 if (exit != null && exit.Target != null) StartCoroutine(UseDoor(exit));
                 else ShowToast("문이 굳게 닫혀 있다.");
-                return;
+                return false;
             }
-            if (encounterCounter.OnStep(tile == FieldTile.Grass, rng)) StartCoroutine(Encounter());
+            if (encounterCounter.OnStep(tile == FieldTile.Grass, rng))
+            {
+                StartCoroutine(Encounter());
+                return false;
+            }
+            return true;
         }
 
         // 출입구: 화면을 어둡게 → 도착 지역의 해당 출입구 칸에 나타남 → 밝게.
@@ -671,20 +698,24 @@ namespace WordRPG.UI
             while (Time.unscaledTime < end) yield return null;
         }
 
-        private Direction? ReadDirection()
+        // 가는 방향 + 달리기: 스틱(끝까지 밀면 달리기)이 먼저, 없으면 키보드(방향키/WASD, Shift = 달리기)
+        private (Direction? direction, bool run) ReadMove()
         {
-            if (padUp.IsHeld) return Direction.Up;
-            if (padDown.IsHeld) return Direction.Down;
-            if (padLeft.IsHeld) return Direction.Left;
-            if (padRight.IsHeld) return Direction.Right;
+            if (stick.IsHeld)
+            {
+                stickDirection = StickInput.ToDirection(stick.Value, stickDirection);
+                return (stickDirection, StickInput.IsRunning(stick.Value));
+            }
+            stickDirection = null;
 
             var keyboard = Keyboard.current;
-            if (keyboard == null) return null;
-            if (keyboard.upArrowKey.isPressed || keyboard.wKey.isPressed) return Direction.Up;
-            if (keyboard.downArrowKey.isPressed || keyboard.sKey.isPressed) return Direction.Down;
-            if (keyboard.leftArrowKey.isPressed || keyboard.aKey.isPressed) return Direction.Left;
-            if (keyboard.rightArrowKey.isPressed || keyboard.dKey.isPressed) return Direction.Right;
-            return null;
+            if (keyboard == null) return (null, false);
+            bool run = keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed;
+            if (keyboard.upArrowKey.isPressed || keyboard.wKey.isPressed) return (Direction.Up, run);
+            if (keyboard.downArrowKey.isPressed || keyboard.sKey.isPressed) return (Direction.Down, run);
+            if (keyboard.leftArrowKey.isPressed || keyboard.aKey.isPressed) return (Direction.Left, run);
+            if (keyboard.rightArrowKey.isPressed || keyboard.dKey.isPressed) return (Direction.Right, run);
+            return (null, false);
         }
 
         // ------------------------------------------------------------------ 월드(타일맵·플레이어·카메라)
@@ -923,13 +954,10 @@ namespace WordRPG.UI
             UiKit.Pad(toastText.rectTransform, 20, 6, 20, 6);
             toastPanel.SetActive(false);
 
-            // 가상 방향 패드 (한 손 조작용으로 아래 가운데)
-            var pad = UiKit.Rect("Pad", hudRoot, 0.25f, 0.02f, 0.75f, 0.27f);
-            padUp = PadButton(pad, "Pad_Up", "▲", 0.35f, 0.67f, 0.65f, 1f);
-            padDown = PadButton(pad, "Pad_Down", "▼", 0.35f, 0f, 0.65f, 0.33f);
-            padLeft = PadButton(pad, "Pad_Left", "◀", 0f, 0.335f, 0.3f, 0.665f);
-            padRight = PadButton(pad, "Pad_Right", "▶", 0.7f, 0.335f, 1f, 0.665f);
-            BuildConfirmButton(pad);
+            // 가상 스틱 (Figma 'Virtual Stick' #34): 오른쪽 아래 아무 곳이나 엄지를 대면 그 자리에 생김, 끝까지 밀면 달리기
+            stick = VirtualStick.Create(hudRoot, 0.4f, 0f, 1f, 0.27f);
+            // [확인]은 왼쪽 아래로 따로 (스틱을 밀면서 다른 손가락으로 누를 수 있게)
+            BuildConfirmButton(UiKit.Rect("ConfirmArea", hudRoot, 0.02f, 0.03f, 0.36f, 0.24f));
 
             // 조우 연출용 번쩍임
             flash = UiKit.Panel("EncounterFlash", hudRoot, Color.clear);
@@ -946,27 +974,19 @@ namespace WordRPG.UI
             quitDialog = ConfirmDialog.Create(hudRoot);
         }
 
-        private static HoldButton PadButton(RectTransform parent, string name, string arrow,
-            float minX, float minY, float maxX, float maxY)
+        // 왼쪽 아래 [확인] (Figma 'Action Button'): 옆에 쓸 것이 있으면 금색(Ready), 없으면 반투명(Idle)
+        private void BuildConfirmButton(RectTransform area)
         {
-            var image = UiKit.RoundPanel(name, parent, new Color(1, 1, 1, 0.22f), UiKit.RadiusMd, minX, minY, maxX, maxY);
-            UiKit.Label("Arrow", image.transform, arrow, 52, new Color(1, 1, 1, 0.92f), 0, 0, 1, 1, TextAnchor.MiddleCenter, FontStyle.Bold);
-            return image.gameObject.AddComponent<HoldButton>();
-        }
-
-        // 패드 가운데 [확인] (Figma 'Action Button'): 옆에 쓸 것이 있으면 금색(Ready), 없으면 반투명(Idle)
-        private void BuildConfirmButton(RectTransform pad)
-        {
-            confirmGlow = UiKit.IconImage("ConfirmGlow", pad, UiKit.GlowSprite(), 0.5f, 0.5f, 0.5f, 0.5f);
-            confirmGlow.rectTransform.sizeDelta = new Vector2(250, 250);
+            confirmGlow = UiKit.IconImage("ConfirmGlow", area, UiKit.GlowSprite(), 0.5f, 0.5f, 0.5f, 0.5f);
+            confirmGlow.rectTransform.sizeDelta = new Vector2(300, 300);
             confirmGlow.color = new Color(Palette.Gold.r, Palette.Gold.g, Palette.Gold.b, 0.5f);
-            confirmImage = UiKit.Pill(UiKit.Panel("Pad_Confirm", pad, Color.white, 0.5f, 0.5f, 0.5f, 0.5f));
-            confirmImage.rectTransform.sizeDelta = new Vector2(144, 144);
+            confirmImage = UiKit.Pill(UiKit.Panel("Pad_Confirm", area, Color.white, 0.5f, 0.5f, 0.5f, 0.5f));
+            confirmImage.rectTransform.sizeDelta = new Vector2(180, 180);
             UiKit.AddButton(confirmImage).onClick.AddListener(() => confirmRequested = true);
             confirmRing = UiKit.Outline(UiKit.Panel("Ring", confirmImage.transform, new Color(1f, 1f, 1f, 0.9f)), 32, 2);
             confirmRing.gameObject.AddComponent<AutoPill>();
             confirmRing.raycastTarget = false;
-            confirmLabel = UiKit.Display(UiKit.Label("Label", confirmImage.transform, "확인", 44, Palette.Text, 0, 0, 1, 1));
+            confirmLabel = UiKit.Display(UiKit.Label("Label", confirmImage.transform, "확인", 52, Palette.Text, 0, 0, 1, 1));
             SetConfirmReady(false);
         }
 

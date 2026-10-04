@@ -89,8 +89,8 @@ namespace WordRPG.Tests
             CollectionAssert.Contains(field.VisibleNameTags, "안쪽 서고", "출입구 위에 도착 지역 이름표");
 
             // 위, 위 → 출입구를 밟으면 안쪽 서고의 출입구 칸에 나타남
-            yield return HoldPad(field, "Pad_Up", () => field.IsMoving);
-            yield return HoldPad(field, "Pad_Up", () => field.IsMoving);
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
             yield return WaitFor(() => field.CurrentArea == inside && !field.IsInBattle);
 
             Assert.AreSame(inside, field.CurrentArea);
@@ -104,8 +104,8 @@ namespace WordRPG.Tests
             Assert.AreSame(inside, field.CurrentArea);
 
             // 위로 한 칸 갔다가 다시 아래 출입구 → 바깥 들판의 출입구로
-            yield return HoldPad(field, "Pad_Up", () => field.IsMoving);
-            yield return HoldPad(field, "Pad_Down", () => field.IsMoving);
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
+            yield return HoldStick(field, Direction.Down, () => field.IsMoving);
             yield return WaitFor(() => field.CurrentArea == outside && !field.IsInBattle);
 
             Assert.AreSame(outside, field.CurrentArea);
@@ -134,7 +134,7 @@ namespace WordRPG.Tests
             CollectionAssert.Contains(field.VisibleNameTags, "까먹대왕", "보스 위에 보스 이름표");
 
             // 위 = 보스 → [확인]으로 도전 → 보스전
-            yield return FacePad(field, "Pad_Up", Direction.Up);
+            yield return FaceStick(field, Direction.Up);
             Assert.IsFalse(field.IsInBattle, "부딪히기만 해서는 싸우지 않음");
             yield return PressConfirm(field);
             yield return WaitFor(() => field.Battle.IsRunning);
@@ -195,20 +195,20 @@ namespace WordRPG.Tests
             CollectionAssert.Contains(field.VisibleNameTags, "숲 · 잠김", "잠긴 출입구 이름표");
 
             // 위로 한 칸 → 숲 출입구는 덤불로 막혀 있음
-            yield return HoldPad(field, "Pad_Up", () => field.IsMoving);
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
             yield return WaitFor(() => !field.IsMoving);
-            yield return HoldPad(field, "Pad_Up", () => field.ToastMessage.Contains("막혀"));
+            yield return HoldStick(field, Direction.Up, () => field.ToastMessage.Contains("막혀"));
             Assert.AreEqual(new Vector2Int(2, 2), field.PlayerCell, "잠긴 출입구는 못 지나감");
             StringAssert.Contains("보스 방의 까먹대왕을 물리치면", field.ToastMessage);
             Assert.AreSame(town, field.CurrentArea);
 
             // 아래로 → 보스 방 → 보스를 물리침
-            yield return HoldPad(field, "Pad_Down", () => field.IsMoving);
-            yield return HoldPad(field, "Pad_Down", () => field.IsMoving);
+            yield return HoldStick(field, Direction.Down, () => field.IsMoving);
+            yield return HoldStick(field, Direction.Down, () => field.IsMoving);
             yield return WaitFor(() => field.CurrentArea == lair && !field.IsInBattle);
-            yield return HoldPad(field, "Pad_Up", () => field.IsMoving);
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
             yield return WaitFor(() => !field.IsMoving);
-            yield return FacePad(field, "Pad_Up", Direction.Up);
+            yield return FaceStick(field, Direction.Up);
             yield return PressConfirm(field);
             yield return WaitFor(() => field.Battle.IsRunning);
             yield return PlayUntilResult(field.Battle, answerCorrectly: true);
@@ -230,11 +230,11 @@ namespace WordRPG.Tests
             Assert.IsTrue(session.World.IsExitOpen(town.Exits[0]));
 
             // 마을로 돌아가 열린 길로 숲에 들어감
-            yield return HoldPad(field, "Pad_Down", () => field.IsMoving);
+            yield return HoldStick(field, Direction.Down, () => field.IsMoving);
             yield return WaitFor(() => field.CurrentArea == town && !field.IsInBattle);
-            yield return HoldPad(field, "Pad_Up", () => field.IsMoving);
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
             CollectionAssert.Contains(field.VisibleNameTags, "숲", "열린 뒤에는 '잠김' 없이");
-            for (int i = 0; i < 2; i++) yield return HoldPad(field, "Pad_Up", () => field.IsMoving || field.CurrentArea == forest);
+            for (int i = 0; i < 2; i++) yield return HoldStick(field, Direction.Up, () => field.IsMoving || field.CurrentArea == forest);
             yield return WaitFor(() => field.CurrentArea == forest && !field.IsInBattle);
             Assert.AreSame(forest, field.CurrentArea);
 

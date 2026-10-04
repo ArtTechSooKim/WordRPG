@@ -79,9 +79,9 @@ namespace WordRPG.Tests
             // 3) 왼쪽으로 한 칸 → 위 = 성유물 제단. 부딪히기만 하면 안 열리고 [확인]으로 열림
             yield return WaitFor(() => !field.IsPanelOpen);
             yield return new WaitForSecondsRealtime(0.6f); // 창을 닫은 직후 대기 시간
-            yield return HoldPad(field, "Pad_Left", () => field.IsMoving);
+            yield return HoldStick(field, Direction.Left, () => field.IsMoving);
             Assert.AreEqual(new Vector2Int(1, 1), field.PlayerCell);
-            yield return FacePad(field, "Pad_Up", Direction.Up);
+            yield return FaceStick(field, Direction.Up);
             yield return new WaitForSecondsRealtime(0.2f);
             Assert.IsFalse(altarView.activeSelf, "부딪히기만 해서는 안 열림");
             yield return PressConfirm(field);

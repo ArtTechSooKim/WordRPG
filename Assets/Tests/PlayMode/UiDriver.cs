@@ -63,31 +63,30 @@ namespace WordRPG.Tests
             while (!condition() && Time.realtimeSinceStartup < end) yield return null;
         }
 
-        // 가상 패드를 손가락으로 누르듯 PointerDown → 조건이 맞으면 PointerUp → 이동이 끝날 때까지 대기
-        public static IEnumerator HoldPad(FieldScreen field, string padName, Func<bool> until, float maxSeconds = 5f)
+        // 가상 스틱을 손가락으로 끌듯: 제자리 받침 가운데를 누르고 → 그 방향으로 끌고(run이면 끝까지 = 달리기)
+        // → 조건이 맞으면 떼고 → 이동이 끝날 때까지 대기
+        public static IEnumerator HoldStick(FieldScreen field, Direction direction, Func<bool> until, float maxSeconds = 5f,
+            bool run = false)
         {
-            HoldButton pad = null;
-            foreach (var candidate in field.GetComponentsInChildren<HoldButton>(true))
-            {
-                if (candidate.name == padName) pad = candidate;
-            }
-            if (pad == null) throw new ArgumentException($"패드 버튼 {padName} 없음");
-
-            var data = new PointerEventData(EventSystem.current);
-            ExecuteEvents.Execute(pad.gameObject, data, ExecuteEvents.pointerDownHandler);
+            var stick = field.Stick;
+            var data = new PointerEventData(EventSystem.current) { pointerId = 1, position = stick.ScreenPointFor(Vector2.zero) };
+            ExecuteEvents.Execute(stick.gameObject, data, ExecuteEvents.pointerDownHandler);
+            Vector2 offset = direction.ToOffset();
+            data.position = stick.ScreenPointFor(offset * (run ? 1f : 0.6f));
+            ExecuteEvents.Execute(stick.gameObject, data, ExecuteEvents.dragHandler);
             yield return WaitFor(until, maxSeconds);
-            ExecuteEvents.Execute(pad.gameObject, data, ExecuteEvents.pointerUpHandler);
+            ExecuteEvents.Execute(stick.gameObject, data, ExecuteEvents.pointerUpHandler);
             yield return WaitFor(() => !field.IsMoving, maxSeconds);
         }
 
-        // 막힌 쪽(상자·제단 등)으로 패드를 눌러 그쪽을 바라보게 한다 — 부딪히기만 하고 쓰지는 않음
-        public static IEnumerator FacePad(FieldScreen field, string padName, Direction direction)
+        // 막힌 쪽(상자·제단 등)으로 스틱을 밀어 그쪽을 바라보게 한다 — 부딪히기만 하고 쓰지는 않음
+        public static IEnumerator FaceStick(FieldScreen field, Direction direction)
         {
-            yield return HoldPad(field, padName, () => field.Facing == direction);
+            yield return HoldStick(field, direction, () => field.Facing == direction);
             yield return null;
         }
 
-        // 패드 가운데 [확인] 버튼을 누른다 (필드가 다음 프레임에 처리)
+        // 왼쪽 아래 [확인] 버튼을 누른다 (필드가 다음 프레임에 처리)
         public static IEnumerator PressConfirm(FieldScreen field)
         {
             var button = FindButton(field.transform, "Pad_Confirm");

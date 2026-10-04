@@ -324,7 +324,7 @@ namespace WordRPG.Tests
             var before = field.Minimap.Picture.PlayerAnchor;
 
             // 위로 한 칸 걸으면 점도 따라 움직인다
-            yield return HoldPad(field, "Pad_Up", () => field.IsMoving);
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
             Assert.AreEqual(new Vector2Int(2, 2), field.PlayerCell);
             Assert.Greater(field.Minimap.Picture.PlayerAnchor.y, before.y);
 
@@ -356,7 +356,7 @@ namespace WordRPG.Tests
             Assert.AreEqual((Color)MinimapArt.Fog, (Color)field.Minimap.Texture.GetPixel(chest.x, chest.y), "처음엔 안개");
             Assert.IsFalse(session.World.IsExplored("meadow", chest));
 
-            yield return HoldPad(field, "Pad_Right", () => field.PlayerCell.x >= 9, 8f);
+            yield return HoldStick(field, Direction.Right, () => field.PlayerCell.x >= 9, 8f);
             Assert.IsTrue(session.World.IsExplored("meadow", chest), "3칸 안으로 다가가면 밝혀짐");
             Assert.AreEqual((Color)MinimapArt.Chest, (Color)field.Minimap.Texture.GetPixel(chest.x, chest.y), "미니맵에 상자가 나타남");
 

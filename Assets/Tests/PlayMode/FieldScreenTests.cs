@@ -14,7 +14,7 @@ using static WordRPG.Tests.UiDriver;
 
 namespace WordRPG.Tests
 {
-    // 필드 통합 테스트: 실제 가상 패드를 눌러 걷고, [확인]으로 상자·샘 사용, 풀숲 조우·전투 복귀까지 확인
+    // 필드 통합 테스트: 실제 가상 스틱을 끌어 걷고, [확인]으로 상자·샘 사용, 풀숲 조우·전투 복귀까지 확인
     public class FieldScreenTests
     {
         //   y=4  #####
@@ -26,7 +26,7 @@ namespace WordRPG.Tests
 
         private ItemData ink;
 
-        private FieldScreen CreateField(GameSession session, MonsterSpecies enemy)
+        private FieldScreen CreateField(GameSession session, MonsterSpecies enemy, string map = TestMap)
         {
             ink = TestData.Item("shiny_ink").Set("displayName", "빛나는 잉크");
             var table = ScriptableObject.CreateInstance<EncounterTable>()
@@ -35,7 +35,7 @@ namespace WordRPG.Tests
             var words = ScriptableObject.CreateInstance<WordDatabase>().Set("regionId", "test").Set("regionName", "테스트");
             words.ReplaceWords(TestData.SampleWords());
             var area = ScriptableObject.CreateInstance<FieldArea>()
-                .Set("areaId", "test").Set("displayName", "테스트 들판").Set("map", TestMap)
+                .Set("areaId", "test").Set("displayName", "테스트 들판").Set("map", map)
                 .Set("encounters", table).Set("words", words)
                 .Set("encounterRate", 1f).Set("minStepsBetweenEncounters", 0)
                 .Set("chests", new List<ChestContent> { new ChestContent(ink, 2) });
@@ -68,7 +68,7 @@ namespace WordRPG.Tests
             Assert.AreEqual(new Vector2Int(2, 1), field.PlayerCell);
 
             // 1) 위 = 보물상자. 부딪히기만 해서는 열리지 않고 [확인]을 눌러야 열림 → 빛나는 잉크 2개, 자리는 그대로
-            yield return FacePad(field, "Pad_Up", Direction.Up);
+            yield return FaceStick(field, Direction.Up);
             yield return new WaitForSecondsRealtime(0.2f);
             Assert.AreEqual(0, session.Inventory.GetCount(ink), "부딪히기만 하면 안 열림");
             Assert.IsTrue(field.ConfirmReady, "옆에 상자가 있으면 확인 버튼이 금색");
@@ -82,18 +82,18 @@ namespace WordRPG.Tests
             // 2) 왼쪽 = 회복의 샘 → 그쪽을 보고 [확인] → HP 회복
             session.Hero.TakeDamage(50);
             yield return new WaitForSecondsRealtime(0.35f); // 연속 사용 대기 시간
-            yield return FacePad(field, "Pad_Left", Direction.Left);
+            yield return FaceStick(field, Direction.Left);
             yield return PressConfirm(field);
             yield return WaitFor(() => session.Hero.CurrentHp == session.Hero.Stats.MaxHp, 2f);
             Assert.AreEqual(session.Hero.Stats.MaxHp, session.Hero.CurrentHp);
             StringAssert.Contains("회복의 샘", field.ToastMessage);
 
             // 3) 오른쪽 → 위 → 위(풀숲) = 조우
-            yield return HoldPad(field, "Pad_Right", () => field.IsMoving);
-            yield return HoldPad(field, "Pad_Up", () => field.IsMoving);
+            yield return HoldStick(field, Direction.Right, () => field.IsMoving);
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
             Assert.AreEqual(new Vector2Int(3, 2), field.PlayerCell);
             Assert.IsFalse(field.IsInBattle, "길에서는 조우하지 않음");
-            yield return HoldPad(field, "Pad_Up", () => field.IsMoving);
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
             yield return WaitFor(() => field.Battle.IsRunning);
             Assert.IsTrue(field.Battle.IsRunning, "풀숲에 들어서면 전투");
 
@@ -113,8 +113,75 @@ namespace WordRPG.Tests
             Assert.IsTrue(session.World.IsChestOpened("test:2,2"));
 
             // 5) 다시 움직일 수 있다
-            yield return HoldPad(field, "Pad_Left", () => field.IsMoving);
+            yield return HoldStick(field, Direction.Left, () => field.IsMoving);
             Assert.AreEqual(new Vector2Int(2, 3), field.PlayerCell);
+
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
+        // 스틱 (#34): 계속 밀면 서지 않고 여러 칸, 끝까지 밀면 달리기(금색 '달리기'), 누른 자리로 받침이 옮겨 옴,
+        // [확인]은 왼쪽 아래·스틱은 오른쪽 아래
+        [UnityTest]
+        public IEnumerator StickWalksRunsAndConfirmIsOnTheLeft()
+        {
+            //   y=1  #P.....C#   ← 긴 길 (끝에 보물상자)
+            const string corridor = "#########\n#P.....C#\n#########";
+            var session = GameSession.NewGame(Hero(100, 30), 1);
+            var field = CreateField(session, Enemy(40, 1, 5), corridor);
+            yield return null;
+            yield return null;
+            Assert.AreEqual(new Vector2Int(1, 1), field.PlayerCell);
+
+            // 자리 배치: [확인]은 화면 왼쪽, 스틱 영역은 오른쪽
+            var confirm = FindButton(field.transform, "Pad_Confirm");
+            Assert.Less(RectTransformUtility.WorldToScreenPoint(null, confirm.transform.position).x, Screen.width * 0.4f);
+            Assert.GreaterOrEqual(RectTransformUtility.WorldToScreenPoint(null, field.Stick.Zone.position).x, Screen.width * 0.4f - 1f,
+                "스틱 영역은 오른쪽 (영역 왼쪽 아래 모서리가 화면 40% 지점부터)");
+
+            // 살짝 밀고 있으면: 걷기로 계속 이동 (한 번 밀어서 3칸)
+            bool sawRun = false;
+            yield return HoldStick(field, Direction.Right, () =>
+            {
+                sawRun |= field.IsRunning;
+                return field.PlayerCell.x >= 4;
+            });
+            Assert.GreaterOrEqual(field.PlayerCell.x, 4, "손을 떼기 전까지 칸마다 서지 않고 계속 감");
+            Assert.IsFalse(sawRun, "살짝 밀면 걷기");
+
+            // 끝까지 밀면: 달리기 + 스틱에 '달리기'
+            bool sawLabel = false;
+            sawRun = false;
+            yield return HoldStick(field, Direction.Left, () =>
+            {
+                sawRun |= field.IsRunning;
+                sawLabel |= field.Stick.transform.Find("Stick/RunLabel").gameObject.activeSelf;
+                return field.PlayerCell.x <= 1;
+            }, run: true);
+            Assert.AreEqual(new Vector2Int(1, 1), field.PlayerCell);
+            Assert.IsTrue(sawRun, "끝까지 밀면 달리기");
+            Assert.IsTrue(sawLabel, "달리는 동안 스틱에 '달리기'");
+            Assert.IsFalse(field.Stick.transform.Find("Stick/RunLabel").gameObject.activeSelf, "손을 떼면 사라짐");
+
+            // 영역 안 다른 곳을 누르면 받침이 그 자리로 옮겨 오고, 떼면 제자리로
+            var zone = field.Stick.Zone;
+            var stickRoot = (RectTransform)field.Stick.transform.Find("Stick");
+            var home = stickRoot.anchoredPosition;
+            var touch = new Vector2(zone.rect.width * 0.72f, zone.rect.height * 0.5f);
+            var data = new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current)
+            {
+                pointerId = 2,
+                position = RectTransformUtility.WorldToScreenPoint(null, zone.TransformPoint(touch))
+            };
+            UnityEngine.EventSystems.ExecuteEvents.Execute(field.Stick.gameObject, data,
+                UnityEngine.EventSystems.ExecuteEvents.pointerDownHandler);
+            Assert.AreEqual(touch.x, stickRoot.anchoredPosition.x, 1f, "누른 자리에 스틱");
+            Assert.AreEqual(Vector2.zero, field.Stick.Value, "누르기만 하면 움직이지 않음");
+            UnityEngine.EventSystems.ExecuteEvents.Execute(field.Stick.gameObject, data,
+                UnityEngine.EventSystems.ExecuteEvents.pointerUpHandler);
+            Assert.AreEqual(home, stickRoot.anchoredPosition, "떼면 제자리");
+            yield return null;
+            Assert.AreEqual(new Vector2Int(1, 1), field.PlayerCell);
 
             Object.Destroy(field.gameObject);
             yield return null;
@@ -130,7 +197,7 @@ namespace WordRPG.Tests
             yield return null;
             Assert.AreEqual(new Vector2Int(3, 2), field.PlayerCell, "저장된 위치에서 시작");
 
-            yield return HoldPad(field, "Pad_Up", () => field.IsMoving);
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
             yield return WaitFor(() => field.Battle.IsRunning);
             yield return PlayUntilResult(field.Battle, answerCorrectly: false);
             Assert.AreEqual("패배…", field.Battle.ResultTitle);
