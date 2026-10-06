@@ -38,6 +38,7 @@ namespace WordRPG.Game
         public VocabularyProgress Vocabulary { get; }
         public PlayerRecord Record { get; }
         public WorldState World { get; }
+        public TutorialProgress Tutorials { get; private set; } = new TutorialProgress(); // 이미 본 안내 (#36)
         public IReadOnlyList<string> LoadWarnings => loadWarnings;
 
         // 연속 정답 수 (전투 콤보). 전투가 끝나도 이어지지만 세이브에는 넣지 않는다 — 게임을 다시 켜면 0부터
@@ -165,7 +166,7 @@ namespace WordRPG.Game
             var skills = new List<string>();
             foreach (var slot in Hero.SkillSlots) skills.Add(slot.Key);
             return new SaveData(nowUtc, new HeroSaveData(Hero.Level, Hero.Exp, Hero.CurrentHp), relics,
-                Inventory, Vocabulary, Record, World).WithSkillSlots(skills);
+                Inventory, Vocabulary, Record, World).WithSkillSlots(skills).WithTutorials(Tutorials.Seen);
         }
 
         // 세이브에 있는 성유물을 찾을 수 없으면(삭제·id 변경) 빼고 경고를 남긴다. 성유물이 하나도 없으면 시작 성유물로 채운다.
@@ -220,6 +221,7 @@ namespace WordRPG.Game
             else hero.RestoreFully(); // v1이거나 쓰러진 채로 저장됐다면(패배 직후 앱 종료 등) 회복한 것으로
 
             var session = new GameSession(hero, data.Inventory, data.Vocabulary, data.Record, data.World);
+            session.Tutorials = new TutorialProgress(data.Tutorials);
             session.loadWarnings.AddRange(warnings);
             return session;
         }

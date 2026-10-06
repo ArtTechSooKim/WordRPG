@@ -57,7 +57,8 @@
 7. **Git LFS 사용 중**: 이미지·오디오·폰트·네이티브 플러그인. 새 바이너리 타입 추가 시 `.gitattributes` 확인 (새로 클론하면 `git lfs install` 먼저)
 8. **입력은 Input System 전용**: EventSystem에 `InputSystemUIInputModule` 사용 (`StandaloneInputModule` 금지).
    뒤로가기 = Escape 키 (`FieldScreen.BackPressed`, 안드로이드 뒤로 버튼·PC Esc) → 새 창(패널)을 만들면 각 화면의 `HandleBack`에 닫기 순서를 추가.
-   아이폰은 앱이 스스로 꺼지면 안 됨 → 종료는 `GameManager.CanQuit`일 때만
+   아이폰은 앱이 스스로 꺼지면 안 됨 → 종료는 `GameManager.CanQuit`일 때만.
+   새 기능에 처음 하는 사람용 안내가 필요하면 `TutorialProgress`에 id를 더하고 그 상황에서 `TutorialOverlay.Run` (GDD 7-1)
 9. **한국어 조사**: 이름 뒤 조사는 `UiKit.WithJosa(name, "이", "가")`로 (펜촉이가 / 책껍질이, 깃펜기사로 / 백과거북으로)
 10. **세로 화면 기준 UI**: 1080×1920 레퍼런스, 한 손 조작, 4지선다 버튼은 화면 하단
 11. **UI는 Figma UI 키트를 따른다** (https://www.figma.com/design/UUDRmdKgisU6B59saw5gJr): 프리팹 없이 코드로 만들고 `UiKit` 도우미를 쓴다
@@ -94,7 +95,7 @@ Assets/
     Field/              FieldMap(맵 글자→격자), FieldWalker(이동), StickInput(스틱 값→4방향·달리기), EncounterCounter(조우), FieldInteraction([확인] 대상·이름표 규칙), FieldAutotile(길·물가 테두리 모양),
                         FieldArea(지역 SO: 테마·출입구 연결·보스·상자·상점), EncounterTable
     Game/               GameSession(진행 상태 전체), GameManager(씬 간 유지 + 자동 저장 + 설정), GameDatabase(id→에셋), PlayerRecord,
-                        Dex(도감 규칙), Keepsakes(징표 진열장), GameSettings(음량·진동)
+                        Dex(도감 규칙), Keepsakes(징표 진열장), GameSettings(음량·진동), TutorialProgress(본 튜토리얼 id, 세이브에 저장)
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
     UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투, 단독 연습 모드도 있음),
                         DexView(도감), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기),
@@ -102,6 +103,7 @@ Assets/
                         SettingsView(설정) + ConfirmDialog(확인 창), SwitchView, GateCutscene(보스가 연 길을 보여 주는 연출),
                         FieldNameTags(오브젝트 이름표),
                         TitleScreen(타이틀), Haptics(진동), UnitView, VirtualStick(가상 스틱 — 누른 자리에 생김, 끝까지 밀면 달리기),
+                        TutorialOverlay(튜토리얼: 검은 막 + 뚫린 곳 + 안내 상자, [다음]/직접 해 보기/[건너뛰기]),
                         FieldArt(필드 타일·잠긴/지역별 출입구) · PlayerArt(주인공) · PlaceholderArt(그림이 없을 때 임시 도트), Sound(음악·효과음·징글),
                         BattleFx(전투 효과) + IdleBob, MapViews(미니맵·지도),
                         UiKit(Palette·글꼴·둥근 패널·아이콘 + WithJosa 한국어 조사), AutoPill — 세로 1080x1920

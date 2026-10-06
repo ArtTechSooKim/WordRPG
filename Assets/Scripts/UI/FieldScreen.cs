@@ -32,6 +32,8 @@ namespace WordRPG.UI
         [SerializeField] private float tilesAcross = 11f;
         [Tooltip("연출 시간 배율. 테스트에서는 아주 작게")]
         [SerializeField] private float animationScale = 1f;
+        [Tooltip("처음 하는 사람에게 튜토리얼 안내를 보여 줄지 (테스트에서는 Configure가 꺼 둔다)")]
+        [SerializeField] private bool showTutorials = true;
 
         private GameSession session;
         private GameDatabase database;
@@ -83,6 +85,10 @@ namespace WordRPG.UI
         private float toastUntil;
         private Image flash;
         private VirtualStick stick;
+        private RectTransform menuRect;
+        private TutorialOverlay tutorial;
+        private bool fieldTutorialRunning; // 첫 안내 중에는 몬스터가 나오지 않는다
+        private int stepsTaken;
         private DexView dexView;
         private RelicAltarView altarView;
         private ShopView shopView;
@@ -101,6 +107,7 @@ namespace WordRPG.UI
         public bool IsMoving => moving;
         public bool IsRunning => moving && running; // 지금 칸을 달리는 중
         public VirtualStick Stick => stick;
+        public TutorialOverlay Tutorial => tutorial;
         public bool IsInBattle => inBattle || transitioning;
         public BattleScreen Battle => battle;
         public GameSession Session => session;
@@ -125,9 +132,10 @@ namespace WordRPG.UI
         // gameSettings / onSettingsChanged / onDeleteSave: 설정 화면용. 안 주면 GameManager 것
         public void Configure(FieldArea fieldArea, GameSession gameSession = null, Action onSave = null,
             float step = 0.16f, float animScale = 1f, BattleConfig config = null, GameDatabase gameDatabase = null,
-            GameSettings gameSettings = null, Action onSettingsChanged = null, Action onDeleteSave = null)
+            GameSettings gameSettings = null, Action onSettingsChanged = null, Action onDeleteSave = null, bool tutorials = false)
         {
             area = fieldArea;
+            showTutorials = tutorials;
             session = gameSession;
             database = gameDatabase;
             saveProgress = onSave;
@@ -200,7 +208,7 @@ namespace WordRPG.UI
             EnterArea(area, spawn);
 
             if (!string.IsNullOrEmpty(statusMessage)) ShowToast(statusMessage, 3f);
-            if (!loadedFromSave) ShowToast("오른쪽 아래를 끌어 움직이고, 끝까지 밀면 달려요!\n제단·상점·샘 앞에서는 왼쪽 [확인]을 눌러요", 4f);
+            if (showTutorials && !session.Tutorials.Has(TutorialProgress.Field)) StartCoroutine(FieldTutorial());
             return true;
         }
 
@@ -212,7 +220,7 @@ namespace WordRPG.UI
             UpdateCamera();
             nameTags.Tick(cam, hudCanvas, Time.unscaledDeltaTime);
 
-            if (inBattle || transitioning || IsPanelOpen)
+            if (inBattle || transitioning || IsPanelOpen || tutorial.IsBlocking)
             {
                 // 창을 닫은 직후 같은 키(Enter 등)로 바로 다시 열리지 않게
                 if (IsPanelOpen) interactCooldown = 0.5f;
@@ -331,6 +339,7 @@ namespace WordRPG.UI
         // 뒤로가기: 맨 위 창부터 닫고, 아무 창도 없으면 '게임을 끝낼까요?'. 전투 중이면 전투 화면에 맡기고, 연출 중에는 무시
         public void HandleBack()
         {
+            if (tutorial.IsShowing) return; // 안내 중에는 [건너뛰기]로
             if (inBattle)
             {
                 battle.HandleBack();
@@ -405,6 +414,7 @@ namespace WordRPG.UI
         private bool OnStepFinished()
         {
             session.World.SetPosition(area.AreaId, walker.Position);
+            stepsTaken++;
             minimap.SetPlayer(walker.Position);
             RefreshNameTags();
             if (session.World.Reveal(area.AreaId, walker.Map.Width, walker.Map.Height, walker.Position) > 0) minimap.Redraw();
@@ -416,7 +426,7 @@ namespace WordRPG.UI
                 else ShowToast("문이 굳게 닫혀 있다.");
                 return false;
             }
-            if (encounterCounter.OnStep(tile == FieldTile.Grass, rng))
+            if (!fieldTutorialRunning && encounterCounter.OnStep(tile == FieldTile.Grass, rng))
             {
                 StartCoroutine(Encounter());
                 return false;
@@ -889,6 +899,7 @@ namespace WordRPG.UI
 
             // 오른쪽 세로 메뉴 (Figma 'Field — HUD (메뉴 버튼)'): 도감 · 가방 · 설정
             var menu = UiKit.Rect("Menu", hudRoot, 1, 0.865f, 1, 0.865f);
+            menuRect = menu;
             menu.pivot = new Vector2(1, 1);
             menu.sizeDelta = new Vector2(120, 3 * 120 + 2 * 16);
             menu.anchoredPosition = new Vector2(-24, 0);
@@ -972,6 +983,7 @@ namespace WordRPG.UI
             mapView = MapView.Create(hudRoot);
             learnView = SkillLearnView.Create(hudRoot);
             quitDialog = ConfirmDialog.Create(hudRoot);
+            tutorial = TutorialOverlay.Create(transform); // 자기 캔버스로 HUD·전투 위에
         }
 
         // 왼쪽 아래 [확인] (Figma 'Action Button'): 옆에 쓸 것이 있으면 금색(Ready), 없으면 반투명(Idle)
@@ -1019,11 +1031,55 @@ namespace WordRPG.UI
         private void RefreshNameTags() =>
             nameTags.Refresh(walker.Position, cell => walker.Map.Get(cell) == FieldTile.Boss && session.World.IsBossDefeated(area.BossId));
 
+        // 처음 필드에 들어오면 (#36, Figma '튜토리얼 — 필드 스틱'): 환영 → 걷기(직접) → 달리기(직접) → [확인] → 메뉴 → 지도 → 풀숲·전투
+        private IEnumerator FieldTutorial()
+        {
+            yield return null; // 화면 배치가 끝난 뒤
+            int? walkFrom = null;
+            var steps = new List<TutorialOverlay.Step>
+            {
+                new TutorialOverlay.Step { Text = "영단어RPG에 온 것을 환영해요!\n처음이니 움직이는 법부터 몇 가지만 알려 드릴게요." },
+                new TutorialOverlay.Step
+                {
+                    Text = "화면 오른쪽 아래를 엄지로 끌면 그 방향으로 걸어요.\n두 칸 걸어 보세요!", Target = () => stick.Zone,
+                    DoneWhen = () =>
+                    {
+                        walkFrom ??= stepsTaken;
+                        return stepsTaken - walkFrom.Value >= 2;
+                    }
+                },
+                new TutorialOverlay.Step
+                {
+                    Text = "스틱을 끝까지 밀면 달릴 수 있어요.\n끝까지 밀어 보세요!", Target = () => stick.Zone,
+                    DoneWhen = () => IsRunning || (stick.IsHeld && StickInput.IsRunning(stick.Value))
+                },
+                new TutorialOverlay.Step
+                {
+                    Text = "상자·샘·제단·상점 옆에 서면 [확인]이 금색으로 빛나요.\n그때 눌러서 사용해요.",
+                    Target = () => confirmImage.rectTransform
+                },
+                new TutorialOverlay.Step { Text = "[도감]에는 만난 단어가, [가방]에는 아이템과 성유물이 있어요.", Target = () => menuRect },
+                new TutorialOverlay.Step
+                {
+                    Text = "왼쪽 위 작은 지도를 누르면 큰 지도로 볼 수 있어요.", Target = () => (RectTransform)minimap.Button.transform
+                },
+                new TutorialOverlay.Step
+                {
+                    Text = "진한 풀숲을 걸으면 야생 몬스터가 나타나요.\n전투에서는 영단어를 맞혀야 기술을 쓸 수 있어요. 모험을 떠나 볼까요?",
+                    Button = "시작하기"
+                },
+            };
+            fieldTutorialRunning = true;
+            yield return tutorial.Run(session, TutorialProgress.Field, steps, saveProgress);
+            fieldTutorialRunning = false;
+        }
+
         private void BuildBattle()
         {
             var battleGo = new GameObject("Battle");
             battleGo.transform.SetParent(transform, false);
             battle = battleGo.AddComponent<BattleScreen>();
+            if (showTutorials) battle.SetTutorial(tutorial); // 첫 전투 안내 (기술·강도·새 단어·문제·오답·콤보·상처약)
             battle.Configure(area.Encounters, area.Words, session, animationScale, battleConfig, saveProgress, loop: false,
                 gameDatabase: database);
         }

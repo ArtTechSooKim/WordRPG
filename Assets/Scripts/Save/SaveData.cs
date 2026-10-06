@@ -95,6 +95,8 @@ namespace WordRPG.Save
         // 주인공 기술 칸 ("relic:{relicId}" / "doc:{itemId}"). 기술문서가 생기기 전 세이브에는 없음 → 끼운 성유물 기술로 채움
         [SerializeField] private List<string> skillSlots = new List<string>();
         [SerializeField] private bool hasSkillSlots;
+        // 이미 본 튜토리얼 id (TutorialProgress). 예전 세이브에는 없음 → 처음부터 한 번씩 보여 준다
+        [SerializeField] private List<string> tutorials = new List<string>();
 
         public int Version => version;
         public DateTime SavedAtUtc => new DateTime(savedAtTicks, DateTimeKind.Utc);
@@ -107,8 +109,15 @@ namespace WordRPG.Save
         public WorldState World => world;
         public IReadOnlyList<string> SkillSlots => skillSlots;
         public bool HasSkillSlots => hasSkillSlots;
+        public IReadOnlyList<string> Tutorials => tutorials ?? (IReadOnlyList<string>)new List<string>();
 
         public SaveData() { }
+
+        public SaveData WithTutorials(IEnumerable<string> ids)
+        {
+            tutorials = new List<string>(ids);
+            return this;
+        }
 
         public SaveData WithSkillSlots(IEnumerable<string> keys)
         {
