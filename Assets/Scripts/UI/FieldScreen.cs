@@ -1031,7 +1031,16 @@ namespace WordRPG.UI
         private void RefreshNameTags() =>
             nameTags.Refresh(walker.Position, cell => walker.Map.Get(cell) == FieldTile.Boss && session.World.IsBossDefeated(area.BossId));
 
-        // 처음 필드에 들어오면 (#36, Figma '튜토리얼 — 필드 스틱'): 환영 → 걷기(직접) → 달리기(직접) → [확인] → 메뉴 → 지도 → 풀숲·전투
+        // 설정 > [튜토리얼 다시 보기]: 본 안내를 지우고 필드 안내부터 다시 (전투 안내도 다음 전투에서 다시)
+        private void ReplayTutorial()
+        {
+            session.Tutorials.Clear();
+            saveProgress?.Invoke();
+            StartCoroutine(FieldTutorial());
+        }
+
+        // 처음 필드에 들어오면 (#36, Figma '튜토리얼 — 필드 스틱'):
+        // 환영 → 걷기(직접) → 달리기(직접) → [확인] → 메뉴 → 지도 → 자동 저장·설정 → 풀숲·전투
         private IEnumerator FieldTutorial()
         {
             yield return null; // 화면 배치가 끝난 뒤
@@ -1062,6 +1071,12 @@ namespace WordRPG.UI
                 new TutorialOverlay.Step
                 {
                     Text = "왼쪽 위 작은 지도를 누르면 큰 지도로 볼 수 있어요.", Target = () => (RectTransform)minimap.Button.transform
+                },
+                new TutorialOverlay.Step
+                {
+                    Text = "게임은 자동으로 저장돼요. 문제를 풀 때마다, 전투가 끝날 때마다 저장되니 언제 꺼도 이어서 할 수 있어요.\n" +
+                           "처음부터 다시 하기와 이 안내 다시 보기는 [설정]에 있어요.",
+                    Target = () => (RectTransform)menuRect.Find("SettingsButton")
                 },
                 new TutorialOverlay.Step
                 {
@@ -1115,7 +1130,7 @@ namespace WordRPG.UI
 
         private void OpenSettings()
         {
-            if (CanOpenMenu) settingsView.Show(settings, saveSettings, deleteSave);
+            if (CanOpenMenu) settingsView.Show(settings, saveSettings, deleteSave, ReplayTutorial);
         }
 
         private void OpenDex()

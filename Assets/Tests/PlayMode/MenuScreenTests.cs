@@ -428,17 +428,20 @@ namespace WordRPG.Tests
             Assert.AreEqual(0.2f, settings.MusicVolume, 0.001f);
             Assert.AreEqual(2, saved);
 
-            // 저장 데이터 지우기: 확인 창에서 취소하면 아무 일도 없음
+            // 처음부터 다시 하기: 첫 확인에서 취소하면 아무 일도 없음
             var dialog = view.transform.Find("ConfirmDialog").gameObject;
-            FindButton(view.transform, "DeleteSaveButton").onClick.Invoke();
+            FindButton(view.transform, "RestartButton").onClick.Invoke();
             Assert.IsTrue(dialog.activeSelf);
-            StringAssert.Contains("되돌릴 수 없어요", AllText(dialog.transform));
+            StringAssert.Contains("처음부터 다시 할까요?", AllText(dialog.transform));
             FindButton(dialog.transform, "DialogCancelButton").onClick.Invoke();
             Assert.IsFalse(dialog.activeSelf);
             Assert.AreEqual(0, deleted);
 
-            // [지우기]를 눌러야 지운다
-            FindButton(view.transform, "DeleteSaveButton").onClick.Invoke();
+            // 한 번 확인해도 아직 안 지우고 다시 묻는다 → 두 번째 [지우기]에서 지운다
+            FindButton(view.transform, "RestartButton").onClick.Invoke();
+            FindButton(dialog.transform, "DialogConfirmButton").onClick.Invoke();
+            Assert.AreEqual(0, deleted, "한 번만 눌러서는 안 지움");
+            StringAssert.Contains("되돌릴 수 없어요", AllText(dialog.transform));
             FindButton(dialog.transform, "DialogConfirmButton").onClick.Invoke();
             Assert.AreEqual(1, deleted);
             Assert.IsFalse(view.activeSelf, "지운 뒤 설정 창은 닫힘");

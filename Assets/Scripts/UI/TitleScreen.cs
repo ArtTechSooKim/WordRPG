@@ -7,9 +7,9 @@ using WordRPG.Game;
 
 namespace WordRPG.UI
 {
-    // 타이틀 (Figma '타이틀 (#27)'): 도트 초원 풍경 배경(위아래 어둡게), 로고, 길 위의 주인공 + 둘레에 끼운 성유물,
-    // 저장 요약, [이어하기] / [처음부터] (저장이 없으면 [시작하기]), 설정.
-    // 처음부터는 확인 창을 거쳐 저장을 지운다. 시작하면 필드 씬으로
+    // 타이틀 (Figma '타이틀 (#37)'): 도트 초원 풍경 배경(위아래 어둡게), 로고, 길 위의 주인공 + 둘레에 끼운 성유물,
+    // 저장 요약, "화면을 터치하세요" — 어디든 누르면 바로 이어하기 (저장이 없으면 새 게임). 설정.
+    // 처음부터 다시 하기·튜토리얼 다시 보기는 설정에서 (2026-10-06 사용자 결정). 시작하면 필드 씬으로
     public class TitleScreen : MonoBehaviour
     {
         [SerializeField] private string fieldScene = GameManager.FieldSceneName;
@@ -24,13 +24,13 @@ namespace WordRPG.UI
         private readonly List<(Image back, Text initial, Image sprite)> avatars = new List<(Image, Text, Image)>();
         private Image heroImage;
         private readonly List<(Image badge, Image icon)> relicBadges = new List<(Image, Image)>();
-        private Button continueButton, newGameButton;
-        private Text newGameLabel;
+        private Text tapLabel;
         private ConfirmDialog dialog;
         private SettingsView settingsView;
         private readonly List<(RectTransform rt, float baseY, float phase)> floaters = new List<(RectTransform, float, float)>();
 
         public bool IsSettingsOpen => settingsView != null && settingsView.IsOpen;
+        public bool IsStarted => started;
 
         public void Configure(Action<bool> onStart) => startOverride = onStart;
 
@@ -54,7 +54,7 @@ namespace WordRPG.UI
             if (dialog.IsOpen) dialog.Hide();
             else if (settingsView.IsOpen) settingsView.Hide();
             else if (GameManager.CanQuit)
-                dialog.Show("게임을 끝낼까요?", "다음에 켜면 [이어하기]로 계속할 수 있어요.", "끝내기", false, GameManager.QuitGame);
+                dialog.Show("게임을 끝낼까요?", "다음에 켜면 이어서 할 수 있어요.", "끝내기", false, GameManager.QuitGame);
         }
 
         public bool IsDialogOpen => dialog != null && dialog.IsOpen;
@@ -62,8 +62,12 @@ namespace WordRPG.UI
         private void Update()
         {
             if (FieldScreen.BackPressed()) HandleBack();
-            // 끼운 성유물 배지가 천천히 오르내린다
+            // 키보드(PC)는 Enter·Space로 시작
+            var keyboard = UnityEngine.InputSystem.Keyboard.current;
+            if (keyboard != null && (keyboard.enterKey.wasPressedThisFrame || keyboard.spaceKey.wasPressedThisFrame)) OnTap();
+            // 끼운 성유물 배지가 천천히 오르내리고, "화면을 터치하세요"가 숨 쉬듯 깜빡인다
             float t = Time.unscaledTime;
+            if (tapLabel != null) tapLabel.color = new Color(1f, 1f, 1f, 0.55f + 0.45f * Mathf.Abs(Mathf.Sin(t * 1.8f)));
             foreach (var (rt, baseY, phase) in floaters)
                 rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, baseY + Mathf.Sin(t * 1.2f + phase) * 10f);
         }
@@ -141,12 +145,11 @@ namespace WordRPG.UI
             saveLine2 = UiKit.Label("Line2", save.transform, "", 30, Palette.TextDim, 0.25f, 0.08f, 0.98f, 0.5f,
                 TextAnchor.MiddleLeft, FontStyle.Normal, true, 18);
 
-            continueButton = UiKit.MakeButton("ContinueButton", root, "이어하기", Palette.Gold, 52, 0.067f, 0.177f, 0.933f, 0.237f);
-            UiKit.LabelOf(continueButton).color = Palette.OnAccent;
-            continueButton.onClick.AddListener(() => Begin(false));
-            newGameButton = UiKit.MakeButton("NewGameButton", root, "처음부터", Palette.Neutral, 46, 0.067f, 0.112f, 0.933f, 0.165f);
-            newGameLabel = UiKit.LabelOf(newGameButton);
-            newGameButton.onClick.AddListener(OnNewGame);
+            // 화면 어디든 누르면 시작 (설정 버튼·창은 그 위에 있어 따로 눌림)
+            var tapArea = UiKit.Panel("TapToStart", root, Color.clear);
+            UiKit.AddButton(tapArea).onClick.AddListener(OnTap);
+            tapLabel = UiKit.Display(UiKit.Label("TapLabel", root, "화면을 터치하세요", 56, Color.white, 0, 0.165f, 1, 0.215f));
+            tapLabel.gameObject.AddComponent<Shadow>().effectColor = new Color(0, 0, 0, 0.7f);
 
             var settingsButton = UiKit.IconButton("SettingsButton", root, "settings", "설정", Palette.PanelLight, 1, 1, 1, 1);
             var settingsRect = (RectTransform)settingsButton.transform;
@@ -210,7 +213,7 @@ namespace WordRPG.UI
             rt.anchoredPosition = new Vector2(0, -y);
         }
 
-        // 저장이 있으면 [이어하기] + [처음부터], 없으면 [시작하기] 하나
+        // 저장 요약은 저장이 있을 때만
         private void Refresh()
         {
             bool hasSave = manager.HasSave;
@@ -245,7 +248,6 @@ namespace WordRPG.UI
             }
 
             saveCard.SetActive(hasSave);
-            continueButton.gameObject.SetActive(hasSave);
             if (hasSave)
             {
                 var area = manager.Database != null && session.World.AreaId != null ? manager.Database.FindArea(session.World.AreaId) : null;
@@ -255,39 +257,26 @@ namespace WordRPG.UI
                 int battles = session.Record.BattlesWon + session.Record.BattlesLost;
                 saveLine2.text = $"발견한 단어 {session.Vocabulary.DiscoveredCount}{total}   ·   전투 {battles}번";
             }
-
-            // 저장이 없으면 시작 버튼이 이어하기 자리(금색)로
-            var rt = (RectTransform)newGameButton.transform;
-            rt.anchorMin = new Vector2(0.067f, hasSave ? 0.112f : 0.177f);
-            rt.anchorMax = new Vector2(0.933f, hasSave ? 0.165f : 0.237f);
-            newGameLabel.text = hasSave ? "처음부터" : "시작하기";
-            newGameLabel.color = hasSave ? Palette.Text : Palette.OnAccent;
-            UiKit.SetColor(newGameButton, hasSave ? Palette.Neutral : Palette.Gold);
         }
 
-        private void OnNewGame()
+        // 화면을 누르면: 저장이 있으면 이어하기, 없으면 새 게임
+        private void OnTap()
         {
-            if (started) return;
-            if (!manager.HasSave)
-            {
-                Begin(true);
-                return;
-            }
-            dialog.Show("처음부터 시작할까요?",
-                "지금까지의 기록(발견한 단어, 성유물, 아이템)이\n모두 지워져요. 되돌릴 수 없어요.",
-                "처음부터", true, () =>
-                {
-                    manager.DeleteSave();
-                    Begin(true);
-                });
+            if (started || dialog.IsOpen || settingsView.IsOpen) return;
+            Begin(!manager.HasSave);
         }
 
+        // 설정: 처음부터 다시 하기(두 번 확인 → 저장을 지우고 다시 "화면을 터치하세요"), 튜토리얼 다시 보기(안내를 지우고 바로 시작)
         private void OpenSettings()
         {
             settingsView.Show(manager.Settings, manager.SaveSettings, () =>
             {
                 manager.DeleteSave();
                 Refresh();
+            }, () =>
+            {
+                manager.Session.Tutorials.Clear();
+                Begin(!manager.HasSave);
             });
         }
 

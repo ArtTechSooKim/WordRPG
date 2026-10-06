@@ -56,7 +56,7 @@ namespace WordRPG.Tests
             yield return WaitFor(() => tutorial.IsShowing, 2f);
 
             // 1/7 환영: [다음] 단계 — 그동안은 움직이지 않는다
-            Assert.AreEqual("1 / 7", tutorial.CurrentCounter);
+            Assert.AreEqual("1 / 8", tutorial.CurrentCounter);
             StringAssert.Contains("환영", tutorial.CurrentText);
             Assert.IsTrue(tutorial.IsBlocking);
             var start = field.PlayerCell;
@@ -66,23 +66,27 @@ namespace WordRPG.Tests
             yield return null;
 
             // 2/7 걷기: 따라 하기 — 두 칸 걸으면 넘어감
-            Assert.AreEqual("2 / 7", tutorial.CurrentCounter);
+            Assert.AreEqual("2 / 8", tutorial.CurrentCounter);
             Assert.IsFalse(tutorial.IsBlocking, "따라 하기 단계는 스틱이 움직임");
             var ring = tutorial.transform.Find("Overlay/Ring").GetComponent<UnityEngine.UI.Image>();
             Assert.IsTrue(ring.enabled, "스틱 자리에 금색 테두리");
-            yield return HoldStick(field, Direction.Right, () => tutorial.CurrentCounter != "2 / 7", 5f);
+            yield return HoldStick(field, Direction.Right, () => tutorial.CurrentCounter != "2 / 8", 5f);
             Assert.GreaterOrEqual(field.PlayerCell.x, start.x + 2);
 
             // 3/7 달리기: 끝까지 밀면 넘어감
-            Assert.AreEqual("3 / 7", tutorial.CurrentCounter);
-            yield return HoldStick(field, Direction.Left, () => tutorial.CurrentCounter != "3 / 7", 5f, run: true);
-            Assert.AreEqual("4 / 7", tutorial.CurrentCounter, "[확인] 버튼 안내");
+            Assert.AreEqual("3 / 8", tutorial.CurrentCounter);
+            yield return HoldStick(field, Direction.Left, () => tutorial.CurrentCounter != "3 / 8", 5f, run: true);
+            Assert.AreEqual("4 / 8", tutorial.CurrentCounter, "[확인] 버튼 안내");
             for (int i = 4; i < 7; i++)
             {
                 tutorial.PressNext();
                 yield return null;
             }
-            Assert.AreEqual("7 / 7", tutorial.CurrentCounter);
+            Assert.AreEqual("7 / 8", tutorial.CurrentCounter);
+            StringAssert.Contains("자동으로 저장", tutorial.CurrentText, "자동 저장·설정 안내");
+            tutorial.PressNext();
+            yield return null;
+            Assert.AreEqual("8 / 8", tutorial.CurrentCounter);
             Assert.AreEqual("시작하기", UiKit.LabelOf(FindButton(tutorial.transform, "TutorialNextButton")).text);
             tutorial.PressNext();
             yield return null;
@@ -98,6 +102,26 @@ namespace WordRPG.Tests
             yield return new WaitForSecondsRealtime(0.3f);
             Assert.IsFalse(again.Tutorial.IsShowing);
             Object.Destroy(again.gameObject);
+            yield return null;
+        }
+
+        // 설정 > [튜토리얼 다시 보기]: 필드 안내가 처음부터 다시
+        [UnityTest]
+        public IEnumerator ReplayFromSettingsShowsFieldTutorialAgain()
+        {
+            var session = NewSession();
+            session.Tutorials.MarkAll();
+            var field = CreateField(session);
+            yield return null;
+            yield return null;
+            Assert.IsFalse(field.Tutorial.IsShowing);
+            var hud = field.transform.Find("FieldHud/SafeArea");
+            FindButton(hud, "SettingsButton").onClick.Invoke();
+            FindButton(hud.Find("SettingsView"), "TutorialReplayButton").onClick.Invoke();
+            yield return WaitFor(() => field.Tutorial.IsShowing, 2f);
+            Assert.AreEqual("1 / 8", field.Tutorial.CurrentCounter);
+            Assert.IsFalse(session.Tutorials.Has(TutorialProgress.Skill), "전투 안내도 다시");
+            Object.Destroy(field.gameObject);
             yield return null;
         }
 

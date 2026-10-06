@@ -5,8 +5,9 @@ using WordRPG.Game;
 
 namespace WordRPG.UI
 {
-    // 설정 (Figma '설정' 화면): 소리(배경 음악·효과음), 진동, 저장 데이터 지우기(+확인 창), 정보.
-    // 값을 바꿀 때마다 onSettingsChanged로 저장. 저장 데이터 지우기는 확인 창에서 [지우기]를 눌러야 onDeleteSave
+    // 설정 (Figma '설정 (#37)'): 소리(배경 음악·효과음), 진동, [튜토리얼 다시 보기], [처음부터 다시 하기], 정보.
+    // 값을 바꿀 때마다 onSettingsChanged로 저장. 처음부터는 실수로 지우지 않게 확인 창을 두 번 거쳐야 onDeleteSave
+    // ('설정 — 처음부터 1차/2차 확인 (#37)')
     public class SettingsView
     {
         public GameObject Root { get; private set; }
@@ -18,6 +19,8 @@ namespace WordRPG.UI
         private GameSettings settings;
         private Action onSettingsChanged;
         private Action onDeleteSave;
+        private Action onReplayTutorial;
+        private Button replayButton;
 
         public static SettingsView Create(Transform parent)
         {
@@ -37,19 +40,22 @@ namespace WordRPG.UI
             view.sfx = UiKit.MakeSlider("SfxSlider", sound, 0.44f, 0.15f, 0.965f, 0.39f);
             view.sfx.onValueChanged.AddListener(v => view.Change(s => s.SfxVolume = v));
 
-            // 게임
-            var game = Section(root, "게임", 0.6f, 0.73f);
-            Row(game, null, "진동", "틀렸을 때 짧게 떨려요", 0.1f, 0.66f);
-            view.vibration = SwitchView.Create("VibrationSwitch", game, 0.84f, 0.24f, 0.965f, 0.54f);
+            // 게임: 진동 + 튜토리얼 다시 보기
+            var game = Section(root, "게임", 0.535f, 0.73f);
+            Row(game, null, "진동", "틀렸을 때 짧게 떨려요", 0.43f, 0.8f);
+            view.vibration = SwitchView.Create("VibrationSwitch", game, 0.84f, 0.5f, 0.965f, 0.73f);
+            view.replayButton = UiKit.MakeButton("TutorialReplayButton", game, "튜토리얼 다시 보기", Palette.Neutral, 40,
+                0.035f, 0.07f, 0.965f, 0.36f);
+            view.replayButton.onClick.AddListener(view.ReplayTutorial);
 
-            // 저장
-            var save = Section(root, "저장", 0.39f, 0.585f);
+            // 저장: 자동 저장 안내 + 처음부터 다시 하기
+            var save = Section(root, "저장", 0.32f, 0.515f);
             Row(save, null, "자동 저장", "답할 때마다, 전투가 끝날 때마다 저절로 저장돼요", 0.44f, 0.8f);
-            var delete = UiKit.MakeButton("DeleteSaveButton", save, "저장 데이터 지우기", Palette.Confirm, 42, 0.035f, 0.08f, 0.965f, 0.38f);
-            delete.onClick.AddListener(view.AskDelete);
+            var restart = UiKit.MakeButton("RestartButton", save, "처음부터 다시 하기", Palette.Confirm, 42, 0.035f, 0.08f, 0.965f, 0.38f);
+            restart.onClick.AddListener(view.AskRestart);
 
             // 정보
-            var info = Section(root, "정보", 0.255f, 0.375f);
+            var info = Section(root, "정보", 0.185f, 0.305f);
             UiKit.Label("Version", info, $"버전 {Application.version} (MVP)", 28, Palette.TextDim, 0.035f, 0.4f, 0.965f, 0.66f,
                 TextAnchor.MiddleLeft);
             UiKit.Label("Fonts", info, "글꼴  Jua · Noto Sans KR — SIL Open Font License 1.1", 28, Palette.TextDim,
@@ -93,11 +99,14 @@ namespace WordRPG.UI
                 FontStyle.Normal, true, 18);
         }
 
-        public void Show(GameSettings gameSettings, Action settingsChanged, Action deleteSave)
+        // replayTutorial: [튜토리얼 다시 보기]를 누르면 (없으면 버튼을 숨김)
+        public void Show(GameSettings gameSettings, Action settingsChanged, Action deleteSave, Action replayTutorial = null)
         {
             settings = gameSettings ?? new GameSettings();
             onSettingsChanged = settingsChanged;
             onDeleteSave = deleteSave;
+            onReplayTutorial = replayTutorial;
+            replayButton.gameObject.SetActive(replayTutorial != null);
             music.SetValueWithoutNotify(settings.MusicVolume);
             sfx.SetValueWithoutNotify(settings.SfxVolume);
             vibration.Bind(settings.Vibration, on => Change(s => s.Vibration = on));
@@ -120,16 +129,26 @@ namespace WordRPG.UI
             onSettingsChanged?.Invoke();
         }
 
-        private void AskDelete()
+        // 처음부터: 두 번 묻는다 (실수로 누르지 않게 — 사용자 요청 2026-10-06)
+        private void AskRestart()
         {
-            Dialog.Show("저장 데이터를 지울까요?",
-                "발견한 단어, 몬스터, 아이템이 모두 사라지고\n처음부터 다시 시작해요. 되돌릴 수 없어요.",
-                "지우기", true, () =>
-                {
-                    var delete = onDeleteSave;
-                    Hide();
-                    delete?.Invoke();
-                });
+            Dialog.Show("처음부터 다시 할까요?",
+                "발견한 단어, 성유물, 아이템이 모두 사라지고\n처음부터 다시 시작해요.",
+                "처음부터", true, () => Dialog.Show("정말 지울까요?",
+                    "실수로 누르지 않았는지 한 번 더 확인할게요.\n지운 기록은 되돌릴 수 없어요.",
+                    "지우기", true, () =>
+                    {
+                        var delete = onDeleteSave;
+                        Hide();
+                        delete?.Invoke();
+                    }));
+        }
+
+        private void ReplayTutorial()
+        {
+            var replay = onReplayTutorial;
+            Hide();
+            replay?.Invoke();
         }
     }
 }

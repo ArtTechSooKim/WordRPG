@@ -55,7 +55,7 @@ namespace WordRPG.Tests
         }
 
         [UnityTest]
-        public IEnumerator NoSaveShowsStartOnly()
+        public IEnumerator NoSaveTapStartsNewGame()
         {
             var manager = StartManager();
             bool? started = null;
@@ -67,11 +67,13 @@ namespace WordRPG.Tests
             Assert.IsFalse(manager.HasSave);
             Assert.AreEqual("영단어와 함께 떠나는 모험", root.Find("TitleCanvas/SafeArea/Subtitle").GetComponent<UnityEngine.UI.Text>().text);
             Assert.IsNull(root.Find("TitleCanvas/SafeArea/Word_apple"), "떠다니는 영단어(apple·memory 등)는 없앰 (2026-10-04)");
-            Assert.IsNull(ActiveButton(root, "ContinueButton"), "저장이 없으면 이어하기 없음");
-            Assert.AreEqual("시작하기", UiKit.LabelOf(FindButton(root, "NewGameButton")).text);
+            Assert.IsNull(root.Find("TitleCanvas/SafeArea/ContinueButton"), "이어하기·처음부터 버튼 없음 (2026-10-06)");
+            Assert.IsNull(root.Find("TitleCanvas/SafeArea/NewGameButton"));
+            Assert.AreEqual("화면을 터치하세요", root.Find("TitleCanvas/SafeArea/TapLabel").GetComponent<UnityEngine.UI.Text>().text);
+            Assert.IsFalse(root.Find("TitleCanvas/SafeArea/SaveCard").gameObject.activeSelf, "저장이 없으면 요약 없음");
 
-            FindButton(root, "NewGameButton").onClick.Invoke();
-            Assert.AreEqual(true, started, "확인 창 없이 바로 새 게임");
+            FindButton(root, "TapToStart").onClick.Invoke();
+            Assert.AreEqual(true, started, "저장이 없으면 화면을 누르면 바로 새 게임");
             Assert.IsTrue(manager.HasSave, "시작하면 바로 저장 → 다음에 켜면 이어하기");
 
             Object.Destroy(title.gameObject);
@@ -79,49 +81,31 @@ namespace WordRPG.Tests
         }
 
         [UnityTest]
-        public IEnumerator SavedGameContinuesOrRestartsAfterConfirm()
+        public IEnumerator SavedGameTapContinues()
         {
             var manager = StartManager();
             manager.MarkPlaying();
             manager.Session.Inventory.AddGold(77);
             manager.Save();
 
-            // 이어하기
             bool? started = null;
             var title = MakeTitle(newGame => started = newGame);
             yield return null;
             yield return null;
             var root = title.transform;
-            Assert.IsNotNull(ActiveButton(root, "ContinueButton"));
-            Assert.AreEqual("처음부터", UiKit.LabelOf(FindButton(root, "NewGameButton")).text);
             var summary = AllText(root.Find("TitleCanvas/SafeArea/SaveCard"));
             StringAssert.Contains("주인공 Lv2  ·  성유물 1개", summary);
             StringAssert.Contains("발견한 단어 0", summary);
-            FindButton(root, "ContinueButton").onClick.Invoke();
-            Assert.AreEqual(false, started);
-            Assert.AreEqual(77, manager.Session.Inventory.Gold, "이어하기는 기록 그대로");
-            Object.Destroy(title.gameObject);
-            yield return null;
 
-            // 처음부터: 확인 창에서 취소 → 그대로, [처음부터] → 지우고 새 게임
-            started = null;
-            title = MakeTitle(newGame => started = newGame);
-            yield return null;
-            yield return null;
-            root = title.transform;
-            var dialog = root.Find("TitleCanvas/SafeArea/ConfirmDialog").gameObject;
-            FindButton(root, "NewGameButton").onClick.Invoke();
-            Assert.IsTrue(dialog.activeSelf);
-            Assert.IsNull(started, "확인 전에는 시작하지 않음");
-            FindButton(dialog.transform, "DialogCancelButton").onClick.Invoke();
-            Assert.AreEqual(77, manager.Session.Inventory.Gold);
+            // 설정을 연 동안에는 화면을 눌러도 시작하지 않음
+            FindButton(root, "SettingsButton").onClick.Invoke();
+            FindButton(root, "TapToStart").onClick.Invoke();
+            Assert.IsNull(started);
+            title.HandleBack();
 
-            FindButton(root, "NewGameButton").onClick.Invoke();
-            FindButton(dialog.transform, "DialogConfirmButton").onClick.Invoke();
-            Assert.AreEqual(true, started);
-            Assert.AreEqual(0, manager.Session.Inventory.Gold, "새 게임");
-            Assert.IsTrue(manager.HasSave);
-
+            FindButton(root, "TapToStart").onClick.Invoke();
+            Assert.AreEqual(false, started, "기본은 이어하기");
+            Assert.AreEqual(77, manager.Session.Inventory.Gold, "기록 그대로");
             Object.Destroy(title.gameObject);
             yield return null;
         }
@@ -152,33 +136,73 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // 처음부터 다시 하기는 설정에서, 실수로 지우지 않게 두 번 묻는다
         [UnityTest]
-        public IEnumerator DeletingSaveInSettingsShowsStartAgain()
+        public IEnumerator RestartInSettingsAsksTwiceThenStartsFresh()
         {
             var manager = StartManager();
             manager.MarkPlaying();
+            manager.Session.Inventory.AddGold(77);
             manager.Save();
 
-            var title = MakeTitle(_ => { });
+            bool? started = null;
+            var title = MakeTitle(newGame => started = newGame);
             yield return null;
             yield return null;
             var root = title.transform;
-            Assert.IsNotNull(ActiveButton(root, "ContinueButton"));
-
             FindButton(root, "SettingsButton").onClick.Invoke();
-            Assert.IsTrue(title.IsSettingsOpen);
             var settings = root.Find("TitleCanvas/SafeArea/SettingsView");
-            FindButton(settings, "DeleteSaveButton").onClick.Invoke();
-            FindButton(settings.Find("ConfirmDialog"), "DialogConfirmButton").onClick.Invoke();
+            var dialog = settings.Find("ConfirmDialog");
 
+            // 1차 [처음부터] → 2차에서 [취소]: 그대로
+            FindButton(settings, "RestartButton").onClick.Invoke();
+            StringAssert.Contains("처음부터 다시 할까요?", AllText(dialog));
+            FindButton(dialog, "DialogConfirmButton").onClick.Invoke();
+            Assert.IsTrue(dialog.gameObject.activeSelf, "한 번 더 묻는다");
+            StringAssert.Contains("정말 지울까요?", AllText(dialog));
+            Assert.IsTrue(manager.HasSave, "아직 안 지움");
+            FindButton(dialog, "DialogCancelButton").onClick.Invoke();
+            Assert.IsTrue(manager.HasSave);
+            Assert.AreEqual(77, manager.Session.Inventory.Gold);
+
+            // 두 번 다 확인하면 지운다 → 요약이 사라지고, 화면을 누르면 새 게임
+            FindButton(settings, "RestartButton").onClick.Invoke();
+            FindButton(dialog, "DialogConfirmButton").onClick.Invoke();
+            FindButton(dialog, "DialogConfirmButton").onClick.Invoke();
             Assert.IsFalse(manager.HasSave, "저장 파일 삭제");
             Assert.IsFalse(title.IsSettingsOpen);
-            Assert.IsNull(ActiveButton(root, "ContinueButton"));
-            Assert.AreEqual("시작하기", UiKit.LabelOf(FindButton(root, "NewGameButton")).text);
+            Assert.IsFalse(root.Find("TitleCanvas/SafeArea/SaveCard").gameObject.activeSelf);
+            Assert.IsNull(started, "지우기만 하고 바로 시작하지는 않음");
 
             // 지운 뒤 그냥 꺼도 빈 세이브를 만들지 않음 (시작하기 전에는 저장 안 함)
             manager.Save();
             Assert.IsFalse(manager.HasSave);
+
+            FindButton(root, "TapToStart").onClick.Invoke();
+            Assert.AreEqual(true, started);
+            Assert.AreEqual(0, manager.Session.Inventory.Gold, "새 게임");
+
+            Object.Destroy(title.gameObject);
+            yield return null;
+        }
+
+        // 튜토리얼 다시 보기 (타이틀 설정): 본 안내를 지우고 바로 시작
+        [UnityTest]
+        public IEnumerator ReplayTutorialFromTitleClearsAndStarts()
+        {
+            var manager = StartManager();
+            manager.MarkPlaying();
+            manager.Session.Tutorials.MarkAll();
+            manager.Save();
+
+            bool? started = null;
+            var title = MakeTitle(newGame => started = newGame);
+            yield return null;
+            yield return null;
+            FindButton(title.transform, "SettingsButton").onClick.Invoke();
+            FindButton(title.transform.Find("TitleCanvas/SafeArea/SettingsView"), "TutorialReplayButton").onClick.Invoke();
+            Assert.AreEqual(false, started, "이어서 시작");
+            Assert.IsFalse(manager.Session.Tutorials.Has(TutorialProgress.Field), "안내를 다시 볼 수 있게");
 
             Object.Destroy(title.gameObject);
             yield return null;
