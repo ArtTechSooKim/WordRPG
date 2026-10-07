@@ -89,11 +89,12 @@ namespace WordRPG.UI
         private Button cardConfirm;
         private Image cardGlow, cardStamp; // 새 단어 '발견!' 연출 (Figma '전투 — 새 단어 발견')
 
-        // 전투 결산 (#41, Figma 'Battle — 전투 결산'): 화면 대부분을 덮는 판에 위에서부터 차례로 놓는다
+        // 전투 결산 (#42, Figma 'Battle — 전투 결산 꽉 채움'): 화면 전체를 덮고 위에서부터 차례로 놓는다. 버튼은 맨 아래
         private RectTransform resultCard;
         private Text resultTitle, resultSubtitle, resultBody;
-        private Image resultBorder;
         private Button resultPrimary, resultSecondary;
+        private Action relayoutResult;      // 지금 결산을 다시 놓기 (화면 높이가 바뀌면 — 안전 영역이 늦게 잡히는 기기 등)
+        private float resultLayoutHeight;
         private RectTransform growthCard, expFill, rewardRow, mvpCard, statsRow, newWordsCard, wrongWordsCard, dexBanners;
         private Image growthFace, mvpIcon;
         private Text growthLevel, growthExp, mvpLabel, mvpTitle, mvpDetail;
@@ -657,9 +658,8 @@ namespace WordRPG.UI
         private IEnumerator ShowResult()
         {
             bool victory = engine.Phase == BattlePhase.Victory;
-            var summary = engine.Summary;
             var hero = session.Hero;
-            ClearResultDynamic();
+            ResetFinisher();
 
             int levelBefore = hero.Level, levels = 0;
             BattleReward reward = null;
@@ -674,15 +674,59 @@ namespace WordRPG.UI
             session.Record.RecordBattle(victory, engine.CorrectAnswers, engine.WrongAnswers);
             saveProgress?.Invoke();
 
-            // 위에서부터 차례로 (Figma 'Battle — 전투 결산')
-            float y = 36f;
+            if (loopBattles) SetResultButtons(victory ? "다음 전투" : "회복 후 재도전", victory ? "회복 후 전투" : null);
+            else SetResultButtons(victory ? "계속 탐험" : "시작 지점으로", null);
+            UiKit.SetColor(resultPrimary, victory ? Palette.Button : Palette.Neutral);
+
+            // 버튼 위까지가 내용 칸. 넘치면 단어 줄을 하나씩 줄이고, 그래도 넘치면 통째로 줄인다
+            relayoutResult = () =>
+            {
+                resultLayoutHeight = ((RectTransform)resultPanel.transform).rect.height;
+                float room = resultLayoutHeight - (ResultBottom + ResultButtonHeight + ResultGap);
+                float height = 0f;
+                for (int rows = MaxWordRows; rows >= 1; rows--)
+                {
+                    ClearResultDynamic();
+                    height = LayoutResult(victory, levelBefore, levels, reward, completions, rows);
+                    if (height <= room) break;
+                }
+                resultCard.sizeDelta = new Vector2(0, height);
+                resultCard.localScale = Vector3.one * (room > 0f && height > room ? room / height : 1f);
+            };
+            relayoutResult();
+
+            resultChoice = -1;
+            ShowPanel(resultPanel);
+            while (resultChoice < 0) yield return null;
+            relayoutResult = null;
+
+            // 패배 후 재도전, 또는 '회복' 선택 시 완전 회복
+            if (!victory || resultChoice == 1)
+            {
+                session.RestoreHero();
+                saveProgress?.Invoke();
+            }
+        }
+
+        private const int MaxWordRows = 4;
+        private const float ResultTop = 140f;          // 오른쪽 위 [도감] 버튼 아래부터
+        private const float ResultGap = 24f;
+        private const float ResultButtonHeight = 118f, ResultBottom = 56f;
+
+        // 결산 내용을 위에서부터 놓고 전체 높이를 돌려준다 (Figma 'Battle — 전투 결산 꽉 채움 (#42)')
+        private float LayoutResult(bool victory, int levelBefore, int levels, BattleReward reward,
+            IReadOnlyList<DexCompletion> completions, int wordRows)
+        {
+            var summary = engine.Summary;
+            var hero = session.Hero;
+            float y = ResultTop;
             resultTitle.text = victory ? "승리!" : "패배…";
             resultTitle.color = victory ? Palette.Gold : Palette.Bad;
-            PlaceResult(resultTitle.rectTransform, ref y, 100f, 0f);
+            PlaceResult(resultTitle.rectTransform, ref y, 140f, 0f);
             string fainted = UiKit.WithJosa(hero.DisplayName, "이", "가");
             resultSubtitle.text = victory ? DefeatedLine()
                 : loopBattles ? $"{fainted} 쓰러졌다. 회복하고 다시 도전하자!" : $"{fainted} 쓰러졌다… 시작 지점으로 돌아간다.";
-            PlaceResult(resultSubtitle.rectTransform, ref y, 44f, 20f);
+            PlaceResult(resultSubtitle.rectTransform, ref y, 52f, ResultGap);
 
             growthCard.gameObject.SetActive(victory);
             rewardRow.gameObject.SetActive(victory);
@@ -696,13 +740,13 @@ namespace WordRPG.UI
                 int need = hero.IsMaxLevel ? 1 : LevelCurve.ExpToNextLevel(hero.Level);
                 expFill.anchorMax = new Vector2(hero.IsMaxLevel ? 1f : Mathf.Clamp01(hero.Exp / (float)need), 1f);
                 growthExp.text = hero.IsMaxLevel ? $"경험치 +{reward.Exp}   ·   최고 레벨" : $"경험치 +{reward.Exp}   ·   다음 레벨까지 {hero.ExpToNextLevel}";
-                PlaceResult(growthCard, ref y, 150f, 18f);
+                PlaceResult(growthCard, ref y, 200f, ResultGap);
 
                 // 보상: 골드 + 재료
                 float x = 0f;
                 AddReward(UiKit.Icon("gold"), $"+{reward.Gold}G", ref x);
                 foreach (var item in reward.Items) AddReward(UiKit.ItemIcon(item.Item), $"×{item.Count}", ref x);
-                PlaceResult(rewardRow, ref y, 64f, 18f);
+                PlaceResult(rewardRow, ref y, 80f, ResultGap);
             }
 
             // 가장 활약한 성유물 (피해를 가장 많이 준 기술의 출처)
@@ -711,7 +755,7 @@ namespace WordRPG.UI
             if (top != null)
             {
                 FillMvp(top, summary.DamageOf(top), summary.TotalDamage);
-                PlaceResult(mvpCard, ref y, 140f, 14f);
+                PlaceResult(mvpCard, ref y, 196f, ResultGap);
             }
 
             // 기록 알약: 정답 · 최대 콤보 · 크리티컬
@@ -721,12 +765,12 @@ namespace WordRPG.UI
             if (summary.MaxCombo >= Combo.FirstStreak) AddStat($"최대 콤보 {summary.MaxCombo}", ref px);
             if (summary.Criticals > 0) AddStat($"크리티컬 {summary.Criticals}", ref px);
             statsRow.gameObject.SetActive(px > 0f);
-            if (px > 0f) PlaceResult(statsRow, ref y, 52f, 18f);
+            if (px > 0f) PlaceResult(statsRow, ref y, 62f, ResultGap);
 
             // 새로 만난 단어 · 틀린 단어 (틀린 단어는 정답 뜻과 함께 — 다시 보는 순간)
-            FillWords(newWordsCard, summary.NewWords, $"새로 만난 단어 {summary.NewWords.Count}", Palette.Gold, ref y);
+            FillWords(newWordsCard, summary.NewWords, $"새로 만난 단어 {summary.NewWords.Count}", Palette.Gold, wordRows, ref y);
             FillWords(wrongWordsCard, summary.WrongWords, $"틀린 단어 {summary.WrongWords.Count} — 오답 노트에 넣었어요, 곧 다시 나와요",
-                Palette.Bad, ref y);
+                Palette.Bad, wordRows, ref y);
 
             // 지역 도감을 다 채웠으면 징표 배너
             dexBanners.gameObject.SetActive(completions.Count > 0);
@@ -734,7 +778,7 @@ namespace WordRPG.UI
             {
                 float by = 0f;
                 foreach (var completion in completions) AddDexBanner(completion, ref by);
-                PlaceResult(dexBanners, ref y, by, 18f);
+                PlaceResult(dexBanners, ref y, by, ResultGap);
             }
 
             int up = 0, down = 0;
@@ -744,38 +788,9 @@ namespace WordRPG.UI
                 else if (change.LeveledDown) down++;
             }
             resultBody.text = $"발견한 단어 {LearnedCount()}/{words.Words.Count}   ·   단어 숙련도 ▲{up} ▼{down}";
-            PlaceResult(resultBody.rectTransform, ref y, 44f, 18f);
-
-            if (loopBattles) SetResultButtons(victory ? "다음 전투" : "회복 후 재도전", victory ? "회복 후 전투" : null);
-            else SetResultButtons(victory ? "계속 탐험" : "시작 지점으로", null);
-            float buttonsY = y;
-            PlaceResult((RectTransform)resultPrimary.transform, ref buttonsY, 110f, 0f);
-            PlaceResult((RectTransform)resultSecondary.transform, ref y, 110f, 0f);
-            HalfWidth((RectTransform)resultPrimary.transform, 0f, resultSecondary.gameObject.activeSelf ? 0.5f : 1f);
-            HalfWidth((RectTransform)resultSecondary.transform, 0.5f, 1f);
-            y += 36f;
-
-            resultBorder.color = victory ? Palette.Gold : Palette.PanelLight;
-            UiKit.SetColor(resultPrimary, victory ? Palette.Button : Palette.Neutral);
-            resultCard.sizeDelta = new Vector2(ResultWidth, y);
-            // 화면보다 길면(단어가 많을 때 등) 통째로 줄여서 맞춘다
-            float room = ((RectTransform)resultPanel.transform).rect.height - 32f;
-            resultCard.localScale = Vector3.one * (room > 0f && y > room ? room / y : 1f);
-
-            resultChoice = -1;
-            ShowPanel(resultPanel);
-            while (resultChoice < 0) yield return null;
-
-            // 패배 후 재도전, 또는 '회복' 선택 시 완전 회복
-            if (!victory || resultChoice == 1)
-            {
-                session.RestoreHero();
-                saveProgress?.Invoke();
-            }
+            PlaceResult(resultBody.rectTransform, ref y, 48f, 0f);
+            return y;
         }
-
-        private const float ResultWidth = 1000f;
-        private const int MaxWordRows = 4;
 
         // "잉크 슬라임 · 낙서 박쥐를 물리쳤어요"
         private string DefeatedLine()
@@ -821,42 +836,36 @@ namespace WordRPG.UI
             mvpDetail.text = $"피해 {damage}   ·   이번 전투 피해의 {percent}%";
         }
 
-        private void FillWords(RectTransform card, IReadOnlyList<WordEntry> list, string header, Color color, ref float y)
+        private void FillWords(RectTransform card, IReadOnlyList<WordEntry> list, string header, Color color, int maxRows, ref float y)
         {
             card.gameObject.SetActive(list.Count > 0);
             if (list.Count == 0) return;
             var title = card.Find("Header").GetComponent<Text>();
             title.text = header;
             title.color = color;
-            float rowY = 62f;
-            int shown = Mathf.Min(MaxWordRows, list.Count);
+            float rowY = 82f;
+            int shown = Mathf.Min(maxRows, list.Count);
             for (int i = 0; i < shown; i++)
             {
                 var row = UiKit.Rect($"Word_{i}", card, 0, 1, 1, 1);
-                row.pivot = new Vector2(0.5f, 1);
-                row.offsetMin = new Vector2(28, -(rowY + 46));
-                row.offsetMax = new Vector2(-28, -rowY);
-                var english = UiKit.Display(UiKit.OneLine(UiKit.Label("English", row, list[i].English, 34, Palette.Text, 0, 0, 0.4f, 1,
-                    TextAnchor.MiddleLeft)));
-                english.resizeTextForBestFit = true;
-                english.resizeTextMinSize = 20;
-                english.resizeTextMaxSize = 34;
-                UiKit.OneLine(UiKit.Label("Meaning", row, list[i].Meaning, 28, Palette.TextDim, 0.4f, 0, 1, 1, TextAnchor.MiddleLeft,
-                    FontStyle.Normal, true, 18));
+                PinTop(row, 28, rowY, 28, 56);
+                var english = UiKit.Display(UiKit.OneLine(UiKit.Label("English", row, list[i].English, 46, Palette.Text, 0, 0, 0.38f, 1,
+                    TextAnchor.MiddleLeft, FontStyle.Normal, true, 26)));
+                english.rectTransform.offsetMax = new Vector2(-12, 0);
+                UiKit.OneLine(UiKit.Label("Meaning", row, list[i].Meaning, 36, Palette.TextDim, 0.38f, 0, 1, 1, TextAnchor.MiddleLeft,
+                    FontStyle.Normal, true, 22));
                 resultDynamic.Add(row.gameObject);
-                rowY += 50f;
+                rowY += 60f;
             }
             if (list.Count > shown)
             {
-                var more = UiKit.Label("More", card, $"외 {list.Count - shown}개 — 도감에서 볼 수 있어요", 24, Palette.TextDim, 0, 1, 1, 1,
-                    TextAnchor.MiddleLeft);
-                more.rectTransform.pivot = new Vector2(0.5f, 1);
-                more.rectTransform.offsetMin = new Vector2(28, -(rowY + 36));
-                more.rectTransform.offsetMax = new Vector2(-28, -rowY);
+                var more = UiKit.OneLine(UiKit.Label("More", card, $"외 {list.Count - shown}개 — 도감에서 볼 수 있어요", 30, Palette.TextDim,
+                    0, 1, 1, 1, TextAnchor.MiddleLeft));
+                PinTop(more.rectTransform, 28, rowY, 28, 44);
                 resultDynamic.Add(more.gameObject);
-                rowY += 40f;
+                rowY += 48f;
             }
-            PlaceResult(card, ref y, rowY + 16f, 18f);
+            PlaceResult(card, ref y, rowY + 18f, ResultGap);
         }
 
         private void ClearResultDynamic()
@@ -877,13 +886,14 @@ namespace WordRPG.UI
             cell.pivot = new Vector2(0, 0.5f);
             var image = UiKit.IconImage("Icon", cell, icon, 0, 0.5f, 0, 0.5f);
             image.rectTransform.pivot = new Vector2(0, 0.5f);
-            image.rectTransform.sizeDelta = new Vector2(56, 56);
-            var label = UiKit.Display(UiKit.OneLine(UiKit.Label("Text", cell, text, 36, Palette.Text, 0, 0, 1, 1, TextAnchor.MiddleLeft)));
-            label.rectTransform.offsetMin = new Vector2(icon != null ? 64 : 0, 0);
-            float width = (icon != null ? 64 : 0) + label.preferredWidth + 8;
+            image.rectTransform.sizeDelta = new Vector2(76, 76);
+            var label = UiKit.Display(UiKit.OneLine(UiKit.Label("Text", cell, text, 44, Palette.Text, 0, 0, 1, 1, TextAnchor.MiddleLeft)));
+            float iconWidth = icon != null ? 86 : 0;
+            label.rectTransform.offsetMin = new Vector2(iconWidth, 0);
+            float width = iconWidth + label.preferredWidth + 8;
             cell.sizeDelta = new Vector2(width, 0);
             cell.anchoredPosition = new Vector2(x, 0);
-            x += width + 28f;
+            x += width + 32f;
             resultDynamic.Add(cell.gameObject);
         }
 
@@ -894,11 +904,11 @@ namespace WordRPG.UI
             pill.raycastTarget = false;
             var rt = pill.rectTransform;
             rt.pivot = new Vector2(0, 0.5f);
-            var label = UiKit.OneLine(UiKit.Label("Text", pill.transform, text, 26, Palette.Text, 0, 0, 1, 1, TextAnchor.MiddleCenter, FontStyle.Bold));
-            float width = label.preferredWidth + 40;
+            var label = UiKit.OneLine(UiKit.Label("Text", pill.transform, text, 34, Palette.Text, 0, 0, 1, 1, TextAnchor.MiddleCenter, FontStyle.Bold));
+            float width = label.preferredWidth + 48;
             rt.sizeDelta = new Vector2(width, 0);
             rt.anchoredPosition = new Vector2(x, 0);
-            x += width + 14f;
+            x += width + 16f;
             resultDynamic.Add(pill.gameObject);
         }
 
@@ -907,26 +917,24 @@ namespace WordRPG.UI
         private void AddDexBanner(DexCompletion completion, ref float y)
         {
             var row = UiKit.Rect("DexBanner", dexBanners, 0, 1, 1, 1);
-            row.pivot = new Vector2(0.5f, 1);
-            row.offsetMin = new Vector2(0, -(y + 120));
-            row.offsetMax = new Vector2(0, -y);
-            y += 132f;
+            PinTop(row, 0, y, 0, 140);
+            y += 152f;
             resultDynamic.Add(row.gameObject);
             UiKit.RoundPanel("Bg", row, Palette.PanelLight, UiKit.RadiusMd).raycastTarget = false;
             UiKit.Outline(UiKit.Panel("Border", row, Palette.Gold), UiKit.RadiusMd, 3).raycastTarget = false;
             var icon = UiKit.IconImage("Keepsake", row, UiKit.ItemIcon(completion.Keepsake), 0, 0.08f, 0, 0.92f);
             icon.rectTransform.pivot = new Vector2(0, 0.5f);
-            icon.rectTransform.sizeDelta = new Vector2(88, 0);
-            icon.rectTransform.anchoredPosition = new Vector2(12, 0);
-            var headline = UiKit.Display(UiKit.Label("Headline", row, $"★ {completion.Region.RegionName} 도감 완성!", 36, Palette.Gold,
-                0, 0.48f, 1, 0.94f, TextAnchor.MiddleLeft, FontStyle.Normal, true, 20));
-            headline.rectTransform.offsetMin = new Vector2(116, 0);
-            headline.rectTransform.offsetMax = new Vector2(-12, 0);
+            icon.rectTransform.sizeDelta = new Vector2(104, 0);
+            icon.rectTransform.anchoredPosition = new Vector2(16, 0);
+            var headline = UiKit.Display(UiKit.Label("Headline", row, $"★ {completion.Region.RegionName} 도감 완성!", 44, Palette.Gold,
+                0, 0.5f, 1, 0.94f, TextAnchor.MiddleLeft, FontStyle.Normal, true, 24));
+            headline.rectTransform.offsetMin = new Vector2(136, 0);
+            headline.rectTransform.offsetMax = new Vector2(-16, 0);
             string keepsake = completion.Keepsake != null ? $"징표 '{completion.Keepsake.DisplayName}' + " : "";
-            var detail = UiKit.Label("Detail", row, $"{keepsake}{completion.Gold} 골드 획득", 28, Palette.Text,
-                0, 0.08f, 1, 0.48f, TextAnchor.MiddleLeft, FontStyle.Normal, true, 16);
-            detail.rectTransform.offsetMin = new Vector2(116, 0);
-            detail.rectTransform.offsetMax = new Vector2(-12, 0);
+            var detail = UiKit.Label("Detail", row, $"{keepsake}{completion.Gold} 골드 획득", 34, Palette.Text,
+                0, 0.06f, 1, 0.5f, TextAnchor.MiddleLeft, FontStyle.Normal, true, 18);
+            detail.rectTransform.offsetMin = new Vector2(136, 0);
+            detail.rectTransform.offsetMax = new Vector2(-16, 0);
         }
 
         // ------------------------------------------------------------------ 스킬 메뉴 / 대상 선택
@@ -1117,6 +1125,9 @@ namespace WordRPG.UI
         private void Update()
         {
             if (loopBattles && FieldScreen.BackPressed()) HandleBack();
+            if (relayoutResult != null && IsResultVisible
+                && !Mathf.Approximately(((RectTransform)resultPanel.transform).rect.height, resultLayoutHeight))
+                relayoutResult();
         }
 
         private void OnCancelTargeting()
@@ -1385,6 +1396,9 @@ namespace WordRPG.UI
             bool two = secondary != null;
             resultSecondary.gameObject.SetActive(two);
             if (two) UiKit.LabelOf(resultSecondary).text = secondary;
+            // 맨 아래 (한 손으로 누르기 쉽게). 둘이면 반씩
+            PinBottom((RectTransform)resultPrimary.transform, 0f, two ? 0.5f : 1f);
+            PinBottom((RectTransform)resultSecondary.transform, 0.5f, 1f);
         }
 
         // 결산 판 안: 위에서 y만큼 내려와 높이 h (좌우 40 여백), 다음 y는 h + gap 아래
@@ -1398,12 +1412,23 @@ namespace WordRPG.UI
             y += h + gap;
         }
 
-        private static void HalfWidth(RectTransform rect, float from, float to)
+        private static void PinBottom(RectTransform rect, float from, float to)
         {
-            rect.anchorMin = new Vector2(from, rect.anchorMin.y);
-            rect.anchorMax = new Vector2(to, rect.anchorMax.y);
-            rect.offsetMin = new Vector2(from > 0 ? 10 : 40, rect.offsetMin.y);
-            rect.offsetMax = new Vector2(to < 1 ? -10 : -40, rect.offsetMax.y);
+            rect.anchorMin = new Vector2(from, 0);
+            rect.anchorMax = new Vector2(to, 0);
+            rect.pivot = new Vector2(0.5f, 0);
+            rect.offsetMin = new Vector2(from > 0 ? 10 : 40, ResultBottom);
+            rect.offsetMax = new Vector2(to < 1 ? -10 : -40, ResultBottom + ResultButtonHeight);
+        }
+
+        // 부모 위쪽에서 top만큼 내려와 높이 height (좌우 left·right 여백)
+        private static void PinTop(RectTransform rect, float left, float top, float right, float height)
+        {
+            rect.anchorMin = new Vector2(0, 1);
+            rect.anchorMax = new Vector2(1, 1);
+            rect.pivot = new Vector2(0.5f, 1);
+            rect.offsetMin = new Vector2(left, -(top + height));
+            rect.offsetMax = new Vector2(-right, -top);
         }
 
         // ------------------------------------------------------------------ 전투 배경 (지역 타일)
@@ -1636,7 +1661,12 @@ namespace WordRPG.UI
             finisherStamp.rectTransform.localEulerAngles = new Vector3(0, 0, 4);
             finisherStamp.gameObject.SetActive(false);
 
+            // 결산은 화면을 다 덮지만 [도감]은 그 위에. 결정타 층은 결산이 뜨기 전에 걷히므로 맨 위에 둬도 된다
             BuildResultPanel(root);
+            dexButton.transform.SetAsLastSibling();
+            finisherShade.transform.SetAsLastSibling();
+            finisherFlash.transform.SetAsLastSibling();
+            finisherStamp.transform.SetAsLastSibling();
             HideAllPanels();
 
             dexView = DexView.Create(root); // 맨 마지막에 만들어 모든 화면 위에 덮는다
@@ -1786,44 +1816,43 @@ namespace WordRPG.UI
             cardStamp.gameObject.SetActive(false);
         }
 
-        // 전투 결산 (Figma 'Battle — 전투 결산 (#41)'): 위쪽 [도감] 줄 아래를 어둡게 덮고 가운데 판. 내용은 ShowResult가 놓는다
+        // 전투 결산 (Figma 'Battle — 전투 결산 꽉 채움 (#42)'): 화면 전체를 덮는 판. 내용은 LayoutResult가 위에서부터 놓고,
+        // 버튼은 맨 아래. 오른쪽 위 [도감] 버튼은 이 판 위에 그대로 보인다
         private void BuildResultPanel(Transform parent)
         {
-            var overlay = UiKit.Panel("ResultPanel", parent, new Color(0f, 0f, 0f, 0.8f), 0, 0, 1, 0.94f);
-            resultPanel = overlay.gameObject;
-            var cardImage = UiKit.RoundPanel("Card", overlay.transform, Palette.Panel, UiKit.RadiusLg, 0.5f, 0.5f, 0.5f, 0.5f);
-            resultCard = cardImage.rectTransform;
-            resultBorder = UiKit.Outline(UiKit.Panel("Border", resultCard, Palette.Gold), UiKit.RadiusLg, 4);
-            resultBorder.raycastTarget = false;
-            resultTitle = UiKit.Display(UiKit.OneLine(UiKit.Label("Title", resultCard, "", 88, Palette.Gold, 0, 1, 1, 1)));
-            resultSubtitle = UiKit.OneLine(UiKit.Label("Subtitle", resultCard, "", 28, Palette.TextDim, 0, 1, 1, 1, TextAnchor.MiddleCenter,
-                FontStyle.Normal, true, 18));
+            var panel = UiKit.Panel("ResultPanel", parent, Palette.Background);
+            resultPanel = panel.gameObject;
+            resultCard = UiKit.Rect("Card", panel.transform, 0, 1, 1, 1);
+            resultCard.pivot = new Vector2(0.5f, 1);
+            resultTitle = UiKit.Display(UiKit.OneLine(UiKit.Label("Title", resultCard, "", 120, Palette.Gold, 0, 1, 1, 1)));
+            resultSubtitle = UiKit.OneLine(UiKit.Label("Subtitle", resultCard, "", 36, Palette.TextDim, 0, 1, 1, 1, TextAnchor.MiddleCenter,
+                FontStyle.Normal, true, 22));
 
             // 성장 카드: 얼굴 · Lv · 레벨 업 · 경험치 막대
             growthCard = Card("Growth");
             growthFace = UiKit.IconImage("Face", growthCard, null, 0, 0.5f, 0, 0.5f);
             growthFace.rectTransform.pivot = new Vector2(0, 0.5f);
-            growthFace.rectTransform.sizeDelta = new Vector2(110, 110);
-            growthFace.rectTransform.anchoredPosition = new Vector2(24, 0);
-            growthLevel = UiKit.Display(UiKit.OneLine(UiKit.Label("Level", growthCard, "", 40, Palette.Text, 0, 0.56f, 1, 0.92f, TextAnchor.MiddleLeft)));
-            growthLevel.rectTransform.offsetMin = new Vector2(156, 0);
-            var pill = UiKit.Pill(UiKit.Panel("LevelUp", growthCard, Palette.Gold, 1, 0.74f, 1, 0.74f));
+            growthFace.rectTransform.sizeDelta = new Vector2(140, 140);
+            growthFace.rectTransform.anchoredPosition = new Vector2(28, 0);
+            growthLevel = UiKit.Display(UiKit.OneLine(UiKit.Label("Level", growthCard, "", 52, Palette.Text, 0, 1, 1, 1, TextAnchor.MiddleLeft,
+                FontStyle.Normal, true, 32)));
+            PinTop(growthLevel.rectTransform, 192, 24, 214, 66);
+            var pill = UiKit.Pill(UiKit.Panel("LevelUp", growthCard, Palette.Gold, 1, 1, 1, 1));
             pill.raycastTarget = false;
-            pill.rectTransform.pivot = new Vector2(1, 0.5f);
-            pill.rectTransform.sizeDelta = new Vector2(150, 48);
-            pill.rectTransform.anchoredPosition = new Vector2(-24, 0);
-            UiKit.Display(UiKit.Label("Text", pill.transform, "레벨 업!", 28, Palette.OnAccent, 0, 0, 1, 1));
+            pill.rectTransform.pivot = new Vector2(1, 1);
+            pill.rectTransform.sizeDelta = new Vector2(174, 58);
+            pill.rectTransform.anchoredPosition = new Vector2(-28, -28);
+            UiKit.Display(UiKit.Label("Text", pill.transform, "레벨 업!", 34, Palette.OnAccent, 0, 0, 1, 1));
             levelUpPill = pill.gameObject;
-            var track = UiKit.Pill(UiKit.Panel("ExpBar", growthCard, Palette.Track, 0, 0.36f, 1, 0.5f));
+            var track = UiKit.Pill(UiKit.Panel("ExpBar", growthCard, Palette.Track, 0, 1, 1, 1));
             track.raycastTarget = false;
-            track.rectTransform.offsetMin = new Vector2(156, 0);
-            track.rectTransform.offsetMax = new Vector2(-28, 0);
+            PinTop(track.rectTransform, 192, 104, 28, 28);
             var fill = UiKit.Pill(UiKit.Panel("Fill", track.transform, Palette.Gold, 0, 0, 0.5f, 1));
             fill.raycastTarget = false;
             expFill = fill.rectTransform;
-            growthExp = UiKit.OneLine(UiKit.Label("Exp", growthCard, "", 26, Palette.TextDim, 0, 0.06f, 1, 0.32f, TextAnchor.MiddleLeft,
-                FontStyle.Normal, true, 18));
-            growthExp.rectTransform.offsetMin = new Vector2(156, 0);
+            growthExp = UiKit.OneLine(UiKit.Label("Exp", growthCard, "", 34, Palette.TextDim, 0, 1, 1, 1, TextAnchor.MiddleLeft,
+                FontStyle.Normal, true, 22));
+            PinTop(growthExp.rectTransform, 192, 142, 28, 44);
 
             rewardRow = UiKit.Rect("Rewards", resultCard, 0, 1, 1, 1);
 
@@ -1831,30 +1860,30 @@ namespace WordRPG.UI
             mvpCard = Card("MVP");
             mvpIcon = UiKit.IconImage("Icon", mvpCard, null, 0, 0.5f, 0, 0.5f);
             mvpIcon.rectTransform.pivot = new Vector2(0, 0.5f);
-            mvpIcon.rectTransform.sizeDelta = new Vector2(100, 100);
-            mvpIcon.rectTransform.anchoredPosition = new Vector2(24, 0);
-            mvpLabel = UiKit.OneLine(UiKit.Label("Label", mvpCard, "", 24, Palette.Gold, 0, 0.66f, 1, 0.92f, TextAnchor.MiddleLeft, FontStyle.Bold));
-            mvpLabel.rectTransform.offsetMin = new Vector2(146, 0);
-            mvpTitle = UiKit.Display(UiKit.OneLine(UiKit.Label("Title", mvpCard, "", 36, Palette.Text, 0, 0.34f, 1, 0.66f, TextAnchor.MiddleLeft)));
-            mvpTitle.resizeTextForBestFit = true;
-            mvpTitle.resizeTextMinSize = 22;
-            mvpTitle.resizeTextMaxSize = 36;
-            mvpTitle.rectTransform.offsetMin = new Vector2(146, 0);
-            mvpTitle.rectTransform.offsetMax = new Vector2(-20, 0);
-            mvpDetail = UiKit.OneLine(UiKit.Label("Detail", mvpCard, "", 26, Palette.TextDim, 0, 0.08f, 1, 0.34f, TextAnchor.MiddleLeft));
-            mvpDetail.rectTransform.offsetMin = new Vector2(146, 0);
+            mvpIcon.rectTransform.sizeDelta = new Vector2(132, 132);
+            mvpIcon.rectTransform.anchoredPosition = new Vector2(28, 0);
+            mvpLabel = UiKit.OneLine(UiKit.Label("Label", mvpCard, "", 32, Palette.Gold, 0, 1, 1, 1, TextAnchor.MiddleLeft, FontStyle.Bold));
+            PinTop(mvpLabel.rectTransform, 184, 22, 28, 42);
+            mvpTitle = UiKit.Display(UiKit.OneLine(UiKit.Label("Title", mvpCard, "", 48, Palette.Text, 0, 1, 1, 1, TextAnchor.MiddleLeft,
+                FontStyle.Normal, true, 28)));
+            PinTop(mvpTitle.rectTransform, 184, 68, 28, 62);
+            mvpDetail = UiKit.OneLine(UiKit.Label("Detail", mvpCard, "", 34, Palette.TextDim, 0, 1, 1, 1, TextAnchor.MiddleLeft,
+                FontStyle.Normal, true, 22));
+            PinTop(mvpDetail.rectTransform, 184, 134, 28, 44);
 
             statsRow = UiKit.Rect("Stats", resultCard, 0, 1, 1, 1);
             newWordsCard = WordCard("NewWords");
             wrongWordsCard = WordCard("WrongWords");
             dexBanners = UiKit.Rect("DexBanners", resultCard, 0, 1, 1, 1);
 
-            resultBody = UiKit.OneLine(UiKit.Label("Body", resultCard, "", 26, Palette.TextDim, 0, 1, 1, 1, TextAnchor.MiddleCenter,
-                FontStyle.Normal, true, 18));
-            resultPrimary = UiKit.MakeButton("ResultButton_Primary", resultCard, "", Palette.Button, 40, 0, 1, 1, 1, bestFit: true);
+            resultBody = UiKit.OneLine(UiKit.Label("Body", resultCard, "", 34, Palette.TextDim, 0, 1, 1, 1, TextAnchor.MiddleCenter,
+                FontStyle.Normal, true, 20));
+            resultPrimary = UiKit.MakeButton("ResultButton_Primary", panel.transform, "", Palette.Button, 54, 0, 0, 1, 0, bestFit: true);
             resultPrimary.onClick.AddListener(() => resultChoice = 0);
-            resultSecondary = UiKit.MakeButton("ResultButton_Secondary", resultCard, "", Palette.Heal, 40, 0, 1, 1, 1, bestFit: true);
+            resultSecondary = UiKit.MakeButton("ResultButton_Secondary", panel.transform, "", Palette.Heal, 54, 0, 0, 1, 0, bestFit: true);
             resultSecondary.onClick.AddListener(() => resultChoice = 1);
+            PinBottom((RectTransform)resultPrimary.transform, 0f, 1f);
+            PinBottom((RectTransform)resultSecondary.transform, 0.5f, 1f);
         }
 
         private RectTransform Card(string name)
@@ -1867,11 +1896,9 @@ namespace WordRPG.UI
         private RectTransform WordCard(string name)
         {
             var card = Card(name);
-            var header = UiKit.OneLine(UiKit.Label("Header", card, "", 28, Palette.Gold, 0, 1, 1, 1, TextAnchor.MiddleLeft, FontStyle.Bold,
-                true, 18));
-            header.rectTransform.pivot = new Vector2(0.5f, 1);
-            header.rectTransform.offsetMin = new Vector2(28, -58);
-            header.rectTransform.offsetMax = new Vector2(-28, -14);
+            var header = UiKit.OneLine(UiKit.Label("Header", card, "", 36, Palette.Gold, 0, 1, 1, 1, TextAnchor.MiddleLeft, FontStyle.Bold,
+                true, 22));
+            PinTop(header.rectTransform, 28, 20, 28, 52);
             return card;
         }
 
