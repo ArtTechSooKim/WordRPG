@@ -12,6 +12,7 @@ namespace WordRPG.UI
         public RectTransform Root { get; private set; }
         public BattleUnit Unit { get; private set; }
         public Button Button { get; private set; }
+        public string HpCaption { get; set; } // 비어 있지 않으면 'HP a/b' 대신 이 글자 (수련 허수아비: '누적 피해 n')
 
         private Image frame;
         private Image art;
@@ -79,6 +80,7 @@ namespace WordRPG.UI
         public void Bind(BattleUnit unit)
         {
             Unit = unit;
+            HpCaption = null;
             string name = unit.DisplayName;
             initial.text = name.Length > 0 ? name.Substring(0, 1) : "?";
             title.text = $"{name}  Lv{unit.Level}";
@@ -111,7 +113,7 @@ namespace WordRPG.UI
             hpFill.anchorMax = new Vector2(ratio, 1);
             hpFillImage.enabled = ratio > 0f;
             hpFillImage.color = ratio > 0.5f ? Palette.Good : ratio > 0.25f ? Palette.Gold : Palette.Bad;
-            hpText.text = $"HP {hp}/{maxHp}";
+            hpText.text = HpCaption ?? $"HP {hp}/{maxHp}";
             shieldTag.SetActive(shield > 0);
             shieldText.text = shield.ToString();
 

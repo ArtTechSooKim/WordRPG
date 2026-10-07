@@ -101,6 +101,12 @@ namespace WordRPG.UI
         private GameObject levelUpPill;
         private readonly List<GameObject> resultDynamic = new List<GameObject>(); // 판마다 새로 만드는 줄들
 
+        // 수련 (#44, Figma 'Battle — 수련'): 허수아비와 싸우며 도감 속 단어만 복습. [수련 종료]를 누르면 수련 결산
+        private bool training, endTrainingRequested;
+        private int trainingDamage;
+        private Button trainingEndButton;
+        public bool IsTraining => training;
+
         // 보스 결정타 (#41, Figma 'Battle — 보스 결정타'): 하얀 번쩍임 · 느린 화면 동안 가장자리 어둡게 · '결정타!' 도장
         private bool bossBattle;
         private Image finisherFlash, finisherShade;
@@ -129,7 +135,7 @@ namespace WordRPG.UI
         // 첫 전투 안내 (#36): 각 상황을 처음 만날 때 한 번씩
         public void SetTutorial(TutorialOverlay overlay) => tutorial = overlay;
 
-        private bool Tip(string id) => tutorial != null && session != null && !session.Tutorials.Has(id) && !tutorial.IsShowing;
+        private bool Tip(string id) => !training && tutorial != null && session != null && !session.Tutorials.Has(id) && !tutorial.IsShowing;
 
         private IEnumerator RunTip(string id, string text, Func<RectTransform> target, Func<bool> doneWhen = null) =>
             tutorial.Run(session, id, new TutorialOverlay.Step { Text = text, Target = target, DoneWhen = doneWhen }, saveProgress);
@@ -204,6 +210,51 @@ namespace WordRPG.UI
             StartCoroutine(SingleBattle(enemies, onFinished, intro));
         }
 
+        // 수련 (#44): 허수아비(주인공과 같은 레벨)와 싸운다. 문제는 wordBooks에서 이미 발견한 단어만.
+        // areaBook = 위쪽 '발견한 단어' 표시용 (지금 지역). [수련 종료]를 누르면 결산 → 닫고 onFinished
+        public void BeginTraining(MonsterSpecies dummy, IReadOnlyList<WordDatabase> wordBooks, WordDatabase areaBook, TrainingMode mode,
+            Action onFinished, FieldTheme theme = FieldTheme.Meadow)
+        {
+            if (running) throw new InvalidOperationException("이미 전투 중입니다");
+            if (dummy == null) throw new ArgumentNullException(nameof(dummy));
+            if (!EnsureInitialized()) return;
+            var books = new List<IReadOnlyList<WordEntry>>();
+            foreach (var book in wordBooks)
+                if (book != null) books.Add(book.Words);
+            var provider = new TrainingQuizProvider(books, session.Vocabulary, masteryRules, mode, rng);
+            SetBackdrop(theme, false);
+            bossBattle = false;
+            ResetFinisher();
+            words = areaBook;
+            running = true;
+            canvas.gameObject.SetActive(true);
+            StartCoroutine(TrainingRoutine(dummy, provider, onFinished));
+        }
+
+        private IEnumerator TrainingRoutine(MonsterSpecies dummy, TrainingQuizProvider provider, Action onFinished)
+        {
+            training = true;
+            endTrainingRequested = false;
+            trainingDamage = 0;
+            string intro = provider.Mode == TrainingMode.WrongNote
+                ? "오답 위주 수련 시작! 허수아비는 쓰러지지 않아요 — 마음껏 연습하세요"
+                : "수련 시작! 허수아비는 쓰러지지 않아요 — 마음껏 연습하세요";
+            StartNewBattle(new List<MonsterInstance> { new MonsterInstance(dummy, Mathf.Max(1, session.Hero.Level)) }, intro, provider);
+            roundLabel.text = "수련";
+            var scarecrow = engine.Enemies[0];
+            viewOf[scarecrow].HpCaption = "누적 피해 0";
+            Sync(scarecrow);
+            yield return PlayBattle();
+            session.EndBattleCombo(DateTime.UtcNow);
+            yield return ShowTrainingResult();
+            training = false;
+            HideAllPanels();
+            if (dexView.IsOpen) dexView.Hide();
+            canvas.gameObject.SetActive(false);
+            running = false;
+            onFinished?.Invoke();
+        }
+
         // ------------------------------------------------------------------ 흐름
 
         private IEnumerator MainLoop()
@@ -232,16 +283,21 @@ namespace WordRPG.UI
             onFinished?.Invoke(victory);
         }
 
-        private void StartNewBattle(List<MonsterInstance> enemies, string intro = null)
+        // provider: 문제 내는 쪽 (비우면 이 지역 단어장 — 수련은 TrainingQuizProvider)
+        private void StartNewBattle(List<MonsterInstance> enemies, string intro = null, IQuizProvider provider = null)
         {
             if (!session.CanFight) session.RestoreHero();
-            if (quizService == null || quizWords != words)
+            if (provider == null)
             {
-                quizWords = words;
-                quizService = new WordQuizService(words.Words, session.Vocabulary, masteryRules, rng);
+                if (quizService == null || quizWords != words)
+                {
+                    quizWords = words;
+                    quizService = new WordQuizService(words.Words, session.Vocabulary, masteryRules, rng);
+                }
+                provider = quizService;
             }
             // 연속 정답 콤보는 전투가 바뀌어도 이어진다
-            engine = new BattleEngine(new ICombatant[] { session.Hero }, enemies, quizService, battleConfig, rng,
+            engine = new BattleEngine(new ICombatant[] { session.Hero }, enemies, provider, battleConfig, rng,
                 session.StartBattleCombo(DateTime.UtcNow));
 
             foreach (var view in enemyViews) Destroy(view.Root.gameObject);
@@ -292,10 +348,11 @@ namespace WordRPG.UI
 
         private IEnumerator PlayBattle()
         {
-            while (!engine.IsOver)
+            while (!engine.IsOver && !endTrainingRequested)
             {
-                // 1. 기술(과 대상) 선택 — 또는 상처약
+                // 1. 기술(과 대상) 선택 — 또는 상처약 (수련이면 [수련 종료]로 끝)
                 yield return ChooseSkill();
+                if (endTrainingRequested) break;
                 if (pickedItem != null)
                 {
                     Snapshot();
@@ -384,7 +441,7 @@ namespace WordRPG.UI
                     () => (RectTransform)skillPanel.transform,
                     () => pickedSkill != null || pickedItem != null || itemMode || intensityMode || targetingSkill != null);
 
-            while (pickedSkill == null && pickedItem == null)
+            while (pickedSkill == null && pickedItem == null && !endTrainingRequested)
             {
                 if (intensityMode && Tip(TutorialProgress.Intensity))
                     yield return RunTip(TutorialProgress.Intensity,
@@ -578,7 +635,13 @@ namespace WordRPG.UI
                             break;
                         }
                         var d = shown[e.Target];
-                        shown[e.Target] = (Mathf.Max(0, d.hp - e.Amount), Mathf.Max(0, d.shield - e.Absorbed));
+                        bool dummyHit = e.Target.Monster != null && e.Target.Monster.Species.IsTrainingDummy;
+                        shown[e.Target] = (dummyHit ? d.hp : Mathf.Max(0, d.hp - e.Amount), Mathf.Max(0, d.shield - e.Absorbed));
+                        if (dummyHit)
+                        {
+                            trainingDamage += e.Amount;
+                            viewOf[e.Target].HpCaption = $"누적 피해 {trainingDamage}";
+                        }
                         Sync(e.Target);
                         string dmgText = e.Amount > 0 ? $"-{e.Amount}" : "막음!";
                         Sound.Play(e.Amount <= 0 ? Sfx.Shield : e.IsCritical ? Sfx.Critical : Sfx.Hit);
@@ -643,7 +706,7 @@ namespace WordRPG.UI
                         break;
 
                     case BattleEventType.RoundStarted:
-                        roundLabel.text = $"라운드 {e.Round}";
+                        roundLabel.text = training ? "수련" : $"라운드 {e.Round}";
                         foreach (var unit in engine.Party) shown[unit] = (shown[unit].hp, 0);
                         SyncAll();
                         yield return Wait(0.2f);
@@ -679,20 +742,7 @@ namespace WordRPG.UI
             UiKit.SetColor(resultPrimary, victory ? Palette.Button : Palette.Neutral);
 
             // 버튼 위까지가 내용 칸. 넘치면 단어 줄을 하나씩 줄이고, 그래도 넘치면 통째로 줄인다
-            relayoutResult = () =>
-            {
-                resultLayoutHeight = ((RectTransform)resultPanel.transform).rect.height;
-                float room = resultLayoutHeight - (ResultBottom + ResultButtonHeight + ResultGap);
-                float height = 0f;
-                for (int rows = MaxWordRows; rows >= 1; rows--)
-                {
-                    ClearResultDynamic();
-                    height = LayoutResult(victory, levelBefore, levels, reward, completions, rows);
-                    if (height <= room) break;
-                }
-                resultCard.sizeDelta = new Vector2(0, height);
-                resultCard.localScale = Vector3.one * (room > 0f && height > room ? room / height : 1f);
-            };
+            relayoutResult = () => FitResult(rows => LayoutResult(victory, levelBefore, levels, reward, completions, rows));
             relayoutResult();
 
             resultChoice = -1;
@@ -706,6 +756,100 @@ namespace WordRPG.UI
                 session.RestoreHero();
                 saveProgress?.Invoke();
             }
+        }
+
+        // 수련 결산 (Figma 'Battle — 수련 결산 (#44)'): 보상 없음. 준 피해 · 가장 활약한 성유물 · 기록 · 복습한 단어 · 틀린 단어
+        private IEnumerator ShowTrainingResult()
+        {
+            ResetFinisher();
+            Sound.Play(Sfx.Victory);
+            saveProgress?.Invoke();
+            SetResultButtons("돌아가기", null);
+            UiKit.SetColor(resultPrimary, Palette.Button);
+            relayoutResult = () => FitResult(LayoutTrainingResult);
+            relayoutResult();
+
+            resultChoice = -1;
+            ShowPanel(resultPanel);
+            while (resultChoice < 0) yield return null;
+            relayoutResult = null;
+        }
+
+        // 버튼 위까지가 내용 칸. 넘치면 단어 줄을 하나씩 줄이고, 그래도 넘치면 통째로 줄인다
+        private void FitResult(Func<int, float> layout)
+        {
+            resultLayoutHeight = ((RectTransform)resultPanel.transform).rect.height;
+            float room = resultLayoutHeight - (ResultBottom + ResultButtonHeight + ResultGap);
+            float height = 0f;
+            for (int rows = MaxWordRows; rows >= 1; rows--)
+            {
+                ClearResultDynamic();
+                height = layout(rows);
+                if (height <= room) break;
+            }
+            resultCard.sizeDelta = new Vector2(0, height);
+            resultCard.localScale = Vector3.one * (room > 0f && height > room ? room / height : 1f);
+        }
+
+        private float LayoutTrainingResult(int wordRows)
+        {
+            var summary = engine.Summary;
+            float y = ResultTop;
+            resultTitle.text = "수련 종료";
+            resultTitle.color = Palette.Gold;
+            PlaceResult(resultTitle.rectTransform, ref y, 140f, 0f);
+            int answered = summary.Correct + summary.Wrong;
+            resultSubtitle.text = $"허수아비에게 준 피해 {summary.TotalDamage}   ·   문제 {answered}개";
+            PlaceResult(resultSubtitle.rectTransform, ref y, 52f, ResultGap);
+
+            growthCard.gameObject.SetActive(false);
+            rewardRow.gameObject.SetActive(false);
+            dexBanners.gameObject.SetActive(false);
+            PlaceMvpAndStats(ref y);
+
+            FillWords(newWordsCard, summary.AnsweredWords, $"복습한 단어 {summary.AnsweredWords.Count}", Palette.Gold, wordRows, ref y);
+            FillWords(wrongWordsCard, summary.WrongWords, $"틀린 단어 {summary.WrongWords.Count} — 오답 노트에 넣었어요, 곧 다시 나와요",
+                Palette.Bad, wordRows, ref y);
+
+            var (up, down) = MasteryUpDown();
+            int wrongLeft = 0;
+            foreach (var entry in session.Vocabulary.Entries)
+                if (entry.InWrongNote) wrongLeft++;
+            resultBody.text = $"단어 숙련도 ▲{up} ▼{down}   ·   오답 노트 남은 단어 {wrongLeft}";
+            PlaceResult(resultBody.rectTransform, ref y, 48f, 0f);
+            return y;
+        }
+
+        private (int up, int down) MasteryUpDown()
+        {
+            int up = 0, down = 0;
+            foreach (var change in engine.MasteryChanges)
+            {
+                if (change.LeveledUp) up++;
+                else if (change.LeveledDown) down++;
+            }
+            return (up, down);
+        }
+
+        // 가장 활약한 성유물 (피해를 가장 많이 준 기술의 출처) + 기록 알약 (정답 · 최대 콤보 · 크리티컬)
+        private void PlaceMvpAndStats(ref float y)
+        {
+            var summary = engine.Summary;
+            var top = summary.TopSkill;
+            mvpCard.gameObject.SetActive(top != null);
+            if (top != null)
+            {
+                FillMvp(top, summary.DamageOf(top), summary.TotalDamage);
+                PlaceResult(mvpCard, ref y, 196f, ResultGap);
+            }
+
+            float px = 0f;
+            int answered = summary.Correct + summary.Wrong;
+            if (answered > 0) AddStat($"정답 {summary.Correct} / {answered}", ref px);
+            if (summary.MaxCombo >= Combo.FirstStreak) AddStat($"최대 콤보 {summary.MaxCombo}", ref px);
+            if (summary.Criticals > 0) AddStat($"크리티컬 {summary.Criticals}", ref px);
+            statsRow.gameObject.SetActive(px > 0f);
+            if (px > 0f) PlaceResult(statsRow, ref y, 62f, ResultGap);
         }
 
         private const int MaxWordRows = 4;
@@ -749,23 +893,7 @@ namespace WordRPG.UI
                 PlaceResult(rewardRow, ref y, 80f, ResultGap);
             }
 
-            // 가장 활약한 성유물 (피해를 가장 많이 준 기술의 출처)
-            var top = summary.TopSkill;
-            mvpCard.gameObject.SetActive(top != null);
-            if (top != null)
-            {
-                FillMvp(top, summary.DamageOf(top), summary.TotalDamage);
-                PlaceResult(mvpCard, ref y, 196f, ResultGap);
-            }
-
-            // 기록 알약: 정답 · 최대 콤보 · 크리티컬
-            float px = 0f;
-            int answered = summary.Correct + summary.Wrong;
-            if (answered > 0) AddStat($"정답 {summary.Correct} / {answered}", ref px);
-            if (summary.MaxCombo >= Combo.FirstStreak) AddStat($"최대 콤보 {summary.MaxCombo}", ref px);
-            if (summary.Criticals > 0) AddStat($"크리티컬 {summary.Criticals}", ref px);
-            statsRow.gameObject.SetActive(px > 0f);
-            if (px > 0f) PlaceResult(statsRow, ref y, 62f, ResultGap);
+            PlaceMvpAndStats(ref y);
 
             // 새로 만난 단어 · 틀린 단어 (틀린 단어는 정답 뜻과 함께 — 다시 보는 순간)
             FillWords(newWordsCard, summary.NewWords, $"새로 만난 단어 {summary.NewWords.Count}", Palette.Gold, wordRows, ref y);
@@ -781,12 +909,7 @@ namespace WordRPG.UI
                 PlaceResult(dexBanners, ref y, by, ResultGap);
             }
 
-            int up = 0, down = 0;
-            foreach (var change in engine.MasteryChanges)
-            {
-                if (change.LeveledUp) up++;
-                else if (change.LeveledDown) down++;
-            }
+            var (up, down) = MasteryUpDown();
             resultBody.text = $"발견한 단어 {LearnedCount()}/{words.Words.Count}   ·   단어 숙련도 ▲{up} ▼{down}";
             PlaceResult(resultBody.rectTransform, ref y, 48f, 0f);
             return y;
@@ -965,8 +1088,9 @@ namespace WordRPG.UI
 
             // 상처약: 가진 개수, HP가 가득이면 잠금
             bool isHero = actor.Hero != null;
-            itemButton.gameObject.SetActive(isHero);
-            if (isHero)
+            itemButton.gameObject.SetActive(isHero && !training);
+            trainingEndButton.gameObject.SetActive(training);
+            if (isHero && !training)
             {
                 int potions = 0;
                 foreach (var item in HealingItems()) potions += session.Inventory.GetCount(item);
@@ -1002,6 +1126,7 @@ namespace WordRPG.UI
             itemMode = true;
             skillTitle.text = "어떤 아이템을 쓸까요? (한 턴을 쓰고, 문제는 없어요)";
             itemButton.gameObject.SetActive(false);
+            trainingEndButton.gameObject.SetActive(false);
             cancelButton.gameObject.SetActive(true);
             var items = HealingItems();
             for (int i = 0; i < skillButtons.Count; i++)
@@ -1045,6 +1170,7 @@ namespace WordRPG.UI
             skillTitle.text = $"{skill.DisplayName} — 대상을 선택하세요";
             foreach (var button in skillButtons) button.gameObject.SetActive(false);
             itemButton.gameObject.SetActive(false);
+            trainingEndButton.gameObject.SetActive(false);
             cancelButton.gameObject.SetActive(true);
 
             foreach (var unit in alive)
@@ -1077,6 +1203,7 @@ namespace WordRPG.UI
             skillTitle.text = $"{skill.DisplayName} — 강도를 고르세요\n<size=26><color=#A6B3D1>하나라도 틀리면 이번 턴 공격 실패 · 맞힌 단어는 모두 콤보</color></size>";
             foreach (var button in skillButtons) button.gameObject.SetActive(false);
             itemButton.gameObject.SetActive(false);
+            trainingEndButton.gameObject.SetActive(false);
             cancelButton.gameObject.SetActive(true);
 
             // 예상 피해는 고른 대상(없으면 살아 있는 첫 적) 기준
@@ -1700,6 +1827,12 @@ namespace WordRPG.UI
             itemColors.disabledColor = new Color(0.6f, 0.6f, 0.6f, 0.5f);
             itemButton.colors = itemColors;
             itemButton.onClick.AddListener(ShowItemMenu);
+
+            // 수련 중에는 상처약 대신 [수련 종료] (Figma 'Battle — 수련 (#44)')
+            trainingEndButton = UiKit.MakeButton("TrainingEndButton", skillPanel.transform, "수련 종료", Palette.Neutral, 44,
+                0, 0, 1, 0.155f, bestFit: true);
+            trainingEndButton.onClick.AddListener(() => endTrainingRequested = true);
+            trainingEndButton.gameObject.SetActive(false);
 
             cancelButton = UiKit.MakeButton("CancelButton", skillPanel.transform, "취소", Palette.Neutral,
                 44, 0.25f, 0, 0.75f, 0.155f);

@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ec416e140bfc414b93cb9aa6306ba85, type: 3}
+  m_Name: training_scarecrow
+  m_EditorClassIdentifier: WordRPG::WordRPG.Monsters.MonsterSpecies
+  speciesId: training_scarecrow
+  displayName: "\uD5C8\uC218\uC544\uBE44"
+  description: "\uC218\uB828\uC7A5\uC758 \uD5C8\uC218\uC544\uBE44. \uC544\uBB34\uB9AC
+    \uB54C\uB824\uB3C4 \uB044\uB5A1\uC5C6\uC5B4\uC11C \uAE30\uC220\uC744 \uC5F0\uC2B5\uD558\uAE30
+    \uC88B\uB2E4."
+  role: 1
+  sprite: {fileID: 21300000, guid: dcc2fd454fe5a3e41b145547210acc08, type: 3}
+  placeholderColor: {r: 0.85, g: 0.7, b: 0.35, a: 1}
+  baseStats:
+    maxHp: 30
+    attack: 10
+    defense: 10
+  growthPerLevel:
+    maxHp: 4
+    attack: 2
+    defense: 2
+  skills: []
+  expReward: 0
+  goldReward: 0
+  drops: []
+  trainingDummy: 1

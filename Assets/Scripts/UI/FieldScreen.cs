@@ -11,6 +11,7 @@ using WordRPG.Game;
 using WordRPG.Heroes;
 using WordRPG.Items;
 using WordRPG.Monsters;
+using WordRPG.Words;
 
 namespace WordRPG.UI
 {
@@ -95,6 +96,7 @@ namespace WordRPG.UI
         private int stepsTaken;
         private int runSteps;
         private DexView dexView;
+        private TrainingView trainingView;
         private RelicAltarView altarView;
         private ShopView shopView;
         private InventoryView inventoryView;
@@ -121,10 +123,11 @@ namespace WordRPG.UI
         public BattleScreen Battle => battle;
         public GameSession Session => session;
         public FieldArea CurrentArea => area;
-        public bool IsPanelOpen => dexView.IsOpen || altarView.IsOpen || shopView.IsOpen
+        public bool IsPanelOpen => dexView.IsOpen || trainingView.IsOpen || altarView.IsOpen || shopView.IsOpen
                                    || inventoryView.IsOpen || settingsView.IsOpen || mapView.IsOpen || learnView.IsOpen
                                    || (quitDialog != null && quitDialog.IsOpen) || (paywall != null && paywall.IsOpen);
         public SkillLearnView LearnView => learnView;
+        public TrainingView TrainingView => trainingView;
         public bool IsQuitDialogOpen => quitDialog.IsOpen;
         public MinimapView Minimap => minimap;
         public string ToastMessage => toastPanel != null && toastPanel.activeSelf ? toastText.text : "";
@@ -429,6 +432,7 @@ namespace WordRPG.UI
             else if (inventoryView.IsOpen) inventoryView.Hide();
             else if (shopView.IsOpen) shopView.Hide();
             else if (dexView.IsOpen) dexView.Hide();
+            else if (trainingView.IsOpen) trainingView.Hide();
             else if (settingsView.IsOpen) settingsView.Hide();
             else if (mapView.IsOpen) mapView.Hide();
             else if (GameManager.CanQuit)
@@ -1006,23 +1010,25 @@ namespace WordRPG.UI
             minimap = MinimapView.Create(hudRoot);
             minimap.Button.onClick.AddListener(OpenMap);
 
-            // 오른쪽 세로 메뉴 (Figma 'Field — HUD (메뉴 버튼)'): 도감 · 가방 · 설정
-            var menu = UiKit.Rect("Menu", hudRoot, 1, 0.865f, 1, 0.865f);
-            menuRect = menu;
-            menu.pivot = new Vector2(1, 1);
-            menu.sizeDelta = new Vector2(120, 3 * 120 + 2 * 16);
-            menu.anchoredPosition = new Vector2(-24, 0);
+            // 오른쪽 세로 메뉴 (Figma 'Field — 수련 (#44)'): 도감 · 수련 · 가방 · 설정
             var entries = new (string name, string icon, string label, UnityEngine.Events.UnityAction open)[]
             {
                 ("DexButton", "dex", "도감", OpenDex),
+                ("TrainingButton", "train", "수련", OpenTraining),
                 ("BagButton", "bag", "가방", OpenBag),
                 ("SettingsButton", "settings", "설정", OpenSettings),
             };
+            float menuHeight = entries.Length * 120 + (entries.Length - 1) * 16;
+            var menu = UiKit.Rect("Menu", hudRoot, 1, 0.865f, 1, 0.865f);
+            menuRect = menu;
+            menu.pivot = new Vector2(1, 1);
+            menu.sizeDelta = new Vector2(120, menuHeight);
+            menu.anchoredPosition = new Vector2(-24, 0);
             for (int i = 0; i < entries.Length; i++)
             {
-                float topY = 1f - i * (136f / 392f);
+                float topY = 1f - i * (136f / menuHeight);
                 var button = UiKit.IconButton(entries[i].name, menu, entries[i].icon, entries[i].label, Palette.Scrim,
-                    0, topY - 120f / 392f, 1, topY);
+                    0, topY - 120f / menuHeight, 1, topY);
                 button.onClick.AddListener(entries[i].open);
             }
 
@@ -1085,6 +1091,7 @@ namespace WordRPG.UI
             flash.gameObject.SetActive(false);
 
             dexView = DexView.Create(hudRoot);
+            trainingView = TrainingView.Create(hudRoot, StartTraining);
             altarView = RelicAltarView.Create(hudRoot, animationScale);
             shopView = ShopView.Create(hudRoot);
             inventoryView = InventoryView.Create(hudRoot);
@@ -1177,7 +1184,7 @@ namespace WordRPG.UI
                     Text = "상자·샘·제단·상점 옆에 서면 [확인]이 금색으로 빛나요.\n그때 눌러서 사용해요.",
                     Target = () => confirmImage.rectTransform
                 },
-                new TutorialOverlay.Step { Text = "[도감]에는 만난 단어가, [가방]에는 아이템과 성유물이 있어요.", Target = () => menuRect },
+                new TutorialOverlay.Step { Text = "[도감]에는 만난 단어가 모여요. [수련]에서는 그 단어로 허수아비와 싸우며 외울 수 있고,\n[가방]에는 아이템과 성유물이 있어요.", Target = () => menuRect },
                 new TutorialOverlay.Step
                 {
                     Text = "왼쪽 위 작은 지도를 누르면 큰 지도로 볼 수 있어요.", Target = () => (RectTransform)minimap.Button.transform
@@ -1253,6 +1260,57 @@ namespace WordRPG.UI
                 ShowToast($"★ {area.Words.RegionName} 도감 완성! 보상을 받았다", 3f);
             }
             dexView.Show(area.Words, session, DateTime.UtcNow);
+        }
+
+        // ------------------------------------------------------------------ 수련 (#44)
+
+        // 수련할 단어장: 모든 지역의 단어장 (도감 속 단어). GameDatabase가 없으면(테스트) 지금 지역만
+        private List<WordDatabase> TrainingBooks()
+        {
+            var books = new List<WordDatabase>();
+            if (database != null)
+                foreach (var candidate in database.Areas)
+                    if (candidate != null && candidate.Words != null && !books.Contains(candidate.Words)) books.Add(candidate.Words);
+            if (!books.Contains(area.Words)) books.Insert(0, area.Words);
+            return books;
+        }
+
+        private MonsterSpecies TrainingDummy()
+        {
+            if (database == null) return null;
+            foreach (var monster in database.Monsters)
+                if (monster != null && monster.IsTrainingDummy) return monster;
+            return null;
+        }
+
+        private void OpenTraining()
+        {
+            if (!CanOpenMenu) return;
+            var books = TrainingBooks().ConvertAll(b => b.Words);
+            var (discovered, wrong) = TrainingQuizProvider.Count(books, session.Vocabulary);
+            trainingView.Show(discovered, wrong);
+        }
+
+        private void StartTraining(TrainingMode mode)
+        {
+            var dummy = TrainingDummy();
+            if (dummy == null || inBattle || transitioning)
+            {
+                ShowToast("수련장을 준비하고 있어요");
+                return;
+            }
+            inBattle = true;
+            HideToast();
+            Sound.PlayMusic(Music.Battle);
+            battle.BeginTraining(dummy, TrainingBooks(), area.Words, mode, OnTrainingFinished, area.Theme);
+        }
+
+        private void OnTrainingFinished()
+        {
+            inBattle = false;
+            Sound.PlayMusic(AreaMusic);
+            saveProgress?.Invoke();
+            RefreshHud();
         }
 
         private void RefreshHud()

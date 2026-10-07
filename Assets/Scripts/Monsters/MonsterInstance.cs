@@ -48,9 +48,10 @@ namespace WordRPG.Monsters
             return levelsGained;
         }
 
-        // 반환값: 실제로 깎인 HP
+        // 반환값: 실제로 깎인 HP. 수련용 허수아비는 HP가 줄지 않지만 받은 피해는 그대로 돌려준다 (피해 숫자를 보여 주려고)
         public int TakeDamage(int amount)
         {
+            if (Species.IsTrainingDummy) return Math.Max(0, amount);
             int dealt = Math.Min(Math.Max(0, amount), CurrentHp);
             CurrentHp -= dealt;
             return dealt;

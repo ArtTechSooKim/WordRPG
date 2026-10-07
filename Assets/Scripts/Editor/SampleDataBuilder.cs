@@ -134,6 +134,11 @@ namespace WordRPG.EditorTools
                 enemyExp: 45, enemyGold: 60,
                 drops: new[] { new ItemDrop(shinyInk, 1f, 2), new ItemDrop(hardCover, 1f, 2), new ItemDrop(sparkleDust, 1f, 2) });
 
+            // --- 수련 (#44): 허수아비. 기술이 없어 공격하지 않고, 맞아도 HP가 줄지 않는다. 레벨 = 주인공 레벨 ---
+            Monster("training_scarecrow", "허수아비", "수련장의 허수아비. 아무리 때려도 끄떡없어서 기술을 연습하기 좋다.", MonsterRole.Defender,
+                new Color(0.85f, 0.7f, 0.35f), new MonsterStats(30, 10, 10), new MonsterStats(4, 2, 2), new SkillData[0],
+                enemyExp: 0, enemyGold: 0, trainingDummy: true);
+
             // --- 출현표 ---
             var meadowEncounters = Encounters("meadow_field", 1, 2,
                 new EncounterTable.Entry(inkSlime, 1, 3, 10),
@@ -557,7 +562,7 @@ namespace WordRPG.EditorTools
 
         private static MonsterSpecies Monster(string id, string name, string description, MonsterRole role, Color color,
             MonsterStats baseStats, MonsterStats growth, SkillData[] skills,
-            int enemyExp = 5, int enemyGold = 5, ItemDrop[] drops = null)
+            int enemyExp = 5, int enemyGold = 5, ItemDrop[] drops = null, bool trainingDummy = false)
         {
             return CreateIfMissing<MonsterSpecies>($"{Root}/Monsters/{id}.asset", so =>
             {
@@ -575,6 +580,7 @@ namespace WordRPG.EditorTools
 
                 Prop(so, "expReward").intValue = enemyExp;
                 Prop(so, "goldReward").intValue = enemyGold;
+                Prop(so, "trainingDummy").boolValue = trainingDummy;
                 var dropList = Prop(so, "drops");
                 dropList.arraySize = drops?.Length ?? 0;
                 for (int i = 0; i < dropList.arraySize; i++)

@@ -10,11 +10,13 @@ namespace WordRPG.Battle
     {
         private readonly List<WordEntry> newWords = new List<WordEntry>();
         private readonly List<WordEntry> wrongWords = new List<WordEntry>();
+        private readonly List<WordEntry> answeredWords = new List<WordEntry>();
         private readonly Dictionary<SkillData, int> damageBySkill = new Dictionary<SkillData, int>();
         private readonly List<SkillData> skillOrder = new List<SkillData>(); // 처음 쓴 순서 (같은 피해면 먼저 쓴 기술)
 
         public IReadOnlyList<WordEntry> NewWords => newWords;
         public IReadOnlyList<WordEntry> WrongWords => wrongWords;
+        public IReadOnlyList<WordEntry> AnsweredWords => answeredWords; // 이번에 문제로 나온 단어 (수련 결산의 '복습한 단어')
         public int Correct { get; private set; }
         public int Wrong { get; private set; }
         public int Criticals { get; private set; }
@@ -27,6 +29,7 @@ namespace WordRPG.Battle
             if (correct) Correct++;
             else Wrong++;
             if (word == null) return;
+            if (!answeredWords.Contains(word)) answeredWords.Add(word);
             if (isNewWord && !newWords.Contains(word)) newWords.Add(word);
             if (!correct && !wrongWords.Contains(word)) wrongWords.Add(word);
         }

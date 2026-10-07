@@ -54,6 +54,10 @@ namespace WordRPG.Monsters
         [SerializeField] private int goldReward = 5;
         [SerializeField] private List<ItemDrop> drops = new List<ItemDrop>();
 
+        [Header("수련 (#44)")]
+        [Tooltip("수련용 허수아비: 맞아도 HP가 줄지 않는다 (피해 숫자는 그대로). 기술을 비워 두면 공격하지 않는다")]
+        [SerializeField] private bool trainingDummy;
+
         public string SpeciesId => speciesId;
         public string DisplayName => displayName;
         public string Description => description;
@@ -66,6 +70,7 @@ namespace WordRPG.Monsters
         public int ExpReward => expReward;
         public int GoldReward => goldReward;
         public IReadOnlyList<ItemDrop> Drops => drops;
+        public bool IsTrainingDummy => trainingDummy;
 
         public MonsterStats GetStats(int level) => baseStats + growthPerLevel * (level - 1);
     }
