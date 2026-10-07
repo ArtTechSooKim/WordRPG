@@ -75,6 +75,21 @@ namespace WordRPG.Tests
             Assert.Greater(screen.Hero.Exp + screen.Hero.Level, 1, "경험치가 지급돼야 함");
             Assert.Greater(screen.Vocabulary.Entries.Count, 0, "맞힌 단어가 학습 기록에 남아야 함");
 
+            // 결산 (#41): 성장 · 가장 활약한 기술 · 기록 · 처음 본 단어
+            var result = AllText(screen.transform.Find("BattleCanvas/SafeArea/ResultPanel"));
+            StringAssert.Contains("물리쳤어요", result);
+            StringAssert.Contains("경험치 +", result);
+            StringAssert.Contains("가장 활약한 기술", result);
+            StringAssert.Contains("(기본 기술)", result);
+            StringAssert.Contains($"정답 {screen.Engine.Summary.Correct} / {screen.Engine.Summary.Correct + screen.Engine.Summary.Wrong}", result);
+            StringAssert.Contains($"새로 만난 단어 {screen.Engine.Summary.NewWords.Count}", result);
+            Assert.Greater(screen.Engine.Summary.NewWords.Count, 0, "첫 전투의 단어는 모두 새 단어");
+            StringAssert.Contains(screen.Engine.Summary.NewWords[0].English, result);
+            Assert.AreEqual(0, screen.FinishersPlayed, "보스전이 아니면 결정타 연출 없음");
+            var card = (RectTransform)screen.transform.Find("BattleCanvas/SafeArea/ResultPanel/Card");
+            var overlay = (RectTransform)card.parent;
+            Assert.LessOrEqual(card.rect.height * card.localScale.y, overlay.rect.height, "결산 판이 화면 안에 들어가야 함");
+
             // 결과 버튼을 누르면 다음 전투가 시작된다
             var next = ActiveButton(screen.transform, "ResultButton_Primary");
             Assert.IsNotNull(next);
@@ -105,8 +120,11 @@ namespace WordRPG.Tests
             Assert.Greater(screen.Engine.WrongAnswers, 0);
             var wrongWord = screen.Vocabulary.Entries[0];
             Assert.IsTrue(wrongWord.InWrongNote, "틀린 단어는 오답 노트에 있어야 함");
+            var defeatText = AllText(screen.transform.Find("BattleCanvas/SafeArea/ResultPanel"));
+            StringAssert.Contains($"틀린 단어 {screen.Engine.Summary.WrongWords.Count} — 오답 노트에 넣었어요", defeatText);
+            StringAssert.Contains(screen.Engine.Summary.WrongWords[0].English, defeatText);
 
-            StringAssert.Contains("주인공이 쓰러졌다", AllText(screen.transform.Find("BattleCanvas/SafeArea/Bottom/ResultPanel")));
+            StringAssert.Contains("주인공이 쓰러졌다", AllText(screen.transform.Find("BattleCanvas/SafeArea/ResultPanel")));
 
             // 재도전하면 주인공이 회복된다
             ActiveButton(screen.transform, "ResultButton_Primary").onClick.Invoke();
@@ -254,7 +272,7 @@ namespace WordRPG.Tests
             Assert.IsTrue(screen.IsResultVisible);
             Assert.AreEqual(777, session.Inventory.Gold);
             Assert.AreEqual(1, session.Inventory.GetCount(keepsake));
-            var resultText = AllText(screen.transform.Find("BattleCanvas/SafeArea/Bottom/ResultPanel"));
+            var resultText = AllText(screen.transform.Find("BattleCanvas/SafeArea/ResultPanel"));
             StringAssert.Contains("도감 완성", resultText);
             StringAssert.Contains("시험 징표", resultText);
 

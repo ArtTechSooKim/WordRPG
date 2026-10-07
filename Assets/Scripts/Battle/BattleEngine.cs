@@ -50,6 +50,7 @@ namespace WordRPG.Battle
         public int ChainCorrect { get; private set; }    // 그중 지금까지 맞힌 수
         public bool CanStillCrit => chainAllFast;        // 지금까지 모두 빨리 맞혀서 크리티컬이 아직 가능한지
         public IReadOnlyList<MasteryChange> MasteryChanges => masteryChanges;
+        public BattleSummary Summary { get; } = new BattleSummary(); // 결산 화면용 (#41)
         public bool IsOver => Phase == BattlePhase.Victory || Phase == BattlePhase.Defeat;
 
         // startStreak: 이전 전투에서 이어지는 연속 정답 수
@@ -118,6 +119,7 @@ namespace WordRPG.Battle
 
             var mastery = quiz.SubmitAnswer(CurrentQuestion, correct);
             masteryChanges.Add(mastery);
+            Summary.RecordAnswer(CurrentQuestion.Word, CurrentQuestion.IsNewWord, correct);
             if (correct)
             {
                 CorrectAnswers++;
@@ -136,6 +138,7 @@ namespace WordRPG.Battle
             if (correct && ChainCorrect < Intensity)
             {
                 CurrentQuestion = quiz.NextQuestion(pendingSkill.QuizDirection);
+                Summary.Record(events);
                 return events;
             }
 
@@ -157,6 +160,7 @@ namespace WordRPG.Battle
             ChainCorrect = 0;
 
             if (!CheckBattleEnd(events)) AdvanceTurn(events);
+            Summary.Record(events);
             return events;
         }
 
@@ -172,6 +176,7 @@ namespace WordRPG.Battle
             int healed = CurrentActor.ReceiveHeal(item.HealAmount);
             events.Add(BattleEvent.ItemUsed(CurrentActor, item, healed));
             if (!CheckBattleEnd(events)) AdvanceTurn(events);
+            Summary.Record(events);
             return events;
         }
 

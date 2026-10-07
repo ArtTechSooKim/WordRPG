@@ -144,6 +144,10 @@ namespace WordRPG.Tests
             StringAssert.Contains("보스 출현", AllText(field.Battle));
 
             yield return PlayUntilResult(field.Battle, answerCorrectly: true);
+            // 보스를 쓰러뜨린 한 방은 결정타 연출 (#41), 결산에 물리친 보스 이름
+            Assert.AreEqual(1, field.Battle.FinishersPlayed);
+            StringAssert.Contains("까먹대왕을 물리쳤어요", AllText(field.Battle.transform.Find("BattleCanvas/SafeArea/ResultPanel")));
+            Assert.IsFalse(field.Battle.transform.Find("BattleCanvas/SafeArea/FinisherShade").gameObject.activeSelf, "결산 전에 어두운 막은 걷힘");
             FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
             yield return WaitFor(() => !field.IsInBattle);
 

@@ -89,10 +89,23 @@ namespace WordRPG.UI
         private Button cardConfirm;
         private Image cardGlow, cardStamp; // 새 단어 '발견!' 연출 (Figma '전투 — 새 단어 발견')
 
-        private Text resultTitle, resultBody;
-        private RectTransform resultLines;
+        // 전투 결산 (#41, Figma 'Battle — 전투 결산'): 화면 대부분을 덮는 판에 위에서부터 차례로 놓는다
+        private RectTransform resultCard;
+        private Text resultTitle, resultSubtitle, resultBody;
         private Image resultBorder;
         private Button resultPrimary, resultSecondary;
+        private RectTransform growthCard, expFill, rewardRow, mvpCard, statsRow, newWordsCard, wrongWordsCard, dexBanners;
+        private Image growthFace, mvpIcon;
+        private Text growthLevel, growthExp, mvpLabel, mvpTitle, mvpDetail;
+        private GameObject levelUpPill;
+        private readonly List<GameObject> resultDynamic = new List<GameObject>(); // 판마다 새로 만드는 줄들
+
+        // 보스 결정타 (#41, Figma 'Battle — 보스 결정타'): 하얀 번쩍임 · 느린 화면 동안 가장자리 어둡게 · '결정타!' 도장
+        private bool bossBattle;
+        private Image finisherFlash, finisherShade;
+        private Text finisherStamp;
+        private int enemyAreaIndex = -1; // 결정타 동안 적 칸을 어두운 막 위로 올렸다가 되돌릴 자리
+        public int FinishersPlayed { get; private set; } // 보스 결정타 연출 횟수 (테스트용)
 
         // --- 입력 대기용 ---
         private SkillData pickedSkill;
@@ -182,6 +195,8 @@ namespace WordRPG.UI
             if (running) throw new InvalidOperationException("이미 전투 중입니다");
             if (!EnsureInitialized()) return;
             SetBackdrop(theme, boss);
+            bossBattle = boss;
+            ResetFinisher();
             words = wordBook;
             running = true;
             canvas.gameObject.SetActive(true);
@@ -556,6 +571,11 @@ namespace WordRPG.UI
                         break;
 
                     case BattleEventType.Damage:
+                        if (IsBossFinisher(events, e))
+                        {
+                            yield return BossFinisher(e);
+                            break;
+                        }
                         var d = shown[e.Target];
                         shown[e.Target] = (Mathf.Max(0, d.hp - e.Amount), Mathf.Max(0, d.shield - e.Absorbed));
                         Sync(e.Target);
@@ -607,6 +627,15 @@ namespace WordRPG.UI
 
                     case BattleEventType.Defeated:
                         Log($"{e.Target.DisplayName} 쓰러졌다!");
+                        if (bossBattle && !e.Target.IsPlayerSide && Has(events, BattleEventType.Victory))
+                        {
+                            // 보스는 느린 화면 그대로 천천히 쓰러진다
+                            Sound.Play(Sfx.Faint, 0.7f);
+                            PlayFx(e.Target, Fx.Smoke, 2.5f, 1.4f);
+                            yield return FadeShade(0f, 0.6f);
+                            yield return Wait(0.4f);
+                            break;
+                        }
                         Sound.Play(Sfx.Faint);
                         PlayFx(e.Target, Fx.Smoke);
                         yield return Wait(0.5f);
@@ -628,37 +657,85 @@ namespace WordRPG.UI
         private IEnumerator ShowResult()
         {
             bool victory = engine.Phase == BattlePhase.Victory;
-            var body = new StringBuilder();
-            ClearResultLines();
-            Sound.PlayMusic(Music.None); // 결과 음악(징글)이 잘 들리게 전투 음악을 멈춘다
-            bool leveledUp = false;
+            var summary = engine.Summary;
+            var hero = session.Hero;
+            ClearResultDynamic();
 
+            int levelBefore = hero.Level, levels = 0;
+            BattleReward reward = null;
             if (victory)
             {
-                var reward = engine.CalculateReward();
-                int levels = BattleRewardCalculator.Apply(reward, session.Hero, session.Inventory);
-                resultTitle.text = "승리!";
-                resultTitle.color = Palette.Gold;
-                AddResultLine(null, $"경험치 +{reward.Exp}", Palette.Text);
-                AddResultLine(UiKit.Icon("gold"), $"+{reward.Gold}   (보유 {session.Inventory.Gold}G)", Palette.Text);
-                foreach (var item in reward.Items) AddResultLine(UiKit.ItemIcon(item.Item), $"{item.Item.DisplayName} x{item.Count} 획득", Palette.Text);
-                if (levels > 0) AddResultLine(UiKit.Icon("star_full"), $"레벨 업!  {session.Hero.DisplayName} Lv{session.Hero.Level}", Palette.Gold);
-                leveledUp = levels > 0;
+                reward = engine.CalculateReward();
+                levels = BattleRewardCalculator.Apply(reward, hero, session.Inventory);
             }
-            else
-            {
-                resultTitle.text = "패배…";
-                resultTitle.color = Palette.Bad;
-                string fainted = UiKit.WithJosa(session.Hero.DisplayName, "이", "가");
-                AddResultLine(null, loopBattles ? $"{fainted} 쓰러졌다. 회복하고 다시 도전하자!" : $"{fainted} 쓰러졌다… 시작 지점으로 돌아간다.", Palette.Text);
-            }
-            resultBorder.color = victory ? Palette.Gold : Palette.PanelLight;
-            UiKit.SetColor(resultPrimary, victory ? Palette.Button : Palette.Neutral);
-
             var completions = session.ClaimDexRewards(new[] { words });
-            foreach (var completion in completions) AddDexBanner(completion);
             // 결과 소리: 도감 완성 > 레벨 업 > 승리, 지면 패배
-            Sound.Play(completions.Count > 0 ? Sfx.DexComplete : leveledUp ? Sfx.LevelUp : victory ? Sfx.Victory : Sfx.Defeat);
+            Sound.Play(completions.Count > 0 ? Sfx.DexComplete : levels > 0 ? Sfx.LevelUp : victory ? Sfx.Victory : Sfx.Defeat);
+            session.Record.RecordBattle(victory, engine.CorrectAnswers, engine.WrongAnswers);
+            saveProgress?.Invoke();
+
+            // 위에서부터 차례로 (Figma 'Battle — 전투 결산')
+            float y = 36f;
+            resultTitle.text = victory ? "승리!" : "패배…";
+            resultTitle.color = victory ? Palette.Gold : Palette.Bad;
+            PlaceResult(resultTitle.rectTransform, ref y, 100f, 0f);
+            string fainted = UiKit.WithJosa(hero.DisplayName, "이", "가");
+            resultSubtitle.text = victory ? DefeatedLine()
+                : loopBattles ? $"{fainted} 쓰러졌다. 회복하고 다시 도전하자!" : $"{fainted} 쓰러졌다… 시작 지점으로 돌아간다.";
+            PlaceResult(resultSubtitle.rectTransform, ref y, 44f, 20f);
+
+            growthCard.gameObject.SetActive(victory);
+            rewardRow.gameObject.SetActive(victory);
+            if (victory)
+            {
+                // 성장: 얼굴 · Lv(오르면 → 새 레벨 + '레벨 업!') · 경험치 막대
+                growthFace.sprite = UiKit.HeroPortrait(hero.Data);
+                growthFace.enabled = growthFace.sprite != null;
+                growthLevel.text = levels > 0 ? $"{hero.DisplayName} Lv{levelBefore} → Lv{hero.Level}" : $"{hero.DisplayName} Lv{hero.Level}";
+                levelUpPill.SetActive(levels > 0);
+                int need = hero.IsMaxLevel ? 1 : LevelCurve.ExpToNextLevel(hero.Level);
+                expFill.anchorMax = new Vector2(hero.IsMaxLevel ? 1f : Mathf.Clamp01(hero.Exp / (float)need), 1f);
+                growthExp.text = hero.IsMaxLevel ? $"경험치 +{reward.Exp}   ·   최고 레벨" : $"경험치 +{reward.Exp}   ·   다음 레벨까지 {hero.ExpToNextLevel}";
+                PlaceResult(growthCard, ref y, 150f, 18f);
+
+                // 보상: 골드 + 재료
+                float x = 0f;
+                AddReward(UiKit.Icon("gold"), $"+{reward.Gold}G", ref x);
+                foreach (var item in reward.Items) AddReward(UiKit.ItemIcon(item.Item), $"×{item.Count}", ref x);
+                PlaceResult(rewardRow, ref y, 64f, 18f);
+            }
+
+            // 가장 활약한 성유물 (피해를 가장 많이 준 기술의 출처)
+            var top = summary.TopSkill;
+            mvpCard.gameObject.SetActive(top != null);
+            if (top != null)
+            {
+                FillMvp(top, summary.DamageOf(top), summary.TotalDamage);
+                PlaceResult(mvpCard, ref y, 140f, 14f);
+            }
+
+            // 기록 알약: 정답 · 최대 콤보 · 크리티컬
+            float px = 0f;
+            int answered = summary.Correct + summary.Wrong;
+            if (answered > 0) AddStat($"정답 {summary.Correct} / {answered}", ref px);
+            if (summary.MaxCombo >= Combo.FirstStreak) AddStat($"최대 콤보 {summary.MaxCombo}", ref px);
+            if (summary.Criticals > 0) AddStat($"크리티컬 {summary.Criticals}", ref px);
+            statsRow.gameObject.SetActive(px > 0f);
+            if (px > 0f) PlaceResult(statsRow, ref y, 52f, 18f);
+
+            // 새로 만난 단어 · 틀린 단어 (틀린 단어는 정답 뜻과 함께 — 다시 보는 순간)
+            FillWords(newWordsCard, summary.NewWords, $"새로 만난 단어 {summary.NewWords.Count}", Palette.Gold, ref y);
+            FillWords(wrongWordsCard, summary.WrongWords, $"틀린 단어 {summary.WrongWords.Count} — 오답 노트에 넣었어요, 곧 다시 나와요",
+                Palette.Bad, ref y);
+
+            // 지역 도감을 다 채웠으면 징표 배너
+            dexBanners.gameObject.SetActive(completions.Count > 0);
+            if (completions.Count > 0)
+            {
+                float by = 0f;
+                foreach (var completion in completions) AddDexBanner(completion, ref by);
+                PlaceResult(dexBanners, ref y, by, 18f);
+            }
 
             int up = 0, down = 0;
             foreach (var change in engine.MasteryChanges)
@@ -666,15 +743,25 @@ namespace WordRPG.UI
                 if (change.LeveledUp) up++;
                 else if (change.LeveledDown) down++;
             }
-            body.AppendLine($"정답 {engine.CorrectAnswers}   오답 {engine.WrongAnswers}   단어 숙련도 ▲{up} ▼{down}");
-            body.Append($"발견한 단어 {LearnedCount()}/{words.Words.Count}");
-            resultBody.text = body.ToString();
-
-            session.Record.RecordBattle(victory, engine.CorrectAnswers, engine.WrongAnswers);
-            saveProgress?.Invoke();
+            resultBody.text = $"발견한 단어 {LearnedCount()}/{words.Words.Count}   ·   단어 숙련도 ▲{up} ▼{down}";
+            PlaceResult(resultBody.rectTransform, ref y, 44f, 18f);
 
             if (loopBattles) SetResultButtons(victory ? "다음 전투" : "회복 후 재도전", victory ? "회복 후 전투" : null);
             else SetResultButtons(victory ? "계속 탐험" : "시작 지점으로", null);
+            float buttonsY = y;
+            PlaceResult((RectTransform)resultPrimary.transform, ref buttonsY, 110f, 0f);
+            PlaceResult((RectTransform)resultSecondary.transform, ref y, 110f, 0f);
+            HalfWidth((RectTransform)resultPrimary.transform, 0f, resultSecondary.gameObject.activeSelf ? 0.5f : 1f);
+            HalfWidth((RectTransform)resultSecondary.transform, 0.5f, 1f);
+            y += 36f;
+
+            resultBorder.color = victory ? Palette.Gold : Palette.PanelLight;
+            UiKit.SetColor(resultPrimary, victory ? Palette.Button : Palette.Neutral);
+            resultCard.sizeDelta = new Vector2(ResultWidth, y);
+            // 화면보다 길면(단어가 많을 때 등) 통째로 줄여서 맞춘다
+            float room = ((RectTransform)resultPanel.transform).rect.height - 32f;
+            resultCard.localScale = Vector3.one * (room > 0f && y > room ? room / y : 1f);
+
             resultChoice = -1;
             ShowPanel(resultPanel);
             while (resultChoice < 0) yield return null;
@@ -687,37 +774,144 @@ namespace WordRPG.UI
             }
         }
 
-        private void ClearResultLines()
+        private const float ResultWidth = 1000f;
+        private const int MaxWordRows = 4;
+
+        // "잉크 슬라임 · 낙서 박쥐를 물리쳤어요"
+        private string DefeatedLine()
         {
-            foreach (Transform child in resultLines)
-            {
-                child.gameObject.SetActive(false); // 레이아웃에서 즉시 빠지게
-                Destroy(child.gameObject);
-            }
+            var names = new List<string>();
+            foreach (var enemy in engine.Enemies)
+                if (!names.Contains(enemy.DisplayName)) names.Add(enemy.DisplayName);
+            if (names.Count == 0) return "";
+            string last = UiKit.WithJosa(names[names.Count - 1], "을", "를");
+            names[names.Count - 1] = last;
+            return $"{string.Join(" · ", names)} 물리쳤어요";
         }
 
-        // 결과 한 줄: [아이콘] 글자 (Figma 'Result Panel')
-        private void AddResultLine(Sprite icon, string text, Color color)
+        // 피해를 가장 많이 준 기술의 출처: 성유물이면 성유물, 기술문서면 문서, 기본 기술이면 주인공
+        private void FillMvp(SkillData skill, int damage, int total)
         {
-            var row = UiKit.Rect("Line", resultLines, 0, 0, 1, 1);
-            var layout = row.gameObject.AddComponent<LayoutElement>();
-            layout.minHeight = layout.preferredHeight = 46;
-            if (icon != null)
+            var hero = session.Hero;
+            SkillSlot slot = null;
+            foreach (var candidate in hero.SkillSlots)
+                if (candidate.Skill == skill) slot = candidate;
+            Sprite icon;
+            if (slot?.Relic != null)
             {
-                var image = UiKit.IconImage("Icon", row, icon, 0, 0, 0, 1);
-                image.rectTransform.pivot = new Vector2(0, 0.5f);
-                image.rectTransform.sizeDelta = new Vector2(46, 0);
+                mvpLabel.text = "가장 활약한 성유물";
+                mvpTitle.text = $"{slot.Relic.Data.DisplayName} +{slot.Relic.Level} — {skill.DisplayName}";
+                icon = UiKit.RelicIcon(slot.Relic.Data);
             }
-            var label = UiKit.Label("Text", row, text, 32, color, 0, 0, 1, 1, TextAnchor.MiddleLeft, FontStyle.Normal, true, 18);
-            label.rectTransform.offsetMin = new Vector2(icon != null ? 60 : 0, 0);
+            else if (slot?.Document != null)
+            {
+                mvpLabel.text = "가장 활약한 기술";
+                mvpTitle.text = $"{skill.DisplayName} (기술문서)";
+                icon = UiKit.ItemIcon(slot.Document);
+            }
+            else
+            {
+                mvpLabel.text = "가장 활약한 기술";
+                mvpTitle.text = $"{skill.DisplayName} (기본 기술)";
+                icon = UiKit.HeroPortrait(hero.Data);
+            }
+            mvpIcon.sprite = icon;
+            mvpIcon.enabled = icon != null;
+            int percent = total > 0 ? Mathf.RoundToInt(100f * damage / total) : 100;
+            mvpDetail.text = $"피해 {damage}   ·   이번 전투 피해의 {percent}%";
         }
+
+        private void FillWords(RectTransform card, IReadOnlyList<WordEntry> list, string header, Color color, ref float y)
+        {
+            card.gameObject.SetActive(list.Count > 0);
+            if (list.Count == 0) return;
+            var title = card.Find("Header").GetComponent<Text>();
+            title.text = header;
+            title.color = color;
+            float rowY = 62f;
+            int shown = Mathf.Min(MaxWordRows, list.Count);
+            for (int i = 0; i < shown; i++)
+            {
+                var row = UiKit.Rect($"Word_{i}", card, 0, 1, 1, 1);
+                row.pivot = new Vector2(0.5f, 1);
+                row.offsetMin = new Vector2(28, -(rowY + 46));
+                row.offsetMax = new Vector2(-28, -rowY);
+                var english = UiKit.Display(UiKit.OneLine(UiKit.Label("English", row, list[i].English, 34, Palette.Text, 0, 0, 0.4f, 1,
+                    TextAnchor.MiddleLeft)));
+                english.resizeTextForBestFit = true;
+                english.resizeTextMinSize = 20;
+                english.resizeTextMaxSize = 34;
+                UiKit.OneLine(UiKit.Label("Meaning", row, list[i].Meaning, 28, Palette.TextDim, 0.4f, 0, 1, 1, TextAnchor.MiddleLeft,
+                    FontStyle.Normal, true, 18));
+                resultDynamic.Add(row.gameObject);
+                rowY += 50f;
+            }
+            if (list.Count > shown)
+            {
+                var more = UiKit.Label("More", card, $"외 {list.Count - shown}개 — 도감에서 볼 수 있어요", 24, Palette.TextDim, 0, 1, 1, 1,
+                    TextAnchor.MiddleLeft);
+                more.rectTransform.pivot = new Vector2(0.5f, 1);
+                more.rectTransform.offsetMin = new Vector2(28, -(rowY + 36));
+                more.rectTransform.offsetMax = new Vector2(-28, -rowY);
+                resultDynamic.Add(more.gameObject);
+                rowY += 40f;
+            }
+            PlaceResult(card, ref y, rowY + 16f, 18f);
+        }
+
+        private void ClearResultDynamic()
+        {
+            foreach (var go in resultDynamic)
+            {
+                if (go == null) continue;
+                go.SetActive(false); // 레이아웃에서 즉시 빠지게
+                Destroy(go);
+            }
+            resultDynamic.Clear();
+        }
+
+        // 보상 한 칸: [아이콘] 글자 (가로로 이어 붙임)
+        private void AddReward(Sprite icon, string text, ref float x)
+        {
+            var cell = UiKit.Rect("Reward", rewardRow, 0, 0, 0, 1);
+            cell.pivot = new Vector2(0, 0.5f);
+            var image = UiKit.IconImage("Icon", cell, icon, 0, 0.5f, 0, 0.5f);
+            image.rectTransform.pivot = new Vector2(0, 0.5f);
+            image.rectTransform.sizeDelta = new Vector2(56, 56);
+            var label = UiKit.Display(UiKit.OneLine(UiKit.Label("Text", cell, text, 36, Palette.Text, 0, 0, 1, 1, TextAnchor.MiddleLeft)));
+            label.rectTransform.offsetMin = new Vector2(icon != null ? 64 : 0, 0);
+            float width = (icon != null ? 64 : 0) + label.preferredWidth + 8;
+            cell.sizeDelta = new Vector2(width, 0);
+            cell.anchoredPosition = new Vector2(x, 0);
+            x += width + 28f;
+            resultDynamic.Add(cell.gameObject);
+        }
+
+        // 기록 알약 하나 (가로로 이어 붙임)
+        private void AddStat(string text, ref float x)
+        {
+            var pill = UiKit.Pill(UiKit.Panel("Stat", statsRow, Palette.PanelLight, 0, 0, 0, 1));
+            pill.raycastTarget = false;
+            var rt = pill.rectTransform;
+            rt.pivot = new Vector2(0, 0.5f);
+            var label = UiKit.OneLine(UiKit.Label("Text", pill.transform, text, 26, Palette.Text, 0, 0, 1, 1, TextAnchor.MiddleCenter, FontStyle.Bold));
+            float width = label.preferredWidth + 40;
+            rt.sizeDelta = new Vector2(width, 0);
+            rt.anchoredPosition = new Vector2(x, 0);
+            x += width + 14f;
+            resultDynamic.Add(pill.gameObject);
+        }
+
 
         // 지역 도감을 다 채운 순간 결과 화면에 붙는 배너: 징표 아이콘 + "★ 초원 도감 완성!"
-        private void AddDexBanner(DexCompletion completion)
+        private void AddDexBanner(DexCompletion completion, ref float y)
         {
-            var row = UiKit.Rect("DexBanner", resultLines, 0, 0, 1, 1);
-            var layout = row.gameObject.AddComponent<LayoutElement>();
-            layout.minHeight = layout.preferredHeight = 120;
+            var row = UiKit.Rect("DexBanner", dexBanners, 0, 1, 1, 1);
+            row.pivot = new Vector2(0.5f, 1);
+            row.offsetMin = new Vector2(0, -(y + 120));
+            row.offsetMax = new Vector2(0, -y);
+            y += 132f;
+            resultDynamic.Add(row.gameObject);
             UiKit.RoundPanel("Bg", row, Palette.PanelLight, UiKit.RadiusMd).raycastTarget = false;
             UiKit.Outline(UiKit.Panel("Border", row, Palette.Gold), UiKit.RadiusMd, 3).raycastTarget = false;
             var icon = UiKit.IconImage("Keepsake", row, UiKit.ItemIcon(completion.Keepsake), 0, 0.08f, 0, 0.92f);
@@ -1127,8 +1321,9 @@ namespace WordRPG.UI
 
         private IEnumerator FloatRoutine(RectTransform target, string text, Color color, int size)
         {
-            var label = UiKit.Display(UiKit.Label("Float", root, text, size + 8, color, 0.5f, 0.5f, 0.5f, 0.5f,
-                TextAnchor.MiddleCenter));
+            // 큰 숫자(보스 결정타)는 칸보다 커도 잘리지 않게 한 줄로 넘쳐 그린다
+            var label = UiKit.Display(UiKit.OneLine(UiKit.Label("Float", root, text, size + 8, color, 0.5f, 0.5f, 0.5f, 0.5f,
+                TextAnchor.MiddleCenter)));
             var rt = label.rectTransform;
             rt.sizeDelta = new Vector2(560, 100);
             var outline = label.gameObject.AddComponent<Outline>();
@@ -1190,9 +1385,25 @@ namespace WordRPG.UI
             bool two = secondary != null;
             resultSecondary.gameObject.SetActive(two);
             if (two) UiKit.LabelOf(resultSecondary).text = secondary;
-            var rt = (RectTransform)resultPrimary.transform;
-            rt.anchorMin = new Vector2(two ? 0.03f : 0.05f, 0.025f);
-            rt.anchorMax = new Vector2(two ? 0.49f : 0.95f, 0.185f);
+        }
+
+        // 결산 판 안: 위에서 y만큼 내려와 높이 h (좌우 40 여백), 다음 y는 h + gap 아래
+        private static void PlaceResult(RectTransform rect, ref float y, float h, float gap)
+        {
+            rect.anchorMin = new Vector2(0, 1);
+            rect.anchorMax = new Vector2(1, 1);
+            rect.pivot = new Vector2(0.5f, 1);
+            rect.offsetMin = new Vector2(40, -(y + h));
+            rect.offsetMax = new Vector2(-40, -y);
+            y += h + gap;
+        }
+
+        private static void HalfWidth(RectTransform rect, float from, float to)
+        {
+            rect.anchorMin = new Vector2(from, rect.anchorMin.y);
+            rect.anchorMax = new Vector2(to, rect.anchorMax.y);
+            rect.offsetMin = new Vector2(from > 0 ? 10 : 40, rect.offsetMin.y);
+            rect.offsetMax = new Vector2(to < 1 ? -10 : -40, rect.offsetMax.y);
         }
 
         // ------------------------------------------------------------------ 전투 배경 (지역 타일)
@@ -1229,11 +1440,136 @@ namespace WordRPG.UI
         }
 
         // 카드 위에 효과 애니메이션 (기다리지 않고 바로 다음 연출로)
-        private void PlayFx(BattleUnit unit, Fx fx)
+        // slow: 효과를 몇 배 느리게 (보스 결정타), scale: 크기 배율
+        private void PlayFx(BattleUnit unit, Fx fx, float slow = 1f, float scale = 1f)
         {
             if (unit == null || !viewOf.TryGetValue(unit, out var view)) return;
-            float size = unit.IsPlayerSide ? 200f : 300f;
-            StartCoroutine(BattleFx.Play(view.Root, fx, size, animationScale));
+            float size = (unit.IsPlayerSide ? 200f : 300f) * scale;
+            StartCoroutine(BattleFx.Play(view.Root, fx, size, animationScale * slow));
+        }
+
+        private static bool Has(IReadOnlyList<BattleEvent> events, BattleEventType type, BattleUnit target = null)
+        {
+            foreach (var e in events)
+                if (e.Type == type && (target == null || e.Target == target)) return true;
+            return false;
+        }
+
+        // 보스전에서 아군이 마지막 적(보스)을 쓰러뜨리는 한 방 (여러 번 때리는 기술이면 마지막 타격만)
+        private bool IsBossFinisher(IReadOnlyList<BattleEvent> events, BattleEvent e)
+        {
+            if (!bossBattle || e.Actor == null || !e.Actor.IsPlayerSide || e.Target == null || e.Target.IsPlayerSide || e.Amount <= 0) return false;
+            if (!Has(events, BattleEventType.Defeated, e.Target) || !Has(events, BattleEventType.Victory)) return false;
+            BattleEvent last = null;
+            foreach (var other in events)
+                if (other.Type == BattleEventType.Damage && other.Target == e.Target && other.Amount > 0) last = other;
+            return ReferenceEquals(last, e);
+        }
+
+        // 하얀 번쩍임 → 느린 화면(가장자리 어둡게, 보스 카드가 커지며 흔들림, 느린 큰 타격 효과, 낮은 소리) → '결정타!' 도장
+        private IEnumerator BossFinisher(BattleEvent e)
+        {
+            var d = shown[e.Target];
+            shown[e.Target] = (Mathf.Max(0, d.hp - e.Amount), Mathf.Max(0, d.shield - e.Absorbed));
+            FinishersPlayed++;
+            Log($"결정타! {e.Target.DisplayName} 피해 {e.Amount}");
+            // 보스(적 칸)만 밝게 남기고 나머지를 어둡게: 적 칸을 어두운 막 바로 위로
+            if (enemyAreaIndex < 0)
+            {
+                enemyAreaIndex = enemyArea.GetSiblingIndex();
+                enemyArea.SetSiblingIndex(finisherShade.transform.GetSiblingIndex());
+            }
+            Sound.Play(Sfx.Critical, 0.55f);
+            Sound.Play(Sfx.Hit, 0.6f);
+            if (settings != null && settings.Vibration) Haptics.Vibrate();
+            PlayFx(e.Target, Fx.Explosion, 3f, 1.8f);
+            Float(e.Target, $"-{e.Amount}", Palette.Bad, 96);
+            StartCoroutine(Flash());
+            StartCoroutine(FadeShade(0.75f, 0.25f)); // Linear 색공간이라 알파를 높게
+            StartCoroutine(StampRoutine());
+
+            var card = viewOf.TryGetValue(e.Target, out var view) ? view.Root : null;
+            var home = card != null ? card.anchoredPosition : Vector2.zero;
+            float duration = 1.5f * animationScale, t = 0f;
+            bool synced = false;
+            while (t < duration)
+            {
+                t += Time.unscaledDeltaTime;
+                float k = Mathf.Clamp01(t / Mathf.Max(0.0001f, duration));
+                if (card != null)
+                {
+                    card.localScale = Vector3.one * (1f + 0.22f * Mathf.Sin(Mathf.Min(1f, k * 2f) * Mathf.PI * 0.5f));
+                    float shake = 14f * (1f - k);
+                    card.anchoredPosition = home + new Vector2(Mathf.Sin(t * 70f) * shake, Mathf.Cos(t * 53f) * shake * 0.6f);
+                }
+                if (!synced && k > 0.35f)
+                {
+                    Sync(e.Target); // HP 바는 느린 화면 중간에 0으로
+                    synced = true;
+                }
+                yield return null;
+            }
+            if (!synced) Sync(e.Target);
+            if (card != null)
+            {
+                card.localScale = Vector3.one;
+                card.anchoredPosition = home;
+            }
+        }
+
+        private IEnumerator Flash()
+        {
+            finisherFlash.gameObject.SetActive(true);
+            float duration = 0.35f * animationScale;
+            for (float t = 0f; t < duration; t += Time.unscaledDeltaTime)
+            {
+                finisherFlash.color = new Color(1f, 1f, 1f, 0.85f * (1f - t / Mathf.Max(0.0001f, duration)));
+                yield return null;
+            }
+            finisherFlash.gameObject.SetActive(false);
+        }
+
+        // 화면을 어둡게(느린 화면 동안) / 다시 밝게
+        private IEnumerator FadeShade(float to, float seconds)
+        {
+            finisherShade.gameObject.SetActive(true);
+            float from = finisherShade.color.a, duration = seconds * animationScale;
+            for (float t = 0f; t < duration; t += Time.unscaledDeltaTime)
+            {
+                finisherShade.color = new Color(0f, 0f, 0f, Mathf.Lerp(from, to, t / Mathf.Max(0.0001f, duration)));
+                yield return null;
+            }
+            finisherShade.color = new Color(0f, 0f, 0f, to);
+            if (to <= 0.001f) ResetFinisher();
+        }
+
+        // 결정타 연출 층을 치우고 적 칸을 원래 자리로
+        private void ResetFinisher()
+        {
+            if (finisherShade == null) return;
+            finisherShade.color = new Color(0f, 0f, 0f, 0f);
+            finisherShade.gameObject.SetActive(false);
+            finisherFlash.gameObject.SetActive(false);
+            finisherStamp.gameObject.SetActive(false);
+            if (enemyAreaIndex >= 0) enemyArea.SetSiblingIndex(enemyAreaIndex);
+            enemyAreaIndex = -1;
+        }
+
+        // '결정타!'가 크게 찍히듯 줄어들었다가 잠시 머문 뒤 사라진다
+        private IEnumerator StampRoutine()
+        {
+            var rt = finisherStamp.rectTransform;
+            finisherStamp.gameObject.SetActive(true);
+            float pop = 0.25f * animationScale, hold = 1.1f * animationScale, fade = 0.3f * animationScale;
+            for (float t = 0f; t < pop + hold + fade; t += Time.unscaledDeltaTime)
+            {
+                float scale = t < pop ? Mathf.Lerp(2.4f, 1f, t / Mathf.Max(0.0001f, pop)) : 1f;
+                float alpha = t < pop + hold ? Mathf.Clamp01(t / Mathf.Max(0.0001f, pop)) : 1f - (t - pop - hold) / Mathf.Max(0.0001f, fade);
+                rt.localScale = Vector3.one * scale;
+                finisherStamp.color = new Color(Palette.Gold.r, Palette.Gold.g, Palette.Gold.b, alpha);
+                yield return null;
+            }
+            finisherStamp.gameObject.SetActive(false);
         }
 
         // ------------------------------------------------------------------ UI 생성
@@ -1285,7 +1621,22 @@ namespace WordRPG.UI
             BuildSkillPanel(bottom);
             BuildQuizPanel(bottom);
             BuildCardPanel(bottom);
-            BuildResultPanel(bottom);
+
+            // 보스 결정타 연출 층: 어둡게 · 하얀 번쩍임 · '결정타!' (Figma 'Battle — 보스 결정타 (#41)')
+            finisherShade = UiKit.Panel("FinisherShade", root, new Color(0f, 0f, 0f, 0f));
+            finisherShade.raycastTarget = false;
+            finisherShade.gameObject.SetActive(false);
+            finisherFlash = UiKit.Panel("FinisherFlash", root, new Color(1f, 1f, 1f, 0f));
+            finisherFlash.raycastTarget = false;
+            finisherFlash.gameObject.SetActive(false);
+            finisherStamp = UiKit.Display(UiKit.Label("FinisherStamp", root, "결정타!", 150, Palette.Gold, 0, 0.66f, 1, 0.8f));
+            var stampOutline = finisherStamp.gameObject.AddComponent<Outline>();
+            stampOutline.effectColor = new Color(0.1f, 0.05f, 0.02f, 1f);
+            stampOutline.effectDistance = new Vector2(5, -5);
+            finisherStamp.rectTransform.localEulerAngles = new Vector3(0, 0, 4);
+            finisherStamp.gameObject.SetActive(false);
+
+            BuildResultPanel(root);
             HideAllPanels();
 
             dexView = DexView.Create(root); // 맨 마지막에 만들어 모든 화면 위에 덮는다
@@ -1435,30 +1786,93 @@ namespace WordRPG.UI
             cardStamp.gameObject.SetActive(false);
         }
 
+        // 전투 결산 (Figma 'Battle — 전투 결산 (#41)'): 위쪽 [도감] 줄 아래를 어둡게 덮고 가운데 판. 내용은 ShowResult가 놓는다
         private void BuildResultPanel(Transform parent)
         {
-            resultPanel = UiKit.Stretch("ResultPanel", parent).gameObject;
-            UiKit.RoundPanel("Bg", resultPanel.transform, Palette.Panel, UiKit.RadiusLg);
-            resultBorder = UiKit.Outline(UiKit.Panel("Border", resultPanel.transform, Palette.Gold), UiKit.RadiusLg, 4);
+            var overlay = UiKit.Panel("ResultPanel", parent, new Color(0f, 0f, 0f, 0.8f), 0, 0, 1, 0.94f);
+            resultPanel = overlay.gameObject;
+            var cardImage = UiKit.RoundPanel("Card", overlay.transform, Palette.Panel, UiKit.RadiusLg, 0.5f, 0.5f, 0.5f, 0.5f);
+            resultCard = cardImage.rectTransform;
+            resultBorder = UiKit.Outline(UiKit.Panel("Border", resultCard, Palette.Gold), UiKit.RadiusLg, 4);
             resultBorder.raycastTarget = false;
-            resultTitle = UiKit.Display(UiKit.Label("Title", resultPanel.transform, "", 60, Palette.Gold, 0, 0.845f, 1, 0.975f,
-                TextAnchor.MiddleCenter));
-            resultLines = UiKit.Rect("Lines", resultPanel.transform, 0.05f, 0.37f, 0.95f, 0.85f);
-            var lines = resultLines.gameObject.AddComponent<VerticalLayoutGroup>();
-            lines.spacing = 6;
-            lines.childAlignment = TextAnchor.UpperLeft;
-            lines.childControlWidth = true;
-            lines.childControlHeight = true;
-            lines.childForceExpandWidth = true;
-            lines.childForceExpandHeight = false;
-            resultBody = UiKit.Label("Body", resultPanel.transform, "", 28, Palette.TextDim, 0.05f, 0.2f, 0.95f, 0.36f,
-                TextAnchor.MiddleCenter, FontStyle.Normal, true, 18);
-            resultPrimary = UiKit.MakeButton("ResultButton_Primary", resultPanel.transform, "", Palette.Button, 38,
-                0.03f, 0.02f, 0.49f, 0.2f, bestFit: true);
+            resultTitle = UiKit.Display(UiKit.OneLine(UiKit.Label("Title", resultCard, "", 88, Palette.Gold, 0, 1, 1, 1)));
+            resultSubtitle = UiKit.OneLine(UiKit.Label("Subtitle", resultCard, "", 28, Palette.TextDim, 0, 1, 1, 1, TextAnchor.MiddleCenter,
+                FontStyle.Normal, true, 18));
+
+            // 성장 카드: 얼굴 · Lv · 레벨 업 · 경험치 막대
+            growthCard = Card("Growth");
+            growthFace = UiKit.IconImage("Face", growthCard, null, 0, 0.5f, 0, 0.5f);
+            growthFace.rectTransform.pivot = new Vector2(0, 0.5f);
+            growthFace.rectTransform.sizeDelta = new Vector2(110, 110);
+            growthFace.rectTransform.anchoredPosition = new Vector2(24, 0);
+            growthLevel = UiKit.Display(UiKit.OneLine(UiKit.Label("Level", growthCard, "", 40, Palette.Text, 0, 0.56f, 1, 0.92f, TextAnchor.MiddleLeft)));
+            growthLevel.rectTransform.offsetMin = new Vector2(156, 0);
+            var pill = UiKit.Pill(UiKit.Panel("LevelUp", growthCard, Palette.Gold, 1, 0.74f, 1, 0.74f));
+            pill.raycastTarget = false;
+            pill.rectTransform.pivot = new Vector2(1, 0.5f);
+            pill.rectTransform.sizeDelta = new Vector2(150, 48);
+            pill.rectTransform.anchoredPosition = new Vector2(-24, 0);
+            UiKit.Display(UiKit.Label("Text", pill.transform, "레벨 업!", 28, Palette.OnAccent, 0, 0, 1, 1));
+            levelUpPill = pill.gameObject;
+            var track = UiKit.Pill(UiKit.Panel("ExpBar", growthCard, Palette.Track, 0, 0.36f, 1, 0.5f));
+            track.raycastTarget = false;
+            track.rectTransform.offsetMin = new Vector2(156, 0);
+            track.rectTransform.offsetMax = new Vector2(-28, 0);
+            var fill = UiKit.Pill(UiKit.Panel("Fill", track.transform, Palette.Gold, 0, 0, 0.5f, 1));
+            fill.raycastTarget = false;
+            expFill = fill.rectTransform;
+            growthExp = UiKit.OneLine(UiKit.Label("Exp", growthCard, "", 26, Palette.TextDim, 0, 0.06f, 1, 0.32f, TextAnchor.MiddleLeft,
+                FontStyle.Normal, true, 18));
+            growthExp.rectTransform.offsetMin = new Vector2(156, 0);
+
+            rewardRow = UiKit.Rect("Rewards", resultCard, 0, 1, 1, 1);
+
+            // 가장 활약한 성유물
+            mvpCard = Card("MVP");
+            mvpIcon = UiKit.IconImage("Icon", mvpCard, null, 0, 0.5f, 0, 0.5f);
+            mvpIcon.rectTransform.pivot = new Vector2(0, 0.5f);
+            mvpIcon.rectTransform.sizeDelta = new Vector2(100, 100);
+            mvpIcon.rectTransform.anchoredPosition = new Vector2(24, 0);
+            mvpLabel = UiKit.OneLine(UiKit.Label("Label", mvpCard, "", 24, Palette.Gold, 0, 0.66f, 1, 0.92f, TextAnchor.MiddleLeft, FontStyle.Bold));
+            mvpLabel.rectTransform.offsetMin = new Vector2(146, 0);
+            mvpTitle = UiKit.Display(UiKit.OneLine(UiKit.Label("Title", mvpCard, "", 36, Palette.Text, 0, 0.34f, 1, 0.66f, TextAnchor.MiddleLeft)));
+            mvpTitle.resizeTextForBestFit = true;
+            mvpTitle.resizeTextMinSize = 22;
+            mvpTitle.resizeTextMaxSize = 36;
+            mvpTitle.rectTransform.offsetMin = new Vector2(146, 0);
+            mvpTitle.rectTransform.offsetMax = new Vector2(-20, 0);
+            mvpDetail = UiKit.OneLine(UiKit.Label("Detail", mvpCard, "", 26, Palette.TextDim, 0, 0.08f, 1, 0.34f, TextAnchor.MiddleLeft));
+            mvpDetail.rectTransform.offsetMin = new Vector2(146, 0);
+
+            statsRow = UiKit.Rect("Stats", resultCard, 0, 1, 1, 1);
+            newWordsCard = WordCard("NewWords");
+            wrongWordsCard = WordCard("WrongWords");
+            dexBanners = UiKit.Rect("DexBanners", resultCard, 0, 1, 1, 1);
+
+            resultBody = UiKit.OneLine(UiKit.Label("Body", resultCard, "", 26, Palette.TextDim, 0, 1, 1, 1, TextAnchor.MiddleCenter,
+                FontStyle.Normal, true, 18));
+            resultPrimary = UiKit.MakeButton("ResultButton_Primary", resultCard, "", Palette.Button, 40, 0, 1, 1, 1, bestFit: true);
             resultPrimary.onClick.AddListener(() => resultChoice = 0);
-            resultSecondary = UiKit.MakeButton("ResultButton_Secondary", resultPanel.transform, "", Palette.Heal,
-                38, 0.51f, 0.02f, 0.97f, 0.2f, bestFit: true);
+            resultSecondary = UiKit.MakeButton("ResultButton_Secondary", resultCard, "", Palette.Heal, 40, 0, 1, 1, 1, bestFit: true);
             resultSecondary.onClick.AddListener(() => resultChoice = 1);
+        }
+
+        private RectTransform Card(string name)
+        {
+            var card = UiKit.RoundPanel(name, resultCard, Palette.PanelLight, UiKit.RadiusMd, 0, 1, 1, 1);
+            card.raycastTarget = false;
+            return card.rectTransform;
+        }
+
+        private RectTransform WordCard(string name)
+        {
+            var card = Card(name);
+            var header = UiKit.OneLine(UiKit.Label("Header", card, "", 28, Palette.Gold, 0, 1, 1, 1, TextAnchor.MiddleLeft, FontStyle.Bold,
+                true, 18));
+            header.rectTransform.pivot = new Vector2(0.5f, 1);
+            header.rectTransform.offsetMin = new Vector2(28, -58);
+            header.rectTransform.offsetMax = new Vector2(-28, -14);
+            return card;
         }
 
     }
