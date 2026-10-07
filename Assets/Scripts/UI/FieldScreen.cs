@@ -87,6 +87,10 @@ namespace WordRPG.UI
         private VirtualStick stick;
         private RectTransform menuRect;
         private TutorialOverlay tutorial;
+        private PaywallView paywall;
+        private IStore store;               // 결제 창구 (GameManager 것, 테스트는 가짜)
+        private Entitlements entitlements; // 산 상품 — 없으면(테스트) 정식판 잠금 없음
+        private bool paywallArmed = true;  // 정식판 안내를 닫은 뒤에는 스틱을 한 번 떼야 다시 뜬다
         private bool fieldTutorialRunning; // 첫 안내 중에는 몬스터가 나오지 않는다
         private int stepsTaken;
         private DexView dexView;
@@ -108,13 +112,14 @@ namespace WordRPG.UI
         public bool IsRunning => moving && running; // 지금 칸을 달리는 중
         public VirtualStick Stick => stick;
         public TutorialOverlay Tutorial => tutorial;
+        public PaywallView Paywall => paywall;
         public bool IsInBattle => inBattle || transitioning;
         public BattleScreen Battle => battle;
         public GameSession Session => session;
         public FieldArea CurrentArea => area;
         public bool IsPanelOpen => dexView.IsOpen || altarView.IsOpen || shopView.IsOpen
                                    || inventoryView.IsOpen || settingsView.IsOpen || mapView.IsOpen || learnView.IsOpen
-                                   || (quitDialog != null && quitDialog.IsOpen);
+                                   || (quitDialog != null && quitDialog.IsOpen) || (paywall != null && paywall.IsOpen);
         public SkillLearnView LearnView => learnView;
         public bool IsQuitDialogOpen => quitDialog.IsOpen;
         public MinimapView Minimap => minimap;
@@ -132,10 +137,13 @@ namespace WordRPG.UI
         // gameSettings / onSettingsChanged / onDeleteSave: 설정 화면용. 안 주면 GameManager 것
         public void Configure(FieldArea fieldArea, GameSession gameSession = null, Action onSave = null,
             float step = 0.16f, float animScale = 1f, BattleConfig config = null, GameDatabase gameDatabase = null,
-            GameSettings gameSettings = null, Action onSettingsChanged = null, Action onDeleteSave = null, bool tutorials = false)
+            GameSettings gameSettings = null, Action onSettingsChanged = null, Action onDeleteSave = null, bool tutorials = false,
+            IStore purchaseStore = null, Entitlements owned = null)
         {
             area = fieldArea;
             showTutorials = tutorials;
+            store = purchaseStore;
+            entitlements = owned;
             session = gameSession;
             database = gameDatabase;
             saveProgress = onSave;
@@ -161,6 +169,8 @@ namespace WordRPG.UI
                 statusMessage = manager.StatusMessage;
                 loadedFromSave = manager.LoadedFromSave;
                 if (database == null) database = manager.Database;
+                if (store == null) store = manager.Store;
+                if (entitlements == null) entitlements = manager.Entitlements;
                 if (settings == null) settings = manager.Settings;
                 if (saveSettings == null) saveSettings = manager.SaveSettings;
                 // 설정에서 저장 데이터를 지우면 타이틀로 (타이틀 씬이 없으면 이 씬을 처음부터)
@@ -225,6 +235,7 @@ namespace WordRPG.UI
                 // 창을 닫은 직후 같은 키(Enter 등)로 바로 다시 열리지 않게
                 if (IsPanelOpen) interactCooldown = 0.5f;
                 confirmRequested = false;
+                if (!ReadMove().direction.HasValue) paywallArmed = true; // 정식판 안내가 떠 있는 동안 손을 뗐으면 다시 뜰 수 있게
                 return;
             }
 
@@ -264,6 +275,7 @@ namespace WordRPG.UI
             }
 
             var (direction, runInput) = ReadMove();
+            if (!direction.HasValue) paywallArmed = true;
             if (direction.HasValue) TryStep(direction.Value, runInput);
             else if (walkTime > 0f)
             {
@@ -293,7 +305,11 @@ namespace WordRPG.UI
                     confirmHint = 0.8f; // 부딪히면 쓰지 않고 [확인] 버튼만 깜빡여 알려 준다
                     break;
                 case StepKind.BlockedByGate:
-                    ShowGateHint(outcome.Target);
+                    if (!IsDoorLocked(outcome.Target) && IsPaywalled(outcome.Target))
+                    {
+                        if (paywallArmed) ShowPaywall(outcome.Target);
+                    }
+                    else ShowGateHint(outcome.Target);
                     break;
             }
         }
@@ -309,6 +325,46 @@ namespace WordRPG.UI
             string message = $"{UiKit.WithJosa(target, "으로", "로")} 가는 길이 덤불로 막혀 있다…\n" +
                              $"{bossArea.DisplayName}의 {UiKit.WithJosa(boss, "을", "를")} 물리치면 열릴 것 같다";
             if (ToastMessage != message) ShowToast(message, 3f);
+        }
+
+        // 정식판이 필요한 지역(숲)으로 가는 출입구인데 아직 안 샀는지 (#40)
+        private bool IsPaywalled(Vector2Int cell)
+        {
+            if (entitlements == null || entitlements.HasFullVersion) return false;
+            var target = area.GetExit(cell)?.Target;
+            return target != null && target.RequiresFullVersion;
+        }
+
+        // 정식판 안내 (Figma '필드 — 정식판 안내 (#40)'). 사면 바로 그 출입구로 들어갈 수 있다
+        private void ShowPaywall(Vector2Int cell)
+        {
+            paywallArmed = false;
+            var target = area.GetExit(cell).Target;
+            paywall.Show(store, entitlements, OfferFor(target), () =>
+                ShowToast($"정식판이 열렸어요! 이제 {UiKit.WithJosa(target.DisplayName, "으로", "로")} 들어갈 수 있어요.", 3f));
+        }
+
+        // 안내 문구는 그 지역 데이터에서: 단어 수 · 몬스터·보스 · 성유물(상자·보스 보상)
+        private static PaywallOffer OfferFor(FieldArea target)
+        {
+            var offer = new PaywallOffer { AreaName = target.DisplayName };
+            if (target.Words != null && target.Words.Words.Count > 0)
+                offer.Lines.Add($"{target.DisplayName} 지역 — 새 영단어 {target.Words.Words.Count}개");
+            var species = new HashSet<MonsterSpecies>();
+            if (target.Encounters != null)
+                foreach (var entry in target.Encounters.Entries)
+                    if (entry.Species != null) species.Add(entry.Species);
+            var boss = target.Boss;
+            offer.Lines.Add(boss != null ? $"새 몬스터 {species.Count}종과 보스 '{boss.Species.DisplayName}'" : $"새 몬스터 {species.Count}종");
+            var relics = new List<RelicData>();
+            foreach (var chest in target.ChestContents)
+                if (chest.Relic != null) relics.Add(chest.Relic);
+            if (boss?.RewardRelic != null) relics.Add(boss.RewardRelic);
+            if (relics.Count > 0)
+                offer.Lines.Add($"{target.DisplayName}의 성유물 {relics.Count}개 ({string.Join("·", relics.ConvertAll(r => r.DisplayName))})");
+            offer.Lines.Add("앞으로 추가될 지역도 모두");
+            foreach (var relic in relics) offer.Icons.Add(UiKit.RelicIcon(relic));
+            return offer;
         }
 
         // 그 칸의 출입구가 지금 잠겨 있는지 (지금 지역 기준)
@@ -340,6 +396,11 @@ namespace WordRPG.UI
         public void HandleBack()
         {
             if (tutorial.IsShowing) return; // 안내 중에는 [건너뛰기]로
+            if (paywall.IsOpen)
+            {
+                paywall.Close(); // 결제 창이 떠 있는 동안은 닫히지 않음
+                return;
+            }
             if (inBattle)
             {
                 battle.HandleBack();
@@ -745,7 +806,7 @@ namespace WordRPG.UI
         {
             area = newArea;
             var map = area.Map;
-            walker = new FieldWalker(map, position, IsDoorLocked);
+            walker = new FieldWalker(map, position, cell => IsDoorLocked(cell) || IsPaywalled(cell));
             encounterCounter = new EncounterCounter(area.EncounterRate, area.MinStepsBetweenEncounters);
             session.World.SetPosition(area.AreaId, position);
 
@@ -983,6 +1044,7 @@ namespace WordRPG.UI
             mapView = MapView.Create(hudRoot);
             learnView = SkillLearnView.Create(hudRoot);
             quitDialog = ConfirmDialog.Create(hudRoot);
+            paywall = PaywallView.Create(hudRoot);
             tutorial = TutorialOverlay.Create(transform); // 자기 캔버스로 HUD·전투 위에
         }
 

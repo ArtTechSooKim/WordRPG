@@ -134,6 +134,10 @@ namespace WordRPG.Field
         [Header("보스 — 맵의 B (한 번 쓰러뜨리면 다시 나오지 않음)")]
         [SerializeField] private BossEncounter boss;
 
+        [Header("정식판")]
+        [Tooltip("정식판(인앱 결제)을 사야 들어갈 수 있는 지역 — 입구에서 정식판 안내가 뜬다 (#40, 숲부터)")]
+        [SerializeField] private bool requiresFullVersion;
+
         [NonSerialized] private FieldMap parsed;
         [NonSerialized] private string parsedFrom;
 
@@ -149,6 +153,7 @@ namespace WordRPG.Field
         public IReadOnlyList<AreaExit> Exits => exits;
         public BossEncounter Boss => boss != null && boss.Species != null ? boss : null;
         public string BossId => $"{areaId}:boss";
+        public bool RequiresFullVersion => requiresFullVersion;
 
         // 맵 텍스트가 바뀌면 다시 해석 (인스펙터에서 고치면서 플레이할 수 있게)
         public FieldMap Map

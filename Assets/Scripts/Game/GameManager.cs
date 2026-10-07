@@ -14,9 +14,13 @@ namespace WordRPG.Game
         public const string TitleSceneName = "Title";
         public const string FieldSceneName = "Field";
         private const string SettingsKey = "WordRPG.Settings";
+        private const string EntitlementsKey = "WordRPG.Entitlements"; // 산 상품 (세이브와 따로 — 처음부터 다시 해도 남음)
 
         // 테스트가 실제 세이브 파일을 건드리지 않도록 저장 폴더를 바꾸는 용도. 평소에는 null
         public static string SaveDirectoryOverride;
+
+        // 테스트용 결제 창구. 평소에는 null → 실제 기기에서는 애플 인앱 결제(UnityIapStore)
+        public static IStore StoreOverride;
 
         [SerializeField] private GameDatabase database;
         [SerializeField] private HeroData hero;
@@ -27,6 +31,8 @@ namespace WordRPG.Game
         public static GameManager Instance { get; private set; }
         public GameSession Session { get; private set; }
         public GameSettings Settings { get; private set; } = new GameSettings();
+        public Entitlements Entitlements { get; private set; } = new Entitlements(); // 산 상품 (정식판)
+        public IStore Store { get; private set; } // 결제 창구 (배치모드 테스트에서는 없음)
         public bool LoadedFromSave { get; private set; }
         public bool HasSave => saveSystem != null && saveSystem.HasSave;
         public string StatusMessage { get; private set; } = "";
@@ -57,6 +63,9 @@ namespace WordRPG.Game
             saveSystem = new SaveSystem(SaveDirectoryOverride ?? Application.persistentDataPath);
             // 테스트(저장 폴더를 바꾼 경우)에서는 실제 기기 설정을 읽거나 덮어쓰지 않는다
             if (SaveDirectoryOverride == null) Settings = GameSettings.FromJson(PlayerPrefs.GetString(SettingsKey, ""));
+            if (SaveDirectoryOverride == null) Entitlements = Entitlements.FromStorage(PlayerPrefs.GetString(EntitlementsKey, ""));
+            Entitlements.Changed += SaveEntitlements;
+            Store = StoreOverride ?? (Application.isBatchMode ? null : ConnectStore());
             LoadOrCreate();
         }
 
@@ -103,6 +112,21 @@ namespace WordRPG.Game
             {
                 Debug.LogError($"[GameManager] 저장 실패: {e.Message}");
             }
+        }
+
+        // 애플 인앱 결제에 연결: 가격을 받아 오고, 이미 산 것(재설치·다른 기기)을 확인해 Entitlements에 넣는다
+        private IStore ConnectStore()
+        {
+            var store = new UnityIapStore(Entitlements);
+            store.Connect();
+            return store;
+        }
+
+        public void SaveEntitlements()
+        {
+            if (SaveDirectoryOverride != null) return;
+            PlayerPrefs.SetString(EntitlementsKey, Entitlements.ToStorage());
+            PlayerPrefs.Save();
         }
 
         public void SaveSettings()

@@ -197,6 +197,7 @@ namespace WordRPG.EditorTools
             var forestShop = ShopAsset("forest_shop", "숲속 쉼터 가게",
                 new ShopEntry(potion, 30), new ShopEntry(largePotion, 90));
             AssignShopIfEmpty("Assets/Data/Areas/forest.asset", forestShop);
+            SetFullVersionArea("Assets/Data/Areas/forest.asset"); // 숲부터는 정식판 (#40)
             ConfigureAreaIfNew("Assets/Data/Areas/forest.asset", so =>
             {
                 Prop(so, "theme").enumValueIndex = (int)FieldTheme.Forest;
@@ -422,6 +423,16 @@ namespace WordRPG.EditorTools
                 "####################################\n";
 
         // 새로 만든 지역에만 추가 설정 (보스가 아직 없을 때 = 처음 만들 때). 인스펙터에서 바꾼 값은 유지
+        // 정식판을 사야 들어가는 지역 표시 (이미 켜져 있으면 그대로)
+        private static void SetFullVersionArea(string areaPath)
+        {
+            var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);
+            if (area == null || area.RequiresFullVersion) return;
+            var so = new SerializedObject(area);
+            Prop(so, "requiresFullVersion").boolValue = true;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         private static void ConfigureAreaIfNew(string areaPath, Action<SerializedObject> configure)
         {
             var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);

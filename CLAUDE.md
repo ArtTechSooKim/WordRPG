@@ -46,6 +46,9 @@
    - 게임 진행 상태는 `GameManager.Instance.Session`에서 얻고, 바뀌면 `GameManager.Save()` 호출
    - 세션을 쓰기 시작하는 화면(필드·전투)은 `MarkPlaying()`을 불러야 저장된다 (타이틀에서 시작 전엔 저장 안 함)
    - 설정(`GameSettings`: 음량·진동)은 세이브가 아니라 PlayerPrefs. `GameManager.Settings` / `SaveSettings()`
+   - **수익화** (GDD 9-3): 산 상품(`Entitlements`, 정식판 id `com.arttechsoo.wordrpg.full` — 바꾸지 말 것)도 세이브가 아니라 PlayerPrefs.
+     결제는 `IStore`(실제 `UnityIapStore` = Unity IAP 5, 테스트는 가짜 — `GameManager.StoreOverride`/`FieldScreen.Configure`).
+     정식판이 필요한 지역은 FieldArea `requiresFullVersion` (지금은 숲) → 입구에서 `PaywallView`
    - 새 지역(단어장)은 regionId·regionName·징표 아이템(종류 Keepsake)·골드를 지정해야 함 (RegionDataTests가 검사)
    - 필드 맵은 FieldArea의 글자 맵 (GDD 7·9장). 상자 수 = 내용물 수, 출입구 수 = 연결 수(서로 왕복), B ↔ 보스 지정,
      모든 상자·샘·출입구 도달 가능 (AreaDataTests·DungeonDataTests가 검사). 지역을 새로 만들면 Refresh Game Database
@@ -94,7 +97,8 @@ Assets/
     Battle/             BattleEngine(기술·강도(단어 n개 연속)·상처약·연속 정답 수), Combo(콤보 단계·글자·추가 피해), BattleFormulas, BattleReward
     Field/              FieldMap(맵 글자→격자), FieldWalker(이동), StickInput(스틱 값→4방향·달리기), EncounterCounter(조우), FieldInteraction([확인] 대상·이름표 규칙), FieldAutotile(길·물가 테두리 모양),
                         FieldArea(지역 SO: 테마·출입구 연결·보스·상자·상점), EncounterTable
-    Game/               GameSession(진행 상태 전체), GameManager(씬 간 유지 + 자동 저장 + 설정), GameDatabase(id→에셋), PlayerRecord,
+    Game/               GameSession(진행 상태 전체), GameManager(씬 간 유지 + 자동 저장 + 설정 + 결제 창구), GameDatabase(id→에셋), PlayerRecord,
+                        Entitlements(산 상품) · IStore + UnityIapStore(애플 인앱 결제),
                         Dex(도감 규칙), Keepsakes(징표 진열장), GameSettings(음량·진동), TutorialProgress(본 튜토리얼 id, 세이브에 저장)
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
     UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투, 단독 연습 모드도 있음),
@@ -104,6 +108,7 @@ Assets/
                         FieldNameTags(오브젝트 이름표),
                         TitleScreen(타이틀), Haptics(진동), UnitView, VirtualStick(가상 스틱 — 누른 자리에 생김, 끝까지 밀면 달리기),
                         TutorialOverlay(튜토리얼: 검은 막 + 뚫린 곳 + 안내 상자, [다음]/직접 해 보기/[건너뛰기]),
+                        PaywallView(정식판 안내: 구매·구매 복원·나중에),
                         FieldArt(필드 타일·잠긴/지역별 출입구) · PlayerArt(주인공) · PlaceholderArt(그림이 없을 때 임시 도트), Sound(음악·효과음·징글),
                         BattleFx(전투 효과) + IdleBob, MapViews(미니맵·지도),
                         UiKit(Palette·글꼴·둥근 패널·아이콘 + WithJosa 한국어 조사), AutoPill — 세로 1080x1920

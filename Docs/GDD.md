@@ -50,7 +50,7 @@
 - 안 쓰는 패키지 정리 (Visual Scripting, Multiplayer Center, Collab 등). `com.unity.ai.inference`(Sentis)는 Resources의 셰이더가
   앱에 **약 29MB** 들어가서 2026-10-03 사용자 결정으로 뺐음 (앱 데이터 48.5 → 19.8MB). AI Assistant의 Asset Knowledge 검색을 켜면
   다시 설치하라고 묻는데, 설치하면 앱이 다시 커짐
-- 수익화 (광고/인앱) — PRD STEP 6
+- ~~수익화~~ → 2026-10-07 결정: 무료 + 정식판 한 번 구매 5,000원, 숲 입구에서 (9-3장)
 
 ---
 
@@ -402,6 +402,22 @@
   Permission denied) → `Builds/WordRPG-iOS-{버전}-build{번호}.zip` → Mac의 Xcode에서 서명·실행·Archive → 앱스토어 커넥트 업로드
   (앱스토어 커넥트에 영단어RPG 앱 등록 필요) → TestFlight 시험 → 심사. Mac 단계 설명서 = `Docs/아이폰출시방법.txt` (zip에도 들어감).
   필요: 애플 개발자 프로그램(연 99달러), 개인정보 처리방침 주소(심사 제출 때), 스크린샷
+
+## 9-3. 수익화 — 무료 + 정식판 (STEP 6, 2026-10-07 사용자 결정)
+
+- **방식**: 다운로드 무료. 초원·잊혀진 서고(첫 던전)까지 무료, **숲부터 정식판**(한 번 사면 계속, 5,000원). 광고·뽑기 없음
+- **상품**: 앱스토어 커넥트 인앱 상품 '정식판' — id `com.arttechsoo.wordrpg.full`(바꾸지 말 것, `Entitlements.FullVersion`),
+  비소모성, 한국 5,000원 기준(다른 나라 자동 환산), 한국어·영어 이름·설명, 심사용 스크린샷. 첫 앱스토어 심사 때 앱 버전과 함께 제출
+- **잠금**: FieldArea `requiresFullVersion`(숲 켬) → 그 지역으로 가는 출입구가 막히고 정식판 안내 (`PaywallView`, Figma '필드 — 정식판 안내 (#40)').
+  보스로 잠긴 길이면 보스 안내가 먼저. 안내 문구는 지역 데이터에서 자동(단어 수·몬스터·보스·상자/보스 성유물)
+- **결제**: Unity IAP 5 (`UnityIapStore` : `IStore`). 켜면 연결 → 상품·가격 받기 + 이미 산 것 확인. 결제 = OnPurchasePending에서
+  Entitlements에 넣고(기기에 저장) → ConfirmPurchase. [구매 복원](RestoreTransactions, 애플 필수). 결과: 구매·복원·취소·보호자 승인 대기·
+  복원할 것 없음·실패·연결 안 됨
+- **산 기록**: 세이브가 아니라 PlayerPrefs (`GameManager.Entitlements`) — [처음부터 다시 하기]로 세이브를 지워도 남음.
+  진짜 기준은 애플 결제 기록(켤 때마다 확인)
+- 테스트: `GameManager.StoreOverride`·`FieldScreen.Configure(purchaseStore, owned)`에 가짜 창구. 배치모드에서는 실제 스토어에 연결하지 않음
+- 사용자 할 일: 유료 앱 계약·세금·은행 계좌, 소규모 사업자 프로그램(수수료 15%)
+- 나중 후보: 확장팩 '내 단어장'(11장)을 정식판 또는 별도 상품으로
 
 ## 10. MVP 진행 현황
 

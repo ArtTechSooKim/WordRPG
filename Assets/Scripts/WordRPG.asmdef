@@ -3,7 +3,8 @@
     "rootNamespace": "WordRPG",
     "references": [
         "UnityEngine.UI",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.Purchasing"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
