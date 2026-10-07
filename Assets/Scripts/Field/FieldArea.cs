@@ -138,6 +138,9 @@ namespace WordRPG.Field
         [Tooltip("정식판(인앱 결제)을 사야 들어갈 수 있는 지역 — 입구에서 정식판 안내가 뜬다 (#40, 숲부터)")]
         [SerializeField] private bool requiresFullVersion;
 
+        [Tooltip("보스의 사전 이름 (예: 숲의 사전). 맵의 받침대 'L'에 이 지역 보스를 물리치면 놓이고, 이 지역 단어장의 단어를 하루 한 번 하나씩 알려 준다 (#45)")]
+        [SerializeField] private string dictionaryName;
+
         [NonSerialized] private FieldMap parsed;
         [NonSerialized] private string parsedFrom;
 
@@ -153,6 +156,8 @@ namespace WordRPG.Field
         public IReadOnlyList<AreaExit> Exits => exits;
         public BossEncounter Boss => boss != null && boss.Species != null ? boss : null;
         public string BossId => $"{areaId}:boss";
+        public string DictionaryName => dictionaryName;
+        public bool HasDictionary => !string.IsNullOrEmpty(dictionaryName);
         public bool RequiresFullVersion => requiresFullVersion;
 
         // 맵 텍스트가 바뀌면 다시 해석 (인스펙터에서 고치면서 플레이할 수 있게)
@@ -187,6 +192,7 @@ namespace WordRPG.Field
                 case FieldTile.Fountain: return "회복의 샘";
                 case FieldTile.Shop: return shop != null ? shop.DisplayName : "상점";
                 case FieldTile.Boss: return Boss?.Species.DisplayName;
+                case FieldTile.Lectern: return HasDictionary ? dictionaryName : "빈 받침대";
                 case FieldTile.Door:
                     var exit = GetExit(position);
                     return exit != null && exit.Target != null ? exit.Target.DisplayName : null;

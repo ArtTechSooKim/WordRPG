@@ -12,14 +12,16 @@ namespace WordRPG.Field
 
         private static readonly Direction[] SideOrder = { Direction.Up, Direction.Down, Direction.Left, Direction.Right };
 
-        // 확인 버튼으로 쓸 방향: 바라보는 칸이 우선, 아니면 옆 칸(위·아래·왼·오른 순). 쓸 것이 없으면 null
-        public static Direction? FindTarget(FieldMap map, Vector2Int position, Direction facing)
+        // 확인 버튼으로 쓸 방향: 바라보는 칸이 우선, 아니면 옆 칸(위·아래·왼·오른 순). 쓸 것이 없으면 null.
+        // cleared: 이제는 쓸 것이 없는 칸 (쓰러뜨린 보스 자리) — 건너뛴다
+        public static Direction? FindTarget(FieldMap map, Vector2Int position, Direction facing, Func<Vector2Int, bool> cleared = null)
         {
             if (map == null) throw new ArgumentNullException(nameof(map));
-            if (FieldMap.IsInteractive(map.Get(position + facing.ToOffset()))) return facing;
+            bool Usable(Vector2Int cell) => FieldMap.IsInteractive(map.Get(cell)) && (cleared == null || !cleared(cell));
+            if (Usable(position + facing.ToOffset())) return facing;
             foreach (var direction in SideOrder)
             {
-                if (FieldMap.IsInteractive(map.Get(position + direction.ToOffset()))) return direction;
+                if (Usable(position + direction.ToOffset())) return direction;
             }
             return null;
         }
@@ -27,7 +29,7 @@ namespace WordRPG.Field
         // 이름표를 다는 칸: 제단·상점·샘·보스·출입구. 보물상자는 모양만 봐도 알 수 있어 달지 않는다
         public static bool HasNameTag(FieldTile tile) =>
             tile == FieldTile.Altar || tile == FieldTile.Shop || tile == FieldTile.Fountain
-            || tile == FieldTile.Boss || tile == FieldTile.Door;
+            || tile == FieldTile.Boss || tile == FieldTile.Door || tile == FieldTile.Lectern;
 
         // 맵의 모든 이름표 칸 (지역에 들어갈 때 이름표를 미리 만들어 둔다)
         public static List<Vector2Int> Landmarks(FieldMap map)

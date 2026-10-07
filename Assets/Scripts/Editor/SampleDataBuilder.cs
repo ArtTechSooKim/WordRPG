@@ -203,6 +203,9 @@ namespace WordRPG.EditorTools
                 new ShopEntry(potion, 30), new ShopEntry(largePotion, 90));
             AssignShopIfEmpty("Assets/Data/Areas/forest.asset", forestShop);
             SetFullVersionArea("Assets/Data/Areas/forest.asset"); // 숲부터는 정식판 (#40)
+            // 보스의 사전 (#45): 보스를 물리치면 그 맵 쉼터의 받침대(L)에 놓인다 — 서고는 샘의 방, 숲은 입구 야영지
+            SetDictionary("Assets/Data/Areas/library.asset", "서고의 사전");
+            SetDictionary("Assets/Data/Areas/forest.asset", "숲의 사전");
             ConfigureAreaIfNew("Assets/Data/Areas/forest.asset", so =>
             {
                 Prop(so, "theme").enumValueIndex = (int)FieldTheme.Forest;
@@ -356,7 +359,7 @@ namespace WordRPG.EditorTools
                 "#####.####::::::::::::::#,,#######\n" +
                 "#####.###::::::::F:::::::###.C####\n" +
                 "#####....::::::::::::::::....#####\n" +
-                "#########::::::::::::::::###.#####\n" +
+                "#########:::::::::::L::::###.#####\n" +
                 "##########::::::...:::::##########\n" +
                 "##C,,,,,,,#,,,,,...,,,,,#,,,,,,,##\n" +
                 "###,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##\n" +
@@ -421,7 +424,7 @@ namespace WordRPG.EditorTools
                 "###::.......::##,,,##########,,,,,##\n" +
                 "#..::.............############,,,###\n" +
                 "D..::P......::###.#,,,,#,,#,,#,,,,##\n" +
-                "####:::::::::####.#,,,,,,,,,,,,,,###\n" +
+                "####::::L::::####.#,,,,,,,,,,,,,,###\n" +
                 "######:::::######..............,,,##\n" +
                 "###################,,,,,,,,,,,,,,,##\n" +
                 "###################,,#,,,,#,,,,,,C##\n" +
@@ -435,6 +438,16 @@ namespace WordRPG.EditorTools
             if (area == null || area.RequiresFullVersion) return;
             var so = new SerializedObject(area);
             Prop(so, "requiresFullVersion").boolValue = true;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // 보스의 사전 이름 (비어 있을 때만)
+        private static void SetDictionary(string areaPath, string name)
+        {
+            var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);
+            if (area == null || area.HasDictionary) return;
+            var so = new SerializedObject(area);
+            Prop(so, "dictionaryName").stringValue = name;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 

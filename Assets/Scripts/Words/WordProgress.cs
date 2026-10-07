@@ -34,6 +34,13 @@ namespace WordRPG.Words
 
         public bool IsDue(DateTime nowUtc) => level != MasteryLevel.New && nowUtc >= NextReviewUtc;
 
+        internal void MarkDiscovered(DateTime nowUtc)
+        {
+            level = MasteryLevel.Learning;
+            nextReviewTicks = nowUtc.Ticks;
+            if (discoveredTicks == 0) discoveredTicks = nowUtc.Ticks;
+        }
+
         internal void Apply(MasteryLevel newLevel, DateTime nextReviewUtc, bool correct)
         {
             level = newLevel;

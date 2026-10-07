@@ -53,6 +53,7 @@
    - 수련용 허수아비는 MonsterSpecies `trainingDummy`(맞아도 HP 그대로, 기술 없음) — 게임에 하나, 출현표에 넣지 말 것 (TrainingTests)
    - 필드 맵은 FieldArea의 글자 맵 (GDD 7·9장). 상자 수 = 내용물 수, 출입구 수 = 연결 수(서로 왕복), B ↔ 보스 지정,
      모든 상자·샘·출입구 도달 가능 (AreaDataTests·DungeonDataTests가 검사). 지역을 새로 만들면 Refresh Game Database
+   - 맵 글자 'L' = 사전 받침대: 보스가 있는 맵마다 쉼터에 하나, FieldArea `dictionaryName` 필수 (BossDictionaryTests). 하루 한 번 읽기 = `BossDictionary`
    - 맵 글자 ':' = 잔디(걸을 수 있고 조우 없음). 출입구 연결(AreaExit)의 openedByBossOf = 그 지역 보스를 물리쳐야 열림 →
      보스를 이기면 FieldScreen이 카메라로 그 출입구를 보여 주는 연출(GateCutscene). 잠긴 길은 진짜 보스가 열어야 함 (GateDataTests)
    - 맵 원본은 SampleDataBuilder의 MeadowMap·LibraryMap·ForestMap 상수. 이미 있는 에셋은 Create Sample Data가 덮어쓰지 않으므로
@@ -102,13 +103,15 @@ Assets/
                         FieldArea(지역 SO: 테마·출입구 연결·보스·상자·상점), EncounterTable
     Game/               GameSession(진행 상태 전체), GameManager(씬 간 유지 + 자동 저장 + 설정 + 결제 창구), GameDatabase(id→에셋), PlayerRecord,
                         Entitlements(산 상품) · IStore + UnityIapStore(애플 인앱 결제),
-                        Dex(도감 규칙), Keepsakes(징표 진열장), GameSettings(음량·진동), TutorialProgress(본 튜토리얼 id, 세이브에 저장)
+                        Dex(도감 규칙), Keepsakes(징표 진열장), GameSettings(음량·진동), TutorialProgress(본 튜토리얼 id, 세이브에 저장),
+                        BossDictionary(보스의 사전: 받침대 L, 하루 한 번 새 단어 — 읽은 날은 WorldState)
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
     UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투 + 보스 결정타 연출 + 전투 결산, 단독 연습 모드도 있음),
                         DexView(도감), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기),
                         InventoryView(소지품: 주인공·성유물·아이템·징표) + HeroViews(HeroInfoPage·RelicPage·RelicSlotsRow·SkillRowView),
                         SettingsView(설정) + ConfirmDialog(확인 창), SwitchView, GateCutscene(보스가 연 길을 보여 주는 연출),
                         TrainingView(수련 창: 전체적 암기·오답 위주 암기 → BattleScreen.BeginTraining, 허수아비),
+                        DictionaryView(보스의 사전 읽기: 점점점 → 새 단어),
                         FieldNameTags(오브젝트 이름표),
                         TitleScreen(타이틀), Haptics(진동), UnitView, VirtualStick(가상 스틱 — 누른 자리에 생김, 끝까지 밀면 달리기),
                         TutorialOverlay(튜토리얼: 검은 막 + 뚫린 곳 + 안내 상자, [다음]/직접 해 보기/[건너뛰기]),

@@ -111,6 +111,22 @@ namespace WordRPG.Words
             return new MasteryChange(wordId, before, after, correct);
         }
 
+        // 문제 없이 단어를 발견한다 (보스의 사전, #45): 아직 New면 '학습 중'으로, 바로 복습 시기가 되어 곧 문제로 나온다.
+        // 반환값: 새로 발견했는지
+        public bool Discover(string wordId, DateTime nowUtc)
+        {
+            var progress = Find(wordId);
+            if (progress == null)
+            {
+                progress = new WordProgress(wordId, nowUtc);
+                entries.Add(progress);
+                lookup[wordId] = progress;
+            }
+            if (progress.Level != MasteryLevel.New) return false;
+            progress.MarkDiscovered(nowUtc);
+            return true;
+        }
+
         private void EnsureLookup()
         {
             if (lookup != null) return;

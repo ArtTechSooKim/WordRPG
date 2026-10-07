@@ -12,10 +12,10 @@ namespace WordRPG.UI
         private const string Folder = "Art/NinjaAdventure/Tiles/";
         private static readonly Dictionary<string, Sprite> Cache = new Dictionary<string, Sprite>();
 
-        // done: 연 보물상자, 쓰러뜨린 보스 자리
+        // done: 연 보물상자, 쓰러뜨린 보스 자리(빈자리), 사전이 놓인 받침대
         public static Sprite ForTile(FieldTile tile, FieldTheme theme, bool done)
         {
-            bool hasDone = done && (tile == FieldTile.Chest || tile == FieldTile.Boss);
+            bool hasDone = done && (tile == FieldTile.Chest || tile == FieldTile.Boss || tile == FieldTile.Lectern);
             return Load($"{theme}_{tile}{(hasDone ? "_done" : "")}") ?? PlaceholderArt.ForTile(tile, theme, done);
         }
 

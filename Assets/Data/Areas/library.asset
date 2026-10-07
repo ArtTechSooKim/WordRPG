@@ -69,7 +69,7 @@ MonoBehaviour:
 
     #####....::::::::::::::::....#####
 
-    #########::::::::::::::::###.#####
+    #########:::::::::::L::::###.#####
 
     ##########::::::...:::::##########
 
@@ -147,3 +147,4 @@ MonoBehaviour:
     level: 7
     rewardRelic: {fileID: 11400000, guid: c3cf9b0f8943bed43976182ff5144417, type: 2}
     rewardItem: {fileID: 11400000, guid: 4185a811547fb65468699483f65b7fdf, type: 2}
+  dictionaryName: "서고의 사전"

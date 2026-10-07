@@ -1,0 +1,111 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.TestTools;
+using WordRPG.Field;
+using WordRPG.Game;
+using WordRPG.Heroes;
+using WordRPG.Monsters;
+using WordRPG.UI;
+using WordRPG.Words;
+using static WordRPG.Tests.UiDriver;
+
+namespace WordRPG.Tests
+{
+    // 보스의 사전 (#45): 쉼터 받침대에서 [확인] → (잠김) / 점점점 → 새 단어 / 오늘은 그만 / 다음 날 또. 쓰러뜨린 보스 자리는 지나갈 수 있음
+    public class DictionaryScreenTests
+    {
+        //  y=2  #B...##   보스 (1,2)
+        //  y=1  #..L.P#   받침대 (3,1), 시작 (5,1)
+        private const string Map = "#######\n#B...##\n#..L.P#\n#######";
+
+        private static FieldArea Area()
+        {
+            var words = ScriptableObject.CreateInstance<WordDatabase>();
+            words.ReplaceWords(TestData.SampleWords());
+            var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var slime = TestData.Species("slime", new MonsterStats(20, 1, 1), new MonsterStats(0, 0, 0), bite);
+            var king = TestData.Species("king", new MonsterStats(40, 1, 50), new MonsterStats(0, 0, 0), bite).Set("displayName", "헷갈너구리");
+            var table = ScriptableObject.CreateInstance<EncounterTable>()
+                .Set("entries", new List<EncounterTable.Entry> { new EncounterTable.Entry(slime, 1, 1, 1) });
+            return ScriptableObject.CreateInstance<FieldArea>()
+                .Set("areaId", "camp_test").Set("displayName", "숲").Set("map", Map).Set("theme", FieldTheme.Forest)
+                .Set("encounters", table).Set("words", words).Set("boss", new BossEncounter(king, 3)).Set("dictionaryName", "숲의 사전");
+        }
+
+        private static HeroData Player()
+        {
+            var strike = TestData.Skill("strike", SkillKind.Damage, SkillTarget.SingleEnemy, 40);
+            return TestData.Hero(new MonsterStats(100, 30, 10)).Set("basicSkill", strike);
+        }
+
+        [UnityTest]
+        public IEnumerator ReadTheBossDictionaryOnceADay()
+        {
+            var area = Area();
+            var session = GameSession.NewGame(Player(), 3);
+            var go = new GameObject("DictionaryFieldUnderTest");
+            var field = go.AddComponent<FieldScreen>();
+            field.Configure(area, session, step: 0.05f, animScale: 0.01f);
+            var today = new DateTime(2026, 10, 7, 15, 0, 0, DateTimeKind.Local);
+            field.LocalClock = () => today;
+            yield return null;
+            yield return null;
+
+            CollectionAssert.Contains(field.VisibleNameTags, "숲의 사전", "받침대 이름표");
+
+            // 왼쪽 = 받침대. 보스를 아직 안 이겼으면 비어 있음
+            yield return HoldStick(field, Direction.Left, () => field.IsMoving);
+            yield return FaceStick(field, Direction.Left);
+            Assert.AreEqual(new Vector2Int(4, 1), field.PlayerCell);
+            yield return PressConfirm(field);
+            StringAssert.Contains("빈 받침대다", field.ToastMessage);
+            StringAssert.Contains("헷갈너구리를 물리치면", field.ToastMessage);
+            Assert.IsFalse(field.DictionaryView.IsOpen);
+
+            // 보스를 이겼다 → 점점점 → 새 단어
+            session.World.MarkBossDefeated(area.BossId);
+            yield return new WaitForSecondsRealtime(0.6f);
+            yield return PressConfirm(field);
+            Assert.IsTrue(field.DictionaryView.IsOpen);
+            yield return WaitFor(() => field.DictionaryView.IsRevealed);
+            Assert.AreEqual("새로운 단어를 발견했다!", field.DictionaryView.HeadText);
+            var first = field.DictionaryView.WordText;
+            var word = System.Linq.Enumerable.FirstOrDefault(area.Words.Words, w => w.English == first);
+            Assert.IsNotNull(word, "그 맵 단어장의 단어");
+            Assert.AreNotEqual(MasteryLevel.New, session.Vocabulary.GetLevel(word.Id), "도감에 등록");
+            Assert.IsTrue(field.IsPanelOpen, "읽는 동안은 움직이지 않음");
+            ActiveButton(field.transform, "DictionaryOk").onClick.Invoke();
+            yield return WaitFor(() => !field.DictionaryView.IsOpen);
+
+            // 같은 날 또 → 안내만
+            yield return new WaitForSecondsRealtime(0.6f);
+            yield return PressConfirm(field);
+            StringAssert.Contains("오늘 책은 충분히 읽은 것 같다", field.ToastMessage);
+            Assert.IsFalse(field.DictionaryView.IsOpen);
+            Assert.AreEqual(1, session.Vocabulary.DiscoveredCount);
+
+            // 다음 날 → 또 한 단어 (뒤로가기로 점점점 건너뛰고, 한 번 더 누르면 닫힘)
+            today = today.AddDays(1);
+            yield return new WaitForSecondsRealtime(0.6f);
+            yield return PressConfirm(field);
+            Assert.IsTrue(field.DictionaryView.IsOpen);
+            field.HandleBack();
+            yield return WaitFor(() => field.DictionaryView.IsRevealed);
+            Assert.AreNotEqual(first, field.DictionaryView.WordText, "이미 발견한 단어는 다시 안 나옴");
+            field.HandleBack();
+            yield return WaitFor(() => !field.DictionaryView.IsOpen);
+            Assert.AreEqual(2, session.Vocabulary.DiscoveredCount);
+
+            // 쓰러뜨린 보스 자리는 빈자리 — 지나갈 수 있다
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
+            yield return HoldStick(field, Direction.Left, () => field.PlayerCell.x <= 1);
+            Assert.AreEqual(new Vector2Int(1, 2), field.PlayerCell, "보스가 있던 칸에 설 수 있음");
+
+            UnityEngine.Object.Destroy(go);
+            yield return null;
+        }
+    }
+}

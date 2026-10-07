@@ -55,7 +55,9 @@ namespace WordRPG.UI
                 case FieldTile.Altar: return Make(t + "altar", Layer(Altar, ground));
                 case FieldTile.Shop: return Make(t + "shop", Layer(ShopStall, ground));
                 case FieldTile.Boss:
-                    return opened ? Make(t + "boss_cleared", Layer(OpenBook, ground)) : Make(t + "boss", Layer(BossPixel, ground));
+                    return opened ? Make(t + "boss_cleared", ground) : Make(t + "boss", Layer(BossPixel, ground)); // 사전은 받침대로 옮겨짐
+                case FieldTile.Lectern:
+                    return opened ? Make(t + "lectern_book", Layer(OpenBook, Layer(Pedestal, ground))) : Make(t + "lectern", Layer(Pedestal, ground));
                 default: return Make(t + "floor", ground);
             }
         }
@@ -272,7 +274,17 @@ namespace WordRPG.UI
             return new Color(0.2f, 0.72f, 0.62f);
         }
 
-        // 보스를 쓰러뜨린 자리: 빛나는 펼친 책 (되찾은 기억)
+        // 사전 받침대: 돌 받침 (가운데가 빈 홈)
+        private static Color Pedestal(int x, int y)
+        {
+            if (x < 2 || x > 13 || y < 1 || y > 12) return Color.clear;
+            bool edge = x == 2 || x == 13 || y == 1 || y == 12;
+            if (edge) return new Color(0.2f, 0.22f, 0.22f);
+            if (x >= 5 && x <= 10 && y >= 6 && y <= 10) return new Color(0.12f, 0.14f, 0.14f);
+            return y <= 3 ? new Color(0.42f, 0.48f, 0.44f) : new Color(0.55f, 0.62f, 0.56f);
+        }
+
+        // 사전이 놓인 받침대: 빛나는 펼친 책
         private static Color OpenBook(int x, int y)
         {
             bool page = y >= 4 && y <= 10 && x >= 1 && x <= 14 && x != 7 && x != 8;

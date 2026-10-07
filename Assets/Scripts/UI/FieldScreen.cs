@@ -97,6 +97,7 @@ namespace WordRPG.UI
         private int runSteps;
         private DexView dexView;
         private TrainingView trainingView;
+        private DictionaryView dictionaryView;
         private RelicAltarView altarView;
         private ShopView shopView;
         private InventoryView inventoryView;
@@ -123,11 +124,13 @@ namespace WordRPG.UI
         public BattleScreen Battle => battle;
         public GameSession Session => session;
         public FieldArea CurrentArea => area;
-        public bool IsPanelOpen => dexView.IsOpen || trainingView.IsOpen || altarView.IsOpen || shopView.IsOpen
+        public bool IsPanelOpen => dexView.IsOpen || trainingView.IsOpen || dictionaryView.IsOpen || altarView.IsOpen || shopView.IsOpen
                                    || inventoryView.IsOpen || settingsView.IsOpen || mapView.IsOpen || learnView.IsOpen
                                    || (quitDialog != null && quitDialog.IsOpen) || (paywall != null && paywall.IsOpen);
         public SkillLearnView LearnView => learnView;
         public TrainingView TrainingView => trainingView;
+        public DictionaryView DictionaryView => dictionaryView;
+        public Func<DateTime> LocalClock { get; set; } = () => DateTime.Now; // 사전 '하루 한 번'의 기준 (테스트에서 바꿀 수 있음)
         public bool IsQuitDialogOpen => quitDialog.IsOpen;
         public MinimapView Minimap => minimap;
         public string ToastMessage => toastPanel != null && toastPanel.activeSelf ? toastText.text : "";
@@ -391,7 +394,7 @@ namespace WordRPG.UI
         private bool TryInteract()
         {
             if (interactCooldown > 0f) return false;
-            var direction = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing);
+            var direction = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot);
             if (!direction.HasValue) return false;
             walker.Face(direction.Value);
             playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
@@ -431,6 +434,7 @@ namespace WordRPG.UI
             }
             else if (inventoryView.IsOpen) inventoryView.Hide();
             else if (shopView.IsOpen) shopView.Hide();
+            else if (dictionaryView.IsOpen) dictionaryView.Back();
             else if (dexView.IsOpen) dexView.Hide();
             else if (trainingView.IsOpen) trainingView.Hide();
             else if (settingsView.IsOpen) settingsView.Hide();
@@ -459,7 +463,54 @@ namespace WordRPG.UI
                     else shopView.Show(area.Shop, session, OnTownChanged);
                     break;
                 case FieldTile.Boss: ChallengeBoss(); break;
+                case FieldTile.Lectern: ReadDictionary(); break;
             }
+        }
+
+        // 쓰러뜨린 보스 자리: 사전은 쉼터 받침대로 옮겨져 빈자리 — 지나갈 수 있고 [확인]할 것도 없다 (#45)
+        private bool IsClearedBossSpot(Vector2Int cell) =>
+            walker.Map.Get(cell) == FieldTile.Boss && session.World.IsBossDefeated(area.BossId);
+
+        // 사전 받침대 (#45): 보스를 물리쳤으면 하루 한 번 읽고 이 지역 단어 하나를 발견
+        private void ReadDictionary()
+        {
+            var now = LocalClock();
+            var read = BossDictionary.Read(area, session, now, now.ToUniversalTime(), rng);
+            switch (read.Outcome)
+            {
+                case DictionaryReadOutcome.Locked:
+                    string boss = area.Boss != null ? UiKit.WithJosa(area.Boss.Species.DisplayName, "을", "를") : "보스를";
+                    ShowToast($"빈 받침대다.\n{boss} 물리치면 무언가 놓일 것 같다.");
+                    break;
+                case DictionaryReadOutcome.AlreadyReadToday:
+                    ShowToast("오늘 책은 충분히 읽은 것 같다.");
+                    break;
+                case DictionaryReadOutcome.AllDiscovered:
+                    ShowToast($"{area.DictionaryName}의 단어를 모두 발견했다!");
+                    break;
+                case DictionaryReadOutcome.Discovered:
+                    StartCoroutine(ShowDictionaryWord(read.Word));
+                    break;
+                default:
+                    ShowToast("빈 받침대다.");
+                    break;
+            }
+        }
+
+        private IEnumerator ShowDictionaryWord(WordEntry word)
+        {
+            saveProgress?.Invoke();
+            var progress = Dex.GetProgress(area.Words, session.Vocabulary);
+            yield return dictionaryView.Play(area.DictionaryName, word,
+                $"도감에 등록했어요   ·   {area.Words.RegionName} 도감 {progress.Discovered} / {progress.Total}", animationScale);
+            var completed = session.ClaimDexRewards(new[] { area.Words });
+            if (completed.Count > 0)
+            {
+                saveProgress?.Invoke();
+                ShowToast($"★ {area.Words.RegionName} 도감 완성! 보상을 받았다", 3f);
+            }
+            RefreshHud();
+            interactCooldown = 0.5f;
         }
 
         private void ChallengeBoss()
@@ -473,7 +524,7 @@ namespace WordRPG.UI
             string name = boss.Species.DisplayName;
             if (session.World.IsBossDefeated(area.BossId))
             {
-                ShowToast($"{UiKit.WithJosa(name, "이", "가")} 있던 자리에\n펼쳐진 책이 빛나고 있다.");
+                ShowToast($"{UiKit.WithJosa(name, "이", "가")} 있던 자리다.");
                 return;
             }
             var enemies = new List<MonsterInstance> { new MonsterInstance(boss.Species, boss.Level) };
@@ -651,6 +702,9 @@ namespace WordRPG.UI
                 session.World.MarkBossDefeated(area.BossId);
                 var bossCell = walker.Map.BossPosition.Value;
                 tilemap.SetTile(new Vector3Int(bossCell.x, bossCell.y, 0), TileFor(FieldTile.Boss, true));
+                var lectern = walker.Map.Find(FieldTile.Lectern);
+                if (lectern.HasValue && area.HasDictionary)
+                    tilemap.SetTile(new Vector3Int(lectern.Value.x, lectern.Value.y, 0), TileFor(FieldTile.Lectern, true));
                 minimap.Redraw();
                 RefreshNameTags();
                 string name = area.Boss.Species.DisplayName;
@@ -662,6 +716,7 @@ namespace WordRPG.UI
                     ? $"★ {UiKit.WithJosa(name, "을", "를")} 물리쳤다!\n성유물 '{relic.Data.DisplayName}' 획득 — {RelicHint(relic)}"
                     : $"★ {UiKit.WithJosa(name, "을", "를")} 물리쳤다!\n{area.DisplayName}에 잊혀진 기억이 돌아왔다";
                 if (rewardItem != null) message += $"\n{rewardItem.DisplayName} 획득!";
+                if (area.HasDictionary) message += $"\n쉼터 받침대에 {UiKit.WithJosa(area.DictionaryName, "이", "가")} 놓였다";
                 Action offer = rewardItem != null && rewardItem.IsSkillDocument ? () => OfferDocument(rewardItem) : (Action)null;
                 // 이 보스가 여는 출입구가 있으면 카메라가 가서 보여 준다 (그다음 기술 배우기)
                 var gates = database != null ? FieldArea.GatesOpenedBy(area, database.Areas) : new List<AreaGate>();
@@ -858,7 +913,8 @@ namespace WordRPG.UI
         {
             area = newArea;
             var map = area.Map;
-            walker = new FieldWalker(map, position, cell => IsDoorLocked(cell) || IsPaywalled(cell));
+            walker = new FieldWalker(map, position, cell => IsDoorLocked(cell) || IsPaywalled(cell),
+                cell => map.Get(cell) == FieldTile.Boss && session.World.IsBossDefeated(area.BossId));
             encounterCounter = new EncounterCounter(area.EncounterRate, area.MinStepsBetweenEncounters);
             session.World.SetPosition(area.AreaId, position);
 
@@ -884,7 +940,8 @@ namespace WordRPG.UI
                 var cell = new Vector2Int(x, y);
                 var kind = map.Get(cell);
                 bool done = kind == FieldTile.Chest && session.World.IsChestOpened(fieldArea.ChestId(cell))
-                            || kind == FieldTile.Boss && session.World.IsBossDefeated(fieldArea.BossId);
+                            || kind == FieldTile.Boss && session.World.IsBossDefeated(fieldArea.BossId)
+                            || kind == FieldTile.Lectern && BossDictionary.IsUnlocked(fieldArea, session.World);
                 Tile tile;
                 if (kind == FieldTile.Door) tile = DoorTile(fieldArea, cell, lockedDoor(cell));
                 else if (FieldAutotile.IsAutotiled(kind)) tile = AutoTile(fieldArea.Theme, kind, FieldAutotile.Mask(map, cell)) ?? TileFor(kind, done, fieldArea.Theme);
@@ -1092,6 +1149,7 @@ namespace WordRPG.UI
 
             dexView = DexView.Create(hudRoot);
             trainingView = TrainingView.Create(hudRoot, StartTraining);
+            dictionaryView = DictionaryView.Create(hudRoot);
             altarView = RelicAltarView.Create(hudRoot, animationScale);
             shopView = ShopView.Create(hudRoot);
             inventoryView = InventoryView.Create(hudRoot);
@@ -1121,7 +1179,7 @@ namespace WordRPG.UI
 
         private void UpdateConfirmButton()
         {
-            bool ready = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing).HasValue;
+            bool ready = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot).HasValue;
             if (ready != confirmReady) SetConfirmReady(ready);
 
             // Ready면 숨 쉬듯 살짝, 부딪힌 직후에는 크게 깜빡

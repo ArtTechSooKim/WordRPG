@@ -168,75 +168,16 @@ def build_title_scene():
 
 
 
-# 수련용 허수아비 (#44): 팩에 허수아비 그림이 없어서 같은 도트 느낌(1픽셀 어두운 외곽선)으로 직접 그린다. 32×32
-def draw_scarecrow():
-    W = H = 32
-    im = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    px = im.load()
-    C = {
-        "wood": (138, 90, 52), "woodD": (94, 58, 34),
-        "straw": (240, 204, 104), "strawD": (196, 152, 64),
-        "sack": (232, 212, 168), "sackD": (196, 170, 122),
-        "red": (200, 72, 72), "redD": (150, 48, 64),
-        "blue": (72, 112, 176), "band": (150, 48, 64),
-        "dark": (40, 30, 34),
-    }
-    def rect(x0, y0, x1, y1, c):
-        for x in range(x0, x1 + 1):
-            for y in range(y0, y1 + 1):
-                px[x, y] = C[c] + (255,)
-    def dot(x, y, c): px[x, y] = C[c] + (255,)
-    # 기둥
-    rect(15, 19, 16, 30, "wood"); rect(16, 19, 16, 30, "woodD")
-    # 팔 막대
-    rect(5, 14, 26, 15, "wood"); rect(5, 15, 26, 15, "woodD")
-    # 짚 손
-    for (x, y) in [(2, 13), (3, 14), (2, 15), (3, 16), (4, 13), (4, 15), (3, 12)]: dot(x, y, "straw")
-    for (x, y) in [(29, 13), (28, 14), (29, 15), (28, 16), (27, 13), (27, 15), (28, 12)]: dot(x, y, "straw")
-    dot(3, 15, "strawD"); dot(28, 15, "strawD")
-    # 옷 (소매 + 몸통) + 헝겊 덧댐
-    rect(7, 13, 24, 16, "red")
-    rect(10, 13, 21, 22, "red")
-    rect(20, 13, 21, 22, "redD"); rect(7, 16, 24, 16, "redD")
-    rect(12, 17, 14, 19, "blue")
-    # 옷 아래로 삐져나온 짚
-    for x in range(10, 22, 2): dot(x, 23, "straw")
-    for x in range(11, 22, 2): dot(x, 24, "strawD")
-    # 자루 머리
-    for x in range(10, 23):
-        for y in range(5, 14):
-            if ((x - 16) / 6.0) ** 2 + ((y - 9.2) / 4.6) ** 2 <= 1.0:
-                px[x, y] = C["sack"] + (255,)
-                if x >= 20 or y >= 12: px[x, y] = C["sackD"] + (255,)
-    # X 눈, 꿰맨 입
-    for (cx, cy) in [(13, 8), (18, 8)]:
-        for d in (-1, 0, 1):
-            dot(cx + d, cy + d, "dark")
-        dot(cx - 1, cy + 1, "dark"); dot(cx + 1, cy - 1, "dark")
-    for x in range(13, 20):
-        dot(x, 11, "dark" if x % 2 == 1 else "sackD")
-    # 밀짚모자
-    rect(8, 4, 24, 5, "straw"); rect(8, 5, 24, 5, "strawD")
-    rect(11, 0, 21, 3, "straw"); rect(11, 3, 21, 3, "band"); rect(20, 0, 21, 2, "strawD")
-    # 모자 위에 외곽선 자리가 남도록 한 칸 아래로
-    moved = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    moved.paste(im.crop((0, 0, W, H - 1)), (0, 1))
-    im = moved
-    px = im.load()
-    # 바깥 테두리 (팩 그림처럼 어두운 1픽셀 외곽선)
-    filled = {(x, y) for x in range(W) for y in range(H) if px[x, y][3] > 0}
-    for x in range(W):
-        for y in range(H):
-            if (x, y) in filled: continue
-            if any((x + dx, y + dy) in filled for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
-                px[x, y] = C["dark"] + (255,)
-    return im
+# 수련용 허수아비 (#44): 팩 TilesetElement의 (15,0) 칸 허수아비 (16×16)
+SCARECROW = ("Backgrounds/Tilesets/TilesetElement.png", 15, 0)
 
 
-def build_scarecrow():
-    path = os.path.join(OUT, "Monsters", "training_scarecrow.png")
-    draw_scarecrow().save(path)
-    print("monster training_scarecrow <- 직접 그림")
+def build_scarecrow(pack_root=DEFAULT_PACK):
+    rel, col, row = SCARECROW
+    sheet = Image.open(os.path.join(pack_root, rel)).convert("RGBA")
+    sheet.crop((col * 16, row * 16, col * 16 + 16, row * 16 + 16)).save(os.path.join(OUT, "Monsters", "training_scarecrow.png"))
+    print("monster training_scarecrow <-", rel, (col, row))
+
 
 def build_fx(pack):
     folder = os.path.join(OUT, "Fx")
@@ -449,6 +390,15 @@ def build_tiles(pack):
     small_chest = [pack.frame("Items/Treasure/LittleTreasureChest.png", i, 16) for i in range(2)]
     gem = pack.tile("TilesetNature.png", 2, 15)
     stall = pack.tile("TilesetElement.png", 14, 0)
+    pedestal = pack.tile("TilesetDungeon.png", 2, 3)  # 가운데가 빈 돌 받침 = 사전 받침대 (#45)
+
+    def lectern(base, with_book):
+        """받침대를 2배로(도트 유지) 깔고, 사전이 놓였으면 책(원래 크기)을 위에 올린다 → 32×32 한 칸"""
+        out = base.resize((32, 32), Image.NEAREST)
+        out.alpha_composite(pedestal.resize((32, 32), Image.NEAREST), (0, 0))
+        if with_book:
+            out.alpha_composite(book, (8, 1))
+        return out
 
     themes = {}
     autos = {}
@@ -474,7 +424,9 @@ def build_tiles(pack):
         "Altar": over(lime, gem),
         "Shop": over(lime, stall),
         "Boss": over(lime, boss, scale=3),
-        "Boss_done": over(lime, book),
+        "Boss_done": lime.copy(),  # 사전은 쉼터 받침대로 옮겨져 빈자리 (#45)
+        "Lectern": lectern(lime, False),
+        "Lectern_done": lectern(lime, True),
     }
     autos["Meadow_Floor_auto"] = auto_atlas(pack, template, "TilesetFloor.png", 0, 7)
     autos["Meadow_Water_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6)
@@ -495,7 +447,9 @@ def build_tiles(pack):
         "Altar": over(stone, gem),
         "Shop": over(stone, stall),
         "Boss": over(stone, boss, scale=3),
-        "Boss_done": over(stone, book),
+        "Boss_done": stone.copy(),  # 사전은 쉼터 받침대로 옮겨져 빈자리 (#45)
+        "Lectern": lectern(stone, False),
+        "Lectern_done": lectern(stone, True),
     }
 
     # 숲: 흙길, 진한 풀 위 고사리(조우), 짙은 덤불 벽, 초록빛 늪, 햇빛 드는 출구(초원으로)
@@ -516,7 +470,9 @@ def build_tiles(pack):
         "Altar": over(moss, gem),
         "Shop": over(moss, stall),
         "Boss": over(moss, raccoon, scale=4),
-        "Boss_done": over(moss, book),
+        "Boss_done": moss.copy(),  # 사전은 쉼터 받침대로 옮겨져 빈자리 (#45)
+        "Lectern": lectern(moss, False),
+        "Lectern_done": lectern(moss, True),
     }
     # 숲: 흙길(진초록 테두리), 늪 물가(연두를 이끼색으로)
     autos["Forest_Floor_auto"] = auto_atlas(pack, template, "TilesetFloor.png", 11, 7)
@@ -543,7 +499,7 @@ def main():
     for species_id, (rel, size) in MONSTERS.items():
         crop_front(os.path.join(pack, rel), size, os.path.join(OUT, "Monsters", species_id + ".png"))
         print("monster", species_id, "<-", rel)
-    build_scarecrow()
+    build_scarecrow(pack)
 
     shutil.copyfile(os.path.join(pack, PLAYER), os.path.join(OUT, "Player", "Boy.png"))
     print("player <-", PLAYER)

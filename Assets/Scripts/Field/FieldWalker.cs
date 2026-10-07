@@ -32,18 +32,23 @@ namespace WordRPG.Field
     public class FieldWalker
     {
         private readonly Func<Vector2Int, bool> isLockedDoor;
+        private readonly Func<Vector2Int, bool> isCleared;
 
         public FieldMap Map { get; }
         public Vector2Int Position { get; private set; }
         public Direction Facing { get; private set; } = Direction.Down;
 
         // lockedDoor: 그 칸의 출입구가 지금 잠겨 있는지 (없으면 모든 출입구가 열림)
-        public FieldWalker(FieldMap map, Vector2Int position, Func<Vector2Int, bool> lockedDoor = null)
+        // cleared: 원래 막힌 칸이지만 이제 지나갈 수 있는 칸 (쓰러뜨린 보스 자리 — 사전이 쉼터로 옮겨져 빈자리, #45)
+        public FieldWalker(FieldMap map, Vector2Int position, Func<Vector2Int, bool> lockedDoor = null, Func<Vector2Int, bool> cleared = null)
         {
             Map = map ?? throw new ArgumentNullException(nameof(map));
             isLockedDoor = lockedDoor;
+            isCleared = cleared;
             WarpTo(position);
         }
+
+        public bool CanStand(Vector2Int position) => Map.IsWalkable(position) || (isCleared != null && Map.InBounds(position) && isCleared(position));
 
         public StepOutcome TryStep(Direction direction)
         {
@@ -63,6 +68,11 @@ namespace WordRPG.Field
                     Position = target;
                     return new StepOutcome(StepKind.Moved, target, tile);
                 default:
+                    if (isCleared != null && isCleared(target))
+                    {
+                        Position = target;
+                        return new StepOutcome(StepKind.Moved, target, tile);
+                    }
                     return new StepOutcome(FieldMap.IsInteractive(tile) ? StepKind.BlockedByObject : StepKind.Blocked, target, tile);
             }
         }
@@ -72,7 +82,7 @@ namespace WordRPG.Field
 
         public void WarpTo(Vector2Int position)
         {
-            if (!Map.IsWalkable(position))
+            if (!CanStand(position))
                 throw new ArgumentException($"{position}은(는) 걸을 수 없는 칸입니다", nameof(position));
             Position = position;
         }

@@ -159,13 +159,15 @@ namespace WordRPG.Tests
 
             CollectionAssert.DoesNotContain(field.VisibleNameTags, "까먹대왕", "쓰러뜨린 보스는 이름표도 사라짐");
 
-            // 다시 [확인]을 눌러도 전투 없음
+            // 다시 [확인]을 눌러도 전투 없음 — 보스가 있던 자리는 빈자리라 걸어 들어갈 수 있다 (#45)
             yield return new WaitForSecondsRealtime(0.7f);
             yield return PressConfirm(field);
-            yield return WaitFor(() => field.ToastMessage.Contains("있던 자리"), 2f);
+            yield return new WaitForSecondsRealtime(0.2f);
             Assert.IsFalse(field.IsInBattle);
-            StringAssert.Contains("까먹대왕이 있던 자리", field.ToastMessage);
             Assert.AreEqual(1, session.Record.BattlesWon);
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
+            yield return WaitFor(() => !field.IsMoving);
+            Assert.AreEqual(new Vector2Int(2, 2), field.PlayerCell, "보스가 있던 칸에 설 수 있음");
 
             Object.Destroy(field.gameObject);
             yield return null;

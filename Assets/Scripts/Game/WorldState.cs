@@ -19,6 +19,7 @@ namespace WordRPG.Game
         [SerializeField] private List<string> openedChests = new List<string>();
         [SerializeField] private List<string> defeatedBosses = new List<string>();
         [SerializeField] private List<ExploredArea> explored = new List<ExploredArea>(); // 예전 세이브에는 없음 → 처음부터 탐험
+        [SerializeField] private List<DictionaryReadDay> dictionaryReads = new List<DictionaryReadDay>(); // 사전을 읽은 날 (#45, 예전 세이브엔 없음)
 
         public string AreaId => hasPosition ? areaId : null;
         public IReadOnlyList<string> OpenedChests => openedChests;
@@ -73,6 +74,40 @@ namespace WordRPG.Game
         public void MarkChestOpened(string chestId)
         {
             if (!openedChests.Contains(chestId)) openedChests.Add(chestId);
+        }
+
+        // 그 지역 사전을 마지막으로 읽은 날 ("yyyy-MM-dd", 없으면 null)
+        public string DictionaryReadDay(string area)
+        {
+            if (dictionaryReads == null) return null;
+            foreach (var read in dictionaryReads)
+                if (read.AreaId == area) return read.Day;
+            return null;
+        }
+
+        public void MarkDictionaryRead(string area, string day)
+        {
+            if (dictionaryReads == null) dictionaryReads = new List<DictionaryReadDay>();
+            dictionaryReads.RemoveAll(r => r.AreaId == area);
+            dictionaryReads.Add(new DictionaryReadDay(area, day));
+        }
+    }
+
+    [Serializable]
+    public class DictionaryReadDay
+    {
+        [SerializeField] private string areaId;
+        [SerializeField] private string day;
+
+        public string AreaId => areaId;
+        public string Day => day;
+
+        private DictionaryReadDay() { } // Unity 직렬화용
+
+        public DictionaryReadDay(string areaId, string day)
+        {
+            this.areaId = areaId;
+            this.day = day;
         }
     }
 }
