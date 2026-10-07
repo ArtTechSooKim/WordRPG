@@ -89,6 +89,7 @@ SFX = {
     "door": "Audio/Sounds/Whoosh & Slash/Whoosh2.wav",
     "gateopen": "Audio/Jingles/Secret2.wav",  # 보스를 물리쳐 새 길이 열릴 때
     "combo": "Audio/Sounds/Bonus/PowerUp1.wav",  # 연속 정답 콤보 (단계마다 음높이를 올려 재생)
+    "respawn": "Audio/Sounds/Magic & Skill/Heal3.wav",  # 지고 나서 시작 지점에서 빛과 함께 다시 일어남
 }
 AUDIO_OUT = os.path.join(PROJECT, "Assets", "Resources", "Audio")
 
@@ -100,6 +101,8 @@ FX = {
     "heal": ("FX/Magic/Circle/SpriteSheetSpark.png", 6),       # 회복
     "shield": ("FX/Magic/Shield/SpriteSheetBlue.png", 6),      # 보호막 · 막음
     "smoke": ("FX/Smoke/Smoke/SpriteSheet.png", 6),            # 쓰러짐
+    "sparkle": ("FX/Magic/Spark/SpriteSheet.png", 10),         # 다시 일어날 때 반짝이 (필드)
+    "dust": ("FX/Smoke/SmokeCircular/SpriteSheet.png", 8),     # 달릴 때 발밑 먼지 (필드)
 }
 
 

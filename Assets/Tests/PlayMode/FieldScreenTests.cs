@@ -140,26 +140,34 @@ namespace WordRPG.Tests
                 "스틱 영역은 오른쪽 (영역 왼쪽 아래 모서리가 화면 40% 지점부터)");
 
             // 살짝 밀고 있으면: 걷기로 계속 이동 (한 번 밀어서 3칸)
-            bool sawRun = false;
+            bool sawRun = false, sawRunPose = false;
+            var runPose = PlayerArt.GetRun(Direction.Right, 1); // 점프 자세 (달릴 때만)
             yield return HoldStick(field, Direction.Right, () =>
             {
                 sawRun |= field.IsRunning;
+                sawRunPose |= field.PlayerSprite == runPose;
                 return field.PlayerCell.x >= 4;
             });
             Assert.GreaterOrEqual(field.PlayerCell.x, 4, "손을 떼기 전까지 칸마다 서지 않고 계속 감");
             Assert.IsFalse(sawRun, "살짝 밀면 걷기");
+            Assert.IsFalse(sawRunPose, "걸을 때는 걷기 그림만");
+            Assert.AreEqual(0, field.DustPuffs, "걸을 때는 먼지 없음");
 
             // 끝까지 밀면: 달리기 + 스틱에 '달리기'
             bool sawLabel = false;
             sawRun = false;
+            runPose = PlayerArt.GetRun(Direction.Left, 1);
             yield return HoldStick(field, Direction.Left, () =>
             {
                 sawRun |= field.IsRunning;
+                sawRunPose |= field.PlayerSprite == runPose;
                 sawLabel |= field.Stick.transform.Find("Stick/RunLabel").gameObject.activeSelf;
                 return field.PlayerCell.x <= 1;
             }, run: true);
             Assert.AreEqual(new Vector2Int(1, 1), field.PlayerCell);
             Assert.IsTrue(sawRun, "끝까지 밀면 달리기");
+            Assert.IsTrue(sawRunPose, "달릴 때는 달리기 그림(점프 자세가 섞임)");
+            Assert.Greater(field.DustPuffs, 0, "달리면 발밑 먼지");
             Assert.IsTrue(sawLabel, "달리는 동안 스틱에 '달리기'");
             Assert.IsFalse(field.Stick.transform.Find("Stick/RunLabel").gameObject.activeSelf, "손을 떼면 사라짐");
 
@@ -206,6 +214,10 @@ namespace WordRPG.Tests
             yield return WaitFor(() => !field.IsInBattle);
 
             Assert.AreEqual(new Vector2Int(2, 1), field.PlayerCell, "시작 위치(회복의 샘 앞)로 돌아감");
+            Assert.AreEqual(1, field.RespawnsPlayed, "빛과 함께 다시 일어나는 연출");
+            var playerRenderer = field.transform.Find("Player").GetComponent<SpriteRenderer>();
+            Assert.AreEqual(1f, playerRenderer.color.a, "연출이 끝나면 주인공이 또렷하게");
+            Assert.AreEqual(Vector3.one, playerRenderer.transform.localScale);
             Assert.AreEqual(session.Hero.Stats.MaxHp, session.Hero.CurrentHp, "HP 회복");
             StringAssert.Contains("돌아왔다", field.ToastMessage);
             Assert.AreEqual(1, session.Record.BattlesLost);

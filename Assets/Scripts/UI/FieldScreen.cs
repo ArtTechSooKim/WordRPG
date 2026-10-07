@@ -93,6 +93,7 @@ namespace WordRPG.UI
         private bool paywallArmed = true;  // 정식판 안내를 닫은 뒤에는 스틱을 한 번 떼야 다시 뜬다
         private bool fieldTutorialRunning; // 첫 안내 중에는 몬스터가 나오지 않는다
         private int stepsTaken;
+        private int runSteps;
         private DexView dexView;
         private RelicAltarView altarView;
         private ShopView shopView;
@@ -114,6 +115,9 @@ namespace WordRPG.UI
         public TutorialOverlay Tutorial => tutorial;
         public PaywallView Paywall => paywall;
         public bool IsInBattle => inBattle || transitioning;
+        public int RespawnsPlayed { get; private set; }   // 지고 나서 다시 일어나는 연출 횟수 (테스트용)
+        public int DustPuffs { get; private set; }        // 달릴 때 발밑 먼지 (테스트용)
+        public Sprite PlayerSprite => playerRenderer != null ? playerRenderer.sprite : null;
         public BattleScreen Battle => battle;
         public GameSession Session => session;
         public FieldArea CurrentArea => area;
@@ -244,7 +248,8 @@ namespace WordRPG.UI
                 moveT += Time.deltaTime / Mathf.Max(0.001f, currentStep);
                 player.position = Vector3.Lerp(moveFrom, moveTo, Mathf.Clamp01(moveT));
                 walkTime += Time.deltaTime * (running ? 1.8f : 1f); // 달리면 발도 빠르게
-                playerRenderer.sprite = PlayerArt.Get(walker.Facing, Mathf.FloorToInt(walkTime * PlayerArt.FramesPerSecond));
+                int frame = Mathf.FloorToInt(walkTime * PlayerArt.FramesPerSecond);
+                playerRenderer.sprite = running ? PlayerArt.GetRun(walker.Facing, frame) : PlayerArt.Get(walker.Facing, frame);
                 if (moveT >= 1f)
                 {
                     float leftover = (moveT - 1f) * currentStep;
@@ -296,6 +301,13 @@ namespace WordRPG.UI
                 case StepKind.Moved:
                     moving = true;
                     running = run;
+                    // 달리면 두 걸음마다 떠난 자리에 먼지가 퍼진다
+                    runSteps = run ? runSteps + 1 : 0;
+                    if (run && runSteps % 2 == 1)
+                    {
+                        DustPuffs++;
+                        StartCoroutine(FieldFx.Play(transform, player.position + Vector3.down * 0.3f, Fx.Dust, 1.25f, animationScale, 9));
+                    }
                     currentStep = stepDuration * (run ? runStepRatio : 1f);
                     moveT = 0f;
                     moveFrom = player.position;
@@ -664,9 +676,45 @@ namespace WordRPG.UI
                 RefreshNameTags();
                 session.World.SetPosition(area.AreaId, walker.Position);
                 saveProgress?.Invoke();
-                ShowToast($"{area.DisplayName} 시작 지점으로 돌아왔다. HP가 회복되었다!");
+                StartCoroutine(Respawn($"{area.DisplayName} 시작 지점으로 돌아왔다. HP가 회복되었다!"));
             }
             RefreshHud();
+        }
+
+        // 지고 나서 시작 지점에서 다시 일어나는 연출: 어둠이 걷힘 → 발밑에 빛 고리 + 반짝이 + 소리 →
+        // 주인공이 빛 속에서 작게 → 원래 크기로, 투명 → 또렷하게 나타나며 살짝 떠올랐다 내려앉음
+        private IEnumerator Respawn(string message)
+        {
+            transitioning = true;
+            RespawnsPlayed++;
+            var cutscene = GateCutscene.Create(transform);
+            yield return cutscene.Fade(1f, 1f, 0f);
+            var home = player.position;
+            playerRenderer.color = new Color(1f, 1f, 1f, 0f);
+            UpdateCamera();
+            yield return cutscene.Fade(1f, 0f, 0.5f * animationScale);
+
+            Sound.Play(Sfx.Respawn);
+            StartCoroutine(FieldFx.Play(transform, home, Fx.Heal, 2.6f, animationScale * 1.5f, 11));
+            yield return WaitUnscaled(0.25f);
+            StartCoroutine(FieldFx.Play(transform, home + Vector3.up * 0.35f, Fx.Sparkle, 1.9f, animationScale * 1.3f, 12));
+
+            float appear = 0.7f * animationScale;
+            for (float t = 0f; t < appear; t += Time.unscaledDeltaTime)
+            {
+                float k = Mathf.Clamp01(t / Mathf.Max(0.0001f, appear));
+                playerRenderer.color = new Color(1f, 1f, 1f, k);
+                player.localScale = Vector3.one * Mathf.Lerp(0.4f, 1f, 1f - (1f - k) * (1f - k));
+                player.position = home + Vector3.up * (Mathf.Sin(k * Mathf.PI) * 0.3f);
+                yield return null;
+            }
+            playerRenderer.color = Color.white;
+            player.localScale = Vector3.one;
+            player.position = home;
+            yield return WaitUnscaled(0.3f);
+            Destroy(cutscene.gameObject);
+            transitioning = false;
+            ShowToast(message);
         }
 
         // ------------------------------------------------------------------ 길 열림 연출

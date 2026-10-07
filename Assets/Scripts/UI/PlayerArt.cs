@@ -5,29 +5,37 @@ using WordRPG.Field;
 namespace WordRPG.UI
 {
     // 필드 주인공 그림 (Ninja Adventure 'Boy' 시트, 16×16 칸).
-    // 시트: 열 = 방향(아래·위·왼쪽·오른쪽), 행 = 걷기 4프레임(첫 행 = 서 있는 모습). 시트가 없으면 임시 도트
+    // 시트: 열 = 방향(아래·위·왼쪽·오른쪽), 행 0~3 = 걷기 4프레임(첫 행 = 서 있는 모습), 4 = 공격, 5 = 점프. 시트가 없으면 임시 도트
+    // 팩에 달리기 그림이 없어서, 달리기는 걷기의 내딛는 두 칸 사이에 점프 행(앞으로 숙이고 다리를 벌린 모습)을 끼워 만든다
     public static class PlayerArt
     {
         public const string SheetPath = "Art/NinjaAdventure/Player/Boy";
         public const float FramesPerSecond = 8f;
         private const int Cell = 16;
         private const int WalkFrames = 4;
+        private static readonly int[] RunRows = { 1, 5, 3, 5 };
 
         private static Texture2D sheet;
         private static bool loaded;
         private static readonly Dictionary<int, Sprite> Cache = new Dictionary<int, Sprite>();
 
-        public static Sprite Get(Direction facing, int step)
+        public static Sprite Get(Direction facing, int step) => Frame(facing, Wrap(step, WalkFrames));
+
+        // 달리는 모습 (걷기 → 점프 자세 → 반대 발 → 점프 자세)
+        public static Sprite GetRun(Direction facing, int step) => Frame(facing, RunRows[Wrap(step, RunRows.Length)]);
+
+        private static int Wrap(int step, int count) => ((step % count) + count) % count;
+
+        private static Sprite Frame(Direction facing, int row)
         {
             if (!loaded)
             {
                 loaded = true;
                 sheet = Resources.Load<Texture2D>(SheetPath);
             }
-            if (sheet == null) return PlaceholderArt.Player(facing);
+            if (sheet == null || (row + 1) * Cell > sheet.height) return PlaceholderArt.Player(facing);
 
             int column = Column(facing);
-            int row = ((step % WalkFrames) + WalkFrames) % WalkFrames;
             int key = column * 16 + row;
             if (Cache.TryGetValue(key, out var cached) && cached != null) return cached;
 

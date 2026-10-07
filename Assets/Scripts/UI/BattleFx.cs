@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 namespace WordRPG.UI
 {
-    public enum Fx { Slash, Claw, Explosion, Heal, Shield, Smoke }
+    // Sparkle·Dust는 필드에서 씀 (다시 일어날 때 반짝이, 달릴 때 발밑 먼지 — FieldFx)
+    public enum Fx { Slash, Claw, Explosion, Heal, Shield, Smoke, Sparkle, Dust }
 
     // 전투 효과 애니메이션 (Ninja Adventure FX → Art/NinjaAdventure/Fx/{이름}.png, 정사각 프레임을 가로로 이어 붙인 시트).
     // 카드 위에 잠깐 겹쳐 그렸다가 사라진다. 그림이 없으면 아무것도 하지 않는다
@@ -49,6 +50,32 @@ namespace WordRPG.UI
                 while (Time.unscaledTime < end) yield return null;
             }
             if (image != null) Object.Destroy(image.gameObject);
+        }
+    }
+
+    // 필드(월드) 위에서 효과를 한 번 재생 — BattleFx와 같은 그림. tiles = 크기(1 = 한 칸)
+    public static class FieldFx
+    {
+        public static IEnumerator Play(Transform parent, Vector3 world, Fx fx, float tiles, float animScale, int sortingOrder,
+            float framesPerSecond = 14f)
+        {
+            var frames = BattleFx.Frames(fx);
+            if (frames == null || frames.Length == 0) yield break;
+            var go = new GameObject($"Fx_{fx}", typeof(SpriteRenderer));
+            go.transform.SetParent(parent, false);
+            go.transform.position = world;
+            go.transform.localScale = Vector3.one * tiles;
+            var renderer = go.GetComponent<SpriteRenderer>();
+            renderer.sortingOrder = sortingOrder;
+            float frameTime = animScale / framesPerSecond;
+            foreach (var frame in frames)
+            {
+                if (renderer == null) yield break;
+                renderer.sprite = frame;
+                float end = Time.unscaledTime + frameTime;
+                while (Time.unscaledTime < end) yield return null;
+            }
+            if (go != null) Object.Destroy(go);
         }
     }
 
