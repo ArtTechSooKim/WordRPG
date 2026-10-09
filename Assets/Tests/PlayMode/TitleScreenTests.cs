@@ -80,6 +80,37 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // 더 새 버전 앱의 세이브 (예: TestFlight에서 예전 빌드를 설치): 치우거나 덮어쓰지 않고, 업데이트를 안내하며 시작을 막는다 (#48)
+        [UnityTest]
+        public IEnumerator SaveFromNewerAppIsKeptAndTitleAsksToUpdate()
+        {
+            var system = new WordRPG.Save.SaveSystem(dir);
+            System.IO.Directory.CreateDirectory(dir);
+            const string newer = "{\"version\": 99, \"note\": \"from a newer app\"}";
+            System.IO.File.WriteAllText(system.MainPath, newer);
+
+            var manager = StartManager();
+            Assert.IsTrue(manager.SaveBlocked);
+            StringAssert.Contains("업데이트", manager.StatusMessage);
+            manager.MarkPlaying();
+            manager.Save();
+            Assert.AreEqual(newer, System.IO.File.ReadAllText(system.MainPath), "덮어쓰지 않음");
+            Assert.AreEqual(1, System.IO.Directory.GetFiles(dir).Length, "깨진 파일처럼 치우지 않음");
+
+            bool? started = null;
+            var title = MakeTitle(newGame => started = newGame);
+            yield return null;
+            yield return null;
+            var root = title.transform;
+            Assert.AreEqual("앱을 업데이트해 주세요", root.Find("TitleCanvas/SafeArea/TapLabel").GetComponent<UnityEngine.UI.Text>().text);
+            StringAssert.Contains("더 새 버전", AllText(root.Find("TitleCanvas/SafeArea/SaveCard")));
+            FindButton(root, "TapToStart").onClick.Invoke();
+            Assert.IsNull(started, "업데이트 전에는 시작하지 않음");
+
+            Object.Destroy(title.gameObject);
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator SavedGameTapContinues()
         {

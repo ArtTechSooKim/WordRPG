@@ -121,6 +121,13 @@ namespace WordRPG.UI
         private int pickedIntensity = 1;
         private SkillData targetingSkill;
         private int pickedChoice = int.MinValue;
+
+        // 앱이 가려진 동안(전화·알림·홈 화면)은 문제 시간이 흐르지 않는다 (#48 실기기 점검표).
+        // 한 프레임에 흐르는 시간도 MaxTimerStep까지만 — 앱이 멈췄다 돌아온 첫 프레임에 시간이 한꺼번에 지나가지 않게
+        private bool appSuspended;
+        private const float MaxTimerStep = 0.1f;
+        private void OnApplicationPause(bool paused) => appSuspended = paused;
+        private void OnApplicationFocus(bool focus) => appSuspended = !focus;
         private bool cardConfirmed;
         private int resultChoice = -1;
 
@@ -478,13 +485,14 @@ namespace WordRPG.UI
                     $"{battleConfig.CriticalTimeSeconds:0}초 안에 맞히면 크리티컬로 더 세게 공격해요.",
                     () => (RectTransform)quizPanel.transform);
             pickedChoice = int.MinValue;
-            float startTime = Time.unscaledTime;
             float limit = battleConfig.AnswerTimeLimitSeconds;
             float elapsed = 0f;
+            string criticalHint = $"{hint}   ★ 크리티컬 찬스!";
+            bool? shownCritical = null;
 
             while (pickedChoice == int.MinValue)
             {
-                elapsed = Time.unscaledTime - startTime;
+                if (!appSuspended) elapsed += Mathf.Min(Time.unscaledDeltaTime, MaxTimerStep);
                 if (elapsed >= limit)
                 {
                     pickedChoice = -1;
@@ -493,7 +501,11 @@ namespace WordRPG.UI
                 }
 
                 bool critical = elapsed <= battleConfig.CriticalTimeSeconds && engine.CanStillCrit;
-                quizHint.text = critical ? $"{hint}   ★ 크리티컬 찬스!" : hint;
+                if (shownCritical != critical) // 글자·색은 크리티컬이 바뀔 때만 (매 프레임 새 글자를 만들지 않게)
+                {
+                    shownCritical = critical;
+                    quizHint.text = critical ? criticalHint : hint;
+                }
                 timerFill.anchorMax = new Vector2(Mathf.Clamp01(1f - elapsed / limit), 1);
                 timerFillImage.color = critical ? Palette.Gold : (limit - elapsed < 3f ? Palette.Bad : Palette.Info);
                 yield return null;
@@ -521,7 +533,7 @@ namespace WordRPG.UI
         private void MarkChoices(QuizQuestion question, int chosen)
         {
             var font = UiFonts.Bold;
-            bool marks = font.HasCharacter('✓') && font.HasCharacter('✕');
+            bool marks = font.HasCharacter('✓') && font.HasCharacter('×'); // ✕는 글꼴에 없어 ×로 (#48)
             for (int i = 0; i < question.Choices.Count; i++)
             {
                 var label = UiKit.LabelOf(choiceButtons[i]);
@@ -533,7 +545,7 @@ namespace WordRPG.UI
                 else if (i == chosen)
                 {
                     UiKit.SetColor(choiceButtons[i], Palette.Bad);
-                    if (marks) label.text = "✕  " + label.text;
+                    if (marks) label.text = "×  " + label.text;
                 }
                 else
                 {

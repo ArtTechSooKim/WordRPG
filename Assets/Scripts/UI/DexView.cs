@@ -111,7 +111,14 @@ namespace WordRPG.UI
             var progress = Dex.GetProgress(region, session.Vocabulary);
             string regionName = string.IsNullOrEmpty(region.RegionName) ? "" : $" · {region.RegionName}";
             title.text = $"단어 도감{regionName}";
-            progressText.text = $"{progress.Discovered} / {progress.Total} 발견      완전 숙련 {progress.Mastered}개";
+            int wrongNote = 0;
+            foreach (var word in region.Words)
+            {
+                var entry = session.Vocabulary.Find(word.Id);
+                if (entry != null && entry.InWrongNote) wrongNote++;
+            }
+            progressText.text = $"{progress.Discovered} / {progress.Total} 발견      완전 숙련 {progress.Mastered}개" +
+                                (wrongNote > 0 ? $"      오답 노트 {wrongNote}" : "");
             progressFill.anchorMax = new Vector2(progress.Ratio, 1);
             rewardText.text = RewardText(progress);
             var keepsakeIcon = UiKit.ItemIcon(region.CompletionKeepsake);
@@ -142,6 +149,8 @@ namespace WordRPG.UI
         {
             var level = session.Vocabulary.GetLevel(word.Id);
             bool discovered = level > MasteryLevel.New;
+            var entryProgress = session.Vocabulary.Find(word.Id);
+            bool wrong = discovered && entryProgress != null && entryProgress.InWrongNote;
 
             var image = UiKit.RoundPanel($"DexRow_{index}", content, RowColor(level), UiKit.RadiusMd);
             image.gameObject.AddComponent<LayoutElement>().preferredHeight = 92;
@@ -152,9 +161,16 @@ namespace WordRPG.UI
 
             UiKit.Label("Number", image.transform, $"{index + 1:000}", 28, Palette.TextDim, 0.03f, 0, 0.12f, 1, TextAnchor.MiddleLeft);
             var name = UiKit.Label("Name", image.transform, discovered ? word.English : "???", 40,
-                discovered ? Palette.Text : Palette.TextDim, 0.13f, 0, 0.66f, 1, TextAnchor.MiddleLeft,
+                discovered ? Palette.Text : Palette.TextDim, 0.13f, 0, wrong ? 0.5f : 0.66f, 1, TextAnchor.MiddleLeft,
                 discovered ? FontStyle.Bold : FontStyle.Normal, true, 22);
             if (!discovered) UiKit.Display(name);
+            // 오답 노트에 있는 단어: 빨간 '오답' 알약 (맞히면 사라짐, #48)
+            if (wrong)
+            {
+                var tag = UiKit.Pill(UiKit.Panel("WrongTag", image.transform, Palette.Bad, 0.51f, 0.26f, 0.63f, 0.74f));
+                tag.raycastTarget = false;
+                UiKit.OneLine(UiKit.Label("Text", tag.transform, "오답", 24, Palette.Text, 0, 0, 1, 1, TextAnchor.MiddleCenter, FontStyle.Bold));
+            }
             // 숙련도 별 4개 (Figma Icon/Star Full · Star Empty)
             if (discovered)
             {
@@ -201,6 +217,7 @@ namespace WordRPG.UI
             }
             text.Append($"\n{Dex.Stars(progress.Level)} {progress.Level.DisplayName()}   맞힘 {progress.CorrectCount} · 틀림 {progress.WrongCount}");
             text.Append($"\n{Dex.DescribeNextReview(progress, nowUtc)}");
+            if (progress.InWrongNote) text.Append("\n오답 노트에 있어요 — 전투나 수련에서 맞히면 빠져요");
             var found = progress.DiscoveredUtc;
             if (found.HasValue) text.Append($"   (발견 {found.Value.ToLocalTime():yyyy-MM-dd})");
             detailText.text = text.ToString();

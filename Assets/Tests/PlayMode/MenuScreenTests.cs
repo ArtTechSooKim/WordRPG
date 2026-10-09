@@ -425,7 +425,12 @@ namespace WordRPG.Tests
             var music = view.GetComponentsInChildren<Slider>(true).First(s => s.name == "MusicSlider");
             Assert.AreEqual(GameSettings.DefaultMusicVolume, music.value, 0.001f, "현재 값으로 열림");
             music.value = 0.2f;
-            Assert.AreEqual(0.2f, settings.MusicVolume, 0.001f);
+            music.value = 0.3f;
+            Assert.AreEqual(0.3f, settings.MusicVolume, 0.001f, "소리는 바로 바뀜");
+            Assert.AreEqual(1, saved, "슬라이더를 끄는 동안은 저장하지 않음 (#48)");
+            FindButton(view.transform, "SettingsCloseButton").onClick.Invoke();
+            Assert.AreEqual(2, saved, "창을 닫을 때 한 번 저장");
+            FindButton(hud, "SettingsButton").onClick.Invoke();
             Assert.AreEqual(2, saved);
 
             // 처음부터 다시 하기: 첫 확인에서 취소하면 아무 일도 없음

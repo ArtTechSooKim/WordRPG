@@ -35,6 +35,8 @@ namespace WordRPG.Game
         public IStore Store { get; private set; } // 결제 창구 (배치모드 테스트에서는 없음)
         public bool LoadedFromSave { get; private set; }
         public bool HasSave => saveSystem != null && saveSystem.HasSave;
+        // 더 새 버전 앱의 세이브가 있어 읽지도 덮어쓰지도 않는 상태 (#48). 타이틀에서 업데이트 안내, 게임 시작 막음
+        public bool SaveBlocked { get; private set; }
         public string StatusMessage { get; private set; } = "";
         public string SaveDirectory => saveSystem?.Directory;
         public GameDatabase Database => database;
@@ -88,6 +90,16 @@ namespace WordRPG.Game
                 return;
             }
 
+            if (result.TooNew)
+            {
+                // 더 새 버전 앱의 세이브: 깨진 것이 아니므로 그대로 두고, 덮어쓰지 않게 저장을 막는다. 타이틀이 업데이트를 안내
+                Debug.LogWarning($"[GameManager] 더 새 버전 앱의 세이브라 읽지 않고 그대로 둡니다: {result.Error}");
+                SaveBlocked = true;
+                Session = GameSession.NewGame(hero);
+                LoadedFromSave = false;
+                StatusMessage = "더 새 버전 앱에서 저장한 기록이 있어요. 앱을 업데이트해 주세요";
+                return;
+            }
             if (result.Error != null)
             {
                 Debug.LogError($"[GameManager] 세이브를 읽을 수 없어 새 게임으로 시작합니다. 원본은 보관합니다: {result.Error}");
@@ -103,7 +115,7 @@ namespace WordRPG.Game
 
         public void Save()
         {
-            if (Session == null || !playing) return;
+            if (Session == null || !playing || SaveBlocked) return;
             try
             {
                 saveSystem.Save(Session.ToSaveData(DateTime.UtcNow));
@@ -140,6 +152,7 @@ namespace WordRPG.Game
         public void DeleteSave()
         {
             saveSystem.Delete();
+            SaveBlocked = false; // 직접 지웠으면 (두 번 확인) 다시 저장할 수 있음
             Session = GameSession.NewGame(hero);
             LoadedFromSave = false;
             playing = false;
@@ -178,7 +191,9 @@ namespace WordRPG.Game
 
         private void OnApplicationPause(bool paused)
         {
-            if (paused) Save();
+            if (!paused) return;
+            Save();
+            SaveSettings(); // 설정 창을 연 채 앱을 내려도 바꾼 음량이 남게 (#48)
         }
 
         private void OnApplicationQuit() => Save();

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using WordRPG.Game;
 
@@ -18,6 +19,7 @@ namespace WordRPG.UI
         private SwitchView vibration;
         private GameSettings settings;
         private Action onSettingsChanged;
+        private bool dirty; // 슬라이더로 바꾸고 아직 저장하지 않음
         private Action onDeleteSave;
         private Action onReplayTutorial;
         private Button replayButton;
@@ -35,10 +37,12 @@ namespace WordRPG.UI
             var sound = Section(root, "소리", 0.745f, 0.915f);
             Row(sound, "music", "배경 음악", null, 0.47f, 0.71f);
             view.music = UiKit.MakeSlider("MusicSlider", sound, 0.44f, 0.47f, 0.965f, 0.71f);
-            view.music.onValueChanged.AddListener(v => view.Change(s => s.MusicVolume = v));
+            view.music.onValueChanged.AddListener(v => view.Change(s => s.MusicVolume = v, false));
+            view.SaveOnRelease(view.music);
             Row(sound, "sound", "효과음", null, 0.15f, 0.39f);
             view.sfx = UiKit.MakeSlider("SfxSlider", sound, 0.44f, 0.15f, 0.965f, 0.39f);
-            view.sfx.onValueChanged.AddListener(v => view.Change(s => s.SfxVolume = v));
+            view.sfx.onValueChanged.AddListener(v => view.Change(s => s.SfxVolume = v, false));
+            view.SaveOnRelease(view.sfx);
 
             // 게임: 진동 + 튜토리얼 다시 보기
             var game = Section(root, "게임", 0.535f, 0.73f);
@@ -117,16 +121,36 @@ namespace WordRPG.UI
 
         public void Hide()
         {
+            if (dirty) Flush();
             Dialog.Hide();
             Root.SetActive(false);
         }
 
-        private void Change(Action<GameSettings> apply)
+        // 소리는 바로 바꾸고, 저장은 saveNow일 때만. 슬라이더는 끄는 동안 값이 계속 바뀌므로 손을 뗄 때·창을 닫을 때 한 번 저장
+        private void Change(Action<GameSettings> apply, bool saveNow = true)
         {
             if (settings == null) return;
             apply(settings);
             Sound.ApplyVolumes(settings);
+            if (saveNow) Flush();
+            else dirty = true;
+        }
+
+        private void Flush()
+        {
+            dirty = false;
             onSettingsChanged?.Invoke();
+        }
+
+        private void SaveOnRelease(Slider slider)
+        {
+            var trigger = slider.gameObject.AddComponent<EventTrigger>();
+            var entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
+            entry.callback.AddListener(_ =>
+            {
+                if (dirty) Flush();
+            });
+            trigger.triggers.Add(entry);
         }
 
         // 처음부터: 두 번 묻는다 (실수로 누르지 않게 — 사용자 요청 2026-10-06)

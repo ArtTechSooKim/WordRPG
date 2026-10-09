@@ -248,6 +248,16 @@ namespace WordRPG.UI
             }
 
             saveCard.SetActive(hasSave);
+            if (manager.SaveBlocked)
+            {
+                // 더 새 버전 앱의 기록: 지우지 않고 그대로 있다고 알리고 시작은 막는다 (#48)
+                for (int i = 0; i < avatars.Count; i++) avatars[i].back.gameObject.SetActive(false);
+                saveLine1.text = "더 새 버전 앱에서 저장한 기록이 있어요";
+                saveLine2.text = "기록은 그대로 있어요 · 앱을 최신 버전으로 업데이트해 주세요";
+                tapLabel.text = "앱을 업데이트해 주세요";
+                return;
+            }
+            tapLabel.text = "화면을 터치하세요";
             if (hasSave)
             {
                 var area = manager.Database != null && session.World.AreaId != null ? manager.Database.FindArea(session.World.AreaId) : null;
@@ -263,6 +273,7 @@ namespace WordRPG.UI
         private void OnTap()
         {
             if (started || dialog.IsOpen || settingsView.IsOpen) return;
+            if (manager.SaveBlocked) return; // 더 새 버전 앱의 기록 — 업데이트해야 이어할 수 있음
             Begin(!manager.HasSave);
         }
 
@@ -282,7 +293,7 @@ namespace WordRPG.UI
 
         private void Begin(bool newGame)
         {
-            if (started) return;
+            if (started || manager.SaveBlocked) return;
             started = true;
             manager.MarkPlaying();
             manager.Save(); // 새 게임도 바로 저장 → 다음에 켜면 [이어하기]

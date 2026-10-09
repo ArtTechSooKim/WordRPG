@@ -95,6 +95,7 @@ namespace WordRPG.Tests
             yield return new WaitForSecondsRealtime(0.6f);
             yield return PressConfirm(field);
             StringAssert.Contains("오늘 책은 충분히 읽은 것 같다", field.Bubble.Text);
+            StringAssert.Contains("내일 다시 읽을 수 있어요", field.Bubble.Text, "다음에 읽을 수 있는 때 (#48)");
             Assert.AreEqual(1, session.Vocabulary.DiscoveredCount);
 
             // 다음 날 → 또 한 단어. 뒤로가기로 말풍선 닫기

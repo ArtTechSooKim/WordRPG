@@ -143,6 +143,44 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // 실기기 점검표 (#48): 오답 노트에 들어간 단어를 도감에서 볼 수 있다
+        [UnityTest]
+        public IEnumerator DexMarksWordsInTheWrongNote()
+        {
+            var enemy = TestData.Species("slime", new MonsterStats(20, 5, 5), new MonsterStats(0, 0, 0),
+                TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 10));
+            var area = Area(enemy);
+            var session = GameSession.NewGame(Player(), 1);
+            var words = area.Words.Words;
+            var rules = new MasteryRules();
+            session.Vocabulary.RecordAnswer(words[0].Id, true, DateTime.UtcNow, rules);
+            session.Vocabulary.RecordAnswer(words[1].Id, false, DateTime.UtcNow, rules); // 오답 노트
+            var field = CreateField(area, session, Scarecrow());
+            yield return null;
+            yield return null;
+
+            FindButton(field.transform, "DexButton").onClick.Invoke();
+            Transform dex = null;
+            foreach (var t in field.GetComponentsInChildren<Transform>(true))
+                if (t.name == "DexView" && t.gameObject.activeInHierarchy) dex = t; // 전투 화면에도 도감이 있어 열린 것을
+            Assert.IsNotNull(dex);
+            yield return null;
+            StringAssert.Contains("오답 노트 1", AllText(dex));
+            Transform row0 = null, row1 = null;
+            foreach (var t in dex.GetComponentsInChildren<Transform>(true))
+            {
+                if (t.name == "DexRow_0") row0 = t;
+                if (t.name == "DexRow_1") row1 = t;
+            }
+            Assert.IsNull(row0.Find("WrongTag"), "맞힌 단어는 표시 없음");
+            Assert.IsNotNull(row1.Find("WrongTag"), "오답 노트 단어에 빨간 '오답'");
+            row1.GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+            StringAssert.Contains("오답 노트에 있어요", AllText(dex));
+
+            UnityEngine.Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator TrainingNeedsDiscoveredWords()
         {

@@ -102,6 +102,46 @@ namespace WordRPG.Tests
             Object.Destroy(screen.gameObject);
         }
 
+        // 실기기 점검표 (#48): 문제 도중 전화·알림·홈 화면으로 앱이 가려지면 시간이 멈춤
+        [UnityTest]
+        public IEnumerator QuizTimerStopsWhileTheAppIsHidden()
+        {
+            var strike = TestData.Skill("strike", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var hero = Hero(new MonsterStats(100, 30, 10), strike);
+            var enemy = TestData.Species("enemy", new MonsterStats(999, 1, 50), new MonsterStats(0, 0, 0), strike);
+            var go = new GameObject("BattleScreenUnderTest");
+            var screen = go.AddComponent<BattleScreen>();
+            screen.Configure(Table(enemy), Words(), GameSession.NewGame(hero, 1), animScale: 0.01f,
+                config: new BattleConfig(answerTimeLimitSeconds: 1f, criticalTimeSeconds: 0.3f, criticalMultiplier: 1.5f, variance: 0f,
+                    expPerCorrectAnswer: 2));
+            yield return null;
+            yield return null;
+
+            // 기술 → 강도 ×1 → 새 단어 카드 → 문제
+            var root = screen.transform;
+            yield return WaitFor(() =>
+            {
+                if (ActiveButton(root, "Choice_0") != null) return true;
+                (ActiveButton(root, "CardConfirmButton") ?? ActiveButton(root, "Intensity_0") ?? ActiveButton(root, "SkillButton_0"))?.onClick.Invoke();
+                return false;
+            }, 5f);
+            Assert.IsNotNull(ActiveButton(root, "Choice_0"));
+
+            go.SendMessage("OnApplicationPause", true);
+            yield return new WaitForSecondsRealtime(1.5f);
+            Assert.AreEqual(int.MinValue, PickedChoiceOf(screen), "앱이 가려진 동안은 1초 제한이 지나도 시간 초과가 아님");
+
+            go.SendMessage("OnApplicationPause", false);
+            yield return WaitFor(() => PickedChoiceOf(screen) != int.MinValue, 3f);
+            Assert.AreEqual(-1, PickedChoiceOf(screen), "돌아오면 다시 시간이 흘러 시간 초과");
+
+            Object.Destroy(go);
+            yield return null;
+        }
+
+        private static int PickedChoiceOf(BattleScreen battle) =>
+            (int)typeof(BattleScreen).GetField("pickedChoice", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(battle);
+
         [UnityTest]
         public IEnumerator LosingABattleThroughTheUi()
         {

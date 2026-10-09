@@ -493,7 +493,7 @@ namespace WordRPG.UI
                     bubble.Say($"빈 받침대다.\n{boss} 물리치면 무언가 놓일 것 같다.", 4f);
                     break;
                 case DictionaryReadOutcome.AlreadyReadToday:
-                    bubble.Say("오늘 책은 충분히 읽은 것 같다.", 3f);
+                    bubble.Say("오늘 책은 충분히 읽은 것 같다.", 4f, "내일 다시 읽을 수 있어요 (밤 12시에 바뀜)");
                     break;
                 case DictionaryReadOutcome.AllDiscovered:
                     bubble.Say($"{area.DictionaryName}의 단어를 모두 발견했다!", 3f);

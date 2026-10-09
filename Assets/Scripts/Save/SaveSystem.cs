@@ -10,12 +10,14 @@ namespace WordRPG.Save
         public SaveData Data { get; }
         public bool UsedBackup { get; }
         public string Error { get; } // 파일은 있었는데 못 읽었을 때의 이유
+        public bool TooNew { get; }  // 더 새 버전 앱의 세이브라서 못 읽음 — 깨진 것이 아님 (치우지 말 것)
 
-        public SaveLoadResult(SaveData data, bool usedBackup, string error)
+        public SaveLoadResult(SaveData data, bool usedBackup, string error, bool tooNew = false)
         {
             Data = data;
             UsedBackup = usedBackup;
             Error = error;
+            TooNew = tooNew;
         }
     }
 
@@ -56,6 +58,7 @@ namespace WordRPG.Save
         public SaveLoadResult Load()
         {
             var errors = new List<string>();
+            bool tooNew = false;
             foreach (var path in new[] { MainPath, BackupPath })
             {
                 if (!File.Exists(path)) continue;
@@ -64,12 +67,17 @@ namespace WordRPG.Save
                     var data = SaveData.FromJson(File.ReadAllText(path, Utf8));
                     return new SaveLoadResult(data, path == BackupPath, null);
                 }
+                catch (SaveTooNewException e)
+                {
+                    tooNew = true;
+                    errors.Add($"{Path.GetFileName(path)}: {e.Message}");
+                }
                 catch (Exception e)
                 {
                     errors.Add($"{Path.GetFileName(path)}: {e.Message}");
                 }
             }
-            return new SaveLoadResult(null, false, errors.Count > 0 ? string.Join(" / ", errors) : null);
+            return new SaveLoadResult(null, false, errors.Count > 0 ? string.Join(" / ", errors) : null, tooNew);
         }
 
         // 읽을 수 없는 세이브를 지우지 않고 옆으로 치워 둔다 (원인 조사용). 새 게임 저장이 덮어쓰지 않게

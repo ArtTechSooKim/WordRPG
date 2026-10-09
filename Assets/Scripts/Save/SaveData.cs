@@ -158,8 +158,7 @@ namespace WordRPG.Save
             if (string.IsNullOrWhiteSpace(json)) throw new FormatException("세이브 파일이 비어 있습니다");
             var data = JsonUtility.FromJson<SaveData>(json);
             if (data == null || data.version <= 0) throw new FormatException("세이브 형식이 아닙니다");
-            if (data.version > CurrentVersion)
-                throw new FormatException($"더 새로운 버전의 세이브입니다 (v{data.version}). 앱을 업데이트하세요");
+            if (data.version > CurrentVersion) throw new SaveTooNewException(data.version);
             data.hero = data.hero ?? new HeroSaveData(1, 0, 0);
             data.relics = data.relics ?? new List<RelicSaveData>();
             data.party = data.party ?? new List<MonsterSaveData>();
@@ -169,6 +168,17 @@ namespace WordRPG.Save
             data.world = data.world ?? new WorldState();
             data.skillSlots = data.skillSlots ?? new List<string>();
             return data;
+        }
+    }
+
+    // 더 새 버전의 앱이 쓴 세이브 (예: TestFlight에서 예전 빌드를 다시 설치). 깨진 것이 아니므로 지우거나 치우지 않는다 (#48)
+    public class SaveTooNewException : FormatException
+    {
+        public int Version { get; }
+
+        public SaveTooNewException(int version) : base($"더 새로운 버전의 세이브입니다 (v{version}). 앱을 업데이트하세요")
+        {
+            Version = version;
         }
     }
 }
