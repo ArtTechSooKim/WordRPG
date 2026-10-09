@@ -120,6 +120,7 @@ namespace WordRPG.UI
         public PaywallView Paywall => paywall;
         public bool IsInBattle => inBattle || transitioning;
         public int RespawnsPlayed { get; private set; }   // 지고 나서 다시 일어나는 연출 횟수 (테스트용)
+        public bool SawRespawnPose { get; private set; }  // 다시 일어날 때 웅크린 자세를 거쳤는지 (테스트용)
         public int DustPuffs { get; private set; }        // 달릴 때 발밑 먼지 (테스트용)
         public Sprite PlayerSprite => playerRenderer != null ? playerRenderer.sprite : null;
         public BattleScreen Battle => battle;
@@ -316,12 +317,18 @@ namespace WordRPG.UI
                     moving = true;
                     running = run;
                     if (bubble.IsVisible) bubble.Hide();
-                    // 달리면 두 걸음마다 떠난 자리에 먼지가 퍼진다
+                    // 달리면 걸음마다 발뒤꿈치 뒤로 흙먼지가 튀어 흩어진다 (#51 사용자 레퍼런스: 달리는 발 뒤로 날리는 먼지).
+                    // 그림 = 폭발 시트의 마지막 3칸. 달리는 반대 방향으로 조금 밀려나며 옅어진다
                     runSteps = run ? runSteps + 1 : 0;
-                    if (run && runSteps % 2 == 1)
+                    if (run)
                     {
                         DustPuffs++;
-                        StartCoroutine(FieldFx.Play(transform, player.position + Vector3.down * 0.3f, Fx.Dust, 1.25f, animationScale, 9));
+                        var back = -(Vector3)(Vector2)direction.ToOffset();
+                        float side = runSteps % 2 == 0 ? 0.12f : -0.12f; // 왼발·오른발
+                        var across = new Vector3(back.y, -back.x, 0f) * side;
+                        var at = player.position + Vector3.down * 0.32f + back * 0.3f + across;
+                        StartCoroutine(FieldFx.Play(transform, at, Fx.Dust, 1.1f, animationScale, 9, 10f,
+                            back * 1.1f + Vector3.up * 0.25f, true, direction == Direction.Left));
                     }
                     currentStep = stepDuration * (run ? runStepRatio : 1f);
                     moveT = 0f;
@@ -762,8 +769,8 @@ namespace WordRPG.UI
             RefreshHud();
         }
 
-        // 지고 나서 시작 지점에서 다시 일어나는 연출: 어둠이 걷힘 → 발밑에 빛 고리 + 반짝이 + 소리 →
-        // 주인공이 빛 속에서 작게 → 원래 크기로, 투명 → 또렷하게 나타나며 살짝 떠올랐다 내려앉음
+        // 지고 나서 시작 지점에서 다시 일어나는 연출: 어둠이 걷힘 → 쓰러진 주인공이 발밑 빛 고리 속에 나타남 + 소리 →
+        // 반짝이와 함께 쓰러짐 → 웅크림 → 서기 (팩의 '쓰러짐' 그림을 거꾸로 — #51 사용자 요청). 빛 효과는 #43 그대로
         private IEnumerator Respawn(string message)
         {
             transitioning = true;
@@ -771,28 +778,33 @@ namespace WordRPG.UI
             var cutscene = GateCutscene.Create(transform);
             yield return cutscene.Fade(1f, 1f, 0f);
             var home = player.position;
+            walker.Face(Direction.Down);
+            playerRenderer.sprite = PlayerArt.Pose(PlayerPose.Dead);
             playerRenderer.color = new Color(1f, 1f, 1f, 0f);
             UpdateCamera();
             yield return cutscene.Fade(1f, 0f, 0.5f * animationScale);
 
+            // 빛 고리 속에 쓰러진 채로 나타남
             Sound.Play(Sfx.Respawn);
-            StartCoroutine(FieldFx.Play(transform, home, Fx.Heal, 2.6f, animationScale * 1.5f, 11));
-            yield return WaitUnscaled(0.25f);
-            StartCoroutine(FieldFx.Play(transform, home + Vector3.up * 0.35f, Fx.Sparkle, 1.9f, animationScale * 1.3f, 12));
-
-            float appear = 0.7f * animationScale;
+            // 빛 고리는 주인공 뒤에 (쓰러진 모습이 빛에 가리지 않게), 반짝이는 앞에
+            StartCoroutine(FieldFx.Play(transform, home, Fx.Heal, 2.6f, animationScale * 1.5f, 9));
+            float appear = 0.45f * animationScale;
             for (float t = 0f; t < appear; t += Time.unscaledDeltaTime)
             {
-                float k = Mathf.Clamp01(t / Mathf.Max(0.0001f, appear));
-                playerRenderer.color = new Color(1f, 1f, 1f, k);
-                player.localScale = Vector3.one * Mathf.Lerp(0.4f, 1f, 1f - (1f - k) * (1f - k));
-                player.position = home + Vector3.up * (Mathf.Sin(k * Mathf.PI) * 0.3f);
+                playerRenderer.color = new Color(1f, 1f, 1f, Mathf.Clamp01(t / Mathf.Max(0.0001f, appear)));
                 yield return null;
             }
             playerRenderer.color = Color.white;
-            player.localScale = Vector3.one;
+            StartCoroutine(FieldFx.Play(transform, home + Vector3.up * 0.35f, Fx.Sparkle, 1.9f, animationScale * 1.3f, 12));
+            yield return WaitUnscaled(0.35f);
+
+            // 거꾸로 돌린 쓰러짐: 웅크림 → 서기
+            playerRenderer.sprite = PlayerArt.Pose(PlayerPose.Crouch);
+            SawRespawnPose = true;
+            yield return WaitUnscaled(0.25f);
+            playerRenderer.sprite = PlayerArt.Get(Direction.Down, 0);
             player.position = home;
-            yield return WaitUnscaled(0.3f);
+            yield return WaitUnscaled(0.35f);
             Destroy(cutscene.gameObject);
             transitioning = false;
             ShowToast(message);

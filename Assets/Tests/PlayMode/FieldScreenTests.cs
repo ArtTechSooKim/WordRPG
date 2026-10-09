@@ -215,6 +215,8 @@ namespace WordRPG.Tests
 
             Assert.AreEqual(new Vector2Int(2, 1), field.PlayerCell, "시작 위치(회복의 샘 앞)로 돌아감");
             Assert.AreEqual(1, field.RespawnsPlayed, "빛과 함께 다시 일어나는 연출");
+            Assert.IsTrue(field.SawRespawnPose, "쓰러짐 → 웅크림 → 서기 (#51)");
+            Assert.AreEqual(PlayerArt.Get(Direction.Down, 0), field.PlayerSprite, "다 일어나면 정면으로 서 있음");
             var playerRenderer = field.transform.Find("Player").GetComponent<SpriteRenderer>();
             Assert.AreEqual(1f, playerRenderer.color.a, "연출이 끝나면 주인공이 또렷하게");
             Assert.AreEqual(Vector3.one, playerRenderer.transform.localScale);

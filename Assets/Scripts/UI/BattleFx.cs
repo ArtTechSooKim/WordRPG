@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace WordRPG.UI
 {
-    // Sparkle·Dust는 필드에서 씀 (다시 일어날 때 반짝이, 달릴 때 발밑 먼지 — FieldFx)
+    // Sparkle·Dust는 필드에서 씀 (다시 일어날 때 반짝이, 달릴 때 뒤로 튀는 흙먼지 = 폭발의 마지막 3칸 — FieldFx)
     public enum Fx { Slash, Claw, Explosion, Heal, Shield, Smoke, Sparkle, Dust }
 
     // 전투 효과 애니메이션 (Ninja Adventure FX → Art/NinjaAdventure/Fx/{이름}.png, 정사각 프레임을 가로로 이어 붙인 시트).
@@ -56,8 +56,9 @@ namespace WordRPG.UI
     // 필드(월드) 위에서 효과를 한 번 재생 — BattleFx와 같은 그림. tiles = 크기(1 = 한 칸)
     public static class FieldFx
     {
+        // drift: 재생하는 동안 흘러가는 속도(칸/초), fadeOut: 끝으로 갈수록 옅어짐, flipX: 좌우 뒤집기
         public static IEnumerator Play(Transform parent, Vector3 world, Fx fx, float tiles, float animScale, int sortingOrder,
-            float framesPerSecond = 14f)
+            float framesPerSecond = 14f, Vector3 drift = default, bool fadeOut = false, bool flipX = false)
         {
             var frames = BattleFx.Frames(fx);
             if (frames == null || frames.Length == 0) yield break;
@@ -67,13 +68,22 @@ namespace WordRPG.UI
             go.transform.localScale = Vector3.one * tiles;
             var renderer = go.GetComponent<SpriteRenderer>();
             renderer.sortingOrder = sortingOrder;
-            float frameTime = animScale / framesPerSecond;
+            renderer.flipX = flipX;
+            float frameTime = animScale / framesPerSecond, total = frameTime * frames.Length, t = 0f;
             foreach (var frame in frames)
             {
                 if (renderer == null) yield break;
                 renderer.sprite = frame;
                 float end = Time.unscaledTime + frameTime;
-                while (Time.unscaledTime < end) yield return null;
+                while (Time.unscaledTime < end)
+                {
+                    float dt = Time.unscaledDeltaTime;
+                    t += dt;
+                    if (go == null) yield break;
+                    go.transform.position += drift * dt;
+                    if (fadeOut) renderer.color = new Color(1f, 1f, 1f, 1f - 0.5f * Mathf.Clamp01(t / Mathf.Max(0.0001f, total)));
+                    yield return null;
+                }
             }
             if (go != null) Object.Destroy(go);
         }

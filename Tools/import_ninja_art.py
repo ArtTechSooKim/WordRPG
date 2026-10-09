@@ -93,7 +93,7 @@ SFX = {
 }
 AUDIO_OUT = os.path.join(PROJECT, "Assets", "Resources", "Audio")
 
-# 전투 효과: (시트, 프레임 수). 프레임을 정사각형으로 맞춰 가로로 다시 붙인다 → 게임은 높이 = 한 칸 크기로 자름
+# 전투 효과: (시트, 프레임 수[, 첫 프레임]). 프레임을 정사각형으로 맞춰 가로로 다시 붙인다 → 게임은 높이 = 한 칸 크기로 자름
 FX = {
     "slash": ("FX/SlashFx/Slash/SpriteSheet.png", 4),          # 아군 공격
     "claw": ("FX/SlashFx/Claw/SpriteSheet.png", 4),            # 적 공격
@@ -102,7 +102,7 @@ FX = {
     "shield": ("FX/Magic/Shield/SpriteSheetBlue.png", 6),      # 보호막 · 막음
     "smoke": ("FX/Smoke/Smoke/SpriteSheet.png", 6),            # 쓰러짐
     "sparkle": ("FX/Magic/Spark/SpriteSheet.png", 10),         # 다시 일어날 때 반짝이 (필드)
-    "dust": ("FX/Smoke/SmokeCircular/SpriteSheet.png", 8),     # 달릴 때 발밑 먼지 (필드)
+    "dust": ("FX/Elemental/Explosion/SpriteSheet.png", 9, 6),  # 달릴 때 뒤로 튀는 흙먼지 — 폭발의 마지막 3칸 (#51 사용자 지정)
 }
 
 
@@ -198,13 +198,16 @@ def build_bubbles(pack_root=DEFAULT_PACK):
 def build_fx(pack):
     folder = os.path.join(OUT, "Fx")
     os.makedirs(folder, exist_ok=True)
-    for name, (rel, count) in FX.items():
+    for name, spec in FX.items():
+        rel, count = spec[0], spec[1]
+        first = spec[2] if len(spec) > 2 else 0  # 시트의 앞쪽 프레임을 건너뛸 때
         sheet = pack.image(rel)
         fw, fh = sheet.width // count, sheet.height
         size = max(fw, fh)
-        strip = Image.new("RGBA", (size * count, size), (0, 0, 0, 0))
-        for i in range(count):
-            frame = sheet.crop((i * fw, 0, i * fw + fw, fh))
+        used = count - first
+        strip = Image.new("RGBA", (size * used, size), (0, 0, 0, 0))
+        for i in range(used):
+            frame = sheet.crop(((first + i) * fw, 0, (first + i) * fw + fw, fh))
             strip.alpha_composite(frame, (i * size + (size - fw) // 2, (size - fh) // 2))
         strip.save(os.path.join(folder, name + ".png"))
     print("fx", len(FX), "->", folder)
