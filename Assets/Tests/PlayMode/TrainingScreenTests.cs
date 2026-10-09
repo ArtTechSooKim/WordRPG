@@ -139,6 +139,17 @@ namespace WordRPG.Tests
             Assert.AreEqual(cell, field.PlayerCell, "수련이 끝나면 그 자리");
             Assert.AreEqual(0, session.Record.BattlesWon + session.Record.BattlesLost, "수련은 전투 기록에 넣지 않음");
 
+            // 수련을 끝낸 뒤 일반 전투가 시작하자마자 끝나면 안 됨 (기기 버그 2026-10-09)
+            bool finished = false;
+            field.Battle.BeginBattle(new List<MonsterInstance> { new MonsterInstance(enemy, 1) }, area.Words, _ => finished = true);
+            yield return new WaitForSecondsRealtime(0.5f);
+            Assert.IsFalse(finished, "전투가 바로 끝나지 않음");
+            Assert.IsFalse(field.Battle.IsResultVisible, "결과(패배)가 바로 뜨지 않음");
+            Assert.AreEqual(BattlePhase.ChoosingSkill, field.Battle.Engine.Phase, "기술을 고르는 차례");
+            Assert.IsNotNull(ActiveButton(root, "ItemButton") ?? ActiveButton(root, "SkillButton_0"), "기술 버튼이 보임");
+            Assert.IsNull(ActiveButton(root, "TrainingEndButton"), "일반 전투에는 [수련 종료] 없음");
+            Assert.AreEqual(0, session.Record.BattlesLost);
+
             UnityEngine.Object.Destroy(field.gameObject);
             yield return null;
         }

@@ -106,6 +106,9 @@ namespace WordRPG.UI
         private int trainingDamage;
         private Button trainingEndButton;
         public bool IsTraining => training;
+        // [수련 종료]는 수련 중에만 뜻이 있다. 끝나면 꼭 내려야 다음 일반 전투가 바로 끝나지 않는다
+        // (기기 버그 2026-10-09: 수련을 끝낸 뒤 모든 전투가 시작하자마자 '패배…')
+        private bool TrainingEnding => training && endTrainingRequested;
 
         // 보스 결정타 (#41, Figma 'Battle — 보스 결정타'): 하얀 번쩍임 · 느린 화면 동안 가장자리 어둡게 · '결정타!' 도장
         private bool bossBattle;
@@ -255,6 +258,7 @@ namespace WordRPG.UI
             session.EndBattleCombo(DateTime.UtcNow);
             yield return ShowTrainingResult();
             training = false;
+            endTrainingRequested = false;
             HideAllPanels();
             if (dexView.IsOpen) dexView.Hide();
             canvas.gameObject.SetActive(false);
@@ -355,11 +359,11 @@ namespace WordRPG.UI
 
         private IEnumerator PlayBattle()
         {
-            while (!engine.IsOver && !endTrainingRequested)
+            while (!engine.IsOver && !TrainingEnding)
             {
                 // 1. 기술(과 대상) 선택 — 또는 상처약 (수련이면 [수련 종료]로 끝)
                 yield return ChooseSkill();
-                if (endTrainingRequested) break;
+                if (TrainingEnding) break;
                 if (pickedItem != null)
                 {
                     Snapshot();
@@ -448,7 +452,7 @@ namespace WordRPG.UI
                     () => (RectTransform)skillPanel.transform,
                     () => pickedSkill != null || pickedItem != null || itemMode || intensityMode || targetingSkill != null);
 
-            while (pickedSkill == null && pickedItem == null && !endTrainingRequested)
+            while (pickedSkill == null && pickedItem == null && !TrainingEnding)
             {
                 if (intensityMode && Tip(TutorialProgress.Intensity))
                     yield return RunTip(TutorialProgress.Intensity,

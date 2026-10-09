@@ -222,6 +222,18 @@ namespace WordRPG.Tests
             StringAssert.Contains("돌아왔다", field.ToastMessage);
             Assert.AreEqual(1, session.Record.BattlesLost);
 
+            // 다시 풀숲으로 → 다음 전투는 HP가 가득인 채로 정상 시작 (사용자 기기 버그 제보 2026-10-09: 죽은 뒤 다음 전투가 바로 패배)
+            yield return HoldStick(field, Direction.Right, () => field.IsMoving); // 위는 보물상자라 오른쪽으로 돌아서
+            yield return WaitFor(() => !field.IsMoving);
+            yield return HoldStick(field, Direction.Up, () => field.PlayerCell.y >= 3 || field.Battle.IsRunning);
+            yield return WaitFor(() => field.Battle.IsRunning);
+            Assert.IsTrue(field.Battle.IsRunning, "다시 조우");
+            yield return WaitFor(() => field.Battle.Engine.Phase == WordRPG.Battle.BattlePhase.ChoosingSkill && !field.Battle.IsResultVisible, 3f);
+            var heroUnit = field.Battle.Engine.Party[0];
+            Assert.AreEqual(heroUnit.MaxHp, heroUnit.Hp, "새 전투는 HP 가득");
+            Assert.IsFalse(field.Battle.IsResultVisible, "바로 결과(패배)가 뜨면 안 됨");
+            Assert.AreEqual(WordRPG.Battle.BattlePhase.ChoosingSkill, field.Battle.Engine.Phase);
+
             Object.Destroy(field.gameObject);
             yield return null;
         }

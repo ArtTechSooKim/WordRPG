@@ -11,9 +11,10 @@ namespace WordRPG.UI
     // 손가락 하나만 따라가므로 다른 손가락으로 [확인]을 눌러도 스틱이 끊기지 않는다
     public class VirtualStick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
     {
-        public const float BaseSize = 300f;
+        // 받침·손잡이가 움직이는 거리는 2026-10-09 기기 점검 뒤 1.25배 (사용자: "너무 쉽게 달린다, 원이 1.25배 컸으면")
+        public const float BaseSize = 375f;
         public const float KnobSize = 132f;
-        public const float Travel = 110f; // 손잡이가 움직이는 최대 거리 (받침 반지름 - 여유)
+        public const float Travel = 137.5f; // 손잡이가 움직이는 최대 거리 (받침 반지름 - 여유) — 달리기는 이 거리의 85% 이상
         private static readonly Vector2 HomeAnchor = new Vector2(0.52f, 0.45f); // 손을 떼면 돌아가는 자리 (영역 비율)
 
         private RectTransform zone, stickRoot, knob;
@@ -40,7 +41,7 @@ namespace WordRPG.UI
             stick.stickRoot.sizeDelta = new Vector2(BaseSize, BaseSize);
 
             stick.glow = UiKit.IconImage("Glow", stick.stickRoot, UiKit.GlowSprite(), 0.5f, 0.5f, 0.5f, 0.5f);
-            stick.glow.rectTransform.sizeDelta = new Vector2(230, 230);
+            stick.glow.rectTransform.sizeDelta = new Vector2(288, 288);
             stick.glow.color = new Color(Palette.Gold.r, Palette.Gold.g, Palette.Gold.b, 0.55f);
 
             stick.baseImage = UiKit.Pill(UiKit.Panel("Base", stick.stickRoot, Color.white));
@@ -49,7 +50,7 @@ namespace WordRPG.UI
             stick.ring.gameObject.AddComponent<AutoPill>();
             stick.ring.raycastTarget = false;
 
-            float edge = 118f / BaseSize; // 받침 가장자리 쪽 방향 표시 (Noto 글꼴 — Jua에는 도형 기호가 없음)
+            float edge = 147.5f / BaseSize; // 받침 가장자리 쪽 방향 표시 (Noto 글꼴 — Jua에는 도형 기호가 없음)
             stick.arrows = new[]
             {
                 Arrow(stick.stickRoot, "▲", 0.5f, 0.5f + edge), Arrow(stick.stickRoot, "▼", 0.5f, 0.5f - edge),
