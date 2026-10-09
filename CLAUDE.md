@@ -111,7 +111,7 @@ Assets/
                         InventoryView(소지품: 주인공·성유물·아이템·징표) + HeroViews(HeroInfoPage·RelicPage·RelicSlotsRow·SkillRowView),
                         SettingsView(설정) + ConfirmDialog(확인 창), SwitchView, GateCutscene(보스가 연 길을 보여 주는 연출),
                         TrainingView(수련 창: 전체적 암기·오답 위주 암기 → BattleScreen.BeginTraining, 허수아비),
-                        DictionaryView(보스의 사전 읽기: 점점점 → 새 단어),
+                        SpeechBubble(주인공 머리 위 말풍선 — 팩 DialogInfo·Emote: 점점점·느낌표 풍선, 글자 풍선. 사전 읽기·혼잣말),
                         FieldNameTags(오브젝트 이름표),
                         TitleScreen(타이틀), Haptics(진동), UnitView, VirtualStick(가상 스틱 — 누른 자리에 생김, 끝까지 밀면 달리기),
                         TutorialOverlay(튜토리얼: 검은 막 + 뚫린 곳 + 안내 상자, [다음]/직접 해 보기/[건너뛰기]),

@@ -179,6 +179,22 @@ def build_scarecrow(pack_root=DEFAULT_PACK):
     print("monster training_scarecrow <-", rel, (col, row))
 
 
+# 말풍선 (#46): 주인공 머리 위 말풍선 — 팩 Ui/Dialog/DialogInfo(20×16 4칸: 빈 풍선 · . · .. · ...) 그대로,
+# 느낌표는 Emote 22(빨간 !)의 살구색 풍선을 DialogInfo와 같은 흰색으로 바꿔서
+def build_bubbles(pack_root=DEFAULT_PACK):
+    folder = os.path.join(OUT, "Ui")
+    os.makedirs(folder, exist_ok=True)
+    shutil.copyfile(os.path.join(pack_root, "Ui", "Dialog", "DialogInfo.png"), os.path.join(folder, "bubble.png"))
+    emote = Image.open(os.path.join(pack_root, "Ui", "Emote", "emote22.png")).convert("RGBA")
+    px = emote.load()
+    for y in range(emote.height):
+        for x in range(emote.width):
+            if px[x, y] == (252, 226, 202, 255):
+                px[x, y] = (255, 255, 255, 255)
+    emote.save(os.path.join(folder, "bubble_exclaim.png"))
+    print("bubbles ->", folder)
+
+
 def build_fx(pack):
     folder = os.path.join(OUT, "Fx")
     os.makedirs(folder, exist_ok=True)
@@ -500,6 +516,7 @@ def main():
         crop_front(os.path.join(pack, rel), size, os.path.join(OUT, "Monsters", species_id + ".png"))
         print("monster", species_id, "<-", rel)
     build_scarecrow(pack)
+    build_bubbles(pack)
 
     shutil.copyfile(os.path.join(pack, PLAYER), os.path.join(OUT, "Player", "Boy.png"))
     print("player <-", PLAYER)

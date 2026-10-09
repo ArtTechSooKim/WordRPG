@@ -97,7 +97,8 @@ namespace WordRPG.UI
         private int runSteps;
         private DexView dexView;
         private TrainingView trainingView;
-        private DictionaryView dictionaryView;
+        private SpeechBubble bubble; // 주인공 머리 위 말풍선 (사전 읽기 등, #46)
+        private bool bubbleShown;
         private RelicAltarView altarView;
         private ShopView shopView;
         private InventoryView inventoryView;
@@ -124,12 +125,13 @@ namespace WordRPG.UI
         public BattleScreen Battle => battle;
         public GameSession Session => session;
         public FieldArea CurrentArea => area;
-        public bool IsPanelOpen => dexView.IsOpen || trainingView.IsOpen || dictionaryView.IsOpen || altarView.IsOpen || shopView.IsOpen
+        public bool IsPanelOpen => dexView.IsOpen || trainingView.IsOpen || altarView.IsOpen || shopView.IsOpen
                                    || inventoryView.IsOpen || settingsView.IsOpen || mapView.IsOpen || learnView.IsOpen
                                    || (quitDialog != null && quitDialog.IsOpen) || (paywall != null && paywall.IsOpen);
         public SkillLearnView LearnView => learnView;
         public TrainingView TrainingView => trainingView;
-        public DictionaryView DictionaryView => dictionaryView;
+        public SpeechBubble Bubble => bubble;
+        public bool IsReadingDictionary { get; private set; } // 점점점 말풍선이 나오는 동안 (움직일 수 없음)
         public Func<DateTime> LocalClock { get; set; } = () => DateTime.Now; // 사전 '하루 한 번'의 기준 (테스트에서 바꿀 수 있음)
         public bool IsQuitDialogOpen => quitDialog.IsOpen;
         public MinimapView Minimap => minimap;
@@ -239,6 +241,12 @@ namespace WordRPG.UI
             UpdateToast();
             UpdateCamera();
             nameTags.Tick(cam, hudCanvas, Time.unscaledDeltaTime);
+            bubble.Tick(cam, hudCanvas, player.position + Vector3.up * 0.45f);
+            if (bubble.IsVisible != bubbleShown)
+            {
+                bubbleShown = bubble.IsVisible;
+                RefreshNameTags();
+            }
 
             if (inBattle || transitioning || IsPanelOpen || tutorial.IsBlocking)
             {
@@ -307,6 +315,7 @@ namespace WordRPG.UI
                 case StepKind.Moved:
                     moving = true;
                     running = run;
+                    if (bubble.IsVisible) bubble.Hide();
                     // 달리면 두 걸음마다 떠난 자리에 먼지가 퍼진다
                     runSteps = run ? runSteps + 1 : 0;
                     if (run && runSteps % 2 == 1)
@@ -434,11 +443,11 @@ namespace WordRPG.UI
             }
             else if (inventoryView.IsOpen) inventoryView.Hide();
             else if (shopView.IsOpen) shopView.Hide();
-            else if (dictionaryView.IsOpen) dictionaryView.Back();
             else if (dexView.IsOpen) dexView.Hide();
             else if (trainingView.IsOpen) trainingView.Hide();
             else if (settingsView.IsOpen) settingsView.Hide();
             else if (mapView.IsOpen) mapView.Hide();
+            else if (bubble.IsVisible) bubble.Hide();
             else if (GameManager.CanQuit)
                 quitDialog.Show("게임을 끝낼까요?", "지금까지의 기록은 자동으로 저장돼요.", "끝내기", false, GameManager.QuitGame);
         }
@@ -471,7 +480,8 @@ namespace WordRPG.UI
         private bool IsClearedBossSpot(Vector2Int cell) =>
             walker.Map.Get(cell) == FieldTile.Boss && session.World.IsBossDefeated(area.BossId);
 
-        // 사전 받침대 (#45): 보스를 물리쳤으면 하루 한 번 읽고 이 지역 단어 하나를 발견
+        // 사전 받침대 (#45): 보스를 물리쳤으면 하루 한 번 읽고 이 지역 단어 하나를 발견.
+        // 창 없이 주인공 머리 위 말풍선으로 (#46, 사용자 요청)
         private void ReadDictionary()
         {
             var now = LocalClock();
@@ -480,29 +490,41 @@ namespace WordRPG.UI
             {
                 case DictionaryReadOutcome.Locked:
                     string boss = area.Boss != null ? UiKit.WithJosa(area.Boss.Species.DisplayName, "을", "를") : "보스를";
-                    ShowToast($"빈 받침대다.\n{boss} 물리치면 무언가 놓일 것 같다.");
+                    bubble.Say($"빈 받침대다.\n{boss} 물리치면 무언가 놓일 것 같다.", 4f);
                     break;
                 case DictionaryReadOutcome.AlreadyReadToday:
-                    ShowToast("오늘 책은 충분히 읽은 것 같다.");
+                    bubble.Say("오늘 책은 충분히 읽은 것 같다.", 3f);
                     break;
                 case DictionaryReadOutcome.AllDiscovered:
-                    ShowToast($"{area.DictionaryName}의 단어를 모두 발견했다!");
+                    bubble.Say($"{area.DictionaryName}의 단어를 모두 발견했다!", 3f);
                     break;
                 case DictionaryReadOutcome.Discovered:
-                    StartCoroutine(ShowDictionaryWord(read.Word));
+                    StartCoroutine(SpeakDictionaryWord(read.Word));
                     break;
                 default:
-                    ShowToast("빈 받침대다.");
+                    bubble.Say("빈 받침대다.", 3f);
                     break;
             }
         }
 
-        private IEnumerator ShowDictionaryWord(WordEntry word)
+        // '.' → '..' → '...' → '!' 풍선 (그동안은 움직일 수 없음) → 새 단어 말풍선 (움직이면 사라짐)
+        private IEnumerator SpeakDictionaryWord(WordEntry word)
         {
+            IsReadingDictionary = true;
+            transitioning = true;
             saveProgress?.Invoke();
+            foreach (var step in new[] { SpeechBubble.Icon.Dot1, SpeechBubble.Icon.Dot2, SpeechBubble.Icon.Dot3, SpeechBubble.Icon.Exclaim })
+            {
+                bubble.ShowIcon(step);
+                Sound.Play(Sfx.Click);
+                yield return WaitUnscaled(step == SpeechBubble.Icon.Exclaim ? 0.55f : 0.45f);
+            }
             var progress = Dex.GetProgress(area.Words, session.Vocabulary);
-            yield return dictionaryView.Play(area.DictionaryName, word,
-                $"도감에 등록했어요   ·   {area.Words.RegionName} 도감 {progress.Discovered} / {progress.Total}", animationScale);
+            Sound.PlayJingle(Sfx.NewWord);
+            bubble.ShowWord("새로운 단어를 발견했다!", word.English, word.Meaning,
+                $"{area.Words.RegionName} 도감 {progress.Discovered} / {progress.Total}", 12f);
+            transitioning = false;
+            IsReadingDictionary = false;
             var completed = session.ClaimDexRewards(new[] { area.Words });
             if (completed.Count > 0)
             {
@@ -1054,6 +1076,7 @@ namespace WordRPG.UI
 
             // 오브젝트 이름표는 맨 아래 층 (상단 바·패드·창이 그 위를 덮는다)
             nameTags = FieldNameTags.Create(hudRoot);
+            bubble = SpeechBubble.Create(hudRoot); // 이름표 위, 상단 바·메뉴·창 아래
 
             // 상단: 지역 이름 · 도감 진행 · 골드
             var top = UiKit.Panel("TopBar", hudRoot, Palette.Scrim, 0, 0.94f, 1, 1);
@@ -1149,7 +1172,6 @@ namespace WordRPG.UI
 
             dexView = DexView.Create(hudRoot);
             trainingView = TrainingView.Create(hudRoot, StartTraining);
-            dictionaryView = DictionaryView.Create(hudRoot);
             altarView = RelicAltarView.Create(hudRoot, animationScale);
             shopView = ShopView.Create(hudRoot);
             inventoryView = InventoryView.Create(hudRoot);
@@ -1203,8 +1225,10 @@ namespace WordRPG.UI
         }
 
         // 가까운 오브젝트 이름표만 보이게 (쓰러뜨린 보스는 감춤)
+        // 말풍선이 떠 있는 동안은 이름표를 숨긴다 (말풍선과 겹치지 않게)
         private void RefreshNameTags() =>
-            nameTags.Refresh(walker.Position, cell => walker.Map.Get(cell) == FieldTile.Boss && session.World.IsBossDefeated(area.BossId));
+            nameTags.Refresh(walker.Position, cell => bubble.IsVisible
+                || walker.Map.Get(cell) == FieldTile.Boss && session.World.IsBossDefeated(area.BossId));
 
         // 설정 > [튜토리얼 다시 보기]: 본 안내를 지우고 필드 안내부터 다시 (전투 안내도 다음 전투에서 다시)
         private void ReplayTutorial()

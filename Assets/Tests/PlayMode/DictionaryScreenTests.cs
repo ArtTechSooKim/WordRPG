@@ -61,46 +61,59 @@ namespace WordRPG.Tests
             yield return FaceStick(field, Direction.Left);
             Assert.AreEqual(new Vector2Int(4, 1), field.PlayerCell);
             yield return PressConfirm(field);
-            StringAssert.Contains("빈 받침대다", field.ToastMessage);
-            StringAssert.Contains("헷갈너구리를 물리치면", field.ToastMessage);
-            Assert.IsFalse(field.DictionaryView.IsOpen);
+            Assert.IsTrue(field.Bubble.ShowsText, "창이 아니라 주인공 머리 위 말풍선");
+            StringAssert.Contains("빈 받침대다", field.Bubble.Text);
+            StringAssert.Contains("헷갈너구리를 물리치면", field.Bubble.Text);
+            Assert.IsFalse(field.IsPanelOpen);
 
-            // 보스를 이겼다 → 점점점 → 새 단어
+            // 보스를 이겼다 → '.' '..' '...' '!' 풍선 → 새 단어 말풍선
             session.World.MarkBossDefeated(area.BossId);
             yield return new WaitForSecondsRealtime(0.6f);
             yield return PressConfirm(field);
-            Assert.IsTrue(field.DictionaryView.IsOpen);
-            yield return WaitFor(() => field.DictionaryView.IsRevealed);
-            Assert.AreEqual("새로운 단어를 발견했다!", field.DictionaryView.HeadText);
-            var first = field.DictionaryView.WordText;
+            Assert.IsTrue(field.IsReadingDictionary, "점점점 동안은 움직일 수 없음");
+            var icons = new List<SpeechBubble.Icon>();
+            yield return WaitFor(() =>
+            {
+                var shown = field.Bubble.ShownIcon;
+                if (shown.HasValue && (icons.Count == 0 || icons[icons.Count - 1] != shown.Value)) icons.Add(shown.Value);
+                return field.Bubble.ShowsText;
+            });
+            // 확인 버튼 도우미가 두 프레임을 기다리는 동안 첫 '.'은 지나갈 수 있음 → 순서대로 '...' 다음 '!'로 끝나는지
+            Assert.GreaterOrEqual(icons.Count, 3);
+            for (int i = 1; i < icons.Count; i++) Assert.Less(icons[i - 1], icons[i], "점이 늘어나다가 느낌표");
+            Assert.AreEqual(SpeechBubble.Icon.Exclaim, icons[icons.Count - 1]);
+            CollectionAssert.Contains(icons, SpeechBubble.Icon.Dot3);
+            Assert.IsFalse(field.IsPanelOpen, "창은 열리지 않음");
+            Assert.AreEqual("새로운 단어를 발견했다!", field.Bubble.HeadText);
+            var first = field.Bubble.MainText;
             var word = System.Linq.Enumerable.FirstOrDefault(area.Words.Words, w => w.English == first);
             Assert.IsNotNull(word, "그 맵 단어장의 단어");
             Assert.AreNotEqual(MasteryLevel.New, session.Vocabulary.GetLevel(word.Id), "도감에 등록");
-            Assert.IsTrue(field.IsPanelOpen, "읽는 동안은 움직이지 않음");
-            ActiveButton(field.transform, "DictionaryOk").onClick.Invoke();
-            yield return WaitFor(() => !field.DictionaryView.IsOpen);
+            Assert.IsFalse(field.IsReadingDictionary);
 
-            // 같은 날 또 → 안내만
+            // 같은 날 또 → 혼잣말만
             yield return new WaitForSecondsRealtime(0.6f);
             yield return PressConfirm(field);
-            StringAssert.Contains("오늘 책은 충분히 읽은 것 같다", field.ToastMessage);
-            Assert.IsFalse(field.DictionaryView.IsOpen);
+            StringAssert.Contains("오늘 책은 충분히 읽은 것 같다", field.Bubble.Text);
             Assert.AreEqual(1, session.Vocabulary.DiscoveredCount);
 
-            // 다음 날 → 또 한 단어 (뒤로가기로 점점점 건너뛰고, 한 번 더 누르면 닫힘)
+            // 다음 날 → 또 한 단어. 뒤로가기로 말풍선 닫기
             today = today.AddDays(1);
             yield return new WaitForSecondsRealtime(0.6f);
             yield return PressConfirm(field);
-            Assert.IsTrue(field.DictionaryView.IsOpen);
-            field.HandleBack();
-            yield return WaitFor(() => field.DictionaryView.IsRevealed);
-            Assert.AreNotEqual(first, field.DictionaryView.WordText, "이미 발견한 단어는 다시 안 나옴");
-            field.HandleBack();
-            yield return WaitFor(() => !field.DictionaryView.IsOpen);
+            yield return WaitFor(() => field.Bubble.ShowsText && field.Bubble.HeadText.Length > 0);
+            Assert.AreNotEqual(first, field.Bubble.MainText, "이미 발견한 단어는 다시 안 나옴");
             Assert.AreEqual(2, session.Vocabulary.DiscoveredCount);
+            field.HandleBack();
+            Assert.IsFalse(field.Bubble.IsVisible);
 
+            // 다시 읽으면 혼잣말 → 걸으면 말풍선이 사라짐
+            yield return new WaitForSecondsRealtime(0.6f);
+            yield return PressConfirm(field);
+            Assert.IsTrue(field.Bubble.IsVisible);
             // 쓰러뜨린 보스 자리는 빈자리 — 지나갈 수 있다
             yield return HoldStick(field, Direction.Up, () => field.IsMoving);
+            Assert.IsFalse(field.Bubble.IsVisible, "걷기 시작하면 말풍선은 사라짐");
             yield return HoldStick(field, Direction.Left, () => field.PlayerCell.x <= 1);
             Assert.AreEqual(new Vector2Int(1, 2), field.PlayerCell, "보스가 있던 칸에 설 수 있음");
 
