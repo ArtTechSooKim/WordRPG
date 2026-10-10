@@ -168,6 +168,7 @@ namespace WordRPG.Tests
             Assert.IsTrue(sawRun, "끝까지 밀면 달리기");
             Assert.IsTrue(sawRunPose, "달릴 때는 달리기 그림(점프 자세가 섞임)");
             Assert.Greater(field.DustPuffs, 0, "달리면 발밑 먼지");
+            Assert.AreEqual(FieldArt.DustColor(field.CurrentArea.Theme, FieldTile.Floor), field.LastDustColor, "흙길을 달리면 흙빛 먼지 (#53)");
             Assert.IsTrue(sawLabel, "달리는 동안 스틱에 '달리기'");
             Assert.IsFalse(field.Stick.transform.Find("Stick/RunLabel").gameObject.activeSelf, "손을 떼면 사라짐");
 
@@ -235,6 +236,79 @@ namespace WordRPG.Tests
             Assert.AreEqual(heroUnit.MaxHp, heroUnit.Hp, "새 전투는 HP 가득");
             Assert.IsFalse(field.Battle.IsResultVisible, "바로 결과(패배)가 뜨면 안 됨");
             Assert.AreEqual(WordRPG.Battle.BattlePhase.ChoosingSkill, field.Battle.Engine.Phase);
+
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
+        // 도망가기 (#53): [도망가기] → '도망쳤다' 결산(보상 없음) → 같은 자리. 줄어든 HP는 그대로, 다시 일어나는 연출 없음
+        [UnityTest]
+        public IEnumerator FleeEndsBattleWithoutRewardAndStaysInPlace()
+        {
+            var session = GameSession.NewGame(Hero(100, 30), 1);
+            session.World.SetPosition("test", new Vector2Int(3, 2));
+            session.Hero.TakeDamage(30);
+            var field = CreateField(session, Enemy(500, 1, 5));
+            yield return null;
+            yield return null;
+
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
+            yield return WaitFor(() => field.Battle.IsRunning);
+            yield return WaitFor(() => ActiveButton(field.Battle.transform, "FleeButton") != null, 3f);
+            var flee = ActiveButton(field.Battle.transform, "FleeButton");
+            Assert.IsNotNull(flee, "기술 고를 때 [도망가기]");
+            StringAssert.Contains("도망가기", AllText(flee));
+            Assert.IsTrue(FindButton(field.Battle.transform, "ItemButton").gameObject.activeInHierarchy, "상처약 버튼도 같이");
+            int gold = session.Inventory.Gold, exp = session.Hero.Exp;
+
+            flee.onClick.Invoke();
+            yield return WaitFor(() => field.Battle.IsResultVisible, 3f);
+            Assert.AreEqual("도망쳤다", field.Battle.ResultTitle);
+            var resultText = AllText(field.Battle.transform.Find("BattleCanvas/SafeArea/ResultPanel"));
+            StringAssert.Contains("보상은 없어요", resultText);
+            StringAssert.Contains("계속 탐험", AllText(FindButton(field.Battle.transform, "ResultButton_Primary")));
+            Assert.AreEqual(gold, session.Inventory.Gold, "골드 없음");
+            Assert.AreEqual(exp, session.Hero.Exp, "경험치 없음");
+
+            FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
+            yield return WaitFor(() => !field.IsInBattle);
+            Assert.AreEqual(new Vector2Int(3, 3), field.PlayerCell, "도망친 자리 그대로");
+            Assert.AreEqual(0, field.RespawnsPlayed, "진 게 아니라 다시 일어나지 않음");
+            Assert.AreEqual(70, session.Hero.CurrentHp, "줄어든 HP 그대로 (회복 없음)");
+            Assert.AreEqual(1, session.Record.BattlesFled);
+            Assert.AreEqual(0, session.Record.BattlesLost + session.Record.BattlesWon);
+
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
+        // 보스전: [도망가기]를 누르면 '도망갈 수 없다!' — 전투·차례는 그대로이고 이어서 싸울 수 있다
+        [UnityTest]
+        public IEnumerator BossBattleCannotBeFled()
+        {
+            var session = GameSession.NewGame(Hero(100, 30), 1);
+            var field = CreateField(session, Enemy(40, 1, 5));
+            yield return null;
+            yield return null;
+            WordRPG.Battle.BattlePhase? outcome = null;
+            field.Battle.BeginBattle(new List<MonsterInstance> { new MonsterInstance(Enemy(40, 1, 5), 1) }, field.CurrentArea.Words,
+                phase => outcome = phase, "보스 등장!", boss: true);
+            yield return WaitFor(() => ActiveButton(field.Battle.transform, "FleeButton") != null, 3f);
+            var flee = ActiveButton(field.Battle.transform, "FleeButton");
+            Assert.IsNotNull(flee, "보스전에도 버튼은 보임");
+
+            flee.onClick.Invoke();
+            Assert.AreEqual("도망갈 수 없다!", field.Battle.SkillTitle);
+            Assert.AreEqual(1, field.Battle.FleeBlockedCount);
+            Assert.AreEqual(WordRPG.Battle.BattlePhase.ChoosingSkill, field.Battle.Engine.Phase, "차례 그대로");
+            yield return WaitFor(() => field.Battle.SkillTitle != "도망갈 수 없다!", 3f);
+            StringAssert.Contains("기술을 고르세요", field.Battle.SkillTitle, "잠시 뒤 원래 안내로");
+
+            yield return PlayUntilResult(field.Battle, answerCorrectly: true);
+            Assert.AreEqual("승리!", field.Battle.ResultTitle, "도망 못 가도 그대로 싸워 이김");
+            FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
+            yield return WaitFor(() => outcome.HasValue);
+            Assert.AreEqual(WordRPG.Battle.BattlePhase.Victory, outcome);
 
             Object.Destroy(field.gameObject);
             yield return null;

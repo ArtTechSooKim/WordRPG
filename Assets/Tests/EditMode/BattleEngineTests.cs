@@ -359,6 +359,62 @@ namespace WordRPG.Tests
             Assert.AreEqual(BattlePhase.ChoosingSkill, battle.Phase);
         }
 
+        // 도망가기 (#53): 바로 끝나고 보상 없음. 그 전에 쓴 상처약·받은 피해·푼 문제는 그대로
+        [Test]
+        public void FleeEndsBattleWithoutRewardButKeepsWhatHappened()
+        {
+            var (battle, hero) = Start();
+            hero.TakeDamage(60);
+            var inventory = new Inventory();
+            inventory.Add(potion, 2);
+            battle.UseItem(potion, inventory);
+            battle.SelectSkill(battle.Party[0].Skills[0], battle.Enemies[0]);
+            battle.SubmitAnswer(0, 5f);
+            int hp = hero.CurrentHp;
+            Assert.Less(hp, 100, "적에게 맞음");
+            Assert.AreEqual(BattlePhase.ChoosingSkill, battle.Phase);
+
+            var events = battle.Flee();
+
+            Assert.AreEqual(BattlePhase.Fled, battle.Phase);
+            Assert.IsTrue(battle.IsOver);
+            Assert.AreEqual(BattleEventType.Fled, events.Single().Type);
+            Assert.AreSame(battle.Party[0], events[0].Actor);
+            Assert.Throws<InvalidOperationException>(() => battle.CalculateReward(), "도망치면 보상 없음");
+            Assert.AreEqual(1, inventory.GetCount(potion), "쓴 상처약은 돌아오지 않음");
+            Assert.AreEqual(hp, hero.CurrentHp, "줄어든 HP 그대로 (회복 없음)");
+            Assert.AreEqual(1, battle.CorrectAnswers, "푼 문제 기록은 남음");
+            Assert.Throws<InvalidOperationException>(() => battle.Flee(), "끝난 전투");
+        }
+
+        // 보스전(canFlee = false): '도망갈 수 없다' 사건만 생기고 차례·적 행동은 그대로
+        [Test]
+        public void BossBattleCannotBeFled()
+        {
+            var hero = new Hero(TestData.Hero(new MonsterStats(100, 10, 10)), 1);
+            var battle = new BattleEngine(new ICombatant[] { hero }, new List<MonsterInstance> { new MonsterInstance(slime, 1) },
+                quiz, config, new Random(1), canFlee: false);
+            Assert.IsFalse(battle.CanFlee);
+
+            var events = battle.Flee();
+
+            Assert.AreEqual(BattleEventType.FleeBlocked, events.Single().Type);
+            Assert.AreEqual(BattlePhase.ChoosingSkill, battle.Phase);
+            Assert.AreEqual(1, battle.Round, "차례를 쓰지 않음");
+            Assert.AreEqual(100, hero.CurrentHp, "적도 움직이지 않음");
+            battle.SelectSkill(battle.Party[0].Skills[0], battle.Enemies[0]);
+            Assert.AreEqual(BattlePhase.AnsweringQuiz, battle.Phase, "그대로 싸운다");
+        }
+
+        [Test]
+        public void FleeOnlyWhileChoosingSkill()
+        {
+            var (battle, _) = Start();
+            Assert.IsTrue(battle.CanFlee, "보통 전투는 도망칠 수 있음");
+            battle.SelectSkill(battle.Party[0].Skills[0], battle.Enemies[0]);
+            Assert.Throws<InvalidOperationException>(() => battle.Flee(), "문제를 푸는 중에는 못 도망침");
+        }
+
         [Test]
         public void PotionNeedsStockAndMustHeal()
         {

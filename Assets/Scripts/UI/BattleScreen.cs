@@ -70,6 +70,14 @@ namespace WordRPG.UI
         private Button cancelButton;
         private Button itemButton;
         private bool itemMode; // 아이템(상처약) 고르는 중
+        // 도망가기 (#53, Figma 'Battle — 도망가기 (#53)'): 상처약 옆. 보스전이면 '도망갈 수 없다!'만 뜨고 차례는 그대로
+        private Button fleeButton;
+        private Vector2 fleeButtonHome;
+        private Coroutine cantFleeRoutine;
+        private IReadOnlyList<BattleEvent> fleeEvents;
+        private const string CantFleeText = "도망갈 수 없다!";
+        public int FleeBlockedCount { get; private set; } // 보스전에서 [도망가기]를 누른 횟수 (테스트용)
+        public string SkillTitle => skillTitle != null ? skillTitle.text : "";
         // 공격 기술 강도 (Figma 'Intensity Button'): ×1 단어 1개 / ×1.2 연속 2개 / ×1.5 연속 3개 / ×2 연속 4개
         private readonly List<Button> intensityButtons = new List<Button>();
         private readonly List<(Text multiplier, Text title, Text detail)> intensityTexts = new List<(Text, Text, Text)>();
@@ -204,9 +212,9 @@ namespace WordRPG.UI
             return true;
         }
 
-        // 필드에서 조우했을 때 한 판. 결과 화면의 버튼을 누르면 화면을 닫고 onFinished(승리 여부)
-        // intro: 전투 로그 첫 줄 (보스전 등). 비우면 "야생 몬스터 출현!"
-        public void BeginBattle(List<MonsterInstance> enemies, WordDatabase wordBook, Action<bool> onFinished,
+        // 필드에서 조우했을 때 한 판. 결과 화면의 버튼을 누르면 화면을 닫고 onFinished(Victory · Defeat · Fled)
+        // intro: 전투 로그 첫 줄 (보스전 등). 비우면 "야생 몬스터 출현!". boss면 도망칠 수 없다
+        public void BeginBattle(List<MonsterInstance> enemies, WordDatabase wordBook, Action<BattlePhase> onFinished,
             string intro = null, FieldTheme theme = FieldTheme.Meadow, bool boss = false)
         {
             if (running) throw new InvalidOperationException("이미 전투 중입니다");
@@ -280,18 +288,18 @@ namespace WordRPG.UI
             }
         }
 
-        private IEnumerator SingleBattle(List<MonsterInstance> enemies, Action<bool> onFinished, string intro)
+        private IEnumerator SingleBattle(List<MonsterInstance> enemies, Action<BattlePhase> onFinished, string intro)
         {
             StartNewBattle(enemies, intro);
             yield return PlayBattle();
             session.EndBattleCombo(DateTime.UtcNow); // 콤보 3분은 전투가 끝난 뒤부터
             yield return ShowResult();
-            bool victory = engine.Phase == BattlePhase.Victory;
+            var outcome = engine.Phase;
             HideAllPanels();
             if (dexView.IsOpen) dexView.Hide();
             canvas.gameObject.SetActive(false);
             running = false;
-            onFinished?.Invoke(victory);
+            onFinished?.Invoke(outcome);
         }
 
         // provider: 문제 내는 쪽 (비우면 이 지역 단어장 — 수련은 TrainingQuizProvider)
@@ -307,9 +315,10 @@ namespace WordRPG.UI
                 }
                 provider = quizService;
             }
-            // 연속 정답 콤보는 전투가 바뀌어도 이어진다
+            // 연속 정답 콤보는 전투가 바뀌어도 이어진다. 보스전은 도망칠 수 없다
             engine = new BattleEngine(new ICombatant[] { session.Hero }, enemies, provider, battleConfig, rng,
-                session.StartBattleCombo(DateTime.UtcNow));
+                session.StartBattleCombo(DateTime.UtcNow), canFlee: !bossBattle);
+            fleeEvents = null;
 
             foreach (var view in enemyViews) Destroy(view.Root.gameObject);
             enemyViews.Clear();
@@ -364,6 +373,12 @@ namespace WordRPG.UI
                 // 1. 기술(과 대상) 선택 — 또는 상처약 (수련이면 [수련 종료]로 끝)
                 yield return ChooseSkill();
                 if (TrainingEnding) break;
+                if (engine.Phase == BattlePhase.Fled)
+                {
+                    HideAllPanels();
+                    yield return PlayEvents(fleeEvents);
+                    break;
+                }
                 if (pickedItem != null)
                 {
                     Snapshot();
@@ -450,9 +465,9 @@ namespace WordRPG.UI
                 yield return RunTip(TutorialProgress.Skill,
                     "몬스터가 나타났어요! 쓸 기술을 하나 고르세요.\n기술을 쓰려면 영단어 문제를 맞혀야 해요.",
                     () => (RectTransform)skillPanel.transform,
-                    () => pickedSkill != null || pickedItem != null || itemMode || intensityMode || targetingSkill != null);
+                    () => pickedSkill != null || pickedItem != null || itemMode || intensityMode || targetingSkill != null || engine.IsOver);
 
-            while (pickedSkill == null && pickedItem == null && !TrainingEnding)
+            while (pickedSkill == null && pickedItem == null && !TrainingEnding && !engine.IsOver)
             {
                 if (intensityMode && Tip(TutorialProgress.Intensity))
                     yield return RunTip(TutorialProgress.Intensity,
@@ -619,6 +634,12 @@ namespace WordRPG.UI
                         yield return Wait(0.45f);
                         break;
 
+                    case BattleEventType.Fled:
+                        Log($"{UiKit.WithJosa(e.Actor.DisplayName, "은", "는")} 무사히 도망쳤다!");
+                        Sound.Play(Sfx.Flee);
+                        yield return Wait(0.6f);
+                        break;
+
                     case BattleEventType.QuizAnswered:
                         comboStep = 0;
                         Log((e.Correct ? "정답! " : "오답… ") + MasteryText(e.Mastery));
@@ -736,7 +757,8 @@ namespace WordRPG.UI
 
         private IEnumerator ShowResult()
         {
-            bool victory = engine.Phase == BattlePhase.Victory;
+            var phase = engine.Phase;
+            bool victory = phase == BattlePhase.Victory, fled = phase == BattlePhase.Fled;
             var hero = session.Hero;
             ResetFinisher();
 
@@ -748,17 +770,20 @@ namespace WordRPG.UI
                 levels = BattleRewardCalculator.Apply(reward, hero, session.Inventory);
             }
             var completions = session.ClaimDexRewards(new[] { words });
-            // 결과 소리: 도감 완성 > 레벨 업 > 승리, 지면 패배
-            Sound.Play(completions.Count > 0 ? Sfx.DexComplete : levels > 0 ? Sfx.LevelUp : victory ? Sfx.Victory : Sfx.Defeat);
-            session.Record.RecordBattle(victory, engine.CorrectAnswers, engine.WrongAnswers);
+            // 결과 소리: 도감 완성 > 레벨 업 > 승리, 지면 패배 (도망치면 도망 소리를 이미 냈다)
+            if (completions.Count > 0) Sound.Play(Sfx.DexComplete);
+            else if (!fled) Sound.Play(levels > 0 ? Sfx.LevelUp : victory ? Sfx.Victory : Sfx.Defeat);
+            if (fled) session.Record.RecordFled(engine.CorrectAnswers, engine.WrongAnswers);
+            else session.Record.RecordBattle(victory, engine.CorrectAnswers, engine.WrongAnswers);
             saveProgress?.Invoke();
 
-            if (loopBattles) SetResultButtons(victory ? "다음 전투" : "회복 후 재도전", victory ? "회복 후 전투" : null);
-            else SetResultButtons(victory ? "계속 탐험" : "시작 지점으로", null);
-            UiKit.SetColor(resultPrimary, victory ? Palette.Button : Palette.Neutral);
+            bool goOn = victory || fled;
+            if (loopBattles) SetResultButtons(goOn ? "다음 전투" : "회복 후 재도전", goOn ? "회복 후 전투" : null);
+            else SetResultButtons(goOn ? "계속 탐험" : "시작 지점으로", null);
+            UiKit.SetColor(resultPrimary, goOn ? Palette.Button : Palette.Neutral);
 
             // 버튼 위까지가 내용 칸. 넘치면 단어 줄을 하나씩 줄이고, 그래도 넘치면 통째로 줄인다
-            relayoutResult = () => FitResult(rows => LayoutResult(victory, levelBefore, levels, reward, completions, rows));
+            relayoutResult = () => FitResult(rows => LayoutResult(phase, levelBefore, levels, reward, completions, rows));
             relayoutResult();
 
             resultChoice = -1;
@@ -766,8 +791,8 @@ namespace WordRPG.UI
             while (resultChoice < 0) yield return null;
             relayoutResult = null;
 
-            // 패배 후 재도전, 또는 '회복' 선택 시 완전 회복
-            if (!victory || resultChoice == 1)
+            // 패배 후 재도전, 또는 '회복' 선택 시 완전 회복 (도망치면 줄어든 HP 그대로)
+            if (phase == BattlePhase.Defeat || resultChoice == 1)
             {
                 session.RestoreHero();
                 saveProgress?.Invoke();
@@ -874,17 +899,20 @@ namespace WordRPG.UI
         private const float ResultButtonHeight = 118f, ResultBottom = 56f;
 
         // 결산 내용을 위에서부터 놓고 전체 높이를 돌려준다 (Figma 'Battle — 전투 결산 꽉 채움 (#42)')
-        private float LayoutResult(bool victory, int levelBefore, int levels, BattleReward reward,
+        // 도망쳤으면 (#53, Figma 'Battle — 도망 결산 (#53)') 성장·보상 칸 없이 나머지는 같다
+        private float LayoutResult(BattlePhase phase, int levelBefore, int levels, BattleReward reward,
             IReadOnlyList<DexCompletion> completions, int wordRows)
         {
             var summary = engine.Summary;
             var hero = session.Hero;
+            bool victory = phase == BattlePhase.Victory, fled = phase == BattlePhase.Fled;
             float y = ResultTop;
-            resultTitle.text = victory ? "승리!" : "패배…";
-            resultTitle.color = victory ? Palette.Gold : Palette.Bad;
+            resultTitle.text = victory ? "승리!" : fled ? "도망쳤다" : "패배…";
+            resultTitle.color = victory ? Palette.Gold : fled ? Palette.TextDim : Palette.Bad;
             PlaceResult(resultTitle.rectTransform, ref y, 140f, 0f);
             string fainted = UiKit.WithJosa(hero.DisplayName, "이", "가");
             resultSubtitle.text = victory ? DefeatedLine()
+                : fled ? "무사히 빠져나왔다 — 이번 전투 보상은 없어요"
                 : loopBattles ? $"{fainted} 쓰러졌다. 회복하고 다시 도전하자!" : $"{fainted} 쓰러졌다… 시작 지점으로 돌아간다.";
             PlaceResult(resultSubtitle.rectTransform, ref y, 52f, ResultGap);
 
@@ -1084,7 +1112,8 @@ namespace WordRPG.UI
             intensityMode = false;
             foreach (var button in intensityButtons) button.gameObject.SetActive(false);
             ShowPanel(skillPanel);
-            skillTitle.text = $"{actor.DisplayName}의 차례 — 기술을 고르세요";
+            skillTitle.text = TurnTitle(actor);
+            skillTitle.color = Palette.Text;
             cancelButton.gameObject.SetActive(false);
 
             for (int i = 0; i < skillButtons.Count; i++)
@@ -1105,6 +1134,7 @@ namespace WordRPG.UI
             // 상처약: 가진 개수, HP가 가득이면 잠금
             bool isHero = actor.Hero != null;
             itemButton.gameObject.SetActive(isHero && !training);
+            fleeButton.gameObject.SetActive(isHero && !training);
             trainingEndButton.gameObject.SetActive(training);
             if (isHero && !training)
             {
@@ -1114,6 +1144,43 @@ namespace WordRPG.UI
                 itemButton.interactable = potions > 0 && !full;
                 UiKit.LabelOf(itemButton).text = potions == 0 ? "가방 — 상처약이 없어요" : full ? "가방 — HP가 가득해요" : $"가방 — 상처약 쓰기 ({potions}개)";
             }
+        }
+
+        private static string TurnTitle(BattleUnit actor) => $"{actor.DisplayName}의 차례 — 기술을 고르세요";
+
+        // [도망가기]: 보통은 바로 전투가 끝나고(ChooseSkill이 끝남 → 도망 결산), 보스전이면 제목이 잠깐 빨간 '도망갈 수 없다!' + 버튼이 흔들림
+        private void OnFleeClicked()
+        {
+            if (engine == null || engine.Phase != BattlePhase.ChoosingSkill || itemMode || intensityMode || targetingSkill != null) return;
+            var events = engine.Flee();
+            if (engine.Phase == BattlePhase.Fled)
+            {
+                fleeEvents = events;
+                return;
+            }
+            FleeBlockedCount++;
+            Sound.Play(Sfx.Fail);
+            Log("보스에게서는 도망갈 수 없다!");
+            if (cantFleeRoutine != null) StopCoroutine(cantFleeRoutine);
+            cantFleeRoutine = StartCoroutine(CantFlee(engine.CurrentActor));
+        }
+
+        private IEnumerator CantFlee(BattleUnit actor)
+        {
+            var rt = (RectTransform)fleeButton.transform;
+            skillTitle.text = CantFleeText;
+            skillTitle.color = Palette.Bad;
+            float shake = 0.35f, hold = Mathf.Max(1.5f * animationScale, 0.05f);
+            for (float t = 0f; t < hold && skillTitle.text == CantFleeText; t += Time.unscaledDeltaTime)
+            {
+                float k = t < shake ? 1f - t / shake : 0f;
+                rt.anchoredPosition = fleeButtonHome + new Vector2(Mathf.Sin(t * 70f) * 14f * k, 0f);
+                yield return null;
+            }
+            rt.anchoredPosition = fleeButtonHome;
+            skillTitle.color = Palette.Text;
+            if (skillTitle.text == CantFleeText) skillTitle.text = TurnTitle(actor);
+            cantFleeRoutine = null;
         }
 
         // "깃펜 · " (성유물 기술) / "기본 · " (주인공 기본 기술). 적이면 빈 글자
@@ -1142,6 +1209,7 @@ namespace WordRPG.UI
             itemMode = true;
             skillTitle.text = "어떤 아이템을 쓸까요? (한 턴을 쓰고, 문제는 없어요)";
             itemButton.gameObject.SetActive(false);
+            fleeButton.gameObject.SetActive(false);
             trainingEndButton.gameObject.SetActive(false);
             cancelButton.gameObject.SetActive(true);
             var items = HealingItems();
@@ -1186,6 +1254,7 @@ namespace WordRPG.UI
             skillTitle.text = $"{skill.DisplayName} — 대상을 선택하세요";
             foreach (var button in skillButtons) button.gameObject.SetActive(false);
             itemButton.gameObject.SetActive(false);
+            fleeButton.gameObject.SetActive(false);
             trainingEndButton.gameObject.SetActive(false);
             cancelButton.gameObject.SetActive(true);
 
@@ -1219,6 +1288,7 @@ namespace WordRPG.UI
             skillTitle.text = $"{skill.DisplayName} — 강도를 고르세요\n<size=26><color=#A6B3D1>하나라도 틀리면 이번 턴 공격 실패 · 맞힌 단어는 모두 콤보</color></size>";
             foreach (var button in skillButtons) button.gameObject.SetActive(false);
             itemButton.gameObject.SetActive(false);
+            fleeButton.gameObject.SetActive(false);
             trainingEndButton.gameObject.SetActive(false);
             cancelButton.gameObject.SetActive(true);
 
@@ -1837,12 +1907,18 @@ namespace WordRPG.UI
                 skillDetails.Add(detail);
             }
 
+            // 맨 아래 줄: [가방 — 상처약 쓰기] [도망가기] (Figma 'Battle — 도망가기 (#53)': 696 : 320, 사이 16)
             itemButton = UiKit.MakeButton("ItemButton", skillPanel.transform, "가방 — 상처약 쓰기", Palette.Button, 40,
-                0, 0, 1, 0.155f, bestFit: true);
+                0, 0, 0.674f, 0.155f, bestFit: true);
             var itemColors = itemButton.colors;
             itemColors.disabledColor = new Color(0.6f, 0.6f, 0.6f, 0.5f);
             itemButton.colors = itemColors;
             itemButton.onClick.AddListener(ShowItemMenu);
+
+            fleeButton = UiKit.MakeButton("FleeButton", skillPanel.transform, "도망가기", Palette.Neutral, 44,
+                0.69f, 0, 1, 0.155f, bestFit: true);
+            fleeButton.onClick.AddListener(OnFleeClicked);
+            fleeButtonHome = ((RectTransform)fleeButton.transform).anchoredPosition;
 
             // 수련 중에는 상처약 대신 [수련 종료] (Figma 'Battle — 수련 (#44)')
             trainingEndButton = UiKit.MakeButton("TrainingEndButton", skillPanel.transform, "수련 종료", Palette.Neutral, 44,

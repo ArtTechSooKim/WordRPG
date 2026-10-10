@@ -17,7 +17,9 @@ namespace WordRPG.Battle
         RoundStarted, // Round
         Victory,
         Defeat,
-        Combo         // Actor, Amount(연속 정답 수) — 정답 직후, 기술 발동 전 (Combo.Label로 글자)
+        Combo,        // Actor, Amount(연속 정답 수) — 정답 직후, 기술 발동 전 (Combo.Label로 글자)
+        Fled,         // Actor — 도망쳐서 전투가 끝남 (#53)
+        FleeBlocked   // Actor — 보스전이라 도망칠 수 없음 (차례는 그대로)
     }
 
     // 전투 로직이 만들어내는 사건 기록. UI는 이 목록을 순서대로 연출만 한다
@@ -67,6 +69,10 @@ namespace WordRPG.Battle
 
         public static BattleEvent Combo(BattleUnit actor, int streak) =>
             new BattleEvent(BattleEventType.Combo) { Actor = actor, Amount = streak };
+
+        public static BattleEvent Fled(BattleUnit actor) => new BattleEvent(BattleEventType.Fled) { Actor = actor };
+
+        public static BattleEvent FleeBlocked(BattleUnit actor) => new BattleEvent(BattleEventType.FleeBlocked) { Actor = actor };
 
         public static BattleEvent Victory() => new BattleEvent(BattleEventType.Victory);
 

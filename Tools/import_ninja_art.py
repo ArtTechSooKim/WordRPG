@@ -90,10 +90,12 @@ SFX = {
     "gateopen": "Audio/Jingles/Secret2.wav",  # 보스를 물리쳐 새 길이 열릴 때
     "combo": "Audio/Sounds/Bonus/PowerUp1.wav",  # 연속 정답 콤보 (단계마다 음높이를 올려 재생)
     "respawn": "Audio/Sounds/Magic & Skill/Heal3.wav",  # 지고 나서 시작 지점에서 빛과 함께 다시 일어남
+    "flee": "Audio/Sounds/Jump & Bounce/Jump2.wav",  # 전투에서 도망침 (#53)
 }
 AUDIO_OUT = os.path.join(PROJECT, "Assets", "Resources", "Audio")
 
-# 전투 효과: (시트, 프레임 수[, 첫 프레임]). 프레임을 정사각형으로 맞춰 가로로 다시 붙인다 → 게임은 높이 = 한 칸 크기로 자름
+# 전투 효과: (시트, 프레임 수[, 첫 프레임[, "gray"]]). 프레임을 정사각형으로 맞춰 가로로 다시 붙인다 → 게임은 높이 = 한 칸 크기로 자름.
+# "gray" = 회색조로 바꿔 저장 (가장 밝은 점 = 흰색) → 게임이 색을 곱해 입힌다 (흙먼지 = 밟은 바닥 색, FieldArt.DustColor)
 FX = {
     "slash": ("FX/SlashFx/Slash/SpriteSheet.png", 4),          # 아군 공격
     "claw": ("FX/SlashFx/Claw/SpriteSheet.png", 4),            # 적 공격
@@ -102,7 +104,7 @@ FX = {
     "shield": ("FX/Magic/Shield/SpriteSheetBlue.png", 6),      # 보호막 · 막음
     "smoke": ("FX/Smoke/Smoke/SpriteSheet.png", 6),            # 쓰러짐
     "sparkle": ("FX/Magic/Spark/SpriteSheet.png", 10),         # 다시 일어날 때 반짝이 (필드)
-    "dust": ("FX/Elemental/Explosion/SpriteSheet.png", 9, 6),  # 달릴 때 뒤로 튀는 흙먼지 — 폭발의 마지막 3칸 (#51 사용자 지정)
+    "dust": ("FX/Elemental/Explosion/SpriteSheet.png", 9, 6, "gray"),  # 달릴 때 뒤로 튀는 흙먼지 — 폭발의 마지막 3칸 (#51 사용자 지정), 색은 바닥 따라 (#53)
 }
 
 
@@ -209,8 +211,27 @@ def build_fx(pack):
         for i in range(used):
             frame = sheet.crop(((first + i) * fw, 0, (first + i) * fw + fw, fh))
             strip.alpha_composite(frame, (i * size + (size - fw) // 2, (size - fh) // 2))
+        if len(spec) > 3 and spec[3] == "gray":
+            strip = to_gray(strip)
         strip.save(os.path.join(folder, name + ".png"))
     print("fx", len(FX), "->", folder)
+
+
+# 밝기만 남긴 흰~회색 그림 (가장 밝은 점이 흰색). 투명도는 그대로
+def to_gray(image):
+    pixels = image.load()
+    w, h = image.size
+    lum = lambda r, g, b: 0.299 * r + 0.587 * g + 0.114 * b
+    brightest = max((lum(*pixels[x, y][:3]) for x in range(w) for y in range(h) if pixels[x, y][3] > 0), default=255) or 255
+    out = Image.new("RGBA", image.size, (0, 0, 0, 0))
+    dst = out.load()
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = pixels[x, y]
+            if a:
+                v = min(255, round(255 * lum(r, g, b) / brightest))
+                dst[x, y] = (v, v, v, a)
+    return out
 
 
 def copy_audio(pack):

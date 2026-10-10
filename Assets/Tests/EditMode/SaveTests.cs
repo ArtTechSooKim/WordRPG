@@ -174,6 +174,7 @@ namespace WordRPG.Tests
             session.Vocabulary.RecordAnswer("abandon", true, T0, rules);
             session.Vocabulary.RecordAnswer("budget", false, T0, rules);
             session.Record.RecordBattle(true, 5, 1);
+            session.Record.RecordFled(2, 1);
 
             var loaded = RoundTrip(session);
             var hero = loaded.Hero;
@@ -199,7 +200,10 @@ namespace WordRPG.Tests
             Assert.IsTrue(loaded.Vocabulary.Find("budget").InWrongNote, "오답 노트 유지");
 
             Assert.AreEqual(1, loaded.Record.BattlesWon);
-            Assert.AreEqual(5, loaded.Record.CorrectAnswers);
+            Assert.AreEqual(0, loaded.Record.BattlesLost, "도망은 진 것이 아님");
+            Assert.AreEqual(1, loaded.Record.BattlesFled);
+            Assert.AreEqual(2, loaded.Record.BattlesFought);
+            Assert.AreEqual(7, loaded.Record.CorrectAnswers, "도망친 전투에서 푼 문제도 셈");
             Assert.AreEqual(0, loaded.LoadWarnings.Count);
         }
 

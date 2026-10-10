@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace WordRPG.UI
 {
-    // Sparkle·Dust는 필드에서 씀 (다시 일어날 때 반짝이, 달릴 때 뒤로 튀는 흙먼지 = 폭발의 마지막 3칸 — FieldFx)
+    // Sparkle·Dust는 필드에서 씀 (다시 일어날 때 반짝이, 달릴 때 뒤로 튀는 흙먼지 = 폭발의 마지막 3칸을 회색조로 — FieldFx, 바닥 색은 FieldArt.DustColor)
     public enum Fx { Slash, Claw, Explosion, Heal, Shield, Smoke, Sparkle, Dust }
 
     // 전투 효과 애니메이션 (Ninja Adventure FX → Art/NinjaAdventure/Fx/{이름}.png, 정사각 프레임을 가로로 이어 붙인 시트).
@@ -56,9 +56,10 @@ namespace WordRPG.UI
     // 필드(월드) 위에서 효과를 한 번 재생 — BattleFx와 같은 그림. tiles = 크기(1 = 한 칸)
     public static class FieldFx
     {
-        // drift: 재생하는 동안 흘러가는 속도(칸/초), fadeOut: 끝으로 갈수록 옅어짐, flipX: 좌우 뒤집기
+        // drift: 재생하는 동안 흘러가는 속도(칸/초), endAlpha: 끝날 때 투명도(1이면 그대로), flipX: 좌우 뒤집기,
+        // tint: 그림에 곱할 색 (회색조 그림에 바닥 색을 입히는 흙먼지 등)
         public static IEnumerator Play(Transform parent, Vector3 world, Fx fx, float tiles, float animScale, int sortingOrder,
-            float framesPerSecond = 14f, Vector3 drift = default, bool fadeOut = false, bool flipX = false)
+            float framesPerSecond = 14f, Vector3 drift = default, float endAlpha = 1f, bool flipX = false, Color? tint = null)
         {
             var frames = BattleFx.Frames(fx);
             if (frames == null || frames.Length == 0) yield break;
@@ -69,6 +70,8 @@ namespace WordRPG.UI
             var renderer = go.GetComponent<SpriteRenderer>();
             renderer.sortingOrder = sortingOrder;
             renderer.flipX = flipX;
+            var color = tint ?? Color.white;
+            renderer.color = color;
             float frameTime = animScale / framesPerSecond, total = frameTime * frames.Length, t = 0f;
             foreach (var frame in frames)
             {
@@ -81,7 +84,8 @@ namespace WordRPG.UI
                     t += dt;
                     if (go == null) yield break;
                     go.transform.position += drift * dt;
-                    if (fadeOut) renderer.color = new Color(1f, 1f, 1f, 1f - 0.5f * Mathf.Clamp01(t / Mathf.Max(0.0001f, total)));
+                    if (endAlpha < 1f)
+                        renderer.color = new Color(color.r, color.g, color.b, Mathf.Lerp(1f, endAlpha, Mathf.Clamp01(t / Mathf.Max(0.0001f, total))));
                     yield return null;
                 }
             }

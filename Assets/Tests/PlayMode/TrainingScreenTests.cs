@@ -112,6 +112,7 @@ namespace WordRPG.Tests
                 else if (engine.Phase == BattlePhase.ChoosingSkill)
                 {
                     Assert.IsNull(ActiveButton(root, "ItemButton"), "수련 중에는 상처약 대신 [수련 종료]");
+                    Assert.IsNull(ActiveButton(root, "FleeButton"), "수련 중에는 [도망가기] 없음");
                     if (asked.Count >= 5) ActiveButton(root, "TrainingEndButton")?.onClick.Invoke();
                     else (ActiveButton(root, "Intensity_0") ?? ActiveButton(root, "SkillButton_0"))?.onClick.Invoke();
                 }

@@ -264,7 +264,7 @@ namespace WordRPG.UI
                 string where = area != null ? area.DisplayName : "초원";
                 saveLine1.text = $"{where}  ·  {hero.DisplayName} Lv{hero.Level}  ·  성유물 {hero.Relics.Count}개";
                 string total = area != null && area.Words != null ? $" / {area.Words.Words.Count}" : "";
-                int battles = session.Record.BattlesWon + session.Record.BattlesLost;
+                int battles = session.Record.BattlesFought;
                 saveLine2.text = $"발견한 단어 {session.Vocabulary.DiscoveredCount}{total}   ·   전투 {battles}번";
             }
         }

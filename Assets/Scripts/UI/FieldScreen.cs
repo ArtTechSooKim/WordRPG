@@ -122,6 +122,7 @@ namespace WordRPG.UI
         public int RespawnsPlayed { get; private set; }   // 지고 나서 다시 일어나는 연출 횟수 (테스트용)
         public bool SawRespawnPose { get; private set; }  // 다시 일어날 때 웅크린 자세를 거쳤는지 (테스트용)
         public int DustPuffs { get; private set; }        // 달릴 때 발밑 먼지 (테스트용)
+        public Color LastDustColor { get; private set; }  // 마지막 흙먼지 색 = 떠난 칸 바닥 색 (테스트용)
         public Sprite PlayerSprite => playerRenderer != null ? playerRenderer.sprite : null;
         public BattleScreen Battle => battle;
         public GameSession Session => session;
@@ -318,7 +319,8 @@ namespace WordRPG.UI
                     running = run;
                     if (bubble.IsVisible) bubble.Hide();
                     // 달리면 걸음마다 발뒤꿈치 뒤로 흙먼지가 튀어 흩어진다 (#51 사용자 레퍼런스: 달리는 발 뒤로 날리는 먼지).
-                    // 그림 = 폭발 시트의 마지막 3칸. 달리는 반대 방향으로 조금 밀려나며 옅어진다
+                    // 그림 = 폭발 시트의 마지막 3칸(회색조). 떠난 칸의 바닥 색을 입힌다 — 흙길은 흙빛, 풀숲은 풀빛, 서고는 돌가루 (#53).
+                    // #53 기기 확인: 작아서 잘 안 보임 → 1.5칸, 0.5초 동안 남고 덜 옅어짐. 달리는 반대 방향으로 조금 밀려난다
                     runSteps = run ? runSteps + 1 : 0;
                     if (run)
                     {
@@ -326,9 +328,10 @@ namespace WordRPG.UI
                         var back = -(Vector3)(Vector2)direction.ToOffset();
                         float side = runSteps % 2 == 0 ? 0.12f : -0.12f; // 왼발·오른발
                         var across = new Vector3(back.y, -back.x, 0f) * side;
-                        var at = player.position + Vector3.down * 0.32f + back * 0.3f + across;
-                        StartCoroutine(FieldFx.Play(transform, at, Fx.Dust, 1.1f, animationScale, 9, 10f,
-                            back * 1.1f + Vector3.up * 0.25f, true, direction == Direction.Left));
+                        var at = player.position + Vector3.down * 0.3f + back * 0.5f + across;
+                        LastDustColor = FieldArt.DustColor(area.Theme, walker.Map.Get(outcome.Target - direction.ToOffset()));
+                        StartCoroutine(FieldFx.Play(transform, at, Fx.Dust, 1.5f, animationScale, 9, 6f,
+                            back * 1.0f + Vector3.up * 0.2f, 0.45f, direction == Direction.Left, LastDustColor));
                     }
                     currentStep = stepDuration * (run ? runStepRatio : 1f);
                     moveT = 0f;
@@ -718,8 +721,10 @@ namespace WordRPG.UI
             }
         }
 
-        private void OnBattleFinished(bool won)
+        // 이기면 보상(보스면 길 열림 등), 지면 시작 지점에서 다시 일어남, 도망치면 (#53) 그 자리 그대로
+        private void OnBattleFinished(BattlePhase outcome)
         {
+            bool won = outcome == BattlePhase.Victory;
             inBattle = false;
             Sound.PlayMusic(AreaMusic);
             encounterCounter.Reset();
@@ -756,7 +761,7 @@ namespace WordRPG.UI
                     offer?.Invoke();
                 }
             }
-            else if (!won)
+            else if (outcome == BattlePhase.Defeat)
             {
                 // 패배: 전투 화면이 이미 주인공을 회복시켰다. 이 지역의 시작 위치로 돌아간다
                 walker.WarpTo(walker.Map.Start);

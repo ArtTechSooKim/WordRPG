@@ -55,6 +55,42 @@ namespace WordRPG.UI
             return sprites[mask];
         }
 
+        // 달리기 흙먼지 색 (#53 사용자 요청: 밟는 바닥에 따라). 먼지 그림(Fx.Dust)은 회색조라 이 색을 곱해 쓴다
+        // (밝은 알갱이 = 이 색, 어두운 알갱이 = 이 색의 약 0.5·0.7배). 바닥 타일 색보다 꽤 밝게 잡아야 밝은·어두운 알갱이가 둘 다 보인다.
+        // 바닥 색은 Tiles/{테마}_{종류}.png에서 뽑음: 초원 흙길 d3865f · 풀숲 74a334 · 잔디 adbc3a, 서고 돌바닥 4e484a · 카펫 8d977f,
+        // 숲 흙길 a3754e · 풀 74a334. 걸을 수 없는 칸이나 처음 보는 바닥은 그 테마의 길 색
+        public static Color DustColor(FieldTheme theme, FieldTile tile)
+        {
+            switch (theme)
+            {
+                case FieldTheme.Library:
+                    switch (tile)
+                    {
+                        case FieldTile.Grass: return Rgb(0xF0EAEE); // 흩어진 책장 — 종이 가루
+                        case FieldTile.Lawn: return Rgb(0xDCE2D2);  // 카펫·이끼
+                        default: return Rgb(0xC9C0BC);              // 돌바닥 (보스 빈자리도 돌바닥)
+                    }
+                case FieldTheme.Forest:
+                    switch (tile)
+                    {
+                        case FieldTile.Grass:
+                        case FieldTile.Lawn:
+                        case FieldTile.Boss: return Rgb(0xD2EBA0);  // 숲 풀 (보스 빈자리는 풀밭)
+                        default: return Rgb(0xE3CDB8);              // 숲 흙길
+                    }
+                default:
+                    switch (tile)
+                    {
+                        case FieldTile.Grass: return Rgb(0xD8EC9A);
+                        case FieldTile.Lawn:
+                        case FieldTile.Boss: return Rgb(0xEEF5B8);  // 잔디 (보스 빈자리는 잔디)
+                        default: return Rgb(0xF7DCC8);              // 초원 흙길
+                    }
+            }
+        }
+
+        private static Color Rgb(int hex) => new Color32((byte)(hex >> 16), (byte)(hex >> 8), (byte)hex, 255);
+
         private static readonly Dictionary<string, Sprite[]> Atlases = new Dictionary<string, Sprite[]>();
         private static readonly Dictionary<string, Texture2D> AtlasTextures = new Dictionary<string, Texture2D>();
 

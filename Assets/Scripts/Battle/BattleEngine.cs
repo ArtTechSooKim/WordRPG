@@ -11,7 +11,8 @@ namespace WordRPG.Battle
         ChoosingSkill, // CurrentActor의 스킬/대상 선택 대기
         AnsweringQuiz, // CurrentQuestion 답 대기
         Victory,
-        Defeat
+        Defeat,
+        Fled           // 도망침 (#53) — 보상 없음
     }
 
     // 턴제 전투 진행. 한 라운드 = 아군(지금은 주인공 혼자)이 [기술 선택 → 단어 문제 → 결과] 후 적 전원 행동.
@@ -19,6 +20,7 @@ namespace WordRPG.Battle
     //  오답/시간 초과: 기술 실패, 단어는 오답 노트로
     //  기술 대신 상처약을 쓰면 문제 없이 회복하고 차례를 넘긴다
     //  연속으로 맞히면 콤보 (Combo): 단계마다 아군 기술 피해가 조금씩 늘고, 틀리면 0으로
+    //  기술 대신 도망칠 수 있다 (#53): 바로 끝나고 보상은 없음. 보스전(canFlee = false)에서는 막힘
     //  공격 기술은 강도를 고를 수 있다 (사용자 아이디어): 단어 n개를 연속으로 맞혀야 발동하고 피해 ×1.2·×1.5·×2.
     //    하나라도 틀리면 이번 턴 공격 실패. 맞힌 단어는 하나하나 콤보에 더해지고, 크리티컬은 모두 빨리 맞혔을 때만
     // MonoBehaviour·UI 의존 없음. UI는 SelectSkill/SubmitAnswer를 호출하고 돌려받은 BattleEvent 목록을 연출한다
@@ -51,16 +53,18 @@ namespace WordRPG.Battle
         public bool CanStillCrit => chainAllFast;        // 지금까지 모두 빨리 맞혀서 크리티컬이 아직 가능한지
         public IReadOnlyList<MasteryChange> MasteryChanges => masteryChanges;
         public BattleSummary Summary { get; } = new BattleSummary(); // 결산 화면용 (#41)
-        public bool IsOver => Phase == BattlePhase.Victory || Phase == BattlePhase.Defeat;
+        public bool IsOver => Phase == BattlePhase.Victory || Phase == BattlePhase.Defeat || Phase == BattlePhase.Fled;
+        public bool CanFlee { get; }
 
-        // startStreak: 이전 전투에서 이어지는 연속 정답 수
+        // startStreak: 이전 전투에서 이어지는 연속 정답 수, canFlee: 도망칠 수 있는 전투인지 (보스전은 false)
         public BattleEngine(IReadOnlyList<ICombatant> partyMembers, IReadOnlyList<MonsterInstance> enemyMonsters,
-            IQuizProvider quiz, BattleConfig config, Random rng, int startStreak = 0)
+            IQuizProvider quiz, BattleConfig config, Random rng, int startStreak = 0, bool canFlee = true)
         {
             this.quiz = quiz ?? throw new ArgumentNullException(nameof(quiz));
             this.config = config ?? new BattleConfig();
             this.rng = rng ?? new Random();
             Streak = Math.Max(0, startStreak);
+            CanFlee = canFlee;
 
             for (int i = 0; i < partyMembers.Count; i++) party.Add(new BattleUnit(partyMembers[i], true, i));
             for (int i = 0; i < enemyMonsters.Count; i++) enemies.Add(new BattleUnit(enemyMonsters[i], false, i));
@@ -176,6 +180,23 @@ namespace WordRPG.Battle
             int healed = CurrentActor.ReceiveHeal(item.HealAmount);
             events.Add(BattleEvent.ItemUsed(CurrentActor, item, healed));
             if (!CheckBattleEnd(events)) AdvanceTurn(events);
+            Summary.Record(events);
+            return events;
+        }
+
+        // 기술 대신 도망친다 (#53): 바로 전투가 끝나고(Fled) 보상은 없다. 그때까지 쓴 상처약·받은 피해·푼 단어 기록은 그대로.
+        // 도망칠 수 없는 전투(보스)면 FleeBlocked만 돌려주고 차례는 그대로
+        public IReadOnlyList<BattleEvent> Flee()
+        {
+            RequirePhase(BattlePhase.ChoosingSkill);
+            var events = new List<BattleEvent>();
+            if (!CanFlee)
+            {
+                events.Add(BattleEvent.FleeBlocked(CurrentActor));
+                return events;
+            }
+            Phase = BattlePhase.Fled;
+            events.Add(BattleEvent.Fled(CurrentActor));
             Summary.Record(events);
             return events;
         }

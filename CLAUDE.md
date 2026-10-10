@@ -81,7 +81,8 @@
     - 소리: `Sound.PlayMusic(Music.X)` / `Sound.Play(Sfx.X)`, 파일 = `Resources/Audio/Music|Sfx/{열거형 소문자}`. 음량은 설정을 따름.
       `UiKit.AddButton`/`MakeButton`은 누르면 딸깍 소리 (`clickSound: false`로 끔). 새 소리를 쓰면 열거형 + 스크립트 표에 같이 추가 (AudioArtTests가 검사)
     - 전투: 효과 `BattleFx`(Fx 열거형 = Art/NinjaAdventure/Fx/{소문자}.png 정사각 프레임 시트), 배경은 지역 타일(`BattleScreen.SetBackdrop`).
-      필드에서 같은 효과를 월드에 그리려면 `FieldFx.Play`(1 = 한 칸 크기) — 다시 일어남(Heal·Sparkle), 달리기 먼지(Dust)
+      필드에서 같은 효과를 월드에 그리려면 `FieldFx.Play`(1 = 한 칸 크기, tint로 색 입히기) — 다시 일어남(Heal·Sparkle),
+      달리기 먼지(Dust = 회색조 그림 × 바닥 색 `FieldArt.DustColor` — 새 바닥 타일을 만들면 색도 정할 것)
     - Linear 색공간이라 반투명 검정은 알파를 높게(0.7~0.8) 잡아야 눈에 보이는 만큼 어두워진다
 13. **맵은 글자 데이터로만**: 미니맵·지도(`MapViews.cs`)가 FieldMap에서 자동으로 그려진다. 탐험 안개는 `WorldState.Reveal/IsExplored`
     (지역별 비트 기록 `ExploredArea`, 세이브에 포함). 새 맵 글자(타일 종류)를 추가하면
@@ -98,7 +99,7 @@ Assets/
     Monsters/           적 몬스터 MonsterSpecies·SkillData SO, MonsterInstance, ICombatant(싸우는 것 공통), LevelCurve
     Heroes/             HeroData SO(주인공), Hero(레벨·HP·성유물 3칸·기술 칸 3개 SkillSlot), RelicData SO(성유물: 기술·각성·보너스·강화 비용), RelicUpgrade(강화 규칙)
     Items/              ItemData SO(재료·상처약·징표·기술문서), Inventory, ShopData SO + Shop(구매 규칙)
-    Battle/             BattleEngine(기술·강도(단어 n개 연속)·상처약·연속 정답 수), Combo(콤보 단계·글자·추가 피해), BattleFormulas, BattleReward,
+    Battle/             BattleEngine(기술·강도(단어 n개 연속)·상처약·도망(Flee, 보스전 canFlee=false)·연속 정답 수), Combo(콤보 단계·글자·추가 피해), BattleFormulas, BattleReward,
                         BattleSummary(한 판 결산: 새 단어·틀린 단어·기술별 피해·최대 콤보 — 결산 화면용)
     Field/              FieldMap(맵 글자→격자), FieldWalker(이동), StickInput(스틱 값→4방향·달리기), EncounterCounter(조우), FieldInteraction([확인] 대상·이름표 규칙), FieldAutotile(길·물가 테두리 모양),
                         FieldArea(지역 SO: 테마·출입구 연결·보스·상자·상점), EncounterTable

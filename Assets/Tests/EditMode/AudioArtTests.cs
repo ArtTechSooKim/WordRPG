@@ -30,6 +30,27 @@ namespace WordRPG.Tests
             }
         }
 
+        // 달리기 흙먼지 (#53): 밟고 지나간 바닥 색을 입힌다. 같은 테마 안에서도 길·풀숲·잔디가 서로 다른 색,
+        // 먼지 그림은 회색조(색을 곱해 입힘)
+        [Test]
+        public void RunDustTakesTheColorOfTheGround()
+        {
+            foreach (FieldTheme theme in Enum.GetValues(typeof(FieldTheme)))
+            {
+                var floor = FieldArt.DustColor(theme, FieldTile.Floor);
+                Assert.AreNotEqual(floor, FieldArt.DustColor(theme, FieldTile.Grass), $"{theme}: 길과 풀숲");
+                Assert.AreNotEqual(floor, FieldArt.DustColor(theme, FieldTile.Lawn), $"{theme}: 길과 잔디");
+                Assert.AreEqual(floor, FieldArt.DustColor(theme, FieldTile.Door), $"{theme}: 출입구는 길 색");
+                foreach (FieldTile tile in Enum.GetValues(typeof(FieldTile)))
+                    Assert.AreEqual(1f, FieldArt.DustColor(theme, tile).a, $"{theme} {tile}");
+            }
+            Assert.AreNotEqual(FieldArt.DustColor(FieldTheme.Meadow, FieldTile.Floor), FieldArt.DustColor(FieldTheme.Library, FieldTile.Floor),
+                "초원 흙길과 서고 돌바닥");
+
+            // 그림은 Tools/import_ninja_art.py가 회색조("gray")로 만든다
+            Assert.IsNotNull(Resources.Load<Texture2D>("Art/NinjaAdventure/Fx/dust"));
+        }
+
         [Test]
         public void EveryFieldTileHasArtForEveryTheme()
         {
