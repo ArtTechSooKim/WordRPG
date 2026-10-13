@@ -107,6 +107,7 @@ namespace WordRPG.UI
         private MapView mapView;
         private SkillLearnView learnView;
         private ConfirmDialog quitDialog; // 뒤로가기 → '게임을 끝낼까요?'
+        private ConfirmDialog returnDialog; // 보스를 이긴 뒤 '시작 지점으로 돌아갈까요?' (#60)
         private Text heroName, heroHp;
         private Image heroHpFill;
         private readonly List<(Image back, Image icon, Text level, Text empty)> relicSlots = new List<(Image, Image, Text, Text)>();
@@ -129,13 +130,16 @@ namespace WordRPG.UI
         public FieldArea CurrentArea => area;
         public bool IsPanelOpen => dexView.IsOpen || trainingView.IsOpen || altarView.IsOpen || shopView.IsOpen
                                    || inventoryView.IsOpen || settingsView.IsOpen || mapView.IsOpen || learnView.IsOpen
-                                   || (quitDialog != null && quitDialog.IsOpen) || (paywall != null && paywall.IsOpen);
+                                   || (quitDialog != null && quitDialog.IsOpen) || (returnDialog != null && returnDialog.IsOpen)
+                                   || (paywall != null && paywall.IsOpen);
         public SkillLearnView LearnView => learnView;
         public TrainingView TrainingView => trainingView;
         public SpeechBubble Bubble => bubble;
         public bool IsReadingDictionary { get; private set; } // 점점점 말풍선이 나오는 동안 (움직일 수 없음)
         public Func<DateTime> LocalClock { get; set; } = () => DateTime.Now; // 사전 '하루 한 번'의 기준 (테스트에서 바꿀 수 있음)
         public bool IsQuitDialogOpen => quitDialog.IsOpen;
+        public bool IsReturnDialogOpen => returnDialog.IsOpen;
+        public int ReturnsToStart { get; private set; } // 보스를 이긴 뒤 시작 지점으로 돌아간 횟수 (테스트용)
         public MinimapView Minimap => minimap;
         public string ToastMessage => toastPanel != null && toastPanel.activeSelf ? toastText.text : "";
         public IEnumerable<string> VisibleNameTags => nameTags.VisibleNames;
@@ -445,6 +449,7 @@ namespace WordRPG.UI
             }
             if (transitioning) return;
             if (quitDialog.IsOpen) quitDialog.Hide();
+            else if (returnDialog.IsOpen) returnDialog.Hide(); // = 여기 있기
             else if (learnView.IsOpen) learnView.Cancel();
             else if (inventoryView.LearnView.IsOpen) inventoryView.LearnView.Cancel();
             else if (altarView.IsOpen)
@@ -751,15 +756,9 @@ namespace WordRPG.UI
                     : $"★ {UiKit.WithJosa(name, "을", "를")} 물리쳤다!\n{area.DisplayName}에 잊혀진 기억이 돌아왔다";
                 if (rewardItem != null) message += $"\n{rewardItem.DisplayName} 획득!";
                 if (area.HasDictionary) message += $"\n쉼터 받침대에 {UiKit.WithJosa(area.DictionaryName, "이", "가")} 놓였다";
-                Action offer = rewardItem != null && rewardItem.IsSkillDocument ? () => OfferDocument(rewardItem) : (Action)null;
-                // 이 보스가 여는 출입구가 있으면 카메라가 가서 보여 준다 (그다음 기술 배우기)
+                // 이 보스가 여는 출입구가 있으면 카메라가 가서 보여 준다 → 기술 배우기 → 시작 지점으로 돌아갈지 묻기
                 var gates = database != null ? FieldArea.GatesOpenedBy(area, database.Areas) : new List<AreaGate>();
-                if (gates.Count > 0) StartCoroutine(RevealGates(gates, message, offer));
-                else
-                {
-                    ShowToast(message, 4.5f);
-                    offer?.Invoke();
-                }
+                StartCoroutine(AfterBossVictory(message, gates, rewardItem != null && rewardItem.IsSkillDocument ? rewardItem : null));
             }
             else if (outcome == BattlePhase.Defeat)
             {
@@ -772,6 +771,53 @@ namespace WordRPG.UI
                 StartCoroutine(Respawn($"{area.DisplayName} 시작 지점으로 돌아왔다. HP가 회복되었다!"));
             }
             RefreshHud();
+        }
+
+        // 보스를 이긴 뒤 (#60 사용자 요청): 승리 알림(또는 길 열림 연출) → 기술문서를 받았으면 배우기 →
+        // "시작 지점으로 돌아갈까요?" — 보스 방은 대개 지역 맨 끝이라 걸어서 돌아가는 수고를 덜어 준다
+        private IEnumerator AfterBossVictory(string message, List<AreaGate> gates, ItemData document)
+        {
+            var bossArea = area;
+            if (gates.Count > 0) yield return RevealGates(gates, message);
+            else
+            {
+                ShowToast(message, 4.5f);
+                yield return WaitUnscaled(2.5f); // 받은 성유물·사전 소식을 먼저 읽게
+            }
+            if (document != null && !session.Hero.Knows(document))
+            {
+                OfferDocument(document);
+                while (learnView.IsOpen) yield return null;
+            }
+            while (inBattle || transitioning || IsPanelOpen || tutorial.IsShowing) yield return null;
+            if (area != bossArea || walker.Position == walker.Map.Start) yield break; // 이미 다른 지역이나 시작 지점이면 묻지 않음
+            returnDialog.Show(BossDefeatedTitle, $"{area.DisplayName} 시작 지점으로 돌아갈까요?", "돌아가기", false,
+                () => StartCoroutine(ReturnToStart()), "star_full", "여기 있기");
+        }
+
+        private const string BossDefeatedTitle = "보스를 물리쳤다!";
+
+        // 시작 지점으로: 어두워짐 + 문 소리 → 시작 지점에 정면으로 서서 밝아짐
+        private IEnumerator ReturnToStart()
+        {
+            transitioning = true;
+            ReturnsToStart++;
+            Sound.Play(Sfx.Door);
+            bubble.Hide();
+            var cutscene = GateCutscene.Create(transform);
+            yield return cutscene.Fade(0f, 1f, 0.35f * animationScale);
+            walker.WarpTo(walker.Map.Start);
+            walker.Face(Direction.Down);
+            SnapPlayer();
+            if (session.World.Reveal(area.AreaId, walker.Map.Width, walker.Map.Height, walker.Position) > 0) minimap.Redraw();
+            RefreshNameTags();
+            session.World.SetPosition(area.AreaId, walker.Position);
+            saveProgress?.Invoke();
+            UpdateCamera();
+            yield return cutscene.Fade(1f, 0f, 0.35f * animationScale);
+            Destroy(cutscene.gameObject);
+            transitioning = false;
+            ShowToast($"{area.DisplayName} 시작 지점으로 돌아왔다");
         }
 
         // 지고 나서 시작 지점에서 다시 일어나는 연출: 어둠이 걷힘 → 쓰러진 주인공이 발밑 빛 고리 속에 나타남 + 소리 →
@@ -819,7 +865,7 @@ namespace WordRPG.UI
 
         // 승리 알림을 잠깐 보여 준 뒤, 열린 출입구마다: 어두워짐 → 그 지역의 출입구 앞으로 카메라 이동 →
         // 막힌 덤불이 흔들리며 사라지고 '열렸다!' → 어두워짐 → 원래 자리로
-        private IEnumerator RevealGates(List<AreaGate> gates, string victoryMessage, Action after = null)
+        private IEnumerator RevealGates(List<AreaGate> gates, string victoryMessage)
         {
             transitioning = true;
             revealingGate = true;
@@ -834,7 +880,6 @@ namespace WordRPG.UI
             var last = gates[gates.Count - 1];
             string target = last.Exit.Target != null ? last.Exit.Target.DisplayName : "새 지역";
             ShowToast($"{last.Area.DisplayName}에서 {UiKit.WithJosa(target, "으로", "로")} 가는 길이 열렸다!", 4f);
-            after?.Invoke();
         }
 
         private IEnumerator RevealGate(AreaGate gate)
@@ -1196,6 +1241,7 @@ namespace WordRPG.UI
             mapView = MapView.Create(hudRoot);
             learnView = SkillLearnView.Create(hudRoot);
             quitDialog = ConfirmDialog.Create(hudRoot);
+            returnDialog = ConfirmDialog.Create(hudRoot);
             paywall = PaywallView.Create(hudRoot);
             tutorial = TutorialOverlay.Create(transform); // 자기 캔버스로 HUD·전투 위에
         }

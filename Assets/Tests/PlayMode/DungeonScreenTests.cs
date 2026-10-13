@@ -159,6 +159,10 @@ namespace WordRPG.Tests
 
             CollectionAssert.DoesNotContain(field.VisibleNameTags, "까먹대왕", "쓰러뜨린 보스는 이름표도 사라짐");
 
+            // 시작 지점에 선 채로 이겼으면 돌아갈지 묻지 않음 (#60)
+            yield return new WaitForSecondsRealtime(0.3f);
+            Assert.IsFalse(field.IsReturnDialogOpen, "이미 시작 지점이면 묻지 않음");
+
             // 다시 [확인]을 눌러도 전투 없음 — 보스가 있던 자리는 빈자리라 걸어 들어갈 수 있다 (#45)
             yield return new WaitForSecondsRealtime(0.7f);
             yield return PressConfirm(field);
@@ -234,6 +238,7 @@ namespace WordRPG.Tests
             Assert.Less(Vector2.Distance(field.CameraPosition, new Vector2(2.5f, 1.5f)), 3f, "카메라도 주인공에게 돌아옴");
             StringAssert.Contains("숲으로 가는 길이 열렸다", field.ToastMessage);
             Assert.IsTrue(session.World.IsExitOpen(town.Exits[0]));
+            Assert.IsFalse(field.IsReturnDialogOpen, "시작 지점에서 싸웠으면 돌아갈지 묻지 않음 (#60)");
 
             // 마을로 돌아가 열린 길로 숲에 들어감
             yield return HoldStick(field, Direction.Down, () => field.IsMoving);
@@ -243,6 +248,69 @@ namespace WordRPG.Tests
             for (int i = 0; i < 2; i++) yield return HoldStick(field, Direction.Up, () => field.IsMoving || field.CurrentArea == forest);
             yield return WaitFor(() => field.CurrentArea == forest && !field.IsInBattle);
             Assert.AreSame(forest, field.CurrentArea);
+
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
+        // 같은 이름의 버튼이 여러 창에 있으므로(끝내기 창·돌아가기 창) 지금 보이는 것
+        private static UnityEngine.UI.Button VisibleButton(FieldScreen field, string name)
+        {
+            foreach (var button in field.GetComponentsInChildren<UnityEngine.UI.Button>())
+                if (button.name == name) return button;
+            return null;
+        }
+
+        // 보스를 이긴 뒤 [돌아가기] (#60): 어두워졌다 밝아지며 그 지역 시작 지점에 정면으로 섬
+        [UnityTest]
+        public IEnumerator BossVictoryOffersReturnToStart()
+        {
+            var hero = Hero();
+            var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var king = TestData.Species("king", new MonsterStats(40, 1, 50), new MonsterStats(0, 0, 0), bite)
+                .Set("displayName", "까먹대왕");
+            //   y=4 #####
+            //   y=3 #.B.#
+            //   y=2 #...#
+            //   y=1 #.P.#  ← 시작
+            //   y=0 #####
+            var area = Area("lair", "보스 방", "#####\n#.B.#\n#...#\n#.P.#\n#####", hero).Set("boss", new BossEncounter(king, 3));
+            var session = GameSession.NewGame(Player(), 1);
+            var field = CreateField(area, session);
+            yield return null;
+            yield return null;
+
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
+            yield return WaitFor(() => !field.IsMoving);
+            Assert.AreEqual(new Vector2Int(2, 2), field.PlayerCell);
+            yield return FaceStick(field, Direction.Up);
+            yield return PressConfirm(field);
+            yield return WaitFor(() => field.Battle.IsRunning);
+            yield return PlayUntilResult(field.Battle, answerCorrectly: true);
+            FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
+            yield return WaitFor(() => field.IsReturnDialogOpen, 5f);
+            Assert.IsTrue(field.IsReturnDialogOpen);
+            StringAssert.Contains("보스를 물리쳤다", AllText(field));
+            StringAssert.Contains("보스 방 시작 지점으로 돌아갈까요", AllText(field));
+
+            StringAssert.Contains("여기 있기", AllText(VisibleButton(field, "DialogCancelButton")));
+
+            // 창이 떠 있는 동안은 움직일 수 없다
+            yield return HoldStick(field, Direction.Left, () => field.IsMoving, maxSeconds: 0.3f);
+            Assert.AreEqual(new Vector2Int(2, 2), field.PlayerCell, "창이 열려 있으면 이동 안 됨");
+
+            VisibleButton(field, "DialogConfirmButton").onClick.Invoke();
+            yield return WaitFor(() => field.ReturnsToStart == 1 && field.ToastMessage.Contains("시작 지점으로 돌아왔다"), 5f);
+            Assert.AreEqual(area.Map.Start, field.PlayerCell, "시작 지점으로");
+            Assert.AreEqual(PlayerArt.Get(Direction.Down, 0), field.PlayerSprite, "정면으로 서 있음");
+            Assert.IsTrue(session.World.TryGetPosition("lair", out var saved));
+            Assert.AreEqual(area.Map.Start, saved, "저장된 위치도 시작 지점");
+            StringAssert.Contains("보스 방 시작 지점으로 돌아왔다", field.ToastMessage);
+            Assert.IsFalse(field.IsReturnDialogOpen);
+
+            // 다시 움직일 수 있다
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
+            Assert.AreEqual(new Vector2Int(2, 2), field.PlayerCell);
 
             Object.Destroy(field.gameObject);
             yield return null;
