@@ -143,7 +143,7 @@ Assets/
 Docs/                   PRD.txt, GDD.md, 아트에셋목록.md, 아이폰출시방법.txt(TestFlight 올리는 순서), 작업메모.md
 .github/workflows/      ios-testflight.yml (GitHub Mac 서버에서 서명·TestFlight 업로드)
 Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow 필요), zip_ios_for_mac.py (Xcode 프로젝트 → Mac용 zip, 실행 권한 유지),
-                        widen_maps.py (맵의 한 칸 통로 → 두 칸)
+                        widen_maps.py (맵의 한 칸 통로 → 두 칸), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구)
 ```
 
 ## 명령어
