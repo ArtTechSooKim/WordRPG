@@ -29,6 +29,7 @@ namespace WordRPG.UI
         public Vector2 Value { get; private set; }
         public bool IsHeld => held;
         public RectTransform Zone => zone;
+        public RectTransform Base => stickRoot; // 스틱 받침 (손을 떼면 제자리, 누르면 그 자리) — 튜토리얼 안내가 가리키는 곳
 
         public static VirtualStick Create(Transform parent, float minX, float minY, float maxX, float maxY)
         {

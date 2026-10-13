@@ -1365,7 +1365,8 @@ namespace WordRPG.UI
             if (!fieldTutorialRunning) StartCoroutine(FieldGuide());
         }
 
-        // 처음 필드에 들어오면 (#61, 사용자 피드백 '글이 너무 많다'): 손끝이 끄는 모습 + 한 줄 → 두 칸 걸어 보면 →
+        // 처음 필드에 들어오면 (#61, 사용자 피드백 '글이 너무 많다'): 스틱 받침 위에서 손끝이 끄는 모습 + 바로 위에 한 줄
+        // (#65 기기 확인: 넓은 스틱 영역 기준이라 안내가 너무 멀었음 → 받침 기준) → 두 칸 걸어 보면 →
         // 끝까지 미는 모습 + 한 줄 → 달려 보면 끝. 화면을 막지 않고, 그동안만 몬스터가 나오지 않는다.
         // 메뉴·지도·저장 설명은 없앴다 — 빨간 점·목표 한 줄·'✓ 저장'이 그 자리에서 알려 준다
         private IEnumerator FieldGuide()
@@ -1375,12 +1376,12 @@ namespace WordRPG.UI
             int from = stepsTaken;
             guide.Show(new GuideHints.Hint
             {
-                Text = "여기를 끌어서 이동", Target = () => stick.Zone, Gesture = GuideHints.Gesture.Drag, Drag = new Vector2(150, 0)
+                Text = "여기를 끌어서 이동", Target = () => stick.Base, Gesture = GuideHints.Gesture.Drag, Drag = new Vector2(150, 0)
             });
             while (stepsTaken - from < 2) yield return null;
             guide.Show(new GuideHints.Hint
             {
-                Text = "끝까지 밀면 달리기", Target = () => stick.Zone, Gesture = GuideHints.Gesture.Drag, Drag = new Vector2(240, 0)
+                Text = "끝까지 밀면 달리기", Target = () => stick.Base, Gesture = GuideHints.Gesture.Drag, Drag = new Vector2(240, 0)
             });
             while (!(IsRunning || (stick.IsHeld && StickInput.IsRunning(stick.Value)))) yield return null;
             guide.Hide();

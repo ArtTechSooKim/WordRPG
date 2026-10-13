@@ -40,6 +40,8 @@ namespace WordRPG.UI
         public bool GhostVisible => current != null && ghost.gameObject.activeSelf;
         public bool ArrowVisible => current != null && arrow.gameObject.activeSelf;
         public Gesture CurrentGesture => current != null ? current.Gesture : Gesture.Point;
+        public RectTransform PillRect => pill; // 테스트용 (안내가 가리키는 곳 가까이 있는지)
+        public RectTransform GhostRect => ghost;
 
         public static GuideHints Create(Transform parent)
         {
@@ -177,7 +179,9 @@ namespace WordRPG.UI
             var near = current.PillNear?.Invoke();
             var (pillMin, pillMax) = near != null && near.gameObject.activeInHierarchy ? Bounds(near) : (min, max);
             float pillCenterY = (pillMin.y + pillMax.y) * 0.5f;
-            float pillY = pillCenterY < 0f ? pillMax.y + (near != null ? 70f : 150f) : pillMin.y - (near != null ? 70f : 150f);
+            // 화살표가 사이에 들어가는 Point만 넉넉히, 손끝(끌기·톡톡)은 바로 위에 붙인다 (#65 기기 확인: 너무 멀었음)
+            float gap = near != null ? 70f : current.Gesture == Gesture.Point ? 150f : 90f;
+            float pillY = pillCenterY < 0f ? pillMax.y + gap : pillMin.y - gap;
             pillY = Mathf.Clamp(pillY, area.yMin + 80f, area.yMax - 200f);
             float halfWidth = pill.sizeDelta.x * 0.5f;
             float pillX = (pillMin.x + pillMax.x) * 0.5f;

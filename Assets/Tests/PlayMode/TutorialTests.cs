@@ -67,6 +67,19 @@ namespace WordRPG.Tests
             Assert.LessOrEqual(guide.CurrentText.Length, 16, "글은 한 줄");
             Assert.AreEqual(GuideHints.Gesture.Drag, guide.CurrentGesture);
             Assert.IsTrue(guide.GhostVisible, "손끝이 끄는 모습");
+            // 안내는 스틱 받침 바로 위에 (#65 기기 확인: 넓은 스틱 영역 기준이라 너무 멀었음)
+            yield return null;
+            var baseCorners = new Vector3[4];
+            var pillCorners = new Vector3[4];
+            field.Stick.Base.GetWorldCorners(baseCorners);
+            guide.PillRect.GetWorldCorners(pillCorners);
+            float scale = guide.PillRect.lossyScale.y;
+            float gap = (pillCorners[0].y - baseCorners[1].y) / scale;
+            Assert.That(gap, Is.InRange(0f, 120f), $"안내와 스틱 받침 사이 {gap}");
+            float pillCenterX = (pillCorners[0].x + pillCorners[2].x) * 0.5f, baseCenterX = (baseCorners[0].x + baseCorners[2].x) * 0.5f;
+            Assert.Less(Mathf.Abs(pillCenterX - baseCenterX) / scale, 260f, "안내가 받침 위쪽 가운데 근처");
+            var ghostWorld = guide.GhostRect.position;
+            Assert.Less(Vector2.Distance(ghostWorld, (baseCorners[0] + baseCorners[2]) * 0.5f) / scale, 260f, "손끝은 받침에서 출발");
             Assert.IsNull(guide.GetComponent<UnityEngine.UI.GraphicRaycaster>(), "안내는 눌림을 막지 않음");
 
             var start = field.PlayerCell;
