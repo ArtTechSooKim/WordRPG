@@ -115,3 +115,11 @@ InitTestScene*.unity*
 *.p12
 *.mobileprovision
 AuthKey_*
+
+# 유료 라이선스 소리(Envato Elements 등) — 앱에는 넣지만 공개 저장소에는 올리지 않음 (재배포 금지, Docs/작업메모.md #66)
+/Assets/Resources/Audio/Licensed/
+/Assets/Resources/Audio/Licensed.meta
+# 받은 원본 폴더(이름-날짜-utc)·라이선스 증명서·소리 후보
+/*-utc/
+/license_certificate_*.pdf
+/_소리후보_*/

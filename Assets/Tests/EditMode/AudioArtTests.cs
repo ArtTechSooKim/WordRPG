@@ -51,6 +51,13 @@ namespace WordRPG.Tests
             Assert.IsNotNull(Resources.Load<Texture2D>("Art/NinjaAdventure/Fx/dust"));
         }
 
+        // 유료 라이선스 소리는 깃에 없는 Audio/Licensed에 두고 먼저 찾는다 (#66) — 없으면 팩 소리
+        [Test]
+        public void LicensedSoundIsTriedBeforeThePackSound()
+        {
+            CollectionAssert.AreEqual(new[] { "Audio/Licensed/newword", "Audio/Sfx/newword" }, Sound.CandidatePaths("Sfx", "newword"));
+        }
+
         [Test]
         public void EveryFieldTileHasArtForEveryTheme()
         {

@@ -81,14 +81,14 @@ SFX = {
     "victory": "Audio/Jingles/Success1.wav",
     "defeat": "Audio/Jingles/GameOver.wav",
     "levelup": "Audio/Jingles/LevelUp1.wav",
-    "newword": "Audio/Jingles/Secret3.wav",  # 새 단어 '발견!' 징글 (나오는 동안 배경 음악을 잠깐 멈춤)
+    "newword": "Audio/Sounds/Menu/Accept3.wav",  # 새 단어 발견 — 대신 쓰는 소리. 실제 게임은 Audio/Licensed/newword (Envato, 깃 제외, #66)
     "coin": "Audio/Sounds/Bonus/Coin.wav",
     "fountain": "Audio/Sounds/Magic & Skill/Heal2.wav",
     "evolvelight": "Audio/Sounds/Magic & Skill/Spirit.wav",
     "evolve": "Audio/Jingles/Secret1.wav",
     "dexcomplete": "Audio/Jingles/Success3.wav",
     "door": "Audio/Sounds/Whoosh & Slash/Whoosh2.wav",
-    "gateopen": "Audio/Jingles/Secret2.wav",  # 보스를 물리쳐 새 길이 열릴 때
+    "gateopen": "Audio/Jingles/Secret3.wav",  # 보스를 물리쳐 새 길이 열릴 때 (#66: 예전 새 단어 징글 — 사용자 '길이 열릴 때 어울림')
     "combo": "Audio/Sounds/Bonus/PowerUp1.wav",  # 연속 정답 콤보 (단계마다 음높이를 올려 재생)
     "respawn": "Audio/Sounds/Magic & Skill/Heal3.wav",  # 지고 나서 시작 지점에서 빛과 함께 다시 일어남
     "flee": "Audio/Sounds/Jump & Bounce/Jump2.wav",  # 전투에서 도망침 (#53)

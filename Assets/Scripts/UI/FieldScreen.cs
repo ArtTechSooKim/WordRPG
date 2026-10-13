@@ -569,7 +569,7 @@ namespace WordRPG.UI
                 yield return WaitUnscaled(step == SpeechBubble.Icon.Exclaim ? 0.55f : 0.45f);
             }
             var progress = Dex.GetProgress(area.Words, session.Vocabulary);
-            Sound.PlayJingle(Sfx.NewWord);
+            Sound.Play(Sfx.NewWord);
             bubble.ShowWord("새로운 단어를 발견했다!", word.English, word.Meaning,
                 $"{area.Words.RegionName} 도감 {progress.Discovered} / {progress.Total}", 12f);
             transitioning = false;

@@ -588,7 +588,7 @@ namespace WordRPG.UI
             ShowPanel(cardPanel);
             cardGlow.gameObject.SetActive(discovery);
             cardStamp.gameObject.SetActive(discovery);
-            if (discovery) Sound.PlayJingle(Sfx.NewWord); // 짧은 '발견' 멜로디 (배경 음악은 잠깐 멈춤)
+            if (discovery) Sound.Play(Sfx.NewWord); // 짧은 '발견' 소리 (#66 사용자: 가장 자주 듣는 소리라 가볍게 — 음악은 멈추지 않음)
             if (discovery && Tip(TutorialProgress.NewWord))
                 ShowTip(TutorialProgress.NewWord, "뜻을 기억하고 [확인]", () => (RectTransform)cardConfirm.transform, () => cardConfirmed,
                     GuideHints.Gesture.Tap, () => (RectTransform)cardPanel.transform); // 알약은 카드 위 (뜻을 가리지 않게)

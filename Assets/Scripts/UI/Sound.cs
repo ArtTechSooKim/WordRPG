@@ -14,6 +14,8 @@ namespace WordRPG.UI
     }
 
     // 배경 음악·효과음 (Ninja Adventure 팩 → Resources/Audio/Music·Sfx, 파일 이름 = 열거형 이름 소문자).
+    // 유료 라이선스 소리(Envato Elements 등)는 Resources/Audio/Licensed/{같은 이름} — 있으면 그걸 먼저 쓴다.
+    // 그 폴더는 공개 저장소에 올리지 않으므로(재배포 금지) 새로 받은 저장소에서는 팩 소리로 대신 난다 (#66)
     // 음량은 설정(GameSettings)을 따른다. 처음 소리를 낼 때 씬이 바뀌어도 남는 'Sound' 오브젝트를 만든다
     public static class Sound
     {
@@ -60,7 +62,7 @@ namespace WordRPG.UI
         public static void Play(Sfx effect)
         {
             if (!Application.isPlaying || !Ensure()) return;
-            var clip = Load("Audio/Sfx/" + effect.ToString().ToLowerInvariant());
+            var clip = LoadSfx(effect);
             if (clip != null) effects.PlayOneShot(clip, SfxVolume);
         }
 
@@ -68,17 +70,17 @@ namespace WordRPG.UI
         public static void Play(Sfx effect, float pitch)
         {
             if (!Application.isPlaying || !Ensure()) return;
-            var clip = Load("Audio/Sfx/" + effect.ToString().ToLowerInvariant());
+            var clip = LoadSfx(effect);
             if (clip == null) return;
             pitched.pitch = pitch;
             pitched.PlayOneShot(clip, SfxVolume);
         }
 
-        // 짧은 음악(징글): 나오는 동안 배경 음악을 멈췄다가 끝나면 서서히 다시 튼다 (새 단어 '발견!', 길이 열림)
+        // 짧은 음악(징글): 나오는 동안 배경 음악을 멈췄다가 끝나면 서서히 다시 튼다 (보스를 이겨 길이 열림)
         public static void PlayJingle(Sfx effect)
         {
             if (!Application.isPlaying || !Ensure()) return;
-            var clip = Load("Audio/Sfx/" + effect.ToString().ToLowerInvariant());
+            var clip = LoadSfx(effect);
             if (clip == null) return;
             effects.PlayOneShot(clip, SfxVolume);
             if (music.clip == null) return;
@@ -122,6 +124,20 @@ namespace WordRPG.UI
             resumeAt = -1f;
             fadingIn = false;
             return true;
+        }
+
+        // 찾는 순서: 라이선스 폴더 → 팩 폴더
+        public static string[] CandidatePaths(string folder, string name) =>
+            new[] { "Audio/Licensed/" + name, $"Audio/{folder}/" + name };
+
+        private static AudioClip LoadSfx(Sfx effect)
+        {
+            foreach (var path in CandidatePaths("Sfx", effect.ToString().ToLowerInvariant()))
+            {
+                var clip = Load(path);
+                if (clip != null) return clip;
+            }
+            return null;
         }
 
         private static AudioClip Load(string path)
