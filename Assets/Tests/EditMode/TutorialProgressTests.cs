@@ -22,7 +22,7 @@ namespace WordRPG.Tests
             Assert.IsFalse(progress.Has(TutorialProgress.Field), "처음엔 아무것도 안 봄");
             progress.Mark(TutorialProgress.Quiz);
             Assert.IsTrue(progress.Has(TutorialProgress.Quiz));
-            Assert.IsFalse(progress.Has(TutorialProgress.Wrong));
+            Assert.IsFalse(progress.Has(TutorialProgress.Potion));
 
             progress.MarkAll();
             foreach (var id in TutorialProgress.All) Assert.IsTrue(progress.Has(id), id);
@@ -46,7 +46,7 @@ namespace WordRPG.Tests
             var loaded = GameSession.FromSaveData(SaveData.FromJson(json), database, heroData);
             Assert.IsTrue(loaded.Tutorials.Has(TutorialProgress.Field));
             Assert.IsTrue(loaded.Tutorials.Has(TutorialProgress.Intensity));
-            Assert.IsFalse(loaded.Tutorials.Has(TutorialProgress.Wrong));
+            Assert.IsFalse(loaded.Tutorials.Has(TutorialProgress.Potion));
 
             // 튜토리얼이 생기기 전 세이브(필드 없음)는 아무것도 안 본 것으로 → 한 번씩 보여 준다
             string oldJson = json.Replace("\"tutorials\"", "\"oldUnknownField\"");

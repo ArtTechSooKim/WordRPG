@@ -148,15 +148,20 @@ namespace WordRPG.UI
         public GameSession Session => session;
         public bool IsRunning => running;
 
-        private TutorialOverlay tutorial; // 필드에서 넘겨줌 (전투 연습 씬에는 없음)
+        private GuideHints guide; // 필드에서 넘겨줌 (전투 연습 씬에는 없음)
 
-        // 첫 전투 안내 (#36): 각 상황을 처음 만날 때 한 번씩
-        public void SetTutorial(TutorialOverlay overlay) => tutorial = overlay;
+        // 첫 전투 안내 (#61): 각 상황을 처음 만날 때 한 번씩, 화면을 막지 않는 한 줄 + 화살표·손끝 (GuideHints)
+        public void SetGuide(GuideHints hints) => guide = hints;
 
-        private bool Tip(string id) => !training && tutorial != null && session != null && !session.Tutorials.Has(id) && !tutorial.IsShowing;
+        private bool Tip(string id) => !training && guide != null && session != null && !session.Tutorials.Has(id);
 
-        private IEnumerator RunTip(string id, string text, Func<RectTransform> target, Func<bool> doneWhen = null) =>
-            tutorial.Run(session, id, new TutorialOverlay.Step { Text = text, Target = target, DoneWhen = doneWhen }, saveProgress);
+        private void ShowTip(string id, string text, Func<RectTransform> target, Func<bool> doneWhen,
+            GuideHints.Gesture gesture = GuideHints.Gesture.Point, Func<RectTransform> pillNear = null) =>
+            StartCoroutine(guide.Run(session, id,
+                new GuideHints.Hint { Text = text, Target = target, DoneWhen = doneWhen, Gesture = gesture, PillNear = pillNear }, saveProgress));
+
+        // 처음 하는 사람(안내가 켜진 필드)은 전투를 몇 번 해 본 뒤에 강도 고르기가 열린다 (#61 기능 하나씩 열기)
+        private bool IntensityUnlocked => guide == null || BattleUnlocks.IntensityUnlocked(session.Record);
         public Hero Hero => session.Hero;
         public VocabularyProgress Vocabulary => session.Vocabulary;
 
@@ -422,11 +427,7 @@ namespace WordRPG.UI
                     yield return Wait(more ? 0.6f : 0.8f);
                     if (!correct)
                     {
-                        if (Tip(TutorialProgress.Wrong))
-                            yield return RunTip(TutorialProgress.Wrong,
-                                "아쉬워요! 틀리거나 시간이 지나면 이번 기술은 실패하고, 연속 정답 콤보도 0이 돼요.\n" +
-                                "초록색이 정답이에요. 틀린 단어는 오답 노트에 남아 곧 다시 나와요.",
-                                () => (RectTransform)quizPanel.transform);
+                        // 틀리면: 정답이 초록·내 답이 빨강으로 표시되고, 오답 카드가 '오답 노트에 추가'를 알려 준다 (따로 설명 없음)
                         string title = choice < 0 ? "시간 초과! 오답 노트에 추가" : "오답! 오답 노트에 추가";
                         if (chainLength > 1) title = (choice < 0 ? "시간 초과" : "오답") + $" — ×{Multiplier(chainLength)} 공격 실패! 오답 노트에 추가";
                         yield return ShowWordCard(title, question.Word, "다음", Palette.Bad);
@@ -437,11 +438,7 @@ namespace WordRPG.UI
 
                 // 5. 결과 연출
                 HideAllPanels();
-                yield return PlayEvents(events);
-                if (engine.Streak >= Combo.FirstStreak && Tip(TutorialProgress.Combo))
-                    yield return RunTip(TutorialProgress.Combo,
-                        "연속으로 맞혔어요! 콤보가 이어질수록 공격 피해가 단계마다 5%씩 (최대 30%) 늘어요.\n" +
-                        "틀리거나, 전투가 끝나고 3분이 지나면 0부터 다시 세요.", null);
+                yield return PlayEvents(events); // 콤보는 글자 아래 'n 연속 정답 · 피해 +n%'가 곧 설명
             }
         }
 
@@ -457,22 +454,18 @@ namespace WordRPG.UI
             UpdateFrames();
             ShowSkillMenu(actor);
 
+            Func<bool> chosen = () => pickedSkill != null || pickedItem != null || itemMode || intensityMode || targetingSkill != null || engine.IsOver;
             if (Tip(TutorialProgress.Potion) && actor.Hp * 2 < actor.MaxHp && itemButton.gameObject.activeInHierarchy && itemButton.interactable)
-                yield return RunTip(TutorialProgress.Potion,
-                    "HP가 절반 아래로 줄었어요.\n[가방 — 상처약 쓰기]로 문제 없이 HP를 회복할 수 있어요. (한 차례를 써요)",
-                    () => (RectTransform)itemButton.transform);
-            if (Tip(TutorialProgress.Skill))
-                yield return RunTip(TutorialProgress.Skill,
-                    "몬스터가 나타났어요! 쓸 기술을 하나 고르세요.\n기술을 쓰려면 영단어 문제를 맞혀야 해요.",
-                    () => (RectTransform)skillPanel.transform,
-                    () => pickedSkill != null || pickedItem != null || itemMode || intensityMode || targetingSkill != null || engine.IsOver);
+                ShowTip(TutorialProgress.Potion, "HP가 낮아요 — 상처약으로 회복", () => (RectTransform)itemButton.transform, chosen);
+            if (Tip(TutorialProgress.Skill) && skillButtons[0].gameObject.activeInHierarchy)
+                ShowTip(TutorialProgress.Skill, "기술을 고르면 단어 문제!", () => (RectTransform)skillButtons[0].transform, chosen,
+                    GuideHints.Gesture.Tap);
 
             while (pickedSkill == null && pickedItem == null && !TrainingEnding && !engine.IsOver)
             {
                 if (intensityMode && Tip(TutorialProgress.Intensity))
-                    yield return RunTip(TutorialProgress.Intensity,
-                        "공격 강도를 고르세요!\n×1은 단어 1개, ×1.2·×1.5·×2는 단어 2·3·4개를 연속으로 맞혀야 해요.\n하나라도 틀리면 이번 차례 공격은 실패해요.",
-                        () => (RectTransform)skillPanel.transform,
+                    ShowTip(TutorialProgress.Intensity, "새로 열림: 단어를 더 맞히면 더 세게!",
+                        () => (RectTransform)intensityButtons[Mathf.Min(1, intensityButtons.Count - 1)].transform,
                         () => pickedSkill != null || !intensityMode);
                 yield return null;
             }
@@ -498,12 +491,11 @@ namespace WordRPG.UI
 
             RefreshChainBadge();
             timerFill.anchorMax = new Vector2(1, 1);
-            if (Tip(TutorialProgress.Quiz))
-                yield return RunTip(TutorialProgress.Quiz,
-                    $"알맞은 답을 고르세요. 시간은 {battleConfig.AnswerTimeLimitSeconds:0}초!\n" +
-                    $"{battleConfig.CriticalTimeSeconds:0}초 안에 맞히면 크리티컬로 더 세게 공격해요.",
-                    () => (RectTransform)quizPanel.transform);
             pickedChoice = int.MinValue;
+            // 첫 문제: 막지 않고 한 줄만 (시간은 그대로 흐름). 크리티컬은 시간 막대가 금색인 동안 '★ 크리티컬 찬스!'가 곧 설명
+            if (Tip(TutorialProgress.Quiz))
+                ShowTip(TutorialProgress.Quiz, $"{battleConfig.AnswerTimeLimitSeconds:0}초 안에! 빨리 맞히면 크리티컬",
+                    () => quizPrompt.rectTransform, () => pickedChoice != int.MinValue, GuideHints.Gesture.None);
             float limit = battleConfig.AnswerTimeLimitSeconds;
             float elapsed = 0f;
             string criticalHint = $"{hint}   ★ 크리티컬 찬스!";
@@ -598,9 +590,8 @@ namespace WordRPG.UI
             cardStamp.gameObject.SetActive(discovery);
             if (discovery) Sound.PlayJingle(Sfx.NewWord); // 짧은 '발견' 멜로디 (배경 음악은 잠깐 멈춤)
             if (discovery && Tip(TutorialProgress.NewWord))
-                StartCoroutine(RunTip(TutorialProgress.NewWord,
-                    "처음 만난 단어예요! 도감에 등록돼요.\n뜻을 잘 보고 [확인]을 누르면 문제가 나와요.",
-                    () => (RectTransform)cardPanel.transform, () => cardConfirmed));
+                ShowTip(TutorialProgress.NewWord, "뜻을 기억하고 [확인]", () => (RectTransform)cardConfirm.transform, () => cardConfirmed,
+                    GuideHints.Gesture.Tap, () => (RectTransform)cardPanel.transform); // 알약은 카드 위 (뜻을 가리지 않게)
 
             // '발견!' 도장이 크게 찍히듯 줄어들고, 단어 뒤 빛이 숨 쉬듯 반짝인다
             float t = 0f;
@@ -1270,7 +1261,7 @@ namespace WordRPG.UI
         // 기술(과 대상)이 정해짐: 주인공의 공격 기술이면 강도를 고르고, 아니면 바로 문제로
         private void Commit(SkillData skill, BattleUnit target)
         {
-            if (engine.CurrentActor.IsPlayerSide && BattleEngine.CanChooseIntensity(skill) && battleConfig.MaxIntensity > 1)
+            if (engine.CurrentActor.IsPlayerSide && BattleEngine.CanChooseIntensity(skill) && battleConfig.MaxIntensity > 1 && IntensityUnlocked)
             {
                 ShowIntensityMenu(skill, target);
                 return;

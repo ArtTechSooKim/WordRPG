@@ -194,7 +194,9 @@ def build_bubbles(pack_root=DEFAULT_PACK):
             if px[x, y] == (252, 226, 202, 255):
                 px[x, y] = (255, 255, 255, 255)
     emote.save(os.path.join(folder, "bubble_exclaim.png"))
-    print("bubbles ->", folder)
+    # 안내 화살표 (#61 GuideHints): 아래를 가리키는 흰 화살표 13×13
+    shutil.copyfile(os.path.join(pack_root, "Ui", "Arrow.png"), os.path.join(folder, "arrow.png"))
+    print("bubbles + arrow ->", folder)
 
 
 def build_fx(pack):

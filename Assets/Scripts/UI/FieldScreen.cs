@@ -87,7 +87,17 @@ namespace WordRPG.UI
         private Image flash;
         private VirtualStick stick;
         private RectTransform menuRect;
-        private TutorialOverlay tutorial;
+        private GuideHints guide;          // 처음 하는 사람용 한 줄 안내 (#61, 화면을 막지 않음)
+        private int interactions;          // [확인]으로 쓴 횟수 ('해 봤는지' 확인용)
+        private float bubbleKeepUntil;     // 혼잣말 말풍선은 이때까지 걸어도 남아 있음
+        // 메뉴 빨간 점 (#61): id → 점
+        private readonly Dictionary<string, RectTransform> badges = new Dictionary<string, RectTransform>();
+        private RectTransform objectivePill; // 목표 한 줄 (#61): 미니맵 아래
+        private Text objectiveText;
+        private Objective objective;
+        private GameObject saveMark;       // 저장될 때 잠깐 '✓ 저장' (#61, 자동 저장 안내 대신)
+        private float saveMarkUntil, lastSaveMark = -999f;
+        private const float SaveMarkGap = 20f; // 자주 저장돼도 이 간격보다 자주 띄우지 않음
         private PaywallView paywall;
         private IStore store;               // 결제 창구 (GameManager 것, 테스트는 가짜)
         private Entitlements entitlements; // 산 상품 — 없으면(테스트) 정식판 잠금 없음
@@ -117,7 +127,11 @@ namespace WordRPG.UI
         public bool IsMoving => moving;
         public bool IsRunning => moving && running; // 지금 칸을 달리는 중
         public VirtualStick Stick => stick;
-        public TutorialOverlay Tutorial => tutorial;
+        public GuideHints Guide => guide;
+        public string ObjectiveText => objectivePill != null && objectivePill.gameObject.activeSelf ? objectiveText.text : "";
+        public Objective CurrentObjective => objective;
+        public bool IsBadgeVisible(string id) => badges.TryGetValue(id, out var dot) && dot.gameObject.activeSelf;
+        public int SaveMarksShown { get; private set; } // '✓ 저장' 표시 횟수 (테스트용)
         public PaywallView Paywall => paywall;
         public bool IsInBattle => inBattle || transitioning;
         public int RespawnsPlayed { get; private set; }   // 지고 나서 다시 일어나는 연출 횟수 (테스트용)
@@ -236,7 +250,7 @@ namespace WordRPG.UI
             EnterArea(area, spawn);
 
             if (!string.IsNullOrEmpty(statusMessage)) ShowToast(statusMessage, 3f);
-            if (showTutorials && !session.Tutorials.Has(TutorialProgress.Field)) StartCoroutine(FieldTutorial());
+            if (showTutorials && !session.Tutorials.Has(TutorialProgress.Field)) StartCoroutine(FieldGuide());
             return true;
         }
 
@@ -254,7 +268,10 @@ namespace WordRPG.UI
                 RefreshNameTags();
             }
 
-            if (inBattle || transitioning || IsPanelOpen || tutorial.IsBlocking)
+            if (saveMark.activeSelf && Time.unscaledTime > saveMarkUntil) saveMark.SetActive(false);
+            PulseBadges();
+
+            if (inBattle || transitioning || IsPanelOpen)
             {
                 // 창을 닫은 직후 같은 키(Enter 등)로 바로 다시 열리지 않게
                 if (IsPanelOpen) interactCooldown = 0.5f;
@@ -293,6 +310,7 @@ namespace WordRPG.UI
 
             interactCooldown -= Time.deltaTime;
             UpdateConfirmButton();
+            UpdateGuide();
             if (confirmRequested || ConfirmKeyPressed())
             {
                 confirmRequested = false;
@@ -321,7 +339,7 @@ namespace WordRPG.UI
                 case StepKind.Moved:
                     moving = true;
                     running = run;
-                    if (bubble.IsVisible) bubble.Hide();
+                    if (bubble.IsVisible && Time.unscaledTime > bubbleKeepUntil) bubble.Hide();
                     // 달리면 걸음마다 발뒤꿈치 뒤로 흙먼지가 튀어 흩어진다 (#51 사용자 레퍼런스: 달리는 발 뒤로 날리는 먼지).
                     // 그림 = 폭발 시트의 마지막 3칸(회색조). 떠난 칸의 바닥 색을 입힌다 — 흙길은 흙빛, 풀숲은 풀빛, 서고는 돌가루 (#53).
                     // #53 기기 확인: 작아서 잘 안 보임 → 1.5칸, 0.5초 동안 남고 덜 옅어짐. 달리는 반대 방향으로 조금 밀려난다
@@ -422,6 +440,7 @@ namespace WordRPG.UI
             walker.Face(direction.Value);
             playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
             var cell = walker.Position + direction.Value.ToOffset();
+            interactions++;
             Interact(walker.Map.Get(cell), cell);
             return true;
         }
@@ -436,7 +455,6 @@ namespace WordRPG.UI
         // 뒤로가기: 맨 위 창부터 닫고, 아무 창도 없으면 '게임을 끝낼까요?'. 전투 중이면 전투 화면에 맡기고, 연출 중에는 무시
         public void HandleBack()
         {
-            if (tutorial.IsShowing) return; // 안내 중에는 [건너뛰기]로
             if (paywall.IsOpen)
             {
                 paywall.Close(); // 결제 창이 떠 있는 동안은 닫히지 않음
@@ -527,7 +545,7 @@ namespace WordRPG.UI
         {
             IsReadingDictionary = true;
             transitioning = true;
-            saveProgress?.Invoke();
+            SaveNow();
             foreach (var step in new[] { SpeechBubble.Icon.Dot1, SpeechBubble.Icon.Dot2, SpeechBubble.Icon.Dot3, SpeechBubble.Icon.Exclaim })
             {
                 bubble.ShowIcon(step);
@@ -543,7 +561,7 @@ namespace WordRPG.UI
             var completed = session.ClaimDexRewards(new[] { area.Words });
             if (completed.Count > 0)
             {
-                saveProgress?.Invoke();
+                SaveNow();
                 ShowToast($"★ {area.Words.RegionName} 도감 완성! 보상을 받았다", 3f);
             }
             RefreshHud();
@@ -571,7 +589,7 @@ namespace WordRPG.UI
         // 강화·구매·장착 직후 저장하고 HUD(주인공·성유물·골드) 갱신
         private void OnTownChanged()
         {
-            saveProgress?.Invoke();
+            SaveNow();
             RefreshHud();
         }
 
@@ -583,6 +601,7 @@ namespace WordRPG.UI
             minimap.SetPlayer(walker.Position);
             RefreshNameTags();
             if (session.World.Reveal(area.AreaId, walker.Map.Width, walker.Map.Height, walker.Position) > 0) minimap.Redraw();
+            MaybeSayGrassLine();
             var tile = walker.Map.Get(walker.Position);
             if (tile == FieldTile.Door)
             {
@@ -623,7 +642,7 @@ namespace WordRPG.UI
             }
 
             EnterArea(target, doors[exit.TargetDoorIndex]);
-            saveProgress?.Invoke();
+            SaveNow();
 
             for (float t = 0; t < half; t += Time.unscaledDeltaTime)
             {
@@ -658,7 +677,7 @@ namespace WordRPG.UI
                 if (result.Gold > 0) loot += (loot.Length > 0 ? " + " : "") + $"{result.Gold} 골드";
                 ShowToast($"보물상자를 열었다!\n{loot} 획득", 2.5f);
             }
-            saveProgress?.Invoke();
+            SaveNow();
             RefreshHud();
             if (result.Item != null && result.Item.IsSkillDocument) OfferDocument(result.Item);
         }
@@ -680,7 +699,7 @@ namespace WordRPG.UI
         private void UseFountain()
         {
             session.RestoreHero();
-            saveProgress?.Invoke();
+            SaveNow();
             RefreshHud();
             Sound.Play(Sfx.Fountain);
             ShowToast("회복의 샘 — HP가 모두 회복되었다!");
@@ -750,7 +769,7 @@ namespace WordRPG.UI
                 var relic = session.GrantRelic(area.Boss.RewardRelic);
                 var rewardItem = area.Boss.RewardItem; // 기술문서 등
                 if (rewardItem != null) session.Inventory.Add(rewardItem);
-                saveProgress?.Invoke();
+                SaveNow();
                 string message = relic != null
                     ? $"★ {UiKit.WithJosa(name, "을", "를")} 물리쳤다!\n성유물 '{relic.Data.DisplayName}' 획득 — {RelicHint(relic)}"
                     : $"★ {UiKit.WithJosa(name, "을", "를")} 물리쳤다!\n{area.DisplayName}에 잊혀진 기억이 돌아왔다";
@@ -767,7 +786,7 @@ namespace WordRPG.UI
                 SnapPlayer();
                 RefreshNameTags();
                 session.World.SetPosition(area.AreaId, walker.Position);
-                saveProgress?.Invoke();
+                SaveNow();
                 StartCoroutine(Respawn($"{area.DisplayName} 시작 지점으로 돌아왔다. HP가 회복되었다!"));
             }
             RefreshHud();
@@ -789,7 +808,7 @@ namespace WordRPG.UI
                 OfferDocument(document);
                 while (learnView.IsOpen) yield return null;
             }
-            while (inBattle || transitioning || IsPanelOpen || tutorial.IsShowing) yield return null;
+            while (inBattle || transitioning || IsPanelOpen) yield return null;
             if (area != bossArea || walker.Position == walker.Map.Start) yield break; // 이미 다른 지역이나 시작 지점이면 묻지 않음
             returnDialog.Show(BossDefeatedTitle, $"{area.DisplayName} 시작 지점으로 돌아갈까요?", "돌아가기", false,
                 () => StartCoroutine(ReturnToStart()), "star_full", "여기 있기");
@@ -812,7 +831,7 @@ namespace WordRPG.UI
             if (session.World.Reveal(area.AreaId, walker.Map.Width, walker.Map.Height, walker.Position) > 0) minimap.Redraw();
             RefreshNameTags();
             session.World.SetPosition(area.AreaId, walker.Position);
-            saveProgress?.Invoke();
+            SaveNow();
             UpdateCamera();
             yield return cutscene.Fade(1f, 0f, 0.35f * animationScale);
             Destroy(cutscene.gameObject);
@@ -1166,13 +1185,41 @@ namespace WordRPG.UI
             menu.pivot = new Vector2(1, 1);
             menu.sizeDelta = new Vector2(120, menuHeight);
             menu.anchoredPosition = new Vector2(-24, 0);
+            var badgeOf = new Dictionary<string, string>
+                { ["DexButton"] = MenuBadges.Dex, ["TrainingButton"] = MenuBadges.Training, ["BagButton"] = MenuBadges.Bag };
             for (int i = 0; i < entries.Length; i++)
             {
                 float topY = 1f - i * (136f / menuHeight);
                 var button = UiKit.IconButton(entries[i].name, menu, entries[i].icon, entries[i].label, Palette.Scrim,
                     0, topY - 120f / menuHeight, 1, topY);
                 button.onClick.AddListener(entries[i].open);
+                if (badgeOf.TryGetValue(entries[i].name, out var badgeId)) AddBadge(badgeId, (RectTransform)button.transform);
             }
+            AddBadge(MenuBadges.Map, (RectTransform)minimap.Button.transform);
+
+            // 목표 한 줄 (#61): 미니맵 바로 아래. 누르면 큰 지도 (목표 칸에 별)
+            var goal = UiKit.Pill(UiKit.Panel("Objective", hudRoot, Palette.Scrim, 0, 0.865f, 0, 0.865f));
+            objectivePill = goal.rectTransform;
+            objectivePill.pivot = new Vector2(0, 1);
+            UiKit.AddButton(goal).onClick.AddListener(OpenMap);
+            var star = UiKit.Label("Star", objectivePill, "★", 32, Palette.Gold, 0, 0, 0, 1, TextAnchor.MiddleCenter, FontStyle.Bold);
+            star.rectTransform.pivot = new Vector2(0, 0.5f);
+            star.rectTransform.sizeDelta = new Vector2(40, 0);
+            star.rectTransform.anchoredPosition = new Vector2(18, 0);
+            objectiveText = UiKit.OneLine(UiKit.Label("Text", objectivePill, "", 28, Palette.Text, 0, 0, 1, 1, TextAnchor.MiddleLeft,
+                FontStyle.Bold));
+            objectiveText.rectTransform.offsetMin = new Vector2(62, 0);
+            objectiveText.rectTransform.offsetMax = new Vector2(-22, 0);
+
+            // 저장될 때 잠깐 (#61): 메뉴 아래 작은 알약
+            var mark = UiKit.Pill(UiKit.Panel("SaveMark", hudRoot, Palette.Scrim, 1, 0.865f, 1, 0.865f));
+            mark.raycastTarget = false;
+            mark.rectTransform.pivot = new Vector2(1, 1);
+            mark.rectTransform.sizeDelta = new Vector2(150, 56);
+            mark.rectTransform.anchoredPosition = new Vector2(-24, -(menuHeight + 16));
+            UiKit.Label("Text", mark.transform, "✓ 저장", 26, Palette.Good, 0, 0, 1, 1, TextAnchor.MiddleCenter, FontStyle.Bold);
+            saveMark = mark.gameObject;
+            saveMark.SetActive(false);
 
             // 주인공 배지 + 끼운 성유물 3칸 (Figma 'Field — HUD (주인공·성유물)' / 'Hero Badge' / 'Relic Slot')
             var strip = UiKit.Rect("HeroStrip", hudRoot, 0, 0.875f, 1, 0.935f);
@@ -1243,7 +1290,7 @@ namespace WordRPG.UI
             quitDialog = ConfirmDialog.Create(hudRoot);
             returnDialog = ConfirmDialog.Create(hudRoot);
             paywall = PaywallView.Create(hudRoot);
-            tutorial = TutorialOverlay.Create(transform); // 자기 캔버스로 HUD·전투 위에
+            guide = GuideHints.Create(transform); // 자기 캔버스로 HUD·전투 위에 (눌림은 받지 않음)
         }
 
         // 왼쪽 아래 [확인] (Figma 'Action Button'): 옆에 쓸 것이 있으면 금색(Ready), 없으면 반투명(Idle)
@@ -1293,62 +1340,150 @@ namespace WordRPG.UI
             nameTags.Refresh(walker.Position, cell => bubble.IsVisible
                 || walker.Map.Get(cell) == FieldTile.Boss && session.World.IsBossDefeated(area.BossId));
 
-        // 설정 > [튜토리얼 다시 보기]: 본 안내를 지우고 필드 안내부터 다시 (전투 안내도 다음 전투에서 다시)
+        // 설정 > [튜토리얼 다시 보기]: 본 안내·빨간 점을 지우고 걷기 안내부터 다시 (전투·[확인] 안내도 그 상황에서 다시)
         private void ReplayTutorial()
         {
             session.Tutorials.Clear();
-            saveProgress?.Invoke();
-            StartCoroutine(FieldTutorial());
+            SaveNow();
+            RefreshHud();
+            if (!fieldTutorialRunning) StartCoroutine(FieldGuide());
         }
 
-        // 처음 필드에 들어오면 (#36, Figma '튜토리얼 — 필드 스틱'):
-        // 환영 → 걷기(직접) → 달리기(직접) → [확인] → 메뉴 → 지도 → 자동 저장·설정 → 풀숲·전투
-        private IEnumerator FieldTutorial()
+        // 처음 필드에 들어오면 (#61, 사용자 피드백 '글이 너무 많다'): 손끝이 끄는 모습 + 한 줄 → 두 칸 걸어 보면 →
+        // 끝까지 미는 모습 + 한 줄 → 달려 보면 끝. 화면을 막지 않고, 그동안만 몬스터가 나오지 않는다.
+        // 메뉴·지도·저장 설명은 없앴다 — 빨간 점·목표 한 줄·'✓ 저장'이 그 자리에서 알려 준다
+        private IEnumerator FieldGuide()
         {
             yield return null; // 화면 배치가 끝난 뒤
-            int? walkFrom = null;
-            var steps = new List<TutorialOverlay.Step>
-            {
-                new TutorialOverlay.Step { Text = "영단어RPG에 온 것을 환영해요!\n처음이니 움직이는 법부터 몇 가지만 알려 드릴게요." },
-                new TutorialOverlay.Step
-                {
-                    Text = "화면 오른쪽 아래를 엄지로 끌면 그 방향으로 걸어요.\n두 칸 걸어 보세요!", Target = () => stick.Zone,
-                    DoneWhen = () =>
-                    {
-                        walkFrom ??= stepsTaken;
-                        return stepsTaken - walkFrom.Value >= 2;
-                    }
-                },
-                new TutorialOverlay.Step
-                {
-                    Text = "스틱을 끝까지 밀면 달릴 수 있어요.\n끝까지 밀어 보세요!", Target = () => stick.Zone,
-                    DoneWhen = () => IsRunning || (stick.IsHeld && StickInput.IsRunning(stick.Value))
-                },
-                new TutorialOverlay.Step
-                {
-                    Text = "상자·샘·제단·상점 옆에 서면 [확인]이 금색으로 빛나요.\n그때 눌러서 사용해요.",
-                    Target = () => confirmImage.rectTransform
-                },
-                new TutorialOverlay.Step { Text = "[도감]에는 만난 단어가 모여요. [수련]에서는 그 단어로 허수아비와 싸우며 외울 수 있고,\n[가방]에는 아이템과 성유물이 있어요.", Target = () => menuRect },
-                new TutorialOverlay.Step
-                {
-                    Text = "왼쪽 위 작은 지도를 누르면 큰 지도로 볼 수 있어요.", Target = () => (RectTransform)minimap.Button.transform
-                },
-                new TutorialOverlay.Step
-                {
-                    Text = "게임은 자동으로 저장돼요. 문제를 풀 때마다, 전투가 끝날 때마다 저장되니 언제 꺼도 이어서 할 수 있어요.\n" +
-                           "처음부터 다시 하기와 이 안내 다시 보기는 [설정]에 있어요.",
-                    Target = () => (RectTransform)menuRect.Find("SettingsButton")
-                },
-                new TutorialOverlay.Step
-                {
-                    Text = "진한 풀숲을 걸으면 야생 몬스터가 나타나요.\n전투에서는 영단어를 맞혀야 기술을 쓸 수 있어요. 모험을 떠나 볼까요?",
-                    Button = "시작하기"
-                },
-            };
             fieldTutorialRunning = true;
-            yield return tutorial.Run(session, TutorialProgress.Field, steps, saveProgress);
+            int from = stepsTaken;
+            guide.Show(new GuideHints.Hint
+            {
+                Text = "여기를 끌어서 이동", Target = () => stick.Zone, Gesture = GuideHints.Gesture.Drag, Drag = new Vector2(150, 0)
+            });
+            while (stepsTaken - from < 2) yield return null;
+            guide.Show(new GuideHints.Hint
+            {
+                Text = "끝까지 밀면 달리기", Target = () => stick.Zone, Gesture = GuideHints.Gesture.Drag, Drag = new Vector2(240, 0)
+            });
+            while (!(IsRunning || (stick.IsHeld && StickInput.IsRunning(stick.Value)))) yield return null;
+            guide.Hide();
+            session.Tutorials.Mark(TutorialProgress.Field);
+            SaveNow();
             fieldTutorialRunning = false;
+        }
+
+        // 그 상황을 처음 만났을 때만 (#61): 물건 옆에 서면 [확인]을 톡톡 누르는 손끝 + 한 줄. 써 보면 끝, 멀어지면 다음에 다시
+        private void UpdateGuide()
+        {
+            if (!showTutorials || guide.IsShowing || fieldTutorialRunning) return;
+            if (confirmReady && !session.Tutorials.Has(TutorialProgress.Confirm))
+            {
+                int before = interactions;
+                StartCoroutine(guide.Run(session, TutorialProgress.Confirm, new GuideHints.Hint
+                {
+                    Text = "[확인]을 눌러 보자", Target = () => confirmImage.rectTransform, Gesture = GuideHints.Gesture.Tap,
+                    DoneWhen = () => interactions > before
+                }, SaveNow, () => !confirmReady && interactions == before));
+            }
+        }
+
+        // 풀숲 가까이 처음 오면 주인공 혼잣말 (#61) — 걸어도 잠깐 남아 있음
+        private void MaybeSayGrassLine()
+        {
+            if (!showTutorials || fieldTutorialRunning || session.Tutorials.Has(TutorialProgress.Grass) || bubble.IsVisible) return;
+            if (!GrassNearby(2)) return;
+            session.Tutorials.Mark(TutorialProgress.Grass);
+            bubble.Say("풀숲에서 뭔가 나올 것 같아…", 2.6f);
+            bubbleKeepUntil = Time.unscaledTime + 2.6f;
+            SaveNow();
+        }
+
+        private bool GrassNearby(int radius)
+        {
+            for (int dx = -radius; dx <= radius; dx++)
+            for (int dy = -radius; dy <= radius; dy++)
+                if (walker.Map.Get(walker.Position + new Vector2Int(dx, dy)) == FieldTile.Grass) return true;
+            return false;
+        }
+
+        // ------------------------------------------------------------------ 빨간 점 · 목표 한 줄 · 저장 표시 (#61)
+
+        private void AddBadge(string id, RectTransform host)
+        {
+            var dot = UiKit.Pill(UiKit.Panel("Badge", host, Palette.Bad, 1, 1, 1, 1));
+            dot.raycastTarget = false;
+            var rt = dot.rectTransform;
+            rt.sizeDelta = new Vector2(30, 30);
+            rt.anchoredPosition = new Vector2(-8, -8);
+            var ring = UiKit.Outline(UiKit.Panel("Ring", rt, Color.white), 15, 3);
+            ring.gameObject.AddComponent<AutoPill>();
+            ring.raycastTarget = false;
+            rt.gameObject.SetActive(false);
+            badges[id] = rt;
+        }
+
+        private void RefreshBadges()
+        {
+            foreach (var pair in badges)
+                pair.Value.gameObject.SetActive(showTutorials && MenuBadges.ShouldShow(pair.Key, session));
+        }
+
+        // 그 메뉴를 열면 점이 꺼진다 (점이 켜져 있었을 때만 — 아직 의미가 없을 때 열어 본 것은 세지 않음)
+        private void ClearBadge(string id)
+        {
+            if (!IsBadgeVisible(id)) return;
+            session.Tutorials.Mark(id);
+            SaveNow();
+            RefreshBadges();
+        }
+
+        // 2초마다 한 번 톡 커졌다 돌아온다
+        private void PulseBadges()
+        {
+            float k = Time.unscaledTime % 2f;
+            float scale = k < 0.3f ? 1f + 0.35f * Mathf.Sin(k / 0.3f * Mathf.PI) : 1f;
+            foreach (var dot in badges.Values)
+                if (dot.gameObject.activeSelf) dot.localScale = Vector3.one * scale;
+        }
+
+        private void RefreshObjective()
+        {
+            objective = Objectives.Current(session, area);
+            objectiveText.text = ObjectiveLine(objective);
+            objectivePill.sizeDelta = new Vector2(Mathf.Clamp(objectiveText.preferredWidth + 88f, 200f, 700f), 60f);
+            objectivePill.anchoredPosition = new Vector2(24, -(minimap.Height + 12f));
+            minimap.SetGoal(objective.Cell);
+        }
+
+        private string ObjectiveLine(Objective goal)
+        {
+            switch (goal.Kind)
+            {
+                case ObjectiveKind.FirstBattle:
+                    return "풀숲에서 몬스터를 만나 보자";
+                case ObjectiveKind.GoToArea:
+                    string next = goal.Next.DisplayName, destination = goal.Destination.DisplayName;
+                    return goal.Next == goal.Destination
+                        ? $"{UiKit.WithJosa(next, "으로", "로")} 가자"
+                        : $"{UiKit.WithJosa(next, "을", "를")} 지나 {UiKit.WithJosa(destination, "으로", "로")}";
+                case ObjectiveKind.DefeatBoss:
+                    return $"보스 {UiKit.WithJosa(goal.Destination.Boss.Species.DisplayName, "을", "를")} 물리치자";
+                default:
+                    var progress = Dex.GetProgress(area.Words, session.Vocabulary);
+                    return $"도감 채우기 {progress.Discovered}/{progress.Total}";
+            }
+        }
+
+        // 자동 저장 + (필드에서) 잠깐 '✓ 저장'. 자주 저장되어도 SaveMarkGap보다 자주 띄우지 않는다
+        private void SaveNow()
+        {
+            saveProgress?.Invoke();
+            if (saveProgress == null || inBattle || saveMark == null || Time.unscaledTime - lastSaveMark < SaveMarkGap) return;
+            lastSaveMark = Time.unscaledTime;
+            saveMarkUntil = Time.unscaledTime + 1.2f;
+            saveMark.SetActive(true);
+            SaveMarksShown++;
         }
 
         private void BuildBattle()
@@ -1356,7 +1491,7 @@ namespace WordRPG.UI
             var battleGo = new GameObject("Battle");
             battleGo.transform.SetParent(transform, false);
             battle = battleGo.AddComponent<BattleScreen>();
-            if (showTutorials) battle.SetTutorial(tutorial); // 첫 전투 안내 (기술·강도·새 단어·문제·오답·콤보·상처약)
+            if (showTutorials) battle.SetGuide(guide); // 첫 전투 안내 (기술·새 단어·첫 문제·강도·상처약 — 한 줄씩)
             battle.Configure(area.Encounters, area.Words, session, animationScale, battleConfig, saveProgress, loop: false,
                 gameDatabase: database);
         }
@@ -1366,7 +1501,9 @@ namespace WordRPG.UI
 
         private void OpenMap()
         {
-            if (CanOpenMenu) mapView.Show(area, minimap.Texture, walker.Position, session);
+            if (!CanOpenMenu) return;
+            ClearBadge(MenuBadges.Map);
+            mapView.Show(area, minimap.Texture, walker.Position, session, objective.Cell);
         }
 
         // 미니맵에서 '끝난 곳' (연 상자, 쓰러뜨린 보스)
@@ -1386,6 +1523,7 @@ namespace WordRPG.UI
         private void OpenBag(BagTab tab, int slot = -1)
         {
             if (!CanOpenMenu) return;
+            ClearBadge(MenuBadges.Bag);
             var relic = session.Hero.SlotAt(slot);
             inventoryView.Show(session, database, tab, relic, OnTownChanged);
         }
@@ -1398,10 +1536,11 @@ namespace WordRPG.UI
         private void OpenDex()
         {
             if (!CanOpenMenu) return;
+            ClearBadge(MenuBadges.Dex);
             var completed = session.ClaimDexRewards(new[] { area.Words });
             if (completed.Count > 0)
             {
-                saveProgress?.Invoke();
+                SaveNow();
                 ShowToast($"★ {area.Words.RegionName} 도감 완성! 보상을 받았다", 3f);
             }
             dexView.Show(area.Words, session, DateTime.UtcNow);
@@ -1431,6 +1570,7 @@ namespace WordRPG.UI
         private void OpenTraining()
         {
             if (!CanOpenMenu) return;
+            ClearBadge(MenuBadges.Training);
             var books = TrainingBooks().ConvertAll(b => b.Words);
             var (discovered, wrong) = TrainingQuizProvider.Count(books, session.Vocabulary);
             trainingView.Show(discovered, wrong);
@@ -1454,7 +1594,7 @@ namespace WordRPG.UI
         {
             inBattle = false;
             Sound.PlayMusic(AreaMusic);
-            saveProgress?.Invoke();
+            SaveNow();
             RefreshHud();
         }
 
@@ -1482,6 +1622,8 @@ namespace WordRPG.UI
                 level.text = relic != null ? $"+{relic.Level}" : "";
                 empty.enabled = relic == null;
             }
+            RefreshBadges();
+            RefreshObjective();
         }
 
         private void ShowToast(string message, float seconds = 2f)

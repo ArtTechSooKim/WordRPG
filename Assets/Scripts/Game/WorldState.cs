@@ -59,6 +59,8 @@ namespace WordRPG.Game
             return record.Reveal(mapWidth, mapHeight, center, radius);
         }
 
+        public int ExploredAreaCount => explored.Count; // 한 번이라도 들어가 본 지역 수 (지도 버튼 빨간 점 #61)
+
         public bool IsExplored(string area, Vector2Int cell)
         {
             var record = explored.Find(e => e.AreaId == area);
