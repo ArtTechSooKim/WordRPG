@@ -113,7 +113,7 @@ MonoBehaviour:
 
 '
   encounters: {fileID: 11400000, guid: f2cdfe93005f98f4997321e9c7852d3f, type: 2}
-  words: {fileID: 11400000, guid: 89d1f80701129f84bad1df742f174dae, type: 2}
+  words: {fileID: 11400000, guid: c2518a4985e9f504d9498327a491bebc, type: 2}
   encounterRate: 0.14
   minStepsBetweenEncounters: 4
   shop: {fileID: 0}
@@ -147,4 +147,5 @@ MonoBehaviour:
     level: 7
     rewardRelic: {fileID: 11400000, guid: c3cf9b0f8943bed43976182ff5144417, type: 2}
     rewardItem: {fileID: 11400000, guid: 4185a811547fb65468699483f65b7fdf, type: 2}
-  dictionaryName: "서고의 사전"
+  requiresFullVersion: 0
+  dictionaryName: "\uC11C\uACE0\uC758 \uC0AC\uC804"

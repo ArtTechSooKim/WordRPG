@@ -27,12 +27,14 @@
 - **엔진**: Unity 6000.3.11f1 (2D, Built-in RP) / **플랫폼**: 모바일, **세로 고정**, **아이폰 앱스토어 출시** (2026-10-03 사용자 결정, 안드로이드는 시험용 빌드만) / **개발**: 1인
 - **핵심 루프**: 탐험 → 랜덤 조우 → 전투(기술마다 단어 문제) → 보상(경험치·재료·성유물) → 레벨업·성유물 강화(+3 각성) → 새 지역·어려운 단어
 - **현재 단계**: MVP 이후 확장 — 초원(마을)·잊혀진 서고(던전)·숲(2번째 지역, 서고 보스를 물리치면 열림), 주인공 + 성유물 8개(3칸 장착),
-  적 6종 + 보스 2, 단어 1단계 100개 + 2단계 100개. 맵은 2026-10-03에 넓이 4배
+  적 6종 + 보스 2. 단어 = 2022 개정 교육과정 영어과 기본 어휘(교육부 고시, 저작권 없음 — GDD 11-2)에서 초원 600·서고 600(중·고 공통)·
+  숲 500(고급), 다음 지역용 500은 `Docs/단어_3단계_다음지역.csv`. 뜻은 Claude 초안 + 사용자 검수. 맵은 2026-10-03에 넓이 4배
 
 ## 기술 규칙 (반드시 준수)
 
 1. **게임 데이터는 ScriptableObject**: 주인공(HeroData), 성유물(RelicData), 적 몬스터, 스킬, 아이템, 출현표, 단어장. 하드코딩 금지
-   - 단어는 `Assets/Data/Words/*.csv`를 고치면 같은 이름의 `WordDatabase` .asset이 자동 갱신됨
+   - 단어는 `Assets/Data/Words/*.csv`를 고치면 같은 이름의 `WordDatabase` .asset이 자동 갱신됨.
+     지역마다 자기 단어장, 한 단어는 한 단어장에만 (RegionDataTests). 단어를 늘릴 땐 남의 사이트·사전을 긁어 오지 않는다 (GDD 11-2)
 2. **로직과 UI 분리**: `Words/ Monsters/ Heroes/ Items/ Battle/`은 순수 C# (MonoBehaviour 없음). UI는 `BattleEngine`이 돌려주는 `BattleEvent` 목록을 연출만 한다
 3. **새 로직에는 EditMode 테스트**: `Assets/Tests/EditMode/`. SO는 `TestData` 도우미로 생성
 4. **시간·랜덤은 주입**: 로직에서 `DateTime.UtcNow`, `UnityEngine.Random` 직접 사용 금지 → `DateTime nowUtc` / `System.Random` 파라미터로 받기 (테스트 결정성)

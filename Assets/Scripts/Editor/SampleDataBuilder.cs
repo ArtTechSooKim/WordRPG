@@ -37,6 +37,8 @@ namespace WordRPG.EditorTools
                 "초원 도감을 완성한 증표. 행운을 부르는 네잎클로버가 곱게 눌려 있다.", new Color(0.35f, 0.8f, 0.35f), ItemKind.Keepsake);
             var forestKeepsake = Item("keepsake_forest", "도토리 책갈피",
                 "숲 도감을 완성한 증표. 반질반질한 도토리가 매달려 있다.", new Color(0.6f, 0.4f, 0.2f), ItemKind.Keepsake);
+            var libraryKeepsake = Item("keepsake_library", "깃털 책갈피",
+                "잊혀진 서고 도감을 완성한 증표. 오래된 책장 사이에서 찾은 깃털이 끼워져 있다.", new Color(0.95f, 0.85f, 0.6f), ItemKind.Keepsake);
 
             // --- 기술: 기본기는 쉬운 영→한, 성유물 기술은 대부분 어려운 한→영 ---
             var swing = Skill("hero_swing", "휘두르기", "들고 있는 사전으로 힘껏 휘두른다.", SkillKind.Damage, SkillTarget.SingleEnemy, 18, QuizDirection.EnglishToMeaning);
@@ -156,6 +158,8 @@ namespace WordRPG.EditorTools
             WordCsvImporter.ImportAll();
             ConfigureRegion("Assets/Data/Words/tier1_meadow.asset", "meadow", "초원", meadowKeepsake, 500);
             ConfigureRegion("Assets/Data/Words/tier2_forest.asset", "forest", "숲", forestKeepsake, 700);
+            // (#62) 서고도 자기 단어장: 교육과정 기본 어휘 중·고 공통 중 어려운 600
+            ConfigureRegion("Assets/Data/Words/tier1_library.asset", "library", "잊혀진 서고", libraryKeepsake, 600);
 
             // --- 필드: 초원. 보물상자는 맵의 C를 위→아래, 왼→오른 순으로 대응 (강화 재료·성유물을 얻는 곳) ---
             Area("meadow", "초원", MeadowMap, meadowEncounters,
@@ -172,14 +176,15 @@ namespace WordRPG.EditorTools
                 new ShopEntry(potion, 30), new ShopEntry(largePotion, 90));
             AssignShopIfEmpty("Assets/Data/Areas/meadow.asset", meadowShop);
 
-            // --- 던전: 잊혀진 서고 (초원 북쪽 동굴 입구로 연결). MVP는 난이도 하나라 단어장은 초원과 같음 ---
+            // --- 던전: 잊혀진 서고 (초원 북쪽 동굴 입구로 연결). 단어장은 서고 것 (#62 — 예전에는 초원과 같았음) ---
             Area("library", "잊혀진 서고", LibraryMap, dungeonEncounters,
-                AssetDatabase.LoadAssetAtPath<WordDatabase>("Assets/Data/Words/tier1_meadow.asset"),
+                AssetDatabase.LoadAssetAtPath<WordDatabase>("Assets/Data/Words/tier1_library.asset"),
                 new ChestContent(null, 0, 120),          // 보스 앞 회랑 왼쪽 구석
                 new ChestContent(null, 0, 100, lantern), // 서쪽 열람실
                 new ChestContent(null, 0, 80, wand),     // 동쪽 잉크 서고
                 new ChestContent(largePotion, 1),        // 샘의 방 옆 벽감
                 new ChestContent(shinyInk, 3));          // 아래 서가 막다른 곳
+            SwitchWordBookIf("Assets/Data/Areas/library.asset", "Assets/Data/Words/tier1_meadow.asset", "Assets/Data/Words/tier1_library.asset");
             ConfigureAreaIfNew("Assets/Data/Areas/library.asset", so =>
             {
                 Prop(so, "theme").enumValueIndex = (int)FieldTheme.Library;
@@ -477,6 +482,18 @@ namespace WordRPG.EditorTools
                 element.FindPropertyRelative("openedByBossOf").objectReferenceValue =
                     exits[i].openedByBossOf != null ? AssetDatabase.LoadAssetAtPath<FieldArea>(exits[i].openedByBossOf) : null;
             }
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // 이미 있는 지역이 예전 단어장(from)을 쓰고 있으면 새 단어장(to)으로 (#62 서고가 초원 단어장을 같이 쓰던 것)
+        private static void SwitchWordBookIf(string areaPath, string fromPath, string toPath)
+        {
+            var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);
+            var from = AssetDatabase.LoadAssetAtPath<WordDatabase>(fromPath);
+            var to = AssetDatabase.LoadAssetAtPath<WordDatabase>(toPath);
+            if (area == null || to == null || area.Words != from) return;
+            var so = new SerializedObject(area);
+            Prop(so, "words").objectReferenceValue = to;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 

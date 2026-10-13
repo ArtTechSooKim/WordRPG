@@ -51,6 +51,7 @@ ITEMS = {
     "potion": "Items/Potion/Medipack.png",       # 상처약
     "potion_large": "Items/Potion/LifePot.png",  # 큰 상처약
     "keepsake_forest": "Items/Food/Nut.png",     # 도토리 책갈피 (숲 도감 완성 징표)
+    "keepsake_library": "Items/Resource/feather.png",  # 깃털 책갈피 (서고 도감 완성 징표, #62)
     # 기술문서 (두루마리)
     "skilldoc_cram": "Items/Scroll/ScrollThunder.png",     # 벼락치기 (서고 보스)
     "skilldoc_highlight": "Items/Scroll/ScrollPlant.png",  # 형광펜 긋기 (숲 보스)

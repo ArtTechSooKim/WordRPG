@@ -182,5 +182,28 @@ namespace WordRPG.Tests
                     $"{book.name}: 징표가 GameDatabase에 없음 (WordRPG > Data > Refresh Game Database)");
             }
         }
+
+        // #62 교육과정 기본 어휘로 바꾼 뒤: 지역마다 자기 단어장, 단어는 한 단어장에만 (도감이 겹치지 않게), 뜻은 비어 있지 않음
+        [Test]
+        public void EveryAreaHasItsOwnWordBookAndBooksDoNotShareWords()
+        {
+            var database = AssetDatabase.LoadAssetAtPath<GameDatabase>("Assets/Data/GameDatabase.asset");
+            var books = new HashSet<WordDatabase>();
+            foreach (var area in database.Areas)
+            {
+                Assert.IsNotNull(area.Words, $"{area.AreaId}: 단어장 없음");
+                Assert.IsTrue(books.Add(area.Words), $"{area.AreaId}: 다른 지역과 같은 단어장 ({area.Words.name})");
+            }
+            var owner = new Dictionary<string, string>();
+            foreach (var book in books)
+            {
+                Assert.GreaterOrEqual(book.Words.Count, 100, $"{book.name}: 단어가 너무 적음");
+                foreach (var word in book.Words)
+                {
+                    Assert.IsFalse(string.IsNullOrWhiteSpace(word.Meaning), $"{book.name}: {word.English} 뜻이 비어 있음");
+                    Assert.IsTrue(owner.TryAdd(word.Id, book.name), $"'{word.Id}'가 {owner.GetValueOrDefault(word.Id)}와 {book.name}에 모두 있음");
+                }
+            }
+        }
     }
 }
