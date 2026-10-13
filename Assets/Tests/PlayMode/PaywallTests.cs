@@ -163,5 +163,54 @@ namespace WordRPG.Tests
             Object.Destroy(again.gameObject);
             yield return null;
         }
+
+        // 설정 > 정식판 (#63 앱스토어 심사 대비): 숲 입구까지 가지 않아도 [정식판 보기]로 살 수 있고, [구매 복원]은 그 자리에서
+        [UnityTest]
+        public IEnumerator SettingsOffersFullVersionAndRestoreAnywhere()
+        {
+            var owned = new Entitlements();
+            var store = new FakeStore(owned) { NextRestore = StoreResult.NothingToRestore };
+            var field = MakeField(NewSession(), store, owned);
+            yield return null;
+            yield return null;
+            var hud = field.transform.Find("FieldHud/SafeArea");
+            FindButton(hud, "SettingsButton").onClick.Invoke();
+            var settingsRoot = hud.Find("SettingsView");
+            Assert.IsTrue(settingsRoot.gameObject.activeSelf);
+            StringAssert.Contains("정식판", AllText(settingsRoot.Find("Section_정식판")));
+
+            // [구매 복원] — 기록이 없으면 그 자리에 안내
+            ActiveButton(settingsRoot, "SettingsRestoreButton").onClick.Invoke();
+            StringAssert.Contains("복원할 구매 기록이 없어요", AllText(settingsRoot.Find("Section_정식판")));
+            Assert.IsFalse(owned.HasFullVersion);
+
+            // [정식판 보기] → 정식판 안내 창 (설정 위에) → 사면 닫히고 설정은 '정식판 이용 중'
+            ActiveButton(settingsRoot, "FullVersionOfferButton").onClick.Invoke();
+            Assert.IsTrue(field.Paywall.IsOpen, "어디서든 정식판 안내");
+            StringAssert.Contains("숲", AllText(field.Paywall.Root.transform));
+            FindButton(field.Paywall.Root.transform, "BuyButton").onClick.Invoke();
+            Assert.IsFalse(field.Paywall.IsOpen);
+            Assert.IsTrue(owned.HasFullVersion);
+            StringAssert.Contains("정식판 이용 중", AllText(settingsRoot.Find("Section_정식판")));
+            Assert.IsNull(ActiveButton(settingsRoot, "FullVersionOfferButton"), "산 뒤에는 [정식판 보기] 없음");
+            Assert.IsNotNull(ActiveButton(settingsRoot, "SettingsRestoreButton"), "[구매 복원]은 늘 있음");
+
+            // 다른 기기: 복원하면 그 자리에서 되찾음
+            var other = new Entitlements();
+            var otherStore = new FakeStore(other) { NextRestore = StoreResult.Restored };
+            Object.Destroy(field.gameObject);
+            yield return null;
+            var second = MakeField(NewSession(), otherStore, other);
+            yield return null;
+            yield return null;
+            hud = second.transform.Find("FieldHud/SafeArea");
+            FindButton(hud, "SettingsButton").onClick.Invoke();
+            settingsRoot = hud.Find("SettingsView");
+            ActiveButton(settingsRoot, "SettingsRestoreButton").onClick.Invoke();
+            Assert.IsTrue(other.HasFullVersion);
+            StringAssert.Contains("되찾았어요", AllText(settingsRoot.Find("Section_정식판")));
+            Object.Destroy(second.gameObject);
+            yield return null;
+        }
     }
 }

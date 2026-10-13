@@ -178,27 +178,26 @@ namespace WordRPG.UI
         {
             SetBusy(false);
             if (!IsOpen) return;
+            if (result == StoreResult.Purchased || result == StoreResult.Restored)
+            {
+                Unlock();
+                return;
+            }
+            status.text = result == StoreResult.Cancelled ? Footer : MessageFor(result);
+        }
+
+        // 결제·복원 결과 안내 (정식판 안내 창과 설정의 [구매 복원]이 같이 씀)
+        public static string MessageFor(StoreResult result)
+        {
             switch (result)
             {
-                case StoreResult.Purchased:
-                case StoreResult.Restored:
-                    Unlock();
-                    return;
-                case StoreResult.Cancelled:
-                    status.text = Footer;
-                    break;
-                case StoreResult.Deferred:
-                    status.text = "보호자 승인을 기다리고 있어요. 승인되면 자동으로 열려요.";
-                    break;
-                case StoreResult.NothingToRestore:
-                    status.text = "복원할 구매 기록이 없어요. 결제한 Apple 계정으로 로그인했는지 확인해 주세요.";
-                    break;
-                case StoreResult.Unavailable:
-                    status.text = "지금은 결제할 수 없어요. 인터넷 연결을 확인하고 잠시 뒤에 다시 해 주세요.";
-                    break;
-                default:
-                    status.text = "결제를 완료하지 못했어요. 잠시 뒤에 다시 해 주세요.";
-                    break;
+                case StoreResult.Purchased: return "정식판이 열렸어요!";
+                case StoreResult.Restored: return "정식판을 되찾았어요!";
+                case StoreResult.Cancelled: return "결제를 취소했어요.";
+                case StoreResult.Deferred: return "보호자 승인을 기다리고 있어요. 승인되면 자동으로 열려요.";
+                case StoreResult.NothingToRestore: return "복원할 구매 기록이 없어요. 결제한 Apple 계정으로 로그인했는지 확인해 주세요.";
+                case StoreResult.Unavailable: return "지금은 결제할 수 없어요. 인터넷 연결을 확인하고 잠시 뒤에 다시 해 주세요.";
+                default: return "결제를 완료하지 못했어요. 잠시 뒤에 다시 해 주세요.";
             }
         }
 

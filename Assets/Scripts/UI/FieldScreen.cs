@@ -403,6 +403,22 @@ namespace WordRPG.UI
                 ShowToast($"정식판이 열렸어요! 이제 {UiKit.WithJosa(target.DisplayName, "으로", "로")} 들어갈 수 있어요.", 3f));
         }
 
+        // 설정 > 정식판 (#63): 정식판이 필요한 지역(지금은 숲)의 안내를 어디서든 띄운다
+        private void OpenFullVersionOffer(FieldArea target) =>
+            paywall.Show(store, entitlements, OfferFor(target), () =>
+                ShowToast($"정식판이 열렸어요! 이제 {UiKit.WithJosa(target.DisplayName, "으로", "로")} 들어갈 수 있어요.", 3f));
+
+        // 정식판이 필요한 지역: 게임 데이터에서 (없으면 지금 지역의 출입구가 이어지는 곳에서)
+        private FieldArea FullVersionArea()
+        {
+            if (database != null)
+                foreach (var candidate in database.Areas)
+                    if (candidate != null && candidate.RequiresFullVersion) return candidate;
+            foreach (var exit in area.Exits)
+                if (exit.Target != null && exit.Target.RequiresFullVersion) return exit.Target;
+            return null;
+        }
+
         // 안내 문구는 그 지역 데이터에서: 단어 수 · 몬스터·보스 · 성유물(상자·보스 보상)
         private static PaywallOffer OfferFor(FieldArea target)
         {
@@ -1530,7 +1546,12 @@ namespace WordRPG.UI
 
         private void OpenSettings()
         {
-            if (CanOpenMenu) settingsView.Show(settings, saveSettings, deleteSave, ReplayTutorial);
+            if (!CanOpenMenu) return;
+            var full = FullVersionArea();
+            settingsView.Show(settings, saveSettings, deleteSave, ReplayTutorial, new SettingsView.PurchaseHooks
+            {
+                Store = store, Owned = entitlements, OpenOffer = full != null ? () => OpenFullVersionOffer(full) : (Action)null
+            });
         }
 
         private void OpenDex()

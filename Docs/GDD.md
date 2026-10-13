@@ -468,6 +468,11 @@
 - **상품**: 앱스토어 커넥트 인앱 상품 '정식판' — id `com.arttechsoo.wordrpg.full`(바꾸지 말 것, `Entitlements.FullVersion`),
   비소모성, 한국 5,000원 기준(다른 나라 자동 환산), 한국어·영어 이름·설명, 심사용 스크린샷. 첫 앱스토어 심사 때 앱 버전과 함께 제출
 - **잠금**: FieldArea `requiresFullVersion`(숲 켬) → 그 지역으로 가는 출입구가 막히고 정식판 안내 (`PaywallView`, Figma '필드 — 정식판 안내 (#40)').
+- **설정 > 정식판** (#63, 앱스토어 심사 대비 — 심사자가 결제를 찾을 수 있고 구매 복원은 언제든): 상태 한 줄('무료판 이용 중' / '정식판 이용 중')
+  + [정식판 보기](정식판이 필요한 지역의 안내 창을 어디서든) + [구매 복원](그 자리에서 결과 안내). 타이틀 화면 설정에는 [구매 복원]만
+  (`SettingsView.PurchaseHooks`, 결과 문구는 `PaywallView.MessageFor`)
+- **웹 페이지** (#63): 지원 https://arttechsookim.github.io/WordRPG/ · 개인정보 처리방침 …/WordRPG/privacy.html
+  (저장소 `gh-pages` 브랜치, 한국어 + 영어. 수집하는 정보 없음, 문의 = GitHub Issues)
   보스로 잠긴 길이면 보스 안내가 먼저. 안내 문구는 지역 데이터에서 자동(단어 수·몬스터·보스·상자/보스 성유물)
 - **결제**: Unity IAP 5 (`UnityIapStore` : `IStore`). 켜면 연결 → 상품·가격 받기 + 이미 산 것 확인. 결제 = OnPurchasePending에서
   Entitlements에 넣고(기기에 저장) → ConfirmPurchase. [구매 복원](RestoreTransactions, 애플 필수). 결과: 구매·복원·취소·보호자 승인 대기·

@@ -288,7 +288,7 @@ namespace WordRPG.UI
             {
                 manager.Session.Tutorials.Clear();
                 Begin(!manager.HasSave);
-            });
+            }, new SettingsView.PurchaseHooks { Store = manager.Store, Owned = manager.Entitlements }); // 타이틀에서는 [구매 복원]만
         }
 
         private void Begin(bool newGame)
