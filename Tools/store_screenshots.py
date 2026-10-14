@@ -1,9 +1,10 @@
-# 앱스토어 스크린샷 (아이폰 6.9인치 1320×2868): 위에 문구 + 아래 게임 화면 (Pillow 필요)
+# 앱스토어 스크린샷 (아이폰 6.9인치 1320×2868 + 6.3인치 1206×2622): 위에 문구 + 아래 게임 화면 (Pillow 필요)
 #
 #   1) Unity 배치모드로 게임 화면을 찍는다 (그래픽 필요 → -nographics 빼기):
 #      Unity.exe -batchmode -projectPath . -runTests -testPlatform PlayMode -testFilter WordRPG.Tests.StoreScreenshots
 #      → Builds/store/raw/{1_field,2_quiz,...}.png  (Assets/Tests/PlayMode/StoreScreenshots.cs)
-#   2) python Tools/store_screenshots.py → Builds/store/final/01_*.png … (앱스토어 커넥트에 이 순서로 올림)
+#   2) python Tools/store_screenshots.py → Builds/store/final/01_*.png … (6.9인치)
+#      + Builds/store/final_1206x2622/ (앱스토어 커넥트 'Dynamic Island 지원 iPhone(중형 디스플레이)' 칸 — 이 순서로 올림)
 #
 # 문구 글꼴 = 게임과 같은 Jua(제목)·Noto Sans KR Bold(설명). Jua에 없는 기호(· 등)는 제목에 쓰지 말 것 — 아래에서 검사함
 import os
@@ -14,6 +15,8 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = os.path.join(ROOT, "Builds", "store", "raw")
 OUT = os.path.join(ROOT, "Builds", "store", "final")
+# 앱스토어 커넥트 칸마다 받는 크기가 다름 → 같은 그림을 줄여서도 저장 (비율 차이 0.1% 미만)
+EXTRA_SIZES = [(1206, 2622)]
 FONTS = os.path.join(ROOT, "Assets", "Resources", "UI", "Fonts")
 
 W, H = 1320, 2868
@@ -91,6 +94,10 @@ def main():
         out = os.path.join(OUT, f"{i:02d}_{name}.png")
         canvas.save(out)
         print(out)
+        for ew, eh in EXTRA_SIZES:
+            folder = f"{OUT}_{ew}x{eh}"
+            os.makedirs(folder, exist_ok=True)
+            canvas.resize((ew, eh), Image.LANCZOS).save(os.path.join(folder, f"{i:02d}_{name}.png"))
 
 
 if __name__ == "__main__":
