@@ -17,6 +17,8 @@ namespace WordRPG.UI
         public static readonly Color32 Door = new Color32(255, 255, 255, 255);
         public static readonly Color32 Boss = new Color32(255, 107, 138, 255);
         public static readonly Color32 Lectern = new Color32(240, 150, 70, 255); // 사전 받침대 (#45)
+        public static readonly Color32 Gate = new Color32(214, 120, 60, 255);    // 보스 방 문 (#76)
+        public static readonly Color32 Key = new Color32(255, 214, 64, 255);     // 열쇠 받침대 (#76)
         public static readonly Color32 Fog = new Color32(20, 22, 34, 255); // 아직 안 가 본 칸
 
         // done: 연 상자·쓰러뜨린 보스 → 바닥색으로
@@ -38,6 +40,8 @@ namespace WordRPG.UI
                 case FieldTile.Shop: return Shop;
                 case FieldTile.Door: return Door;
                 case FieldTile.Lectern: return Lectern;
+                case FieldTile.Gate: return done ? floor : Gate;
+                case FieldTile.Key: return done ? Lectern : Key; // 가져가면 빈 받침대
                 default: return floor;
             }
         }
@@ -63,7 +67,8 @@ namespace WordRPG.UI
             {
                 var cell = new Vector2Int(x, y);
                 var tile = map.Get(cell);
-                bool isDone = (tile == FieldTile.Chest || tile == FieldTile.Boss) && done != null && done(cell);
+                bool isDone = (tile == FieldTile.Chest || tile == FieldTile.Boss || tile == FieldTile.Gate || tile == FieldTile.Key)
+                              && done != null && done(cell);
                 bool seen = explored == null || explored(cell);
                 pixels[y * map.Width + x] = seen ? ColorOf(tile, theme, isDone) : Fog;
             }

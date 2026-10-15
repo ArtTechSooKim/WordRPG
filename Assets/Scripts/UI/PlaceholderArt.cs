@@ -58,6 +58,10 @@ namespace WordRPG.UI
                     return opened ? Make(t + "boss_cleared", ground) : Make(t + "boss", Layer(BossPixel, ground)); // 사전은 받침대로 옮겨짐
                 case FieldTile.Lectern:
                     return opened ? Make(t + "lectern_book", Layer(OpenBook, Layer(Pedestal, ground))) : Make(t + "lectern", Layer(Pedestal, ground));
+                case FieldTile.Gate: // 보스 방 문 (#76): 열쇠 구멍 블록 → 열리면 길
+                    return opened ? Make(t + "gate_open", ground) : Make(t + "gate", Keyhole);
+                case FieldTile.Key: // 열쇠 받침대 (#76): 받침 위 금 열쇠 → 가져가면 빈 받침
+                    return opened ? Make(t + "key_taken", Layer(Pedestal, ground)) : Make(t + "key", Layer(KeyPixel, Layer(Pedestal, ground)));
                 default: return Make(t + "floor", ground);
             }
         }
@@ -282,6 +286,25 @@ namespace WordRPG.UI
             if (edge) return new Color(0.2f, 0.22f, 0.22f);
             if (x >= 5 && x <= 10 && y >= 6 && y <= 10) return new Color(0.12f, 0.14f, 0.14f);
             return y <= 3 ? new Color(0.42f, 0.48f, 0.44f) : new Color(0.55f, 0.62f, 0.56f);
+        }
+
+        // 보스 방 문: 주황 돌 블록 가운데 검은 열쇠 구멍
+        private static Color Keyhole(int x, int y)
+        {
+            if (x == 0 || x == 15 || y == 0 || y == 15) return new Color(0.12f, 0.1f, 0.1f);
+            bool hole = (Distance(x, y - 2) <= 2.2f) || (x >= 7 && x <= 8 && y >= 4 && y <= 8);
+            if (hole) return new Color(0.08f, 0.08f, 0.09f);
+            return y >= 12 ? new Color(0.98f, 0.86f, 0.62f) : new Color(0.86f, 0.55f, 0.35f);
+        }
+
+        // 받침 위 금 열쇠 (손잡이 고리 + 몸통 + 이)
+        private static Color KeyPixel(int x, int y)
+        {
+            float d = Distance(x + 3, y - 2);
+            bool ring = d <= 2.6f && d >= 1.2f;
+            bool shaft = y == 9 && x >= 7 && x <= 13;
+            bool teeth = (x == 11 || x == 13) && y == 8;
+            return ring || shaft || teeth ? new Color(1f, 0.78f, 0.2f) : Color.clear;
         }
 
         // 사전이 놓인 받침대: 빛나는 펼친 책

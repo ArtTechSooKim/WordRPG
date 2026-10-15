@@ -44,7 +44,8 @@ namespace WordRPG.Tests
         public void LandmarksStandOutFromTerrainInEveryTheme()
         {
             foreach (FieldTheme theme in System.Enum.GetValues(typeof(FieldTheme)))
-            foreach (var landmark in new[] { FieldTile.Chest, FieldTile.Fountain, FieldTile.Altar, FieldTile.Shop, FieldTile.Door, FieldTile.Boss, FieldTile.Lectern })
+            foreach (var landmark in new[] { FieldTile.Chest, FieldTile.Fountain, FieldTile.Altar, FieldTile.Shop, FieldTile.Door, FieldTile.Boss, FieldTile.Lectern,
+                         FieldTile.Gate, FieldTile.Key })
             foreach (var terrain in new[] { FieldTile.Floor, FieldTile.Lawn, FieldTile.Grass, FieldTile.Wall, FieldTile.Water })
                 Assert.AreNotEqual(MinimapArt.ColorOf(terrain, theme, false), MinimapArt.ColorOf(landmark, theme, false),
                     $"{theme}: {landmark}와 {terrain} 색이 같음");

@@ -9,7 +9,10 @@ namespace WordRPG.Game
         FirstBattle, // 아직 한 번도 안 싸움 → 풀숲에서 몬스터 만나기
         GoToArea,    // 아직 안 쓰러뜨린 보스가 다른 지역에 있음 → 다음 출입구로
         DefeatBoss,  // 이 지역의 보스
-        FillDex      // 갈 수 있는 보스를 다 쓰러뜨림 → 도감 채우기
+        FillDex,     // 갈 수 있는 보스를 다 쓰러뜨림 → 도감 채우기
+        FindKey,     // 이 지역 보스 방 문이 잠겼고 열쇠가 없음 (#76) — 열쇠 자리는 별로 알려 주지 않는다 (찾는 재미)
+        GatherWords, // 열쇠는 있지만 이 지역 단어를 덜 발견함 (#76)
+        OpenGate     // 문을 열 수 있음 (#76) — 문에 별
     }
 
     // 지금 할 일 한 줄 (#61 '목표 한 줄'): 화면에 늘 떠 있고, 미니맵·지도에 그 칸을 별로 표시한다
@@ -47,7 +50,7 @@ namespace WordRPG.Game
                 var area = queue.Dequeue();
                 if (HasUndefeatedBoss(session, area))
                 {
-                    if (area == current) return new Objective(ObjectiveKind.DefeatBoss, null, area, area.Map.BossPosition);
+                    if (area == current) return BossObjective(session, area);
                     int index = firstExit[area];
                     var doors = current.Map.Doors;
                     Vector2Int? cell = index >= 0 && index < doors.Count ? doors[index] : (Vector2Int?)null;
@@ -62,6 +65,20 @@ namespace WordRPG.Game
                 }
             }
             return new Objective(ObjectiveKind.FillDex);
+        }
+
+        // 지금 지역 보스: 보스 방 문이 잠겼으면 문부터 (#76)
+        private static Objective BossObjective(GameSession session, FieldArea area)
+        {
+            switch (BossGate.State(area, session))
+            {
+                case BossGateState.NeedKey: return new Objective(ObjectiveKind.FindKey, null, area);
+                case BossGateState.NeedWords: return new Objective(ObjectiveKind.GatherWords, null, area);
+                case BossGateState.Ready:
+                    var cells = BossGate.Cells(area);
+                    return new Objective(ObjectiveKind.OpenGate, null, area, cells[cells.Count / 2]);
+                default: return new Objective(ObjectiveKind.DefeatBoss, null, area, area.Map.BossPosition);
+            }
         }
 
         private static bool HasUndefeatedBoss(GameSession session, FieldArea area) =>

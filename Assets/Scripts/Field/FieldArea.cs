@@ -108,7 +108,7 @@ namespace WordRPG.Field
         [SerializeField] private string displayName; // 예: "초원"
         [SerializeField] private FieldTheme theme = FieldTheme.Meadow;
 
-        [Tooltip(". 길  : 잔디(조우 없음)  , 풀숲(조우)  # 나무  ~ 물  P 시작 위치  D 출입구  /  옆에서 [확인]으로 사용: F 회복의 샘  C 보물상자  E 성유물 제단  S 상점  B 보스")]
+        [Tooltip(". 길  : 잔디(조우 없음)  , 풀숲(조우)  # 나무  ~ 물  P 시작 위치  D 출입구  /  옆에서 [확인]으로 사용: F 회복의 샘  C 보물상자  E 성유물 제단  S 상점  B 보스  G 보스 방 문  K 열쇠 받침대")]
         [TextArea(12, 40)]
         [SerializeField] private string map;
 
@@ -136,6 +136,12 @@ namespace WordRPG.Field
         [Header("보스 — 맵의 B (한 번 쓰러뜨리면 다시 나오지 않음)")]
         [SerializeField] private BossEncounter boss;
 
+        [Header("보스 방 문 — 맵의 G (#76)")]
+        [Tooltip("맵의 열쇠 받침대 'K'에서 얻는 열쇠 (종류 Key). 이 열쇠 + 단어 발견 수가 모이면 보스 방 문 'G'가 열린다")]
+        [SerializeField] private ItemData bossKey;
+        [Tooltip("보스 방 문을 열려면 이 지역 단어장에서 발견해야 하는 단어 수 (사용자 결정 40)")]
+        [SerializeField] private int bossGateWords = 40;
+
         [Header("정식판")]
         [Tooltip("정식판(인앱 결제)을 사야 들어갈 수 있는 지역 — 입구에서 정식판 안내가 뜬다 (#40, 숲부터)")]
         [SerializeField] private bool requiresFullVersion;
@@ -162,6 +168,8 @@ namespace WordRPG.Field
         public string DictionaryName => dictionaryName;
         public bool HasDictionary => !string.IsNullOrEmpty(dictionaryName);
         public bool RequiresFullVersion => requiresFullVersion;
+        public ItemData BossKey => bossKey;
+        public int BossGateWords => bossGateWords;
 
         // 맵 텍스트가 바뀌면 다시 해석 (인스펙터에서 고치면서 플레이할 수 있게)
         public FieldMap Map
@@ -196,11 +204,21 @@ namespace WordRPG.Field
                 case FieldTile.Shop: return shop != null ? shop.DisplayName : "상점";
                 case FieldTile.Boss: return Boss?.Species.DisplayName;
                 case FieldTile.Lectern: return HasDictionary ? dictionaryName : "빈 받침대";
+                case FieldTile.Gate: return IsMiddleOfGate(position) ? "보스 방 문" : null; // 여러 칸짜리 문은 가운데 칸에만
+                case FieldTile.Key: return bossKey != null ? bossKey.DisplayName : "열쇠";
                 case FieldTile.Door:
                     var exit = GetExit(position);
                     return exit != null && exit.Target != null ? exit.Target.DisplayName : null;
                 default: return null;
             }
+        }
+
+        private bool IsMiddleOfGate(Vector2Int position)
+        {
+            int left = position.x, right = position.x;
+            while (Map.Get(new Vector2Int(left - 1, position.y)) == FieldTile.Gate) left--;
+            while (Map.Get(new Vector2Int(right + 1, position.y)) == FieldTile.Gate) right++;
+            return position.x == left + (right - left) / 2;
         }
 
         // bossArea의 보스를 물리치면 열리는 출입구들 (연출에서 카메라가 찾아가 보여 준다)

@@ -24,57 +24,15 @@ MonoBehaviour:
     partOfSpeech: adj
     example: 
     exampleMeaning: 
-  - id: accent
-    english: accent
-    meaning: "\uC5B5\uC591, \uAC15\uC138"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: accept
     english: accept
     meaning: "\uBC1B\uC544\uB4E4\uC774\uB2E4, \uC218\uB77D\uD558\uB2E4"
     partOfSpeech: v
     example: 
     exampleMeaning: 
-  - id: accident
-    english: accident
-    meaning: "\uC0AC\uACE0, \uC6B0\uC5F0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: admire
-    english: admire
-    meaning: "\uAC10\uD0C4\uD558\uB2E4, \uC874\uACBD\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: adventure
-    english: adventure
-    meaning: "\uBAA8\uD5D8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: advice
     english: advice
     meaning: "\uC870\uC5B8, \uCDA9\uACE0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: advise
-    english: advise
-    meaning: "\uC870\uC5B8\uD558\uB2E4, \uAD8C\uACE0\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: aim
-    english: aim
-    meaning: "\uBAA9\uD45C, \uACA8\uB0E5"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: airline
-    english: airline
-    meaning: "\uD56D\uACF5\uC0AC"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -84,46 +42,10 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: alarm
-    english: alarm
-    meaning: "\uACBD\uBCF4, \uC790\uBA85\uC885"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: alive
-    english: alive
-    meaning: "\uC0B4\uC544 \uC788\uB294"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
   - id: allow
     english: allow
     meaning: "\uD5C8\uB77D\uD558\uB2E4, \uD5C8\uC6A9\uD558\uB2E4"
     partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: aloud
-    english: aloud
-    meaning: "\uC18C\uB9AC \uB0B4\uC5B4"
-    partOfSpeech: adv
-    example: 
-    exampleMeaning: 
-  - id: amaze
-    english: amaze
-    meaning: "\uAE5C\uC9DD \uB180\uB77C\uAC8C \uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: ambulance
-    english: ambulance
-    meaning: "\uAD6C\uAE09\uCC28"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: among
-    english: among
-    meaning: "~ \uC0AC\uC774\uC5D0, ~ \uC911\uC5D0"
-    partOfSpeech: prep
     example: 
     exampleMeaning: 
   - id: amount
@@ -132,51 +54,9 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: angel
-    english: angel
-    meaning: "\uCC9C\uC0AC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: anger
-    english: anger
-    meaning: "\uBD84\uB178, \uD654"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: annoy
-    english: annoy
-    meaning: "\uC9DC\uC99D\uB098\uAC8C \uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: ant
-    english: ant
-    meaning: "\uAC1C\uBBF8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: apart
-    english: apart
-    meaning: "\uB5A8\uC5B4\uC838, \uB530\uB85C"
-    partOfSpeech: adv
-    example: 
-    exampleMeaning: 
   - id: appear
     english: appear
     meaning: "\uB098\uD0C0\uB098\uB2E4, ~\uCC98\uB7FC \uBCF4\uC774\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: apply
-    english: apply
-    meaning: "\uC9C0\uC6D0\uD558\uB2E4, \uC801\uC6A9\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: argue
-    english: argue
-    meaning: "\uB17C\uC7C1\uD558\uB2E4, \uC8FC\uC7A5\uD558\uB2E4"
     partOfSpeech: v
     example: 
     exampleMeaning: 
@@ -186,27 +66,9 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: aside
-    english: aside
-    meaning: "\uC606\uC73C\uB85C, \uB530\uB85C"
-    partOfSpeech: adv
-    example: 
-    exampleMeaning: 
-  - id: asleep
-    english: asleep
-    meaning: "\uC7A0\uB4E0"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
   - id: attack
     english: attack
     meaning: "\uACF5\uACA9\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: attend
-    english: attend
-    meaning: "\uCC38\uC11D\uD558\uB2E4"
     partOfSpeech: v
     example: 
     exampleMeaning: 
@@ -216,27 +78,9 @@ MonoBehaviour:
     partOfSpeech: v
     example: 
     exampleMeaning: 
-  - id: awake
-    english: awake
-    meaning: "\uAE68\uC5B4 \uC788\uB294"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
   - id: award
     english: award
     meaning: "\uC0C1, \uC0C1\uAE08"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: bacon
-    english: bacon
-    meaning: "\uBCA0\uC774\uCEE8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: balloon
-    english: balloon
-    meaning: "\uD48D\uC120"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -246,27 +90,9 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: bang
-    english: bang
-    meaning: "\uCF85 \uCE58\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
   - id: bar
     english: bar
     meaning: "\uB9C9\uB300, \uC220\uC9D1"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: bark
-    english: bark
-    meaning: "\uC9D6\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: battery
-    english: battery
-    meaning: "\uAC74\uC804\uC9C0, \uBC30\uD130\uB9AC"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -276,52 +102,10 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: bean
-    english: bean
-    meaning: "\uCF69"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: beat
     english: beat
     meaning: "\uC774\uAE30\uB2E4, \uB450\uB4DC\uB9AC\uB2E4"
     partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: beer
-    english: beer
-    meaning: "\uB9E5\uC8FC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: belief
-    english: belief
-    meaning: "\uBBFF\uC74C, \uC2E0\uB150"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: belong
-    english: belong
-    meaning: "~\uC5D0 \uC18D\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: bench
-    english: bench
-    meaning: "\uBCA4\uCE58, \uAE34 \uC758\uC790"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: bend
-    english: bend
-    meaning: "\uAD6C\uBD80\uB9AC\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: bin
-    english: bin
-    meaning: "\uC4F0\uB808\uAE30\uD1B5, \uD1B5"
-    partOfSpeech: n
     example: 
     exampleMeaning: 
   - id: bit
@@ -330,117 +114,9 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: bite
-    english: bite
-    meaning: "\uBB3C\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: bitter
-    english: bitter
-    meaning: "\uC4F4, \uC4F0\uB77C\uB9B0"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: blank
-    english: blank
-    meaning: "\uBE48, \uACF5\uBC31\uC758"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: blanket
-    english: blanket
-    meaning: "\uB2F4\uC694"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: bless
-    english: bless
-    meaning: "\uCD95\uBCF5\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: blind
-    english: blind
-    meaning: "\uB208\uC774 \uBA3C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
   - id: block
     english: block
     meaning: "\uB369\uC5B4\uB9AC, \uAD6C\uC5ED"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: blonde
-    english: blonde
-    meaning: "\uAE08\uBC1C\uC758"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: bloom
-    english: bloom
-    meaning: "\uAF43\uC774 \uD53C\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: blow
-    english: blow
-    meaning: "\uBD88\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: boil
-    english: boil
-    meaning: "\uB053\uB2E4, \uB053\uC774\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: bomb
-    english: bomb
-    meaning: "\uD3ED\uD0C4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: boot
-    english: boot
-    meaning: "\uBD80\uCE20, \uC7A5\uD654"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: bore
-    english: bore
-    meaning: "\uC9C0\uB8E8\uD558\uAC8C \uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: boss
-    english: boss
-    meaning: "\uC0C1\uC0AC, \uC6B0\uB450\uBA38\uB9AC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: bother
-    english: bother
-    meaning: "\uADC0\uCC2E\uAC8C \uD558\uB2E4, \uC2E0\uACBD \uC4F0\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: bounce
-    english: bounce
-    meaning: "\uD280\uB2E4, \uD280\uAE30\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: bow
-    english: bow
-    meaning: "\uC808\uD558\uB2E4, \uACE0\uAC1C\uB97C \uC219\uC774\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: bowl
-    english: bowl
-    meaning: "\uADF8\uB987, \uC0AC\uBC1C"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -450,117 +126,15 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: brake
-    english: brake
-    meaning: "\uBE0C\uB808\uC774\uD06C, \uC81C\uB3D9 \uC7A5\uCE58"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: branch
-    english: branch
-    meaning: "\uB098\uBB47\uAC00\uC9C0, \uC9C0\uC810"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: brand
     english: brand
     meaning: "\uC0C1\uD45C, \uBE0C\uB79C\uB4DC"
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: breath
-    english: breath
-    meaning: "\uC228, \uD638\uD761"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: brick
-    english: brick
-    meaning: "\uBCBD\uB3CC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: bubble
-    english: bubble
-    meaning: "\uAC70\uD488, \uBC29\uC6B8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: bug
-    english: bug
-    meaning: "\uBC8C\uB808, (\uD504\uB85C\uADF8\uB7A8) \uC624\uB958"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: bump
-    english: bump
-    meaning: "\uBD80\uB52A\uCE58\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: bunch
-    english: bunch
-    meaning: "\uB2E4\uBC1C, \uC1A1\uC774"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: bury
-    english: bury
-    meaning: "\uBB3B\uB2E4, \uB9E4\uC7A5\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: bush
-    english: bush
-    meaning: "\uB364\uBD88, \uAD00\uBAA9"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: cable
-    english: cable
-    meaning: "\uC804\uC120, \uCF00\uC774\uBE14"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: cage
-    english: cage
-    meaning: "\uC0C8\uC7A5, \uC6B0\uB9AC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: calendar
-    english: calendar
-    meaning: "\uB2EC\uB825"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: calm
-    english: calm
-    meaning: "\uCE68\uCC29\uD55C, \uACE0\uC694\uD55C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
   - id: career
     english: career
     meaning: "\uC9C1\uC5C5, \uACBD\uB825"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: carpet
-    english: carpet
-    meaning: "\uC591\uD0C4\uC790, \uCE74\uD3AB"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: cart
-    english: cart
-    meaning: "\uC190\uC218\uB808, \uCE74\uD2B8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: castle
-    english: castle
-    meaning: "\uC131"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -576,87 +150,9 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: chain
-    english: chain
-    meaning: "\uC0AC\uC2AC, \uCCB4\uC778"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: champion
-    english: champion
-    meaning: "\uC6B0\uC2B9\uC790, \uCC54\uD53C\uC5B8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: chart
-    english: chart
-    meaning: "\uB3C4\uD45C, \uCC28\uD2B8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: chase
-    english: chase
-    meaning: "\uB4A4\uCAD3\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: chat
-    english: chat
-    meaning: "\uC218\uB2E4 \uB5A8\uB2E4, \uCC44\uD305\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: cheek
-    english: cheek
-    meaning: "\uBEA8, \uBCFC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: cheer
-    english: cheer
-    meaning: "\uC751\uC6D0\uD558\uB2E4, \uD658\uD638\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: chest
-    english: chest
-    meaning: "\uAC00\uC2B4, \uC0C1\uC790"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: chew
-    english: chew
-    meaning: "\uC539\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: chip
-    english: chip
-    meaning: "\uC870\uAC01, \uCE69"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: choice
     english: choice
     meaning: "\uC120\uD0DD"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: chop
-    english: chop
-    meaning: "\uC370\uB2E4, \uC790\uB974\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: cinema
-    english: cinema
-    meaning: "\uC601\uD654\uAD00"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: clerk
-    english: clerk
-    meaning: "\uC810\uC6D0, \uC0AC\uBB34\uC6D0"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -666,33 +162,9 @@ MonoBehaviour:
     partOfSpeech: v
     example: 
     exampleMeaning: 
-  - id: cliff
-    english: cliff
-    meaning: "\uC808\uBCBD"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: clip
-    english: clip
-    meaning: "\uD074\uB9BD, \uC9E7\uC740 \uC601\uC0C1"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: clue
-    english: clue
-    meaning: "\uB2E8\uC11C, \uC2E4\uB9C8\uB9AC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: coach
     english: coach
     meaning: "\uCF54\uCE58, \uAC10\uB3C5"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: coal
-    english: coal
-    meaning: "\uC11D\uD0C4"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -708,69 +180,15 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: coin
-    english: coin
-    meaning: "\uB3D9\uC804"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: comedy
-    english: comedy
-    meaning: "\uD76C\uADF9, \uCF54\uBBF8\uB514"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: common
     english: common
     meaning: "\uD754\uD55C, \uACF5\uD1B5\uC758"
     partOfSpeech: adj
     example: 
     exampleMeaning: 
-  - id: concert
-    english: concert
-    meaning: "\uC5F0\uC8FC\uD68C, \uCF58\uC11C\uD2B8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: cop
-    english: cop
-    meaning: "\uACBD\uCC30\uAD00"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: copy
-    english: copy
-    meaning: "\uBCF5\uC0AC\uD558\uB2E4, \uBCA0\uB07C\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: cotton
-    english: cotton
-    meaning: "\uBA74, \uBAA9\uD654"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: cough
-    english: cough
-    meaning: "\uAE30\uCE68\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
   - id: count
     english: count
     meaning: "\uC138\uB2E4, \uC911\uC694\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: crash
-    english: crash
-    meaning: "\uCDA9\uB3CC\uD558\uB2E4, \uCD94\uB77D\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: crawl
-    english: crawl
-    meaning: "\uAE30\uC5B4\uAC00\uB2E4"
     partOfSpeech: v
     example: 
     exampleMeaning: 
@@ -786,51 +204,9 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: crowd
-    english: crowd
-    meaning: "\uAD70\uC911, \uBB34\uB9AC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: crown
-    english: crown
-    meaning: "\uC655\uAD00"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: cruel
-    english: cruel
-    meaning: "\uC794\uC778\uD55C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: cure
-    english: cure
-    meaning: "\uCE58\uB8CC\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: cute
-    english: cute
-    meaning: "\uADC0\uC5EC\uC6B4"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: cycle
-    english: cycle
-    meaning: "\uC21C\uD658, \uC8FC\uAE30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: damage
     english: damage
     meaning: "\uC190\uC0C1, \uD53C\uD574"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: dawn
-    english: dawn
-    meaning: "\uC0C8\uBCBD"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -840,160 +216,16 @@ MonoBehaviour:
     partOfSpeech: v
     example: 
     exampleMeaning: 
-  - id: delay
-    english: delay
-    meaning: "\uC9C0\uC5F0\uC2DC\uD0A4\uB2E4, \uBBF8\uB8E8\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: dentist
-    english: dentist
-    meaning: "\uCE58\uACFC \uC758\uC0AC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: depend
-    english: depend
-    meaning: "\uC758\uC874\uD558\uB2E4, ~\uC5D0 \uB2EC\uB824 \uC788\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: desert
-    english: desert
-    meaning: "\uC0AC\uB9C9"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: detail
-    english: detail
-    meaning: "\uC138\uBD80 \uC0AC\uD56D"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: diary
-    english: diary
-    meaning: "\uC77C\uAE30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: dictionary
-    english: dictionary
-    meaning: "\uC0AC\uC804"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: diet
-    english: diet
-    meaning: "\uC2DD\uB2E8, \uB2E4\uC774\uC5B4\uD2B8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: dig
-    english: dig
-    meaning: "\uD30C\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
   - id: direct
     english: direct
     meaning: "\uC9C1\uC811\uC801\uC778, \uB611\uBC14\uB978"
     partOfSpeech: adj
     example: 
     exampleMeaning: 
-  - id: dirt
-    english: dirt
-    meaning: "\uBA3C\uC9C0, \uD759"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: disc
-    english: disc
-    meaning: "\uC6D0\uBC18, \uB514\uC2A4\uD06C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: dish
-    english: dish
-    meaning: "\uC811\uC2DC, \uC694\uB9AC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: dive
-    english: dive
-    meaning: "\uB6F0\uC5B4\uB4E4\uB2E4, \uC7A0\uC218\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: divide
-    english: divide
-    meaning: "\uB098\uB204\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: dolphin
-    english: dolphin
-    meaning: "\uB3CC\uACE0\uB798"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: donate
-    english: donate
-    meaning: "\uAE30\uBD80\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: dozen
-    english: dozen
-    meaning: "12\uAC1C, \uB2E4\uC2A4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: drag
-    english: drag
-    meaning: "\uB04C\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: drama
-    english: drama
-    meaning: "\uB4DC\uB77C\uB9C8, \uADF9"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: drug
     english: drug
     meaning: "\uC57D, \uB9C8\uC57D"
     partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: dust
-    english: dust
-    meaning: "\uBA3C\uC9C0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: each
-    english: each
-    meaning: "\uAC01\uAC01\uC758"
-    partOfSpeech: det
-    example: 
-    exampleMeaning: 
-  - id: earn
-    english: earn
-    meaning: "\uBC8C\uB2E4, \uC5BB\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: edge
-    english: edge
-    meaning: "\uAC00\uC7A5\uC790\uB9AC, \uBAA8\uC11C\uB9AC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: edit
-    english: edit
-    meaning: "\uD3B8\uC9D1\uD558\uB2E4"
-    partOfSpeech: v
     example: 
     exampleMeaning: 
   - id: effect
@@ -1008,58 +240,10 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: either
-    english: either
-    meaning: "\uB458 \uC911 \uC5B4\uB290 \uD558\uB098\uC758"
-    partOfSpeech: det
-    example: 
-    exampleMeaning: 
-  - id: else
-    english: else
-    meaning: "\uADF8 \uBC16\uC5D0, \uB2E4\uB978"
-    partOfSpeech: adv
-    example: 
-    exampleMeaning: 
-  - id: empty
-    english: empty
-    meaning: "\uBE44\uC5B4 \uC788\uB294"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: enemy
-    english: enemy
-    meaning: "\uC801"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: engine
     english: engine
     meaning: "\uC5D4\uC9C4"
     partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: equal
-    english: equal
-    meaning: "\uAC19\uC740, \uD3C9\uB4F1\uD55C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: escape
-    english: escape
-    meaning: "\uD0C8\uCD9C\uD558\uB2E4, \uBC97\uC5B4\uB098\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: essay
-    english: essay
-    meaning: "\uC218\uD544, \uC5D0\uC138\uC774"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: even
-    english: even
-    meaning: "~\uC870\uCC28, \uC2EC\uC9C0\uC5B4"
-    partOfSpeech: adv
     example: 
     exampleMeaning: 
   - id: event
@@ -1068,64 +252,10 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: ever
-    english: ever
-    meaning: "\uC5B8\uC820\uAC00, \uC9C0\uAE08\uAE4C\uC9C0"
-    partOfSpeech: adv
-    example: 
-    exampleMeaning: 
-  - id: evil
-    english: evil
-    meaning: "\uC0AC\uC545\uD55C, \uB098\uC05C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: exact
-    english: exact
-    meaning: "\uC815\uD655\uD55C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: except
-    english: except
-    meaning: "~\uC744 \uC81C\uC678\uD558\uACE0"
-    partOfSpeech: prep
-    example: 
-    exampleMeaning: 
-  - id: excite
-    english: excite
-    meaning: "\uD765\uBD84\uC2DC\uD0A4\uB2E4, \uB4E4\uB728\uAC8C \uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: excuse
-    english: excuse
-    meaning: "\uBCC0\uBA85, \uD551\uACC4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: exist
-    english: exist
-    meaning: "\uC874\uC7AC\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: exit
-    english: exit
-    meaning: "\uCD9C\uAD6C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: expect
     english: expect
     meaning: "\uAE30\uB300\uD558\uB2E4, \uC608\uC0C1\uD558\uB2E4"
     partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: expert
-    english: expert
-    meaning: "\uC804\uBB38\uAC00"
-    partOfSpeech: n
     example: 
     exampleMeaning: 
   - id: explain
@@ -1140,27 +270,9 @@ MonoBehaviour:
     partOfSpeech: adj
     example: 
     exampleMeaning: 
-  - id: factory
-    english: factory
-    meaning: "\uACF5\uC7A5"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: fair
     english: fair
     meaning: "\uACF5\uC815\uD55C, \uD0C0\uB2F9\uD55C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: fancy
-    english: fancy
-    meaning: "\uD654\uB824\uD55C, \uACE0\uAE09\uC758"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: fantastic
-    english: fantastic
-    meaning: "\uD658\uC0C1\uC801\uC778, \uBA4B\uC9C4"
     partOfSpeech: adj
     example: 
     exampleMeaning: 
@@ -1170,57 +282,15 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: fault
-    english: fault
-    meaning: "\uC798\uBABB, \uACB0\uC810"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: favor
-    english: favor
-    meaning: "\uD638\uC758, \uBD80\uD0C1"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: fear
     english: fear
     meaning: "\uB450\uB824\uC6C0, \uACF5\uD3EC"
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: fee
-    english: fee
-    meaning: "\uC694\uAE08, \uC218\uC218\uB8CC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: feed
-    english: feed
-    meaning: "\uBA39\uC774\uB97C \uC8FC\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
   - id: female
     english: female
     meaning: "\uC5EC\uC131\uC758, \uC554\uCEF7\uC758"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: fence
-    english: fence
-    meaning: "\uC6B8\uD0C0\uB9AC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: fever
-    english: fever
-    meaning: "\uC5F4, \uC5F4\uBCD1"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: few
-    english: few
-    meaning: "\uAC70\uC758 \uC5C6\uB294, \uBA87\uBA87\uC758"
     partOfSpeech: adj
     example: 
     exampleMeaning: 
@@ -1236,64 +306,10 @@ MonoBehaviour:
     partOfSpeech: v
     example: 
     exampleMeaning: 
-  - id: flag
-    english: flag
-    meaning: "\uAE43\uBC1C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: flame
-    english: flame
-    meaning: "\uBD88\uAF43, \uBD88\uAE38"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: flash
-    english: flash
-    meaning: "\uC12C\uAD11, \uBC88\uCA4D\uC784"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: flat
-    english: flat
-    meaning: "\uD3C9\uD3C9\uD55C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
   - id: flight
     english: flight
     meaning: "\uBE44\uD589, \uD56D\uACF5\uD3B8"
     partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: float
-    english: float
-    meaning: "\uB728\uB2E4, \uB5A0\uB2E4\uB2C8\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: flood
-    english: flood
-    meaning: "\uD64D\uC218"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: flow
-    english: flow
-    meaning: "\uD750\uB974\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: fog
-    english: fog
-    meaning: "\uC548\uAC1C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: fold
-    english: fold
-    meaning: "\uC811\uB2E4"
-    partOfSpeech: v
     example: 
     exampleMeaning: 
   - id: follow
@@ -1308,154 +324,10 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: forever
-    english: forever
-    meaning: "\uC601\uC6D0\uD788"
-    partOfSpeech: adv
-    example: 
-    exampleMeaning: 
-  - id: frame
-    english: frame
-    meaning: "\uD2C0, \uC561\uC790"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: freeze
-    english: freeze
-    meaning: "\uC5BC\uB2E4, \uC5BC\uB9AC\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: frog
-    english: frog
-    meaning: "\uAC1C\uAD6C\uB9AC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: fry
-    english: fry
-    meaning: "\uD280\uAE30\uB2E4, \uBCF6\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: fur
-    english: fur
-    meaning: "\uD138, \uBAA8\uD53C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: garage
-    english: garage
-    meaning: "\uCC28\uACE0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: gate
-    english: gate
-    meaning: "\uBB38, \uCD9C\uC785\uAD6C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: gather
-    english: gather
-    meaning: "\uBAA8\uC73C\uB2E4, \uBAA8\uC774\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: gentle
-    english: gentle
-    meaning: "\uC628\uD654\uD55C, \uBD80\uB4DC\uB7EC\uC6B4"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: ghost
-    english: ghost
-    meaning: "\uC720\uB839"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: giant
-    english: giant
-    meaning: "\uAC70\uC778"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: gift
-    english: gift
-    meaning: "\uC120\uBB3C, \uC7AC\uB2A5"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: giraffe
-    english: giraffe
-    meaning: "\uAE30\uB9B0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: glove
-    english: glove
-    meaning: "\uC7A5\uAC11"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: glue
-    english: glue
-    meaning: "\uD480, \uC811\uCC29\uC81C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: golf
-    english: golf
-    meaning: "\uACE8\uD504"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: grab
-    english: grab
-    meaning: "\uBD99\uC7A1\uB2E4, \uC6C0\uCF1C\uC950\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: grade
-    english: grade
-    meaning: "\uC131\uC801, \uD559\uB144"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: grand
     english: grand
     meaning: "\uC6C5\uC7A5\uD55C, \uAC70\uB300\uD55C"
     partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: graph
-    english: graph
-    meaning: "\uADF8\uB798\uD504, \uB3C4\uD45C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: greet
-    english: greet
-    meaning: "\uB9DE\uC774\uD558\uB2E4, \uC778\uC0AC\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: guard
-    english: guard
-    meaning: "\uACBD\uBE44\uC6D0, \uACBD\uACC4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: guest
-    english: guest
-    meaning: "\uC190\uB2D8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: guide
-    english: guide
-    meaning: "\uC548\uB0B4\uC790, \uC548\uB0B4\uC11C"
-    partOfSpeech: n
     example: 
     exampleMeaning: 
   - id: gun
@@ -1476,28 +348,10 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: handle
-    english: handle
-    meaning: "\uB2E4\uB8E8\uB2E4, \uCC98\uB9AC\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: handsome
-    english: handsome
-    meaning: "\uC798\uC0DD\uAE34"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
   - id: happen
     english: happen
     meaning: "\uC77C\uC5B4\uB098\uB2E4, \uBC1C\uC0DD\uD558\uB2E4"
     partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: harm
-    english: harm
-    meaning: "\uD574, \uD53C\uD574"
-    partOfSpeech: n
     example: 
     exampleMeaning: 
   - id: health
@@ -1512,57 +366,9 @@ MonoBehaviour:
     partOfSpeech: v
     example: 
     exampleMeaning: 
-  - id: heaven
-    english: heaven
-    meaning: "\uCC9C\uAD6D, \uD558\uB298"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: height
-    english: height
-    meaning: "\uB192\uC774, \uD0A4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: helicopter
-    english: helicopter
-    meaning: "\uD5EC\uB9AC\uCF65\uD130"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: hell
     english: hell
     meaning: "\uC9C0\uC625"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: hide
-    english: hide
-    meaning: "\uC228\uB2E4, \uC228\uAE30\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: hint
-    english: hint
-    meaning: "\uD78C\uD2B8, \uC554\uC2DC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: hole
-    english: hole
-    meaning: "\uAD6C\uBA4D"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: honey
-    english: honey
-    meaning: "\uAFC0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: honor
-    english: honor
-    meaning: "\uBA85\uC608, \uC601\uAD11"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -1572,51 +378,15 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: hug
-    english: hug
-    meaning: "\uAEF4\uC548\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
   - id: huge
     english: huge
     meaning: "\uAC70\uB300\uD55C"
     partOfSpeech: adj
     example: 
     exampleMeaning: 
-  - id: humor
-    english: humor
-    meaning: "\uC720\uBA38, \uC775\uC0B4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: hunger
-    english: hunger
-    meaning: "\uBC30\uACE0\uD514, \uAD76\uC8FC\uB9BC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: hurt
     english: hurt
     meaning: "\uB2E4\uCE58\uAC8C \uD558\uB2E4, \uC544\uD504\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: ignore
-    english: ignore
-    meaning: "\uBB34\uC2DC\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: ill
-    english: ill
-    meaning: "\uC544\uD508, \uBCD1\uB4E0"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: injure
-    english: injure
-    meaning: "\uB2E4\uCE58\uAC8C \uD558\uB2E4, \uBD80\uC0C1\uC744 \uC785\uD788\uB2E4"
     partOfSpeech: v
     example: 
     exampleMeaning: 
@@ -1626,51 +396,9 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: invent
-    english: invent
-    meaning: "\uBC1C\uBA85\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: iron
-    english: iron
-    meaning: "\uCCA0, \uB2E4\uB9AC\uBBF8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: island
     english: island
     meaning: "\uC12C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: item
-    english: item
-    meaning: "\uBB3C\uD488, \uD56D\uBAA9"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: jaw
-    english: jaw
-    meaning: "\uD131, \uD131\uBF08"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: jeans
-    english: jeans
-    meaning: "\uCCAD\uBC14\uC9C0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: joke
-    english: joke
-    meaning: "\uB18D\uB2F4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: joy
-    english: joy
-    meaning: "\uAE30\uC068, \uC990\uAC70\uC6C0"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -1680,58 +408,10 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: junior
-    english: junior
-    meaning: "\uC190\uC544\uB798\uC758, \uD558\uAE09\uC758"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: knee
-    english: knee
-    meaning: "\uBB34\uB98E"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: knock
-    english: knock
-    meaning: "\uB450\uB4DC\uB9AC\uB2E4, \uB178\uD06C\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: label
-    english: label
-    meaning: "\uC0C1\uD45C, \uAF2C\uB9AC\uD45C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: lamb
-    english: lamb
-    meaning: "\uC5B4\uB9B0 \uC591, \uC591\uACE0\uAE30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: lamp
-    english: lamp
-    meaning: "\uB4F1, \uB7A8\uD504"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: lane
-    english: lane
-    meaning: "\uCC28\uC120, \uC881\uC740 \uAE38"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: language
     english: language
     meaning: "\uC5B8\uC5B4"
     partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: laugh
-    english: laugh
-    meaning: "\uC6C3\uB2E4"
-    partOfSpeech: v
     example: 
     exampleMeaning: 
   - id: law
@@ -1740,28 +420,10 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: lawn
-    english: lawn
-    meaning: "\uC794\uB514\uBC2D"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: lawyer
-    english: lawyer
-    meaning: "\uBCC0\uD638\uC0AC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: lead
     english: lead
     meaning: "\uC774\uB04C\uB2E4, \uC548\uB0B4\uD558\uB2E4"
     partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: leaf
-    english: leaf
-    meaning: "\uB098\uBB47\uC78E"
-    partOfSpeech: n
     example: 
     exampleMeaning: 
   - id: league
@@ -1773,18 +435,6 @@ MonoBehaviour:
   - id: leave
     english: leave
     meaning: "\uB5A0\uB098\uB2E4, \uB0A8\uAE30\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: lemon
-    english: lemon
-    meaning: "\uB808\uBAAC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: lend
-    english: lend
-    meaning: "\uBE4C\uB824\uC8FC\uB2E4"
     partOfSpeech: v
     example: 
     exampleMeaning: 
@@ -1800,24 +450,6 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: lid
-    english: lid
-    meaning: "\uB69C\uAED1"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: lift
-    english: lift
-    meaning: "\uB4E4\uC5B4 \uC62C\uB9AC\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: limit
-    english: limit
-    meaning: "\uD55C\uACC4, \uC81C\uD55C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: link
     english: link
     meaning: "\uC5F0\uACB0, \uACE0\uB9AC"
@@ -1830,33 +462,9 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: livingroom
-    english: livingroom
-    meaning: "\uAC70\uC2E4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: load
-    english: load
-    meaning: "\uC9D0, \uBD80\uB2F4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: local
     english: local
     meaning: "\uC9C0\uC5ED\uC758, \uD604\uC9C0\uC758"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: lock
-    english: lock
-    meaning: "\uC7A0\uADF8\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: loose
-    english: loose
-    meaning: "\uB290\uC2A8\uD55C, \uD5D0\uAC70\uC6B4"
     partOfSpeech: adj
     example: 
     exampleMeaning: 
@@ -1878,27 +486,9 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: loud
-    english: loud
-    meaning: "\uC2DC\uB044\uB7EC\uC6B4, \uD070 \uC18C\uB9AC\uC758"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
   - id: machine
     english: machine
     meaning: "\uAE30\uACC4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: magazine
-    english: magazine
-    meaning: "\uC7A1\uC9C0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: magic
-    english: magic
-    meaning: "\uB9C8\uBC95, \uB9C8\uC220"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -1920,21 +510,9 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: mask
-    english: mask
-    meaning: "\uAC00\uBA74, \uB9C8\uC2A4\uD06C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: match
     english: match
     meaning: "\uACBD\uAE30, \uC131\uB0E5"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: mate
-    english: mate
-    meaning: "\uCE5C\uAD6C, \uC9DD"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -1944,46 +522,10 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: maybe
-    english: maybe
-    meaning: "\uC544\uB9C8"
-    partOfSpeech: adv
-    example: 
-    exampleMeaning: 
-  - id: meal
-    english: meal
-    meaning: "\uC2DD\uC0AC, \uB07C\uB2C8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: mean
     english: mean
     meaning: "\uC758\uBBF8\uD558\uB2E4"
     partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: melon
-    english: melon
-    meaning: "\uBA5C\uB860"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: melt
-    english: melt
-    meaning: "\uB179\uB2E4, \uB179\uC774\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: menu
-    english: menu
-    meaning: "\uBA54\uB274, \uCC28\uB9BC\uD45C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: mess
-    english: mess
-    meaning: "\uC5C9\uB9DD, \uC9C0\uC800\uBD84\uD568"
-    partOfSpeech: n
     example: 
     exampleMeaning: 
   - id: message
@@ -1998,34 +540,10 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: method
-    english: method
-    meaning: "\uBC29\uBC95"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: microwave
-    english: microwave
-    meaning: "\uC804\uC790\uB808\uC778\uC9C0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: minute
     english: minute
     meaning: "\uBD84, \uC7A0\uAE50"
     partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: mirror
-    english: mirror
-    meaning: "\uAC70\uC6B8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: mix
-    english: mix
-    meaning: "\uC11E\uB2E4"
-    partOfSpeech: v
     example: 
     exampleMeaning: 
   - id: modern
@@ -2040,124 +558,10 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: mood
-    english: mood
-    meaning: "\uAE30\uBD84, \uBD84\uC704\uAE30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: motor
-    english: motor
-    meaning: "\uBAA8\uD130, \uC804\uB3D9\uAE30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: mud
-    english: mud
-    meaning: "\uC9C4\uD759"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: muscle
-    english: muscle
-    meaning: "\uADFC\uC721"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: museum
-    english: museum
-    meaning: "\uBC15\uBB3C\uAD00"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: mushroom
-    english: mushroom
-    meaning: "\uBC84\uC12F"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: nail
-    english: nail
-    meaning: "\uC190\uD1B1, \uBABB"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: narrow
-    english: narrow
-    meaning: "\uC881\uC740"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: native
-    english: native
-    meaning: "\uC6D0\uC8FC\uBBFC\uC758, \uBAA8\uAD6D\uC758"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: neat
-    english: neat
-    meaning: "\uAE54\uB054\uD55C, \uB2E8\uC815\uD55C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: neighbor
-    english: neighbor
-    meaning: "\uC774\uC6C3"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: nest
-    english: nest
-    meaning: "\uB465\uC9C0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: net
-    english: net
-    meaning: "\uADF8\uBB3C, \uB9DD"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: noise
-    english: noise
-    meaning: "\uC18C\uC74C, \uC2DC\uB044\uB7EC\uC6B4 \uC18C\uB9AC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: none
-    english: none
-    meaning: "\uC544\uBB34\uB3C4 ~ \uC54A\uB2E4, \uD558\uB098\uB3C4 ~ \uC54A\uB2E4"
-    partOfSpeech: pron
-    example: 
-    exampleMeaning: 
-  - id: noon
-    english: noon
-    meaning: "\uC815\uC624, \uB0AE 12\uC2DC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: notice
     english: notice
     meaning: "\uC54C\uC544\uCC28\uB9AC\uB2E4"
     partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: nut
-    english: nut
-    meaning: "\uACAC\uACFC, \uB108\uD2B8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: oak
-    english: oak
-    meaning: "\uCC38\uB098\uBB34"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: ocean
-    english: ocean
-    meaning: "\uB300\uC591, \uBC14\uB2E4"
-    partOfSpeech: n
     example: 
     exampleMeaning: 
   - id: offer
@@ -2166,87 +570,15 @@ MonoBehaviour:
     partOfSpeech: v
     example: 
     exampleMeaning: 
-  - id: once
-    english: once
-    meaning: "\uD55C \uBC88, \uD55C\uB54C"
-    partOfSpeech: adv
-    example: 
-    exampleMeaning: 
-  - id: opera
-    english: opera
-    meaning: "\uC624\uD398\uB77C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: order
     english: order
     meaning: "\uC8FC\uBB38, \uBA85\uB839, \uC21C\uC11C"
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: other
-    english: other
-    meaning: "\uB2E4\uB978, \uADF8 \uBC16\uC758"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: oven
-    english: oven
-    meaning: "\uC624\uBE10"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: own
-    english: own
-    meaning: "\uC790\uAE30 \uC790\uC2E0\uC758"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: pack
-    english: pack
-    meaning: "\uC2F8\uB2E4, \uD3EC\uC7A5\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
   - id: pain
     english: pain
     meaning: "\uACE0\uD1B5, \uC544\uD514"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: pair
-    english: pair
-    meaning: "\uD55C \uC30D, \uD55C \uCF24\uB808"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: palace
-    english: palace
-    meaning: "\uAD81\uC804"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: pan
-    english: pan
-    meaning: "\uB0C4\uBE44, \uD504\uB77C\uC774\uD32C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: panic
-    english: panic
-    meaning: "\uACF5\uD669, \uADF9\uC2EC\uD55C \uACF5\uD3EC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: parade
-    english: parade
-    meaning: "\uD589\uC9C4, \uD37C\uB808\uC774\uB4DC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: pardon
-    english: pardon
-    meaning: "\uC6A9\uC11C, (\uB2E4\uC2DC \uB9D0\uD574 \uB2EC\uB77C\uB294) \uBB50\uB77C\uACE0\uC694"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -2256,33 +588,9 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: path
-    english: path
-    meaning: "\uAE38, \uC624\uC194\uAE38"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: pause
-    english: pause
-    meaning: "\uC7A0\uC2DC \uBA48\uCD94\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
   - id: peace
     english: peace
     meaning: "\uD3C9\uD654"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: pear
-    english: pear
-    meaning: "\uBC30(\uACFC\uC77C)"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: pepper
-    english: pepper
-    meaning: "\uD6C4\uCD94, \uACE0\uCD94"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -2304,129 +612,15 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: pet
-    english: pet
-    meaning: "\uC560\uC644\uB3D9\uBB3C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: photograph
-    english: photograph
-    meaning: "\uC0AC\uC9C4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: picnic
-    english: picnic
-    meaning: "\uC18C\uD48D"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: pie
-    english: pie
-    meaning: "\uD30C\uC774"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: piece
     english: piece
     meaning: "\uC870\uAC01, \uD55C \uAC1C"
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: pin
-    english: pin
-    meaning: "\uD540, \uACE0\uC815 \uBC14\uB298"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: pine
-    english: pine
-    meaning: "\uC18C\uB098\uBB34"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: pipe
-    english: pipe
-    meaning: "\uAD00, \uD30C\uC774\uD504"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: plane
-    english: plane
-    meaning: "\uBE44\uD589\uAE30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: planet
-    english: planet
-    meaning: "\uD589\uC131"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: plant
     english: plant
     meaning: "\uC2DD\uBB3C, \uACF5\uC7A5"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: plate
-    english: plate
-    meaning: "\uC811\uC2DC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: plenty
-    english: plenty
-    meaning: "\uB9CE\uC74C, \uD48D\uBD80\uD568"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: plus
-    english: plus
-    meaning: "\uB354\uD558\uAE30, ~\uC5D0 \uB354\uD558\uC5EC"
-    partOfSpeech: prep
-    example: 
-    exampleMeaning: 
-  - id: pocket
-    english: pocket
-    meaning: "\uC8FC\uBA38\uB2C8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: poem
-    english: poem
-    meaning: "\uC2DC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: poet
-    english: poet
-    meaning: "\uC2DC\uC778"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: poison
-    english: poison
-    meaning: "\uB3C5, \uB3C5\uC57D"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: pole
-    english: pole
-    meaning: "\uB9C9\uB300\uAE30, \uADF9"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: polite
-    english: polite
-    meaning: "\uACF5\uC190\uD55C, \uC608\uC758 \uBC14\uB978"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: pool
-    english: pool
-    meaning: "\uC218\uC601\uC7A5, \uC6C5\uB369\uC774"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -2442,18 +636,6 @@ MonoBehaviour:
     partOfSpeech: adj
     example: 
     exampleMeaning: 
-  - id: pork
-    english: pork
-    meaning: "\uB3FC\uC9C0\uACE0\uAE30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: port
-    english: port
-    meaning: "\uD56D\uAD6C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: possible
     english: possible
     meaning: "\uAC00\uB2A5\uD55C"
@@ -2466,33 +648,9 @@ MonoBehaviour:
     partOfSpeech: v
     example: 
     exampleMeaning: 
-  - id: pot
-    english: pot
-    meaning: "\uB0C4\uBE44, \uD654\uBD84"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: pour
-    english: pour
-    meaning: "\uBD93\uB2E4, \uC3DF\uC544\uC9C0\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
   - id: practice
     english: practice
     meaning: "\uC5F0\uC2B5\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: pray
-    english: pray
-    meaning: "\uAE30\uB3C4\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: prepare
-    english: prepare
-    meaning: "\uC900\uBE44\uD558\uB2E4"
     partOfSpeech: v
     example: 
     exampleMeaning: 
@@ -2508,123 +666,9 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: pride
-    english: pride
-    meaning: "\uC790\uBD80\uC2EC, \uC790\uC874\uC2EC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: prize
-    english: prize
-    meaning: "\uC0C1, \uC0C1\uD488"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: promise
-    english: promise
-    meaning: "\uC57D\uC18D\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: proud
-    english: proud
-    meaning: "\uC790\uB791\uC2A4\uB7EC\uC6B4"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: prove
-    english: prove
-    meaning: "\uC99D\uBA85\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: pub
-    english: pub
-    meaning: "\uC220\uC9D1"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: pull
-    english: pull
-    meaning: "\uB04C\uB2E4, \uB2F9\uAE30\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: pump
-    english: pump
-    meaning: "\uD38C\uD504"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: punch
-    english: punch
-    meaning: "\uC8FC\uBA39\uC73C\uB85C \uCE58\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: pure
-    english: pure
-    meaning: "\uC21C\uC218\uD55C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: purple
-    english: purple
-    meaning: "\uBCF4\uB77C\uC0C9\uC758"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: puzzle
-    english: puzzle
-    meaning: "\uD37C\uC990, \uC218\uC218\uAED8\uB07C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: quit
-    english: quit
-    meaning: "\uADF8\uB9CC\uB450\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: quite
-    english: quite
-    meaning: "\uAF64, \uC0C1\uB2F9\uD788"
-    partOfSpeech: adv
-    example: 
-    exampleMeaning: 
-  - id: rainbow
-    english: rainbow
-    meaning: "\uBB34\uC9C0\uAC1C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: raise
-    english: raise
-    meaning: "\uB4E4\uC5B4 \uC62C\uB9AC\uB2E4, \uAE30\uB974\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: rare
-    english: rare
-    meaning: "\uB4DC\uBB38, \uD76C\uADC0\uD55C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: rat
-    english: rat
-    meaning: "\uC950"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: reach
     english: reach
     meaning: "\uB3C4\uCC29\uD558\uB2E4, \uB2FF\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: react
-    english: react
-    meaning: "\uBC18\uC751\uD558\uB2E4"
     partOfSpeech: v
     example: 
     exampleMeaning: 
@@ -2640,39 +684,9 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: relax
-    english: relax
-    meaning: "\uC26C\uB2E4, \uAE34\uC7A5\uC744 \uD480\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: rent
-    english: rent
-    meaning: "\uBE4C\uB9AC\uB2E4, \uC784\uB300\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: repeat
-    english: repeat
-    meaning: "\uBC18\uBCF5\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: reply
-    english: reply
-    meaning: "\uB300\uB2F5\uD558\uB2E4, \uB2F5\uC7A5\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
   - id: rest
     english: rest
     meaning: "\uD734\uC2DD, \uB098\uBA38\uC9C0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: rice
-    english: rice
-    meaning: "\uC300, \uBC25"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -2682,21 +696,9 @@ MonoBehaviour:
     partOfSpeech: v
     example: 
     exampleMeaning: 
-  - id: rise
-    english: rise
-    meaning: "\uC624\uB974\uB2E4, \uC77C\uC5B4\uB098\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
   - id: risk
     english: risk
     meaning: "\uC704\uD5D8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: rocket
-    english: rocket
-    meaning: "\uB85C\uCF13"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -2706,81 +708,15 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: roll
-    english: roll
-    meaning: "\uAD6C\uB974\uB2E4, \uAD74\uB9AC\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: roof
-    english: roof
-    meaning: "\uC9C0\uBD95"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: root
-    english: root
-    meaning: "\uBFCC\uB9AC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: rope
-    english: rope
-    meaning: "\uBC27\uC904"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: round
     english: round
     meaning: "\uB465\uADFC"
     partOfSpeech: adj
     example: 
     exampleMeaning: 
-  - id: row
-    english: row
-    meaning: "\uC904, \uC5F4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: rude
-    english: rude
-    meaning: "\uBB34\uB840\uD55C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
   - id: rule
     english: rule
     meaning: "\uADDC\uCE59, \uD1B5\uCE58"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: rush
-    english: rush
-    meaning: "\uC11C\uB450\uB974\uB2E4, \uB3CC\uC9C4\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: sail
-    english: sail
-    meaning: "\uD56D\uD574\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: sauce
-    english: sauce
-    meaning: "\uC18C\uC2A4, \uC591\uB150"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: scare
-    english: scare
-    meaning: "\uAC81\uC8FC\uB2E4, \uBB34\uC12D\uAC8C \uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: scarf
-    english: scarf
-    meaning: "\uBAA9\uB3C4\uB9AC, \uC2A4\uCE74\uD504"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -2796,21 +732,9 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: seat
-    english: seat
-    meaning: "\uC88C\uC11D, \uC790\uB9AC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: secret
     english: secret
     meaning: "\uBE44\uBC00"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: seed
-    english: seed
-    meaning: "\uC528\uC557"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -2832,93 +756,9 @@ MonoBehaviour:
     partOfSpeech: v
     example: 
     exampleMeaning: 
-  - id: shake
-    english: shake
-    meaning: "\uD754\uB4E4\uB2E4, \uB5A8\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: shape
-    english: shape
-    meaning: "\uBAA8\uC591, \uD615\uD0DC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: share
     english: share
     meaning: "\uB098\uB204\uB2E4, \uACF5\uC720\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: sharp
-    english: sharp
-    meaning: "\uB0A0\uCE74\uB85C\uC6B4, \uC608\uB9AC\uD55C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: sheep
-    english: sheep
-    meaning: "\uC591"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: sheet
-    english: sheet
-    meaning: "(\uC885\uC774) \uD55C \uC7A5, \uC2DC\uD2B8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: shelf
-    english: shelf
-    meaning: "\uC120\uBC18"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: shell
-    english: shell
-    meaning: "\uAECD\uB370\uAE30, \uC870\uAC1C\uAECD\uC9C8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: shine
-    english: shine
-    meaning: "\uBE5B\uB098\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: shock
-    english: shock
-    meaning: "\uCDA9\uACA9"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: shoot
-    english: shoot
-    meaning: "\uC3D8\uB2E4, \uCD2C\uC601\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: shoulder
-    english: shoulder
-    meaning: "\uC5B4\uAE68"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: shout
-    english: shout
-    meaning: "\uC678\uCE58\uB2E4, \uC18C\uB9AC\uCE58\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: shower
-    english: shower
-    meaning: "\uC0E4\uC6CC, \uC18C\uB098\uAE30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: shut
-    english: shut
-    meaning: "\uB2EB\uB2E4"
     partOfSpeech: v
     example: 
     exampleMeaning: 
@@ -2928,52 +768,10 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: silly
-    english: silly
-    meaning: "\uC5B4\uB9AC\uC11D\uC740, \uBC14\uBCF4 \uAC19\uC740"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: silver
-    english: silver
-    meaning: "\uC740"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: simple
     english: simple
     meaning: "\uAC04\uB2E8\uD55C, \uB2E8\uC21C\uD55C"
     partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: since
-    english: since
-    meaning: "~ \uC774\uD6C4\uB85C, ~ \uB54C\uBB38\uC5D0"
-    partOfSpeech: conj
-    example: 
-    exampleMeaning: 
-  - id: sink
-    english: sink
-    meaning: "\uAC00\uB77C\uC549\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: skill
-    english: skill
-    meaning: "\uAE30\uC220, \uC19C\uC528"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: slide
-    english: slide
-    meaning: "\uBBF8\uB044\uB7EC\uC9C0\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: slip
-    english: slip
-    meaning: "(\uBC1C\uC744) \uD5DB\uB514\uB514\uB2E4, \uBBF8\uB044\uB7EC\uC9C0\uB2E4"
-    partOfSpeech: v
     example: 
     exampleMeaning: 
   - id: smart
@@ -2982,64 +780,10 @@ MonoBehaviour:
     partOfSpeech: adj
     example: 
     exampleMeaning: 
-  - id: smoke
-    english: smoke
-    meaning: "\uC5F0\uAE30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: snack
-    english: snack
-    meaning: "\uAC04\uC2DD"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: snake
-    english: snake
-    meaning: "\uBC40"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: soil
-    english: soil
-    meaning: "\uD759, \uD1A0\uC591"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: solve
-    english: solve
-    meaning: "\uD480\uB2E4, \uD574\uACB0\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: soon
-    english: soon
-    meaning: "\uACE7"
-    partOfSpeech: adv
-    example: 
-    exampleMeaning: 
   - id: sort
     english: sort
     meaning: "\uC885\uB958"
     partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: soul
-    english: soul
-    meaning: "\uC601\uD63C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: sour
-    english: sour
-    meaning: "\uC2E0, \uC2DC\uD07C\uD55C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: spell
-    english: spell
-    meaning: "\uCCA0\uC790\uB97C \uC4F0\uB2E4"
-    partOfSpeech: v
     example: 
     exampleMeaning: 
   - id: spend
@@ -3054,40 +798,10 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: spray
-    english: spray
-    meaning: "\uBFCC\uB9AC\uB2E4, \uBD84\uC0AC\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: spy
-    english: spy
-    meaning: "\uC2A4\uD30C\uC774, \uCCA9\uBCF4\uC6D0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: stage
     english: stage
     meaning: "\uBB34\uB300, \uB2E8\uACC4"
     partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: stairs
-    english: stairs
-    meaning: "\uACC4\uB2E8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: stamp
-    english: stamp
-    meaning: "\uC6B0\uD45C, \uB3C4\uC7A5"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: stare
-    english: stare
-    meaning: "\uBE64\uD788 \uCCD0\uB2E4\uBCF4\uB2E4"
-    partOfSpeech: v
     example: 
     exampleMeaning: 
   - id: station
@@ -3096,69 +810,9 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: steal
-    english: steal
-    meaning: "\uD6D4\uCE58\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: steam
-    english: steam
-    meaning: "\uC99D\uAE30, \uAE40"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: steel
-    english: steel
-    meaning: "\uAC15\uCCA0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: step
     english: step
     meaning: "\uAC78\uC74C, \uB2E8\uACC4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: stick
-    english: stick
-    meaning: "\uB9C9\uB300\uAE30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: still
-    english: still
-    meaning: "\uC544\uC9C1, \uC5EC\uC804\uD788"
-    partOfSpeech: adv
-    example: 
-    exampleMeaning: 
-  - id: storm
-    english: storm
-    meaning: "\uD3ED\uD48D"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: strange
-    english: strange
-    meaning: "\uC774\uC0C1\uD55C, \uB0AF\uC120"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: strawberry
-    english: strawberry
-    meaning: "\uB538\uAE30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: stress
-    english: stress
-    meaning: "\uC2A4\uD2B8\uB808\uC2A4, \uC555\uBC15"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: studio
-    english: studio
-    meaning: "\uC791\uC5C5\uC2E4, \uC2A4\uD29C\uB514\uC624"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -3174,81 +828,15 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: such
-    english: such
-    meaning: "\uADF8\uB7EC\uD55C, \uADF8\uB7F0"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: suit
-    english: suit
-    meaning: "\uC815\uC7A5"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: super
     english: super
     meaning: "\uCD5C\uACE0\uC758, \uAD49\uC7A5\uD55C"
     partOfSpeech: adj
     example: 
     exampleMeaning: 
-  - id: surprise
-    english: surprise
-    meaning: "\uB180\uB77C\uAC8C \uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: sweater
-    english: sweater
-    meaning: "\uC2A4\uC6E8\uD130"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: sweet
     english: sweet
     meaning: "\uB2EC\uCF64\uD55C, \uB2E8"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: swing
-    english: swing
-    meaning: "\uD754\uB4E4\uB2E4, \uADF8\uB124\uB97C \uD0C0\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: tale
-    english: tale
-    meaning: "\uC774\uC57C\uAE30, \uC124\uD654"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: tank
-    english: tank
-    meaning: "\uD0F1\uD06C, \uC218\uC870"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: tap
-    english: tap
-    meaning: "\uAC00\uBCCD\uAC8C \uB450\uB4DC\uB9AC\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: tea
-    english: tea
-    meaning: "\uCC28"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: tear
-    english: tear
-    meaning: "\uB208\uBB3C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: terrible
-    english: terrible
-    meaning: "\uB054\uCC0D\uD55C, \uC2EC\uD55C"
     partOfSpeech: adj
     example: 
     exampleMeaning: 
@@ -3258,105 +846,15 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: then
-    english: then
-    meaning: "\uADF8\uB54C, \uADF8 \uB2E4\uC74C\uC5D0"
-    partOfSpeech: adv
-    example: 
-    exampleMeaning: 
-  - id: thick
-    english: thick
-    meaning: "\uB450\uAEBC\uC6B4, \uC9D9\uC740"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: thief
-    english: thief
-    meaning: "\uB3C4\uB451"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: thin
-    english: thin
-    meaning: "\uC587\uC740, \uB9C8\uB978"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: thousand
-    english: thousand
-    meaning: "\uCC9C, 1000"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: throw
     english: throw
     meaning: "\uB358\uC9C0\uB2E4"
     partOfSpeech: v
     example: 
     exampleMeaning: 
-  - id: tie
-    english: tie
-    meaning: "\uBB36\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: tight
-    english: tight
-    meaning: "\uAF49 \uB07C\uB294, \uB2E8\uB2E8\uD55C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: till
-    english: till
-    meaning: "(\uAD6C\uC5B4) ~\uAE4C\uC9C0"
-    partOfSpeech: prep
-    example: 
-    exampleMeaning: 
-  - id: tiny
-    english: tiny
-    meaning: "\uC544\uC8FC \uC791\uC740"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: tip
-    english: tip
-    meaning: "\uC870\uC5B8, \uB05D, \uD301"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: title
     english: title
     meaning: "\uC81C\uBAA9, \uCE6D\uD638"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: toast
-    english: toast
-    meaning: "\uD1A0\uC2A4\uD2B8, \uAC74\uBC30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: toe
-    english: toe
-    meaning: "\uBC1C\uAC00\uB77D"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: toilet
-    english: toilet
-    meaning: "\uD654\uC7A5\uC2E4, \uBCC0\uAE30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: tool
-    english: tool
-    meaning: "\uB3C4\uAD6C, \uC5F0\uC7A5"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: topic
-    english: topic
-    meaning: "\uC8FC\uC81C, \uD654\uC81C"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -3366,45 +864,9 @@ MonoBehaviour:
     partOfSpeech: adj
     example: 
     exampleMeaning: 
-  - id: tough
-    english: tough
-    meaning: "\uD798\uB4E0, \uAC15\uC778\uD55C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
   - id: tour
     english: tour
     meaning: "\uAD00\uAD11, \uC5EC\uD589"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: towel
-    english: towel
-    meaning: "\uC218\uAC74"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: tower
-    english: tower
-    meaning: "\uD0D1"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: trap
-    english: trap
-    meaning: "\uB36B, \uD568\uC815"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: tray
-    english: tray
-    meaning: "\uC7C1\uBC18"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: trick
-    english: trick
-    meaning: "\uC18D\uC784\uC218, \uBB18\uAE30"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -3420,45 +882,15 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: twin
-    english: twin
-    meaning: "\uC30D\uB465\uC774"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: uniform
-    english: uniform
-    meaning: "\uC81C\uBCF5, \uAD50\uBCF5"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: university
     english: university
     meaning: "\uB300\uD559\uAD50"
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: until
-    english: until
-    meaning: "~\uAE4C\uC9C0"
-    partOfSpeech: prep
-    example: 
-    exampleMeaning: 
-  - id: upset
-    english: upset
-    meaning: "\uC18D\uC0C1\uD55C, \uD654\uB09C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
   - id: value
     english: value
     meaning: "\uAC00\uCE58"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: van
-    english: van
-    meaning: "\uC2B9\uD569\uCC28, \uBC34"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -3468,70 +900,10 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: village
-    english: village
-    meaning: "\uB9C8\uC744"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
   - id: vote
     english: vote
     meaning: "\uD22C\uD45C\uD558\uB2E4"
     partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: warn
-    english: warn
-    meaning: "\uACBD\uACE0\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: waste
-    english: waste
-    meaning: "\uB0AD\uBE44\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: wave
-    english: wave
-    meaning: "\uD30C\uB3C4, \uBB3C\uACB0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: weak
-    english: weak
-    meaning: "\uC57D\uD55C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: weigh
-    english: weigh
-    meaning: "\uBB34\uAC8C\uAC00 ~\uC774\uB2E4, \uBB34\uAC8C\uB97C \uB2EC\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: whale
-    english: whale
-    meaning: "\uACE0\uB798"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: wheel
-    english: wheel
-    meaning: "\uBC14\uD034"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: which
-    english: which
-    meaning: "\uC5B4\uB290 \uAC83, \uC5B4\uB290"
-    partOfSpeech: pron
-    example: 
-    exampleMeaning: 
-  - id: while
-    english: while
-    meaning: "~\uD558\uB294 \uB3D9\uC548, \uBC18\uBA74\uC5D0"
-    partOfSpeech: conj
     example: 
     exampleMeaning: 
   - id: whole
@@ -3544,77 +916,5 @@ MonoBehaviour:
     english: wide
     meaning: "\uB113\uC740, \uD3ED\uC774 ~\uC778"
     partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: wild
-    english: wild
-    meaning: "\uC57C\uC0DD\uC758, \uAC70\uCE5C"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: wing
-    english: wing
-    meaning: "\uB0A0\uAC1C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: wipe
-    english: wipe
-    meaning: "\uB2E6\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: wire
-    english: wire
-    meaning: "\uCCA0\uC0AC, \uC804\uC120"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: wise
-    english: wise
-    meaning: "\uD604\uBA85\uD55C, \uC9C0\uD61C\uB85C\uC6B4"
-    partOfSpeech: adj
-    example: 
-    exampleMeaning: 
-  - id: wool
-    english: wool
-    meaning: "\uC591\uD138, \uBAA8\uC9C1"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: would
-    english: would
-    meaning: "~\uD560 \uAC83\uC774\uB2E4, ~\uD558\uACE4 \uD588\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: wrap
-    english: wrap
-    meaning: "\uAC10\uC2F8\uB2E4, \uD3EC\uC7A5\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: yell
-    english: yell
-    meaning: "\uC18C\uB9AC\uCE58\uB2E4, \uACE0\uD568\uCE58\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-  - id: yet
-    english: yet
-    meaning: "\uC544\uC9C1, \uADF8\uB7F0\uB370\uB3C4"
-    partOfSpeech: adv
-    example: 
-    exampleMeaning: 
-  - id: zebra
-    english: zebra
-    meaning: "\uC5BC\uB8E9\uB9D0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-  - id: zero
-    english: zero
-    meaning: "\uC601, 0"
-    partOfSpeech: n
     example: 
     exampleMeaning: 

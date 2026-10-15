@@ -29,7 +29,7 @@ MonoBehaviour:
 
     ####C########.........############
 
-    ####,,,#########...###############
+    ####,,,#########GGG###############
 
     ####,,,,,,,,,,,,,,,,,,,,,,,,,,####
 
@@ -57,7 +57,7 @@ MonoBehaviour:
 
     ##::::::::::::##...#,,,,,,,,~~~,,#
 
-    ##::::::::::::##...#,,,,,,,,~~~,,#
+    ##K:::::::::::##...#,,,,,,,,~~~,,#
 
     ####..##########...#,,,,,,,,,,,,##
 
@@ -116,6 +116,7 @@ MonoBehaviour:
   words: {fileID: 11400000, guid: c2518a4985e9f504d9498327a491bebc, type: 2}
   encounterRate: 0.14
   minStepsBetweenEncounters: 4
+  encounterStyle: 0
   shop: {fileID: 0}
   chests:
   - item: {fileID: 0}
@@ -147,5 +148,7 @@ MonoBehaviour:
     level: 7
     rewardRelic: {fileID: 11400000, guid: c3cf9b0f8943bed43976182ff5144417, type: 2}
     rewardItem: {fileID: 11400000, guid: 4185a811547fb65468699483f65b7fdf, type: 2}
+  bossKey: {fileID: 11400000, guid: e2d52f7fbc559d2459414dddf06ac7b5, type: 2}
+  bossGateWords: 40
   requiresFullVersion: 0
   dictionaryName: "\uC11C\uACE0\uC758 \uC0AC\uC804"

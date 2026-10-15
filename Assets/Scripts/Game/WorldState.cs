@@ -5,7 +5,7 @@ using WordRPG.Field;
 
 namespace WordRPG.Game
 {
-    // 필드 진행 상태: 마지막 위치(지역+칸), 열어 본 보물상자, 쓰러뜨린 보스, 탐험한 칸(안개). 세이브 파일에 들어간다
+    // 필드 진행 상태: 마지막 위치(지역+칸), 열어 본 보물상자, 쓰러뜨린 보스, 탐험한 칸(안개), 연 보스 방 문. 세이브 파일에 들어간다
     [Serializable]
     public class WorldState
     {
@@ -20,6 +20,7 @@ namespace WordRPG.Game
         [SerializeField] private List<string> defeatedBosses = new List<string>();
         [SerializeField] private List<ExploredArea> explored = new List<ExploredArea>(); // 예전 세이브에는 없음 → 처음부터 탐험
         [SerializeField] private List<DictionaryReadDay> dictionaryReads = new List<DictionaryReadDay>(); // 사전을 읽은 날 (#45, 예전 세이브엔 없음)
+        [SerializeField] private List<string> openedGates = new List<string>(); // 연 보스 방 문의 지역 id (#76, 예전 세이브엔 없음)
 
         public string AreaId => hasPosition ? areaId : null;
         public IReadOnlyList<string> OpenedChests => openedChests;
@@ -72,6 +73,14 @@ namespace WordRPG.Game
             exit == null || exit.OpenedByBossOf == null || IsBossDefeated(exit.OpenedByBossOf.BossId);
 
         public bool IsChestOpened(string chestId) => openedChests.Contains(chestId);
+
+        public bool IsGateOpened(string area) => openedGates != null && openedGates.Contains(area);
+
+        public void MarkGateOpened(string area)
+        {
+            if (openedGates == null) openedGates = new List<string>();
+            if (!openedGates.Contains(area)) openedGates.Add(area);
+        }
 
         public void MarkChestOpened(string chestId)
         {

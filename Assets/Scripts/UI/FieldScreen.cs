@@ -556,12 +556,74 @@ namespace WordRPG.UI
                     break;
                 case FieldTile.Boss: ChallengeBoss(); break;
                 case FieldTile.Lectern: ReadDictionary(); break;
+                case FieldTile.Gate: KnockGate(); break;
+                case FieldTile.Key: TakeKey(cell); break;
             }
         }
 
-        // 쓰러뜨린 보스 자리: 사전은 쉼터 받침대로 옮겨져 빈자리 — 지나갈 수 있고 [확인]할 것도 없다 (#45)
-        private bool IsClearedBossSpot(Vector2Int cell) =>
-            walker.Map.Get(cell) == FieldTile.Boss && session.World.IsBossDefeated(area.BossId);
+        // 지나갈 수 있게 된 칸 — [확인]할 것도 없다: 쓰러뜨린 보스 자리(사전은 쉼터 받침대로 옮겨짐, #45), 연 보스 방 문(#76)
+        private bool IsClearedBossSpot(Vector2Int cell) => IsCleared(area, cell);
+
+        private bool IsCleared(FieldArea fieldArea, Vector2Int cell)
+        {
+            switch (fieldArea.Map.Get(cell))
+            {
+                case FieldTile.Boss: return session.World.IsBossDefeated(fieldArea.BossId);
+                case FieldTile.Gate: return BossGate.IsOpen(fieldArea, session);
+                default: return false;
+            }
+        }
+
+        // 보스 방 문 (#76, 사용자가 정한 말): 열쇠가 없으면 / 단어가 모자라면 주인공 혼잣말, 다 갖췄으면 문이 열린다
+        private void KnockGate()
+        {
+            switch (BossGate.State(area, session))
+            {
+                case BossGateState.NeedKey:
+                    bubble.Say("열쇠가 필요한 것 같다", 3f);
+                    break;
+                case BossGateState.NeedWords:
+                    bubble.Say("보스를 상대하려면 새로운 단어로 힘을 모아야해", 4f,
+                        $"이 지역에서 발견한 단어 {BossGate.WordsFound(area, session)} / {area.BossGateWords}");
+                    break;
+                case BossGateState.Ready:
+                    if (!BossGate.TryOpen(area, session)) return;
+                    foreach (var gate in BossGate.Cells(area))
+                    {
+                        tilemap.SetTile(new Vector3Int(gate.x, gate.y, 0), TileFor(FieldTile.Gate, true));
+                        StartCoroutine(FieldFx.Play(transform, CellCenter(gate), Fx.Sparkle, 1.3f, animationScale, 12));
+                    }
+                    Sound.PlayJingle(Sfx.GateOpen);
+                    ShowToast("보스 방 문이 열렸다!", 2.5f);
+                    AfterFieldChange();
+                    break;
+            }
+        }
+
+        // 열쇠 받침대 'K' (#76): 처음 [확인]하면 열쇠를 얻고 빈 받침대가 된다
+        private void TakeKey(Vector2Int cell)
+        {
+            if (!BossGate.TakeKey(area, session))
+            {
+                ShowToast("빈 받침대다.");
+                return;
+            }
+            tilemap.SetTile(new Vector3Int(cell.x, cell.y, 0), TileFor(FieldTile.Key, true));
+            Sound.Play(Sfx.Evolve);
+            ShowToast($"{UiKit.WithJosa(area.BossKey.DisplayName, "을", "를")} 찾았다!\n보스 방 문을 열 수 있을 것 같다", 3f);
+            AfterFieldChange();
+        }
+
+        // 문·열쇠처럼 맵 상태가 바뀐 뒤: 미니맵·이름표·목표 한 줄·메뉴 점을 다시 그리고 저장
+        private void AfterFieldChange()
+        {
+            minimap.Redraw();
+            RefreshNameTags();
+            RefreshObjective();
+            RefreshBadges();
+            SaveNow();
+            RefreshHud();
+        }
 
         // 사전 받침대 (#45): 보스를 물리쳤으면 하루 한 번 읽고 이 지역 단어 하나를 발견.
         // 창 없이 주인공 머리 위 말풍선으로 (#46, 사용자 요청)
@@ -1078,8 +1140,7 @@ namespace WordRPG.UI
         {
             area = newArea;
             var map = area.Map;
-            walker = new FieldWalker(map, position, cell => IsDoorLocked(cell) || IsPaywalled(cell),
-                cell => map.Get(cell) == FieldTile.Boss && session.World.IsBossDefeated(area.BossId));
+            walker = new FieldWalker(map, position, cell => IsDoorLocked(cell) || IsPaywalled(cell), cell => IsCleared(area, cell));
             encounterCounter = new EncounterCounter(area.EncounterRate, area.MinStepsBetweenEncounters);
             session.World.SetPosition(area.AreaId, position);
             SetUpRoamers(position);
@@ -1107,7 +1168,9 @@ namespace WordRPG.UI
                 var kind = map.Get(cell);
                 bool done = kind == FieldTile.Chest && session.World.IsChestOpened(fieldArea.ChestId(cell))
                             || kind == FieldTile.Boss && session.World.IsBossDefeated(fieldArea.BossId)
-                            || kind == FieldTile.Lectern && BossDictionary.IsUnlocked(fieldArea, session.World);
+                            || kind == FieldTile.Lectern && BossDictionary.IsUnlocked(fieldArea, session.World)
+                            || kind == FieldTile.Gate && BossGate.IsOpen(fieldArea, session)
+                            || kind == FieldTile.Key && BossGate.HasKey(fieldArea, session);
                 Tile tile;
                 if (kind == FieldTile.Door) tile = DoorTile(fieldArea, cell, lockedDoor(cell));
                 else if (FieldAutotile.IsAutotiled(kind)) tile = AutoTile(fieldArea.Theme, kind, FieldAutotile.Mask(map, cell)) ?? TileFor(kind, done, fieldArea.Theme);
@@ -1442,8 +1505,8 @@ namespace WordRPG.UI
         // 가까운 오브젝트 이름표만 보이게 (쓰러뜨린 보스는 감춤)
         // 말풍선이 떠 있는 동안은 이름표를 숨긴다 (말풍선과 겹치지 않게)
         private void RefreshNameTags() =>
-            nameTags.Refresh(walker.Position, cell => bubble.IsVisible
-                || walker.Map.Get(cell) == FieldTile.Boss && session.World.IsBossDefeated(area.BossId));
+            nameTags.Refresh(walker.Position, cell => bubble.IsVisible || IsCleared(area, cell)
+                || walker.Map.Get(cell) == FieldTile.Key && BossGate.HasKey(area, session));
 
         // 설정 > [튜토리얼 다시 보기]: 본 안내·빨간 점을 지우고 걷기 안내부터 다시 (전투·[확인] 안내도 그 상황에서 다시)
         private void ReplayTutorial()
@@ -1575,6 +1638,12 @@ namespace WordRPG.UI
                         : $"{UiKit.WithJosa(next, "을", "를")} 지나 {UiKit.WithJosa(destination, "으로", "로")}";
                 case ObjectiveKind.DefeatBoss:
                     return $"보스 {UiKit.WithJosa(goal.Destination.Boss.Species.DisplayName, "을", "를")} 물리치자";
+                case ObjectiveKind.FindKey:
+                    return "보스 방 열쇠를 찾자";
+                case ObjectiveKind.GatherWords:
+                    return $"새 단어로 힘을 모으자 {BossGate.WordsFound(area, session)}/{area.BossGateWords}";
+                case ObjectiveKind.OpenGate:
+                    return "보스 방 문을 열자";
                 default:
                     var progress = Dex.GetProgress(area.Words, session.Vocabulary);
                     return $"도감 채우기 {progress.Discovered}/{progress.Total}";
@@ -1619,6 +1688,8 @@ namespace WordRPG.UI
             {
                 case FieldTile.Chest: return session.World.IsChestOpened(area.ChestId(cell));
                 case FieldTile.Boss: return session.World.IsBossDefeated(area.BossId);
+                case FieldTile.Gate: return BossGate.IsOpen(area, session);
+                case FieldTile.Key: return BossGate.HasKey(area, session);
                 default: return false;
             }
         }

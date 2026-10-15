@@ -27,8 +27,9 @@
 - **엔진**: Unity 6000.3.11f1 (2D, Built-in RP) / **플랫폼**: 모바일, **세로 고정**, **아이폰 앱스토어 출시** (2026-10-03 사용자 결정, 안드로이드는 시험용 빌드만) / **개발**: 1인
 - **핵심 루프**: 탐험 → 랜덤 조우 → 전투(기술마다 단어 문제) → 보상(경험치·재료·성유물) → 레벨업·성유물 강화(+3 각성) → 새 지역·어려운 단어
 - **현재 단계**: MVP 이후 확장 — 초원(마을)·잊혀진 서고(던전)·숲(2번째 지역, 서고 보스를 물리치면 열림), 주인공 + 성유물 8개(3칸 장착),
-  적 6종 + 보스 2. 단어 = 2022 개정 교육과정 영어과 기본 어휘(교육부 고시, 저작권 없음 — GDD 11-2)에서 초원 600·서고 600(중·고 공통)·
-  숲 500(고급), 다음 지역용 500은 `Docs/단어_3단계_다음지역.csv`. 뜻은 Claude 초안 + 사용자 검수. 맵은 2026-10-03에 넓이 4배
+  적 6종 + 보스 2. 단어 = 2022 개정 교육과정 영어과 기본 어휘(교육부 고시, 저작권 없음 — GDD 11-2)에서 **지역마다 150개**(#76: 초원·서고 = 중·고 공통,
+  숲 = 고급에서 자주 쓰는 순 — `Tools/trim_wordbooks.py`). 남은 단어는 `Docs/단어_예비_중고공통.csv`(900)·`Docs/단어_예비_고급.csv`(850) — 새 지역은 위에서부터 150개.
+  뜻은 Claude 초안 + 사용자 검수. 맵은 2026-10-03에 넓이 4배. 보스 방은 열쇠 + 그 지역 단어 40개 발견으로 열림(#76)
 
 ## 기술 규칙 (반드시 준수)
 
@@ -58,6 +59,8 @@
    - 필드 맵은 FieldArea의 글자 맵 (GDD 7·9장). 상자 수 = 내용물 수, 출입구 수 = 연결 수(서로 왕복), B ↔ 보스 지정,
      모든 상자·샘·출입구 도달 가능 (AreaDataTests·DungeonDataTests가 검사). 지역을 새로 만들면 Refresh Game Database
    - 맵 글자 'L' = 사전 받침대: 보스가 있는 맵마다 쉼터에 하나, FieldArea `dictionaryName` 필수 (BossDictionaryTests). 하루 한 번 읽기 = `BossDictionary`
+   - 맵 글자 'G' = 보스 방 문, 'K' = 열쇠 받침대 (#76): 보스가 있는 맵마다 G 한 덩어리(가운데 칸에 이름표)·K 하나 + FieldArea `bossKey`(종류 Key)·`bossGateWords`(40).
+     열쇠 + 그 지역 단어 40개 발견 → [확인]으로 열림 (규칙 `BossGate`, 세이브 `WorldState.openedGates`). 열쇠는 문 밖, 보스는 문 안에서만 닿아야 함 (BossGateDataTests)
    - 맵 글자 ':' = 잔디(걸을 수 있고 조우 없음). 출입구 연결(AreaExit)의 openedByBossOf = 그 지역 보스를 물리쳐야 열림 →
      보스를 이기면 FieldScreen이 카메라로 그 출입구를 보여 주는 연출(GateCutscene). 잠긴 길은 진짜 보스가 열어야 함 (GateDataTests)
    - 맵 원본은 SampleDataBuilder의 MeadowMap·LibraryMap·ForestMap 상수. 이미 있는 에셋은 Create Sample Data가 덮어쓰지 않으므로
@@ -116,7 +119,8 @@ Assets/
                         Entitlements(산 상품) · IStore + UnityIapStore(애플 인앱 결제),
                         Dex(도감 규칙), Keepsakes(징표 진열장), GameSettings(음량·진동), TutorialProgress(본 튜토리얼 id, 세이브에 저장),
                         Objectives(목표 한 줄) · MenuBadges(메뉴 빨간 점) · BattleUnlocks(강도 고르기는 전투 2번 뒤),
-                        BossDictionary(보스의 사전: 받침대 L, 하루 한 번 새 단어 — 읽은 날은 WorldState)
+                        BossDictionary(보스의 사전: 받침대 L, 하루 한 번 새 단어 — 읽은 날은 WorldState),
+                        BossGate(보스 방 문: 열쇠 K + 단어 40개 → G가 열림 — #76)
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
     UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투 + 보스 결정타 연출 + 전투 결산, 단독 연습 모드도 있음),
                         DexView(도감), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기),
@@ -146,7 +150,7 @@ Assets/
 Docs/                   PRD.txt, GDD.md, 아트에셋목록.md, 아이폰출시방법.txt(TestFlight 올리는 순서), 작업메모.md
 .github/workflows/      ios-testflight.yml (GitHub Mac 서버에서 서명·TestFlight 업로드)
 Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow 필요), zip_ios_for_mac.py (Xcode 프로젝트 → Mac용 zip, 실행 권한 유지),
-                        widen_maps.py (맵의 한 칸 통로 → 두 칸), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구)
+                        widen_maps.py (맵의 한 칸 통로 → 두 칸), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구)
 ```
 
 ## 명령어

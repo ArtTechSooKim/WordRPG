@@ -8,7 +8,8 @@ namespace WordRPG.Items
         Material,   // 성유물 강화 재료 (전투·보물상자·보스에서 얻음. 상점에서는 팔지 않음)
         Consumable, // 상처약 등 소모품 — healAmount만큼 회복, 필드·전투에서 사용
         Keepsake,   // 지역 도감 완성 징표 (기념물). 모으는 용도
-        SkillDocument // 기술문서 — 읽으면 기술을 배운다 (보스·보물상자에서 얻음). 배워도 사라지지 않아 언제든 다시 배울 수 있다
+        SkillDocument, // 기술문서 — 읽으면 기술을 배운다 (보스·보물상자에서 얻음). 배워도 사라지지 않아 언제든 다시 배울 수 있다
+        Key           // 보스 방 열쇠 (#76) — 맵의 열쇠 받침대 'K'에서 얻음. 쓰지 않고 가지고만 있으면 보스 방 문을 열 수 있다
     }
 
     [CreateAssetMenu(fileName = "NewItem", menuName = "WordRPG/Item", order = 20)]

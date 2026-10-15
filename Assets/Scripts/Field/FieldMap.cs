@@ -17,7 +17,9 @@ namespace WordRPG.Field
         Door,     // 출입구 — 걸어 들어가면 다른 지역으로 이동 (보스를 물리쳐야 열리는 것도 있음: AreaExit)
         Boss,     // 보스 (막힘, 옆에서 [확인] → 보스 전투)
         Lawn,     // 짧은 잔디·카펫·이끼 땅 — 걸을 수 있고 조우 없음 (탁 트인 곳)
-        Lectern   // 사전 받침대 (막힘, 옆에서 [확인] → 보스의 사전 읽기, 하루 한 번). 그 지역 보스를 물리치기 전엔 비어 있음 (#45)
+        Lectern,  // 사전 받침대 (막힘, 옆에서 [확인] → 보스의 사전 읽기, 하루 한 번). 그 지역 보스를 물리치기 전엔 비어 있음 (#45)
+        Gate,     // 보스 방 문 (#76): 그 지역 열쇠 + 단어 40개 발견 → [확인]으로 열림, 열리면 지나갈 수 있음 (BossGate)
+        Key       // 열쇠 받침대 (#76, 막힘): [확인] → 그 지역 보스 방 열쇠를 얻음
     }
 
     // 지역 분위기에 따라 같은 칸도 다르게 그린다 (초원: 나무·풀숲·물 / 서고: 책장·흩어진 책장·잉크 웅덩이 / 숲: 짙은 덤불·고사리·늪)
@@ -119,6 +121,8 @@ namespace WordRPG.Field
                         case 'E': tiles[x, y] = FieldTile.Altar; break;
                         case 'S': tiles[x, y] = FieldTile.Shop; break;
                         case 'L': tiles[x, y] = FieldTile.Lectern; break;
+                        case 'G': tiles[x, y] = FieldTile.Gate; break;
+                        case 'K': tiles[x, y] = FieldTile.Key; break;
                         case 'D':
                             tiles[x, y] = FieldTile.Door;
                             doors.Add(new Vector2Int(x, y));
@@ -158,7 +162,7 @@ namespace WordRPG.Field
         // 걸을 수는 없지만 옆에서 [확인]을 누르면 무언가 일어나는 칸
         public static bool IsInteractive(FieldTile tile) =>
             tile == FieldTile.Chest || tile == FieldTile.Fountain || tile == FieldTile.Altar || tile == FieldTile.Shop
-            || tile == FieldTile.Boss || tile == FieldTile.Lectern;
+            || tile == FieldTile.Boss || tile == FieldTile.Lectern || tile == FieldTile.Gate || tile == FieldTile.Key;
 
         // 맵에서 그 종류의 칸 위치 (없으면 null) — 사전 받침대처럼 하나뿐인 칸
         public Vector2Int? Find(FieldTile tile)
@@ -170,6 +174,16 @@ namespace WordRPG.Field
         }
 
         public bool IsWalkable(Vector2Int p) => IsWalkable(Get(p));
+
+        // 그 종류의 칸 전부 (보스 방 문처럼 여러 칸이 한 덩어리인 것)
+        public List<Vector2Int> FindAll(FieldTile tile)
+        {
+            var cells = new List<Vector2Int>();
+            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+                if (tiles[x, y] == tile) cells.Add(new Vector2Int(x, y));
+            return cells;
+        }
 
         public int ChestIndex(Vector2Int p) => chests.IndexOf(p);
 

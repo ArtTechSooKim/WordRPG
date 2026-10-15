@@ -263,9 +263,12 @@ namespace WordRPG.UI
                 var area = manager.Database != null && session.World.AreaId != null ? manager.Database.FindArea(session.World.AreaId) : null;
                 string where = area != null ? area.DisplayName : "초원";
                 saveLine1.text = $"{where}  ·  {hero.DisplayName} Lv{hero.Level}  ·  성유물 {hero.Relics.Count}개";
-                string total = area != null && area.Words != null ? $" / {area.Words.Words.Count}" : "";
+                // 지금 지역 도감 기준 (지역마다 150개 — #76). 지역을 모르면 전체 발견 수만
+                string found = area != null && area.Words != null
+                    ? $"{Dex.GetProgress(area.Words, session.Vocabulary).Discovered} / {area.Words.Words.Count}"
+                    : session.Vocabulary.DiscoveredCount.ToString();
                 int battles = session.Record.BattlesFought;
-                saveLine2.text = $"발견한 단어 {session.Vocabulary.DiscoveredCount}{total}   ·   전투 {battles}번";
+                saveLine2.text = $"발견한 단어 {found}   ·   전투 {battles}번";
             }
         }
 

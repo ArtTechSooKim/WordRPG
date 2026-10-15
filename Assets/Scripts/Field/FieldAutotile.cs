@@ -24,7 +24,7 @@ namespace WordRPG.Field
         {
             switch (tile)
             {
-                case FieldTile.Floor: return neighbor == FieldTile.Floor || neighbor == FieldTile.Door;
+                case FieldTile.Floor: return neighbor == FieldTile.Floor || neighbor == FieldTile.Door || neighbor == FieldTile.Gate; // 보스 방 문은 길이 이어지는 자리
                 case FieldTile.Water: return neighbor == FieldTile.Water;
                 default: return false;
             }

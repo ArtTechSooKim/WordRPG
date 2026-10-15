@@ -281,7 +281,9 @@ namespace WordRPG.Tests
                 foreach (var d in new[] { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right })
                 {
                     var next = cell + d;
-                    if (map.IsWalkable(next) && seen.Add(next)) queue.Enqueue(next);
+                    // 보스 방 문은 열 수 있는 칸 (#76) — 문을 연 뒤 기준. 열기 전 조건은 BossGateDataTests가 본다
+                    bool passable = map.IsWalkable(next) || map.Get(next) == FieldTile.Gate;
+                    if (passable && seen.Add(next)) queue.Enqueue(next);
                 }
             }
             return seen;

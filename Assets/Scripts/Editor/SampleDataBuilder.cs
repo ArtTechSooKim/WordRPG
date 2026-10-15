@@ -222,6 +222,16 @@ namespace WordRPG.EditorTools
                 boss.FindPropertyRelative("rewardItem").objectReferenceValue = highlightDoc;
             });
 
+            // 보스 방 문 (#76, 사용자 결정): 맵에 숨긴 열쇠(K)를 찾고 그 지역 단어 40개를 발견해야 보스 방(G)이 열린다
+            var libraryKey = Item("library_key", "서고 열쇠", "잊혀진 서고 깊은 곳, 보스 방 문을 여는 금빛 열쇠.",
+                new Color(1f, 0.8f, 0.25f), ItemKind.Key);
+            var forestKey = Item("forest_key", "숲 열쇠", "숲 깊은 곳, 보스 방 문을 여는 은빛 열쇠.",
+                new Color(0.8f, 0.82f, 0.86f), ItemKind.Key);
+            AddGateToMap("Assets/Data/Areas/library.asset", LibraryMap);
+            AddGateToMap("Assets/Data/Areas/forest.asset", ForestMap);
+            SetBossGate("Assets/Data/Areas/library.asset", libraryKey, 40);
+            SetBossGate("Assets/Data/Areas/forest.asset", forestKey, 40);
+
             // --- 출입구 연결 (맵의 D를 위→아래, 왼→오른 순): 초원 0 = 서고, 초원 1 = 숲(서고 보스를 물리치면 열림) ---
             const string meadowPath = "Assets/Data/Areas/meadow.asset", libraryPath = "Assets/Data/Areas/library.asset",
                 forestPath = "Assets/Data/Areas/forest.asset";
@@ -344,7 +354,7 @@ namespace WordRPG.EditorTools
                 "############.~:::::::~.###########\n" +
                 "############...........###########\n" +
                 "####C########.........############\n" +
-                "####,,,#########...###############\n" +
+                "####,,,#########GGG###############\n" +
                 "####,,,,,,,,,,,,,,,,,,,,,,,,,,####\n" +
                 "####,,,,,,##,,,,,,,,,,##,,,,,,####\n" +
                 "####,,,,,,,,,,,,,,,,,,,,,,,,,,####\n" +
@@ -358,7 +368,7 @@ namespace WordRPG.EditorTools
                 "##::::::::::::##...#,,~~~~~,,,,,##\n" +
                 "##::#:::#:::#:##...#,,,~~~,,~~~,,#\n" +
                 "##::::::::::::##...#,,,,,,,,~~~,,#\n" +
-                "##::::::::::::##...#,,,,,,,,~~~,,#\n" +
+                "##K:::::::::::##...#,,,,,,,,~~~,,#\n" +
                 "####..##########...#,,,,,,,,,,,,##\n" +
                 "####..##########...######,,#,,,###\n" +
                 "####..####::::::::::::::#,,#######\n" +
@@ -398,13 +408,13 @@ namespace WordRPG.EditorTools
                 "##,,,,,##,,,,,C###:::::#::.......::#\n" +
                 "##,,,,,##,,,,,,###:::::##:.......:##\n" +
                 "##,,,,,##,,,,,,####:::#####:::::####\n" +
-                "##,,,,,###,#:::::##:::::###...###~~#\n" +
+                "##,,,,,###,#:::::##:::::###GGG###~~#\n" +
                 "##,,,,,,,,,:::::::##:::::.....###~~#\n" +
                 "##,,#,,,#,,:::::::######,,,######~~#\n" +
                 "###,,,,,,,,:::::::######,,,####,,,~#\n" +
                 "##,,,,####,,:::::#######,,,###,,,,C#\n" +
                 "##,,,#####,,,::#########,,,##,,,,~~#\n" +
-                "##,,,#####,,,::#########,,,##,,##~~#\n" +
+                "##,,,#####,,,:K#########,,,##,,##~~#\n" +
                 "##,,,#####,,,############......##~~#\n" +
                 "#,,##,,##,,,,#:::::~~~###:::#,,,#~~#\n" +
                 "##,,,,,,,,,,,::::::~~~##:::::,,,#~~#\n" +
@@ -453,6 +463,33 @@ namespace WordRPG.EditorTools
             if (area == null || area.HasDictionary) return;
             var so = new SerializedObject(area);
             Prop(so, "dictionaryName").stringValue = name;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // 보스 방 문의 열쇠·필요한 단어 수 (#76, 비어 있을 때만)
+        private static void SetBossGate(string areaPath, ItemData key, int words)
+        {
+            var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);
+            if (area == null || area.BossKey != null) return;
+            var so = new SerializedObject(area);
+            Prop(so, "bossKey").objectReferenceValue = key;
+            Prop(so, "bossGateWords").intValue = words;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // 원본 맵에 보스 방 문(G)·열쇠(K)가 생겼을 때 (#76): 에셋의 맵이 그 칸만 빼고 원본과 같으면 원본으로 바꾼다
+        // (인스펙터에서 따로 고친 맵은 건드리지 않음 — 그때는 직접 옮길 것)
+        private static void AddGateToMap(string areaPath, string map)
+        {
+            var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);
+            if (area == null) return;
+            var so = new SerializedObject(area);
+            var prop = Prop(so, "map");
+            string current = prop.stringValue.Replace("\r\n", "\n"), source = map.Replace("\r\n", "\n");
+            if (current == source || current.IndexOf('G') >= 0 || current.Length != source.Length) return;
+            for (int i = 0; i < source.Length; i++)
+                if (source[i] != 'G' && source[i] != 'K' && source[i] != current[i]) return;
+            prop.stringValue = source;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 

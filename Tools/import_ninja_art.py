@@ -56,6 +56,9 @@ ITEMS = {
     "skilldoc_cram": "Items/Scroll/ScrollThunder.png",     # 벼락치기 (서고 보스)
     "skilldoc_highlight": "Items/Scroll/ScrollPlant.png",  # 형광펜 긋기 (숲 보스)
     "skilldoc_pencilcase": "Items/Scroll/ScrollRock.png",  # 필통 방패 (초원 숨은 상자)
+    # 보스 방 열쇠 (#76): 맵 'K' 받침대에서 찾음
+    "library_key": "Items/Treasure/GoldKey.png",
+    "forest_key": "Items/Treasure/SilverKey.png",
 }
 
 # 소리: 파일 이름 = 게임 코드의 이름(Music·Sfx 열거형을 소문자로)
@@ -423,6 +426,15 @@ def copy_relics_and_items(pack):
     print("relics", len(RELICS), "+ items", len(ITEMS), "->", OUT)
 
 
+def save_if_changed(img, path):
+    """픽셀이 같으면 다시 쓰지 않는다 (PNG를 다시 저장하면 바이트가 달라져 LFS 파일이 괜히 바뀜)"""
+    if os.path.exists(path):
+        old = Image.open(path).convert("RGBA")
+        if old.size == img.size and old.tobytes() == img.convert("RGBA").tobytes():
+            return
+    img.save(path)
+
+
 def build_tiles(pack):
     boss = pack.frame("Actor/Boss/GiantSpirit/Idle.png", 0, 50).crop((1, 1, 49, 49))
     raccoon = pack.frame("Actor/Boss/GiantRacoon/Idle.png", 0, 60)
@@ -434,6 +446,9 @@ def build_tiles(pack):
     gem = pack.tile("TilesetNature.png", 2, 15)
     stall = pack.tile("TilesetElement.png", 14, 0)
     pedestal = pack.tile("TilesetDungeon.png", 2, 3)  # 가운데가 빈 돌 받침 = 사전 받침대 (#45)
+    keyhole = [pack.tile("TilesetDungeon.png", 0, 0), pack.tile("TilesetDungeon.png", 1, 0)]  # 열쇠 구멍 블록 = 보스 방 문 (#76)
+    gold_key = pack.image("Items/Treasure/GoldKey.png")
+    silver_key = pack.image("Items/Treasure/SilverKey.png")
 
     def lectern(base, with_book):
         """받침대를 2배로(도트 유지) 깔고, 사전이 놓였으면 책(원래 크기)을 위에 올린다 → 32×32 한 칸"""
@@ -441,6 +456,13 @@ def build_tiles(pack):
         out.alpha_composite(pedestal.resize((32, 32), Image.NEAREST), (0, 0))
         if with_book:
             out.alpha_composite(book, (8, 1))
+        return out
+
+    def key_stand(base, key):
+        """사전 받침대와 같은 돌 받침 위에 열쇠(2배)를 올린다 (#76) — 가져가면 빈 받침대(Key_done)"""
+        out = lectern(base, False)
+        big = key.resize((key.width * 2, key.height * 2), Image.NEAREST)
+        out.alpha_composite(big, ((32 - big.width) // 2, 3))
         return out
 
     themes = {}
@@ -470,6 +492,10 @@ def build_tiles(pack):
         "Boss_done": lime.copy(),  # 사전은 쉼터 받침대로 옮겨져 빈자리 (#45)
         "Lectern": lectern(lime, False),
         "Lectern_done": lectern(lime, True),
+        "Gate": keyhole[0],
+        "Gate_done": path,
+        "Key": key_stand(lime, gold_key),
+        "Key_done": lectern(lime, False),
     }
     autos["Meadow_Floor_auto"] = auto_atlas(pack, template, "TilesetFloor.png", 0, 7)
     autos["Meadow_Water_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6)
@@ -493,6 +519,10 @@ def build_tiles(pack):
         "Boss_done": stone.copy(),  # 사전은 쉼터 받침대로 옮겨져 빈자리 (#45)
         "Lectern": lectern(stone, False),
         "Lectern_done": lectern(stone, True),
+        "Gate": keyhole[1],  # 서고 돌바닥에 어울리는 옅은 블록
+        "Gate_done": stone,
+        "Key": key_stand(pack.tile("Interior/TilesetInteriorFloor.png", 12, 7), gold_key),  # 열람실 카펫 위
+        "Key_done": lectern(pack.tile("Interior/TilesetInteriorFloor.png", 12, 7), False),
     }
 
     # 숲: 흙길, 진한 풀 위 고사리(조우), 짙은 덤불 벽, 초록빛 늪, 햇빛 드는 출구(초원으로)
@@ -516,6 +546,10 @@ def build_tiles(pack):
         "Boss_done": moss.copy(),  # 사전은 쉼터 받침대로 옮겨져 빈자리 (#45)
         "Lectern": lectern(moss, False),
         "Lectern_done": lectern(moss, True),
+        "Gate": tint(keyhole[0], (0.78, 0.9, 0.7)),  # 이끼 낀 열쇠 구멍 블록
+        "Gate_done": dirt,
+        "Key": key_stand(moss, silver_key),
+        "Key_done": lectern(moss, False),
     }
     # 숲: 흙길(진초록 테두리), 늪 물가(연두를 이끼색으로)
     autos["Forest_Floor_auto"] = auto_atlas(pack, template, "TilesetFloor.png", 11, 7)
@@ -525,9 +559,9 @@ def build_tiles(pack):
     os.makedirs(folder, exist_ok=True)
     for theme, tiles in themes.items():
         for kind, img in tiles.items():
-            img.save(os.path.join(folder, f"{theme}_{kind}.png"))
+            save_if_changed(img, os.path.join(folder, f"{theme}_{kind}.png"))
     for name, img in autos.items():
-        img.save(os.path.join(folder, name + ".png"))
+        save_if_changed(img, os.path.join(folder, name + ".png"))
     print("tiles", sum(len(t) for t in themes.values()), "+ autotile", len(autos), "->", folder)
 
 
