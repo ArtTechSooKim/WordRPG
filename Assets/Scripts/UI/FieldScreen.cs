@@ -26,9 +26,13 @@ namespace WordRPG.UI
         [SerializeField] private FieldArea area;
         [SerializeField] private BattleConfig battleConfig = new BattleConfig();
         [Tooltip("한 칸 이동에 걸리는 시간(초)")]
-        [SerializeField] private float stepDuration = 0.16f;
+        // 한 칸 걷는 시간 · 달리면 그 몇 배 (보이는 몬스터는 이 사이 속도로 쫓아옴 — RoamingRules.ChaseStepSeconds, RoamingTests)
+        public const float WalkStepSeconds = 0.16f;
+        public const float RunStepRatio = 0.55f;
+
+        [SerializeField] private float stepDuration = WalkStepSeconds;
         [Tooltip("달릴 때 한 칸 시간 = 걷기 시간 × 이 값")]
-        [SerializeField] private float runStepRatio = 0.55f;
+        [SerializeField] private float runStepRatio = RunStepRatio;
         [Tooltip("화면 가로에 보이는 타일 수")]
         [SerializeField] private float tilesAcross = 11f;
         [Tooltip("연출 시간 배율. 테스트에서는 아주 작게")]

@@ -120,6 +120,8 @@ namespace WordRPG.Field
         [SerializeField] private float encounterRate = 0.12f;
         [Tooltip("조우 직후 이 걸음 수만큼은 다시 조우하지 않음")]
         [SerializeField] private int minStepsBetweenEncounters = 4;
+        [Tooltip("Grass = 풀숲을 밟으면 확률로 조우 / Roaming = 보이는 몬스터가 마른 덤불(,) 근처를 돌다 쫓아옴 — 부딪히면 전투, 가까우면 [선제공격] (#73)")]
+        [SerializeField] private EncounterStyle encounterStyle = EncounterStyle.Grass;
 
         [Header("마을")]
         [Tooltip("맵의 S(상점) 앞에서 [확인]을 누르면 여는 상점")]
@@ -150,6 +152,7 @@ namespace WordRPG.Field
         public WordDatabase Words => words;
         public float EncounterRate => encounterRate;
         public int MinStepsBetweenEncounters => minStepsBetweenEncounters;
+        public EncounterStyle EncounterStyle => encounterStyle;
         public IReadOnlyList<ChestContent> ChestContents => chests;
         public ShopData Shop => shop;
         public FieldTheme Theme => theme;
