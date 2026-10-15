@@ -61,6 +61,21 @@ ITEMS = {
     "forest_key": "Items/Treasure/SilverKey.png",
 }
 
+# 동료 (#77, 1.1 메아리 정글): companionId → 팩 캐릭터 폴더. 얼굴(Faceset) → Companions/{id}.png, 걷기 시트 → Companions/{id}_sheet.png
+COMPANIONS = {
+    "ara": "Actor/Characters/Cavegirl",  # 아라 — 유적에 갇혀 고대 단어를 지키던 정글 소녀
+}
+
+
+def copy_companions(pack_root=DEFAULT_PACK):
+    folder = os.path.join(OUT, "Companions")
+    os.makedirs(folder, exist_ok=True)
+    for companion_id, rel in COMPANIONS.items():
+        shutil.copyfile(os.path.join(pack_root, rel, "Faceset.png"), os.path.join(folder, companion_id + ".png"))
+        shutil.copyfile(os.path.join(pack_root, rel, "SpriteSheet.png"), os.path.join(folder, companion_id + "_sheet.png"))
+    print("companions", len(COMPANIONS), "->", folder)
+
+
 # 소리: 파일 이름 = 게임 코드의 이름(Music·Sfx 열거형을 소문자로)
 MUSIC = {
     "title": "Audio/Musics/1 - Adventure Begin.ogg",
@@ -583,6 +598,7 @@ def main():
     print("player <-", PLAYER)
 
     copy_relics_and_items(pack)
+    copy_companions(pack)
 
     art = Pack(pack)
     build_tiles(art)

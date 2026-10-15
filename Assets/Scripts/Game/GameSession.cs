@@ -4,6 +4,7 @@ using UnityEngine;
 using WordRPG.Field;
 using WordRPG.Heroes;
 using WordRPG.Items;
+using WordRPG.Monsters;
 using WordRPG.Save;
 using WordRPG.Words;
 
@@ -27,13 +28,20 @@ namespace WordRPG.Game
         }
     }
 
-    // 플레이어 한 명의 게임 진행 상태 전체: 주인공(레벨·성유물), 소지품, 단어 학습 기록, 전적, 필드 위치·연 상자.
+    // 플레이어 한 명의 게임 진행 상태 전체: 주인공(레벨·성유물), 동료, 소지품, 단어 학습 기록, 전적, 필드 위치·연 상자.
     // 세이브 파일(SaveData)과 서로 변환된다. MonoBehaviour가 아니라 테스트에서 바로 만들 수 있다
     public class GameSession
     {
         private readonly List<string> loadWarnings = new List<string>();
+        private readonly List<Companion> companions = new List<Companion>();
 
         public Hero Hero { get; }
+        public IReadOnlyList<Companion> Companions => companions;   // 얻은 동료 (#77)
+        public Companion PartyCompanion { get; private set; }       // 함께 다니는 동료 (없으면 null) — 파티 = 주인공 + 동료 1명
+
+        // 전투에 나서는 순서 (차례도 이 순서): 주인공 → 동료
+        public IReadOnlyList<ICombatant> PartyMembers =>
+            PartyCompanion != null ? new ICombatant[] { Hero, PartyCompanion } : new ICombatant[] { Hero };
         public Inventory Inventory { get; }
         public VocabularyProgress Vocabulary { get; }
         public PlayerRecord Record { get; }
@@ -75,7 +83,42 @@ namespace WordRPG.Game
                 new PlayerRecord(), new WorldState());
         }
 
-        public void RestoreHero() => Hero.RestoreFully();
+        // 샘·패배 뒤 회복: 주인공과 동료 모두
+        public void RestoreHero()
+        {
+            Hero.RestoreFully();
+            foreach (var companion in companions) companion.RestoreFully();
+        }
+
+        // 전투가 끝난 뒤(이김·도망): 쓰러졌던 동료는 HP 1로 일어난다 (#77 기본값)
+        public void AfterBattle()
+        {
+            foreach (var companion in companions) companion.ReviveIfFainted();
+        }
+
+        public Companion FindCompanion(CompanionData data) => companions.Find(c => c.Data == data);
+
+        public bool HasCompanion(CompanionData data) => FindCompanion(data) != null;
+
+        // 동료를 얻는다 (#77): 주인공 레벨로 합류하고, 함께 다니는 동료가 없으면 바로 파티에. 이미 있으면 그 동료
+        public Companion AddCompanion(CompanionData data)
+        {
+            if (data == null) throw new ArgumentNullException(nameof(data));
+            var existing = FindCompanion(data);
+            if (existing != null) return existing;
+            var companion = new Companion(data, Hero.Level);
+            companions.Add(companion);
+            if (PartyCompanion == null) PartyCompanion = companion;
+            return companion;
+        }
+
+        // 함께 다닐 동료 (null = 아무도 안 데려감). 얻은 동료만 고를 수 있다
+        public bool SetPartyCompanion(Companion companion)
+        {
+            if (companion != null && !companions.Contains(companion)) return false;
+            PartyCompanion = companion;
+            return true;
+        }
 
         // 회복 아이템(상처약)을 필드에서 쓴다. HP가 가득이거나 아이템이 없으면 쓰지 않고 0
         public int UseHealingItem(ItemData item)
@@ -165,8 +208,12 @@ namespace WordRPG.Game
                 relics.Add(new RelicSaveData(relic.Data.RelicId, relic.Level, Hero.SlotOf(relic)));
             var skills = new List<string>();
             foreach (var slot in Hero.SkillSlots) skills.Add(slot.Key);
+            var savedCompanions = new List<CompanionSaveData>();
+            foreach (var companion in companions)
+                savedCompanions.Add(new CompanionSaveData(companion.Data.CompanionId, companion.Level, companion.Exp, companion.CurrentHp));
             return new SaveData(nowUtc, new HeroSaveData(Hero.Level, Hero.Exp, Hero.CurrentHp), relics,
-                Inventory, Vocabulary, Record, World).WithSkillSlots(skills).WithTutorials(Tutorials.Seen);
+                    Inventory, Vocabulary, Record, World).WithSkillSlots(skills).WithTutorials(Tutorials.Seen)
+                .WithCompanions(savedCompanions, PartyCompanion?.Data.CompanionId);
         }
 
         // 세이브에 있는 성유물을 찾을 수 없으면(삭제·id 변경) 빼고 경고를 남긴다. 성유물이 하나도 없으면 시작 성유물로 채운다.
@@ -222,8 +269,28 @@ namespace WordRPG.Game
 
             var session = new GameSession(hero, data.Inventory, data.Vocabulary, data.Record, data.World);
             session.Tutorials = new TutorialProgress(data.Tutorials);
+            RestoreCompanions(session, data, database, warnings);
             session.loadWarnings.AddRange(warnings);
             return session;
+        }
+
+        // 동료 (#77): 찾을 수 없는 동료는 빼고 경고. 쓰러진 채 저장됐으면 회복한 것으로 (주인공과 같은 규칙)
+        private static void RestoreCompanions(GameSession session, SaveData data, GameDatabase database, List<string> warnings)
+        {
+            foreach (var saved in data.Companions)
+            {
+                var companionData = database != null ? database.FindCompanion(saved.CompanionId) : null;
+                if (companionData == null)
+                {
+                    warnings.Add($"세이브의 동료 '{saved.CompanionId}'를 찾을 수 없어 제외했습니다");
+                    continue;
+                }
+                if (session.HasCompanion(companionData)) continue;
+                var companion = new Companion(companionData, saved.Level, saved.Exp);
+                if (saved.CurrentHp > 0) companion.SetHp(saved.CurrentHp);
+                session.companions.Add(companion);
+                if (saved.CompanionId == data.PartyCompanionId) session.PartyCompanion = companion;
+            }
         }
 
         // 저장된 기술 칸 순서대로 되살린다. 끼우지 않은 성유물·찾을 수 없는 기술문서는 건너뜀

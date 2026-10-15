@@ -290,6 +290,13 @@ namespace WordRPG.UI
         public static Sprite HeroPortrait(HeroData hero) =>
             hero != null && hero.Portrait != null ? hero.Portrait : PlayerArt.Get(Direction.Down, 0);
 
+        // 동료 얼굴 (#77): 지정한 그림이 없으면 Art/NinjaAdventure/Companions/{companionId}.png
+        public static Sprite CompanionPortrait(CompanionData companion)
+        {
+            if (companion == null) return null;
+            return companion.Portrait != null ? companion.Portrait : LoadSprite("Art/NinjaAdventure/Companions/" + companion.CompanionId);
+        }
+
         // 몬스터 그림 칸의 바탕색: 그림이 있으면 옅게(그림이 잘 보이게), 없으면 몬스터 색을 진하게(임시 도형)
         public static Color ArtColor(MonsterSpecies species) =>
             Color.Lerp(Palette.PanelLight, species.PlaceholderColor, species.Sprite != null ? 0.22f : 0.65f);

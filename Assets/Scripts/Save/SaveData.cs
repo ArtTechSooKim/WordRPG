@@ -75,6 +75,31 @@ namespace WordRPG.Save
         }
     }
 
+    // 얻은 동료 한 명 (#77): id · 레벨 · 경험치 · HP
+    [Serializable]
+    public class CompanionSaveData
+    {
+        [SerializeField] private string companionId;
+        [SerializeField] private int level;
+        [SerializeField] private int exp;
+        [SerializeField] private int currentHp;
+
+        public string CompanionId => companionId;
+        public int Level => level;
+        public int Exp => exp;
+        public int CurrentHp => currentHp;
+
+        private CompanionSaveData() { } // Unity 직렬화용
+
+        public CompanionSaveData(string companionId, int level, int exp, int currentHp)
+        {
+            this.companionId = companionId;
+            this.level = level;
+            this.exp = exp;
+            this.currentHp = currentHp;
+        }
+    }
+
     // 세이브 파일(save.json) 한 개의 내용. 에셋은 전부 id 문자열로 저장해서 에셋 이름이 바뀌어도 깨지지 않는다.
     // 필드를 추가해도 예전 세이브는 그 필드가 기본값으로 읽힌다. 기존 필드의 의미를 바꿀 때만 version을 올리고 변환 코드를 넣을 것
     //   v1: 몬스터 파티(party)  →  v2: 주인공(hero) + 성유물(relics). v1은 GameSession.FromSaveData가 주인공으로 바꿔 읽는다
@@ -97,6 +122,9 @@ namespace WordRPG.Save
         [SerializeField] private bool hasSkillSlots;
         // 이미 본 튜토리얼 id (TutorialProgress). 예전 세이브에는 없음 → 처음부터 한 번씩 보여 준다
         [SerializeField] private List<string> tutorials = new List<string>();
+        // 얻은 동료와 파티에 넣은 동료 id (#77, 1.1 — 예전 세이브엔 없음 → 동료 없이 시작). 빈 문자열 = 동료가 쉬는 중
+        [SerializeField] private List<CompanionSaveData> companions = new List<CompanionSaveData>();
+        [SerializeField] private string partyCompanionId = "";
 
         public int Version => version;
         public DateTime SavedAtUtc => new DateTime(savedAtTicks, DateTimeKind.Utc);
@@ -110,12 +138,21 @@ namespace WordRPG.Save
         public IReadOnlyList<string> SkillSlots => skillSlots;
         public bool HasSkillSlots => hasSkillSlots;
         public IReadOnlyList<string> Tutorials => tutorials ?? (IReadOnlyList<string>)new List<string>();
+        public IReadOnlyList<CompanionSaveData> Companions => companions ?? (IReadOnlyList<CompanionSaveData>)new List<CompanionSaveData>();
+        public string PartyCompanionId => partyCompanionId ?? "";
 
         public SaveData() { }
 
         public SaveData WithTutorials(IEnumerable<string> ids)
         {
             tutorials = new List<string>(ids);
+            return this;
+        }
+
+        public SaveData WithCompanions(IEnumerable<CompanionSaveData> saved, string partyId)
+        {
+            companions = new List<CompanionSaveData>(saved);
+            partyCompanionId = partyId ?? "";
             return this;
         }
 

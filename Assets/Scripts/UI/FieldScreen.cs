@@ -138,6 +138,10 @@ namespace WordRPG.UI
         private ConfirmDialog quitDialog; // 뒤로가기 → '게임을 끝낼까요?'
         private ConfirmDialog returnDialog; // 보스를 이긴 뒤 '시작 지점으로 돌아갈까요?' (#60)
         private Text heroName, heroHp;
+        private Image heroBadge;
+        private Image companionBadge, companionFace, companionHpFill; // 동료 배지 (#77, Figma 'Companion Badge')
+        private Text companionName;
+        private CompanionCutscene companionCutscene;                  // 동료 조우 연출 (#77)
         private Image heroHpFill;
         private readonly List<(Image back, Image icon, Text level, Text empty)> relicSlots = new List<(Image, Image, Text, Text)>();
 
@@ -164,7 +168,10 @@ namespace WordRPG.UI
         public bool IsPanelOpen => dexView.IsOpen || trainingView.IsOpen || altarView.IsOpen || shopView.IsOpen
                                    || inventoryView.IsOpen || settingsView.IsOpen || mapView.IsOpen || learnView.IsOpen
                                    || (quitDialog != null && quitDialog.IsOpen) || (returnDialog != null && returnDialog.IsOpen)
-                                   || (paywall != null && paywall.IsOpen) || (preemptView != null && preemptView.IsOpen);
+                                   || (paywall != null && paywall.IsOpen) || (preemptView != null && preemptView.IsOpen)
+                                   || (companionCutscene != null && companionCutscene.IsPlaying);
+        public CompanionCutscene CompanionCutscene => companionCutscene;
+        public bool IsCompanionBadgeVisible => companionBadge != null && companionBadge.gameObject.activeSelf;
         public SkillLearnView LearnView => learnView;
         public RoamingMonsters Roaming => roaming;
         public bool IsPreemptAvailable => preemptPrompt != null && preemptPrompt.activeSelf;
@@ -1351,6 +1358,7 @@ namespace WordRPG.UI
             // 주인공 배지 + 끼운 성유물 3칸 (Figma 'Field — HUD (주인공·성유물)' / 'Hero Badge' / 'Relic Slot')
             var strip = UiKit.Rect("HeroStrip", hudRoot, 0, 0.875f, 1, 0.935f);
             var badge = UiKit.RoundPanel("HeroBadge", strip, Palette.Scrim, UiKit.RadiusMd, 0.012f, 0, 0.575f, 1);
+            heroBadge = badge;
             UiKit.AddButton(badge).onClick.AddListener(() => OpenBag(BagTab.Hero)); // 누르면 가방 > 주인공
             var avatar = UiKit.Pill(UiKit.Panel("Avatar", badge.transform, Palette.PanelLight, 0, 0.5f, 0, 0.5f));
             avatar.raycastTarget = false;
@@ -1368,6 +1376,7 @@ namespace WordRPG.UI
             hpBack.rectTransform.offsetMin = new Vector2(104, 0);
             heroHpFill = UiKit.Pill(UiKit.Panel("HpFill", hpBack.transform, Palette.Good));
             heroHpFill.raycastTarget = false;
+            BuildCompanionBadge(strip);
             for (int i = 0; i < HeroData.SlotCount; i++)
             {
                 var back = UiKit.RoundPanel($"RelicSlot_{i}", strip, Palette.PanelLight, UiKit.RadiusMd, 0, 0.5f, 0, 0.5f);
@@ -1422,6 +1431,7 @@ namespace WordRPG.UI
             quitDialog = ConfirmDialog.Create(hudRoot);
             returnDialog = ConfirmDialog.Create(hudRoot);
             paywall = PaywallView.Create(hudRoot);
+            companionCutscene = CompanionCutscene.Create(hudRoot);
             preemptView = PreemptView.Create(hudRoot);
             guide = GuideHints.Create(transform); // 자기 캔버스로 HUD·전투 위에 (눌림은 받지 않음)
         }
@@ -1475,6 +1485,57 @@ namespace WordRPG.UI
             edge.gameObject.AddComponent<AutoPill>();
             edge.raycastTarget = false;
             preemptPrompt.SetActive(false);
+        }
+
+        // 동료 배지 (#77, Figma 'Companion Badge' 168×92): 주인공 배지(줄어듦) 오른쪽 · 성유물 칸 왼쪽. 누르면 가방 > 동료
+        private void BuildCompanionBadge(RectTransform strip)
+        {
+            companionBadge = UiKit.RoundPanel("CompanionBadge", strip, Palette.Scrim, UiKit.RadiusMd, 0.41f, 0, 0.575f, 1);
+            UiKit.AddButton(companionBadge).onClick.AddListener(() => OpenBag(BagTab.Companion));
+            var avatar = UiKit.Pill(UiKit.Panel("Avatar", companionBadge.transform, Palette.PanelLight, 0, 0.5f, 0, 0.5f));
+            avatar.raycastTarget = false;
+            avatar.rectTransform.pivot = new Vector2(0, 0.5f);
+            avatar.rectTransform.sizeDelta = new Vector2(64, 64);
+            avatar.rectTransform.anchoredPosition = new Vector2(10, 0);
+            companionFace = UiKit.IconImage("Face", avatar.transform, null, 0.08f, 0.08f, 0.92f, 0.92f);
+            companionName = UiKit.Label("Name", companionBadge.transform, "", 24, Palette.Text, 0, 0.45f, 1, 0.95f,
+                TextAnchor.MiddleLeft, FontStyle.Bold, true, 16);
+            companionName.rectTransform.offsetMin = new Vector2(82, 0);
+            companionName.rectTransform.offsetMax = new Vector2(-8, 0);
+            var back = UiKit.Pill(UiKit.Panel("HpBack", companionBadge.transform, Palette.Track, 0, 0.2f, 1, 0.36f));
+            back.raycastTarget = false;
+            back.rectTransform.offsetMin = new Vector2(82, 0);
+            back.rectTransform.offsetMax = new Vector2(-12, 0);
+            companionHpFill = UiKit.Pill(UiKit.Panel("HpFill", back.transform, Palette.Good));
+            companionHpFill.raycastTarget = false;
+            companionBadge.gameObject.SetActive(false);
+        }
+
+        private void RefreshCompanionBadge()
+        {
+            var companion = session.PartyCompanion;
+            companionBadge.gameObject.SetActive(companion != null);
+            heroBadge.rectTransform.anchorMax = new Vector2(companion != null ? 0.4f : 0.575f, 1f);
+            if (companion == null) return;
+            companionFace.sprite = UiKit.CompanionPortrait(companion.Data);
+            companionFace.enabled = companionFace.sprite != null;
+            companionName.text = $"{companion.DisplayName} Lv{companion.Level}";
+            float ratio = Mathf.Clamp01((float)companion.CurrentHp / Mathf.Max(1, companion.Stats.MaxHp));
+            companionHpFill.enabled = ratio > 0f;
+            companionHpFill.rectTransform.anchorMax = new Vector2(ratio, 1);
+            companionHpFill.color = ratio > 0.5f ? Palette.Good : ratio > 0.25f ? Palette.Gold : Palette.Bad;
+        }
+
+        // 동료를 만난다 (#77): 조우 연출([함께 가기]까지) → 파티에 → 저장·HUD. 메아리 정글 유적 제단에서 부른다
+        public IEnumerator MeetCompanion(CompanionData companion)
+        {
+            if (companion == null || session.HasCompanion(companion)) yield break;
+            if (moving) SnapPlayer();
+            yield return companionCutscene.Play(companion, Mathf.Max(0.05f, animationScale));
+            session.AddCompanion(companion);
+            SaveNow();
+            RefreshHud();
+            ShowToast($"{UiKit.WithJosa(companion.DisplayName, "이", "가")} 파티에 들어왔다!", 2.5f);
         }
 
         private void UpdateConfirmButton()
@@ -1946,6 +2007,7 @@ namespace WordRPG.UI
             heroHpFill.enabled = ratio > 0f;
             heroHpFill.rectTransform.anchorMax = new Vector2(ratio, 1);
             heroHpFill.color = ratio > 0.5f ? Palette.Good : ratio > 0.25f ? Palette.Gold : Palette.Bad;
+            RefreshCompanionBadge();
             for (int i = 0; i < relicSlots.Count; i++)
             {
                 var relic = hero.SlotAt(i);

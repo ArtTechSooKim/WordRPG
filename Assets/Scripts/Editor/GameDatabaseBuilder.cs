@@ -23,10 +23,12 @@ namespace WordRPG.EditorTools
             var items = LoadAll<ItemData>().OrderBy(i => i.ItemId).ToList();
             var areas = LoadAll<FieldArea>().OrderBy(a => a.AreaId).ToList();
             var relics = LoadAll<RelicData>().OrderBy(r => r.RelicId).ToList();
+            var companions = LoadAll<CompanionData>().OrderBy(c => c.CompanionId).ToList();
             WarnDuplicates(monsters.Select(m => m.SpeciesId), "몬스터");
             WarnDuplicates(relics.Select(r => r.RelicId), "성유물");
             WarnDuplicates(items.Select(i => i.ItemId), "아이템");
             WarnDuplicates(areas.Select(a => a.AreaId), "지역");
+            WarnDuplicates(companions.Select(c => c.CompanionId), "동료");
 
             var database = AssetDatabase.LoadAssetAtPath<GameDatabase>(DatabasePath);
             if (database == null)
@@ -34,10 +36,10 @@ namespace WordRPG.EditorTools
                 database = ScriptableObject.CreateInstance<GameDatabase>();
                 AssetDatabase.CreateAsset(database, DatabasePath);
             }
-            database.ReplaceContents(monsters, items, areas, relics);
+            database.ReplaceContents(monsters, items, areas, relics, companions);
             EditorUtility.SetDirty(database);
             AssetDatabase.SaveAssets();
-            Debug.Log($"[WordRPG] GameDatabase 갱신: 몬스터 {monsters.Count}, 아이템 {items.Count}, 성유물 {relics.Count}, 지역 {areas.Count}");
+            Debug.Log($"[WordRPG] GameDatabase 갱신: 몬스터 {monsters.Count}, 아이템 {items.Count}, 성유물 {relics.Count}, 지역 {areas.Count}, 동료 {companions.Count}");
             return database;
         }
 

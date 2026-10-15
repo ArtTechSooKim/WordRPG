@@ -95,7 +95,8 @@ namespace WordRPG.UI
             else
             {
                 baseColor = Palette.PanelLight;
-                sprite = unit.Hero != null ? UiKit.HeroPortrait(unit.Hero.Data) : null;
+                sprite = unit.Hero != null ? UiKit.HeroPortrait(unit.Hero.Data)
+                    : unit.Companion != null ? UiKit.CompanionPortrait(unit.Companion.Data) : null;
             }
             artSprite.sprite = sprite;
             artSprite.enabled = sprite != null;

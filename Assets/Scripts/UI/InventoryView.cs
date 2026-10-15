@@ -14,7 +14,8 @@ namespace WordRPG.UI
         Hero,     // 주인공 능력치·기술 (HeroInfoPage)
         Relics,   // 모은 성유물 · 장착 (RelicPage)
         Items,    // 강화 재료 · 상처약
-        Keepsakes // 징표 진열장
+        Keepsakes, // 징표 진열장
+        Companion  // 동료 (#77) — 동료를 얻은 뒤에만 탭이 보임 (주인공 다음 자리)
     }
 
     // 소지품 (Figma '소지품 — 주인공' / '— 성유물' / '— 재료(아이템)' / '— 징표 진열장'):
@@ -51,7 +52,9 @@ namespace WordRPG.UI
         public OwnedRelic SelectedRelic => relicPage.Selected;
 
         private Text goldText;
-        private Button heroTab, relicsTab, itemsTab, keepsakesTab;
+        private Button heroTab, relicsTab, itemsTab, keepsakesTab, companionTab;
+        private Button[] tabButtons;
+        private CompanionPage companionPage;
         private GameObject materialsPage, keepsakesPage, detailBox;
         private HeroInfoPage heroPage;
         private RelicPage relicPage;
@@ -81,23 +84,26 @@ namespace WordRPG.UI
             view.goldText = UiKit.IconTitle("Gold", root, UiKit.Icon("gold"), "", 44, Palette.Text, 0, 0.885f, 1, 0.925f);
 
             var tabs = UiKit.RoundPanel("Tabs", root, Palette.Track, UiKit.RadiusMd, 0.022f, 0.815f, 0.978f, 0.872f);
-            var names = new[] { ("TabHero", "주인공", BagTab.Hero), ("TabRelics", "성유물", BagTab.Relics),
+            var names = new[] { ("TabHero", "주인공", BagTab.Hero), ("TabCompanion", "동료", BagTab.Companion), ("TabRelics", "성유물", BagTab.Relics),
                 ("TabItems", "아이템", BagTab.Items), ("TabKeepsakes", "징표", BagTab.Keepsakes) };
             var buttons = new Button[names.Length];
             for (int i = 0; i < names.Length; i++)
             {
-                float x0 = 0.006f + i * 0.247f;
-                buttons[i] = UiKit.MakeButton(names[i].Item1, tabs.transform, names[i].Item2, Color.clear, 44, x0, 0.1f, x0 + 0.24f, 0.9f);
+                buttons[i] = UiKit.MakeButton(names[i].Item1, tabs.transform, names[i].Item2, Color.clear, 44, 0, 0.1f, 0, 0.9f);
                 var tab = names[i].Item3;
                 buttons[i].onClick.AddListener(() => view.SelectTab(tab));
             }
+            view.tabButtons = buttons;
             view.heroTab = buttons[0];
-            view.relicsTab = buttons[1];
-            view.itemsTab = buttons[2];
-            view.keepsakesTab = buttons[3];
+            view.companionTab = buttons[1];
+            view.relicsTab = buttons[2];
+            view.itemsTab = buttons[3];
+            view.keepsakesTab = buttons[4];
+            view.LayoutTabs(false);
 
             view.heroPage = HeroInfoPage.Create(root, 0.022f, 0.105f, 0.978f, 0.8f, slot => view.SelectTab(BagTab.Relics, view.session.Hero.SlotAt(slot)));
             view.relicPage = RelicPage.Create(root, 0.022f, 0.105f, 0.978f, 0.8f);
+            view.companionPage = CompanionPage.Create(root, 0.022f, 0.105f, 0.978f, 0.8f);
             view.BuildMaterials(root);
             view.BuildKeepsakes(root);
             view.BuildDetail(root);
@@ -215,8 +221,29 @@ namespace WordRPG.UI
 
             Root.transform.SetAsLastSibling();
             Root.SetActive(true);
-            SelectTab(tab, relic);
+            bool hasCompanion = session.Companions.Count > 0;
+            LayoutTabs(hasCompanion);
+            SelectTab(tab == BagTab.Companion && !hasCompanion ? BagTab.Hero : tab, relic);
         }
+
+        // 탭 4개(주인공·성유물·아이템·징표), 동료가 있으면 '동료'를 주인공 다음에 넣어 5개 (#77)
+        private void LayoutTabs(bool withCompanion)
+        {
+            companionTab.gameObject.SetActive(withCompanion);
+            int count = withCompanion ? 5 : 4, slot = 0;
+            float width = (0.988f - 0.006f * (count - 1)) / count;
+            foreach (var button in tabButtons)
+            {
+                if (!button.gameObject.activeSelf) continue;
+                var rt = (RectTransform)button.transform;
+                float x0 = 0.006f + slot * (width + 0.006f);
+                rt.anchorMin = new Vector2(x0, 0.1f);
+                rt.anchorMax = new Vector2(x0 + width, 0.9f);
+                slot++;
+            }
+        }
+
+        public CompanionPage CompanionPage => companionPage;
 
         private void CollectItems()
         {
@@ -245,8 +272,11 @@ namespace WordRPG.UI
             StyleTab(relicsTab, tab == BagTab.Relics);
             StyleTab(itemsTab, tab == BagTab.Items);
             StyleTab(keepsakesTab, tab == BagTab.Keepsakes);
+            StyleTab(companionTab, tab == BagTab.Companion);
             if (tab == BagTab.Hero) heroPage.Show(session.Hero);
             else heroPage.Hide();
+            if (tab == BagTab.Companion) companionPage.Show(session, onChanged);
+            else companionPage.Hide();
             if (tab == BagTab.Relics) relicPage.Show(session, database, relic, onChanged);
             else relicPage.Hide();
             if (tab == BagTab.Items) ShowMaterial(0);

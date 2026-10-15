@@ -48,6 +48,9 @@
    - 이미 출시된 id는 바꾸지 말 것. SaveData에 필드 추가는 자유(예전 세이브는 기본값), 기존 필드 의미를 바꿀 때만 version 올리고 변환.
      version을 올리면 예전 앱은 그 세이브를 '너무 새로움'으로 보고 건드리지 않음 (GameManager.SaveBlocked, 깨진 세이브와 구분)
    - 게임 진행 상태는 `GameManager.Instance.Session`에서 얻고, 바뀌면 `GameManager.Save()` 호출
+   - 동료 (#77, 1.1): 데이터 = `CompanionData` SO(companionId — 출시 뒤 바꾸지 말 것, 얼굴 = Art/NinjaAdventure/Companions/{id}.png). 세이브 칸 companions·partyCompanionId.
+     전투는 `GameSession.PartyMembers`(주인공 → 동료 차례), 경험치는 둘 다(`BattleRewardCalculator.ApplyTo`), 이긴 뒤 쓰러진 동료는 HP 1(`AfterBattle`),
+     샘·패배 회복(`RestoreHero`)은 동료도. 얻기 = `FieldScreen.MeetCompanion`(조우 연출) — 동료를 새로 만들면 Refresh Game Database (CompanionDataTests)
    - 세션을 쓰기 시작하는 화면(필드·전투)은 `MarkPlaying()`을 불러야 저장된다 (타이틀에서 시작 전엔 저장 안 함)
    - 설정(`GameSettings`: 음량·진동)은 세이브가 아니라 PlayerPrefs. `GameManager.Settings` / `SaveSettings()`
    - **수익화** (GDD 9-3): 산 상품(`Entitlements`, 정식판 id `com.arttechsoo.wordrpg.full` — 바꾸지 말 것)도 세이브가 아니라 PlayerPrefs.
@@ -109,7 +112,8 @@ Assets/
     Core/               CSV 파서 등 공용
     Words/              단어, 숙련도(VocabularyProgress), 출제(WordSelector), 4지선다(QuizGenerator), 수련 출제(TrainingQuizProvider — 이미 본 단어만)
     Monsters/           적 몬스터 MonsterSpecies·SkillData SO, MonsterInstance, ICombatant(싸우는 것 공통), LevelCurve
-    Heroes/             HeroData SO(주인공), Hero(레벨·HP·성유물 3칸·기술 칸 3개 SkillSlot), RelicData SO(성유물: 기술·각성·보너스·강화 비용), RelicUpgrade(강화 규칙)
+    Heroes/             HeroData SO(주인공), Hero(레벨·HP·성유물 3칸·기술 칸 3개 SkillSlot), RelicData SO(성유물: 기술·각성·보너스·강화 비용), RelicUpgrade(강화 규칙),
+                        CompanionData SO + Companion(동료 #77: 레벨·경험치·HP, 기본 기술 + 레벨에 배우는 기술, 성유물 없음 — 파티 = 주인공 + 동료 1명)
     Items/              ItemData SO(재료·상처약·징표·기술문서), Inventory, ShopData SO + Shop(구매 규칙)
     Battle/             BattleEngine(기술·강도(단어 n개 연속)·상처약·도망(Flee, 보스전 canFlee=false)·연속 정답 수), Combo(콤보 단계·글자·추가 피해), BattleFormulas, BattleReward,
                         BattleSummary(한 판 결산: 새 단어·틀린 단어·기술별 피해·최대 콤보 — 결산 화면용), Preemptive(선제공격: HP 20%·이미 본 단어만)
@@ -131,7 +135,7 @@ Assets/
                         FieldNameTags(오브젝트 이름표),
                         TitleScreen(타이틀), Haptics(진동), UnitView, VirtualStick(가상 스틱 — 누른 자리에 생김, 끝까지 밀면 달리기),
                         GuideHints(튜토리얼: 화면을 막지 않는 한 줄 알약 + 손끝 끌기·톡톡·화살표, 해 보면 끝 — #61),
-                        PaywallView(정식판 안내: 구매·구매 복원·나중에), FieldRoamerViews(필드 위 보이는 몬스터 그림·'!') · PreemptView([선제공격] QTE: 집중선·줄어드는 원·2×2 선택지·결과 도장 + TargetLock 조준 괄호),
+                        PaywallView(정식판 안내: 구매·구매 복원·나중에), CompanionViews(가방 > 동료 탭 CompanionPage · 동료 조우 연출 CompanionCutscene — #77), FieldRoamerViews(필드 위 보이는 몬스터 그림·'!') · PreemptView([선제공격] QTE: 집중선·줄어드는 원·2×2 선택지·결과 도장 + TargetLock 조준 괄호),
                         UiRing(두께가 일정한 원 테두리 — 코드로 만들 땐 CanvasRenderer를 먼저 붙임),
                         FieldArt(필드 타일·잠긴/지역별 출입구) · PlayerArt(주인공) · PlaceholderArt(그림이 없을 때 임시 도트), Sound(음악·효과음·징글),
                         BattleFx(전투 효과) + FieldFx(필드 위 효과) + IdleBob, MapViews(미니맵·지도),

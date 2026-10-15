@@ -232,6 +232,13 @@ namespace WordRPG.EditorTools
             SetBossGate("Assets/Data/Areas/library.asset", libraryKey, 40);
             SetBossGate("Assets/Data/Areas/forest.asset", forestKey, 40);
 
+            // --- 동료 (#77, 1.1 메아리 정글): 유적 석판 4개 + 정글 단어 60개 → 아라를 만남 (얻는 곳은 정글을 만들 때 붙임) ---
+            var araPebble = Skill("ara_pebble", "돌팔매", "돌을 던져 적 하나를 맞힌다.", SkillKind.Damage, SkillTarget.SingleEnemy, 12, QuizDirection.EnglishToMeaning);
+            var araSprout = Skill("ara_sprout", "새싹 치유", "새싹의 힘으로 아군 하나를 치유한다.", SkillKind.Heal, SkillTarget.SingleAlly, 20, QuizDirection.MeaningToEnglish);
+            var araEcho = Skill("ara_echo", "메아리 방패", "메아리를 둘러 모두를 지킨다.", SkillKind.Guard, SkillTarget.AllAllies, 8, QuizDirection.EnglishToMeaning);
+            Companion("ara", "아라", "유적에 갇혀 고대 단어를 지키던 정글 소녀. 석판의 빈칸을 채워 준 주인공을 따라 함께 떠난다.",
+                "정글 소녀 · 회복·보조", new MonsterStats(52, 11, 11), new MonsterStats(6, 2, 2), araPebble, (1, araSprout), (8, araEcho));
+
             // --- 출입구 연결 (맵의 D를 위→아래, 왼→오른 순): 초원 0 = 서고, 초원 1 = 숲(서고 보스를 물리치면 열림) ---
             const string meadowPath = "Assets/Data/Areas/meadow.asset", libraryPath = "Assets/Data/Areas/library.asset",
                 forestPath = "Assets/Data/Areas/forest.asset";
@@ -609,6 +616,30 @@ namespace WordRPG.EditorTools
                 var list = Prop(so, "startingRelics");
                 list.arraySize = startingRelics.Length;
                 for (int i = 0; i < startingRelics.Length; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = startingRelics[i];
+            });
+        }
+
+        // 동료 (#77): 기본 기술 + (배우는 레벨, 기술)
+        private static CompanionData Companion(string id, string name, string description, string role, MonsterStats baseStats,
+            MonsterStats growth, SkillData basicSkill, params (int level, SkillData skill)[] learned)
+        {
+            return CreateIfMissing<CompanionData>($"{Root}/Companions/{id}.asset", so =>
+            {
+                Prop(so, "companionId").stringValue = id;
+                Prop(so, "displayName").stringValue = name;
+                Prop(so, "description").stringValue = description;
+                Prop(so, "role").stringValue = role;
+                SetStats(Prop(so, "baseStats"), baseStats);
+                SetStats(Prop(so, "growthPerLevel"), growth);
+                Prop(so, "basicSkill").objectReferenceValue = basicSkill;
+                var list = Prop(so, "learnedSkills");
+                list.arraySize = learned.Length;
+                for (int i = 0; i < learned.Length; i++)
+                {
+                    var element = list.GetArrayElementAtIndex(i);
+                    element.FindPropertyRelative("level").intValue = learned[i].level;
+                    element.FindPropertyRelative("skill").objectReferenceValue = learned[i].skill;
+                }
             });
         }
 

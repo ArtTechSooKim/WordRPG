@@ -322,7 +322,7 @@ namespace WordRPG.UI
                 provider = quizService;
             }
             // 연속 정답 콤보는 전투가 바뀌어도 이어진다. 보스전은 도망칠 수 없다
-            engine = new BattleEngine(new ICombatant[] { session.Hero }, enemies, provider, battleConfig, rng,
+            engine = new BattleEngine(session.PartyMembers, enemies, provider, battleConfig, rng,
                 session.StartBattleCombo(DateTime.UtcNow), canFlee: !bossBattle);
             fleeEvents = null;
 
@@ -339,10 +339,15 @@ namespace WordRPG.UI
                 enemyViews.Add(view);
                 viewOf[engine.Enemies[i]] = view;
             }
+            // 아군 카드: 혼자면 가운데, 동료와 둘이면 나란히 (#77)
+            int members = Mathf.Min(engine.Party.Count, partyViews.Length);
+            float partyStart = (1f - members / 3f) / 2f;
             for (int i = 0; i < partyViews.Length; i++)
             {
                 if (i < engine.Party.Count)
                 {
+                    partyViews[i].Root.anchorMin = new Vector2(partyStart + i / 3f, 0f);
+                    partyViews[i].Root.anchorMax = new Vector2(partyStart + (i + 1) / 3f, 1f);
                     partyViews[i].Root.gameObject.SetActive(true);
                     partyViews[i].Bind(engine.Party[i]);
                     viewOf[engine.Party[i]] = partyViews[i];
@@ -756,10 +761,12 @@ namespace WordRPG.UI
 
             int levelBefore = hero.Level, levels = 0;
             BattleReward reward = null;
+            companionGrowth = "";
             if (victory)
             {
                 reward = engine.CalculateReward();
                 levels = BattleRewardCalculator.Apply(reward, hero, session.Inventory);
+                companionGrowth = GrowCompanion(reward);
             }
             var completions = session.ClaimDexRewards(new[] { words });
             // 결과 소리: 도감 완성 > 레벨 업 > 승리, 지면 패배 (도망치면 도망 소리를 이미 냈다)
@@ -783,12 +790,26 @@ namespace WordRPG.UI
             while (resultChoice < 0) yield return null;
             relayoutResult = null;
 
-            // 패배 후 재도전, 또는 '회복' 선택 시 완전 회복 (도망치면 줄어든 HP 그대로)
-            if (phase == BattlePhase.Defeat || resultChoice == 1)
-            {
-                session.RestoreHero();
-                saveProgress?.Invoke();
-            }
+            // 패배 후 재도전, 또는 '회복' 선택 시 완전 회복 (도망치면 줄어든 HP 그대로).
+            // 이기거나 도망쳤으면 쓰러졌던 동료는 HP 1로 일어난다 (#77)
+            if (phase == BattlePhase.Defeat || resultChoice == 1) session.RestoreHero();
+            else session.AfterBattle();
+            saveProgress?.Invoke();
+        }
+
+        private string companionGrowth = ""; // 결산 부제에 붙이는 동료 성장 한 줄 (#77)
+
+        // 동료도 같은 경험치 (#77): 레벨이 오르면 "아라 레벨 업! Lv6", 새 기술을 배우면 "· '메아리 방패'를 배웠다"
+        private string GrowCompanion(BattleReward reward)
+        {
+            var companion = session.PartyCompanion;
+            if (companion == null) return "";
+            int before = companion.Level;
+            if (BattleRewardCalculator.ApplyTo(reward, companion) <= 0) return "";
+            string line = $"{companion.DisplayName} 레벨 업! Lv{companion.Level}";
+            foreach (var skill in companion.Data.SkillsLearnedBetween(before, companion.Level))
+                line += $" · '{skill.DisplayName}'{UiKit.WithJosa(skill.DisplayName, "을", "를").Substring(skill.DisplayName.Length)} 배웠다";
+            return line;
         }
 
         // 수련 결산 (Figma 'Battle — 수련 결산 (#44)'): 보상 없음. 준 피해 · 가장 활약한 성유물 · 기록 · 복습한 단어 · 틀린 단어
@@ -903,10 +924,10 @@ namespace WordRPG.UI
             resultTitle.color = victory ? Palette.Gold : fled ? Palette.TextDim : Palette.Bad;
             PlaceResult(resultTitle.rectTransform, ref y, 140f, 0f);
             string fainted = UiKit.WithJosa(hero.DisplayName, "이", "가");
-            resultSubtitle.text = victory ? DefeatedLine()
+            resultSubtitle.text = victory ? (companionGrowth.Length > 0 ? $"{DefeatedLine()}\n{companionGrowth}" : DefeatedLine())
                 : fled ? "무사히 빠져나왔다 — 이번 전투 보상은 없어요"
                 : loopBattles ? $"{fainted} 쓰러졌다. 회복하고 다시 도전하자!" : $"{fainted} 쓰러졌다… 시작 지점으로 돌아간다.";
-            PlaceResult(resultSubtitle.rectTransform, ref y, 52f, ResultGap);
+            PlaceResult(resultSubtitle.rectTransform, ref y, victory && companionGrowth.Length > 0 ? 100f : 52f, ResultGap); // 동료 성장 한 줄이 붙으면 두 줄
 
             growthCard.gameObject.SetActive(victory);
             rewardRow.gameObject.SetActive(victory);
@@ -1123,12 +1144,12 @@ namespace WordRPG.UI
                 skillButtons[i].onClick.AddListener(() => OnSkillClicked(skill));
             }
 
-            // 상처약: 가진 개수, HP가 가득이면 잠금
-            bool isHero = actor.Hero != null;
-            itemButton.gameObject.SetActive(isHero && !training);
-            fleeButton.gameObject.SetActive(isHero && !training);
+            // 상처약: 가진 개수, HP가 가득이면 잠금 (동료 차례에도 — 그 차례인 아군에게, #77)
+            bool isPlayer = actor.IsPlayerSide;
+            itemButton.gameObject.SetActive(isPlayer && !training);
+            fleeButton.gameObject.SetActive(isPlayer && !training);
             trainingEndButton.gameObject.SetActive(training);
-            if (isHero && !training)
+            if (isPlayer && !training)
             {
                 int potions = 0;
                 foreach (var item in HealingItems()) potions += session.Inventory.GetCount(item);
@@ -1175,9 +1196,10 @@ namespace WordRPG.UI
             cantFleeRoutine = null;
         }
 
-        // "깃펜 · " (성유물 기술) / "기본 · " (주인공 기본 기술). 적이면 빈 글자
+        // "깃펜 · " (성유물 기술) / "기본 · " (기본 기술) / "아라 · " (동료가 배운 기술, #77). 적이면 빈 글자
         private static string SourcePrefix(BattleUnit actor, SkillData skill)
         {
+            if (actor.Companion != null) return actor.Companion.Data.BasicSkill == skill ? "기본 · " : $"{actor.Companion.DisplayName} · ";
             if (actor.Hero == null) return "";
             var source = actor.Hero.SourceOf(skill);
             return source != null ? $"{source.SourceName} · " : "기본 · ";
@@ -1841,9 +1863,10 @@ namespace WordRPG.UI
                 TextAnchor.MiddleLeft, FontStyle.Normal, true, 22);
             UiKit.Pad(logLabel.rectTransform, 24, 8, 24, 8);
 
-            // 주인공 카드 (가운데 한 장)
+            // 아군 카드: 주인공 (+ 동료, #77 — 자리는 BeginBattle에서 인원에 맞춤)
             var partyArea = UiKit.Rect("PartyArea", root, 0, 0.355f, 1, 0.51f);
-            partyViews = new[] { UnitView.Create(partyArea, "Party_0", 1f / 3f, 0, 2f / 3f, 1) };
+            partyViews = new[] { UnitView.Create(partyArea, "Party_0", 1f / 3f, 0, 2f / 3f, 1),
+                                 UnitView.Create(partyArea, "Party_1", 2f / 3f, 0, 1f, 1) };
 
             // 하단 패널들
             var bottom = UiKit.Rect("Bottom", root, 0, 0, 1, 0.35f);

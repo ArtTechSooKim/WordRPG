@@ -59,6 +59,10 @@ namespace WordRPG.Battle
             return new BattleReward(exp, gold, items);
         }
 
+        // 동료도 같은 경험치를 받는다 (#77 — 사용자 결정: 둘 다 받아 각자 레벨업). 반환: 오른 레벨 수
+        public static int ApplyTo(BattleReward reward, Companion companion) =>
+            companion != null ? companion.GainExp(reward.Exp) : 0;
+
         // 주인공이 경험치를 받고, 골드·떨어뜨린 재료는 소지품으로. 반환: 오른 레벨 수
         public static int Apply(BattleReward reward, Hero hero, Inventory inventory)
         {

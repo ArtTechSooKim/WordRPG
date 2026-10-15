@@ -10,6 +10,7 @@ namespace WordRPG.Battle
         public ICombatant Combatant { get; }
         public MonsterInstance Monster => Combatant as MonsterInstance; // 적이면 몬스터, 주인공이면 null
         public Hero Hero => Combatant as Hero;
+        public Companion Companion => Combatant as Companion; // 동료 (#77)
         public bool IsPlayerSide { get; }
         public int Index { get; } // 같은 편 안에서의 위치 (UI 배치용)
         public int Shield { get; private set; }
