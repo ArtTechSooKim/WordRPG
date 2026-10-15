@@ -142,6 +142,7 @@ namespace WordRPG.UI
         private Image companionBadge, companionFace, companionHpFill; // 동료 배지 (#77, Figma 'Companion Badge')
         private Text companionName;
         private CompanionCutscene companionCutscene;                  // 동료 조우 연출 (#77)
+        private FieldFollower follower;                               // 주인공을 따라다니는 동료 그림 (#78)
         private Image heroHpFill;
         private readonly List<(Image back, Image icon, Text level, Text empty)> relicSlots = new List<(Image, Image, Text, Text)>();
 
@@ -171,6 +172,7 @@ namespace WordRPG.UI
                                    || (paywall != null && paywall.IsOpen) || (preemptView != null && preemptView.IsOpen)
                                    || (companionCutscene != null && companionCutscene.IsPlaying);
         public CompanionCutscene CompanionCutscene => companionCutscene;
+        public FieldFollower Follower => follower;
         public bool IsCompanionBadgeVisible => companionBadge != null && companionBadge.gameObject.activeSelf;
         public SkillLearnView LearnView => learnView;
         public RoamingMonsters Roaming => roaming;
@@ -1239,6 +1241,7 @@ namespace WordRPG.UI
             player = playerGo.transform;
             playerRenderer = playerGo.GetComponent<SpriteRenderer>();
             playerRenderer.sortingOrder = 10;
+            follower = new FieldFollower(transform);
             roamerViews = new FieldRoamerViews(transform, CellCenter);
 
             cam = Camera.main;
@@ -1511,9 +1514,22 @@ namespace WordRPG.UI
             companionBadge.gameObject.SetActive(false);
         }
 
+        // 동료 그림은 보이기만 한다 — 순간이동 뒤 '주인공 뒤 한 칸'이 벽이면 주인공 자리에서 나오게 할 때만 칸을 본다
+        private bool CanFollowerStand(Vector3 world) =>
+            walker != null && walker.CanStand(new Vector2Int(Mathf.FloorToInt(world.x), Mathf.FloorToInt(world.y)));
+
+        // 주인공 이동이 끝난 뒤 같은 프레임에 동료가 자취를 따라온다 (#78)
+        private void LateUpdate()
+        {
+            if (follower == null || walker == null || session == null) return;
+            follower.SetCompanion(session.PartyCompanion?.Data, player.position, walker.Facing, CanFollowerStand); // 바뀌었을 때만
+            follower.Tick(player.position, walker.Facing, CanFollowerStand);
+        }
+
         private void RefreshCompanionBadge()
         {
             var companion = session.PartyCompanion;
+            if (walker != null) follower.SetCompanion(companion?.Data, player.position, walker.Facing, CanFollowerStand);
             companionBadge.gameObject.SetActive(companion != null);
             heroBadge.rectTransform.anchorMax = new Vector2(companion != null ? 0.4f : 0.575f, 1f);
             if (companion == null) return;

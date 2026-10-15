@@ -110,6 +110,32 @@ namespace WordRPG.Tests
             Object.Destroy(field.gameObject);
         }
 
+        // #78: 함께 다니는 동료가 필드에서 주인공 한 칸 뒤를 따라온다 (보이기만 하는 그림)
+        [UnityTest]
+        public IEnumerator CompanionFollowsOneTileBehind()
+        {
+            var (field, session, ara) = Create();
+            session.AddCompanion(ara);
+            yield return null;
+            yield return null;
+            Assert.IsTrue(field.Follower.Visible, "함께 다니는 동료는 필드에 보임");
+            var start = field.PlayerCell;
+
+            yield return HoldStick(field, Direction.Right, () => field.PlayerCell.x >= start.x + 2, 3f);
+            yield return WaitFor(() => !field.IsMoving, 2f);
+            yield return null;
+            var hero = new Vector3(field.PlayerCell.x + 0.5f, field.PlayerCell.y + 0.5f, 0f);
+            Assert.AreEqual(1f, Vector3.Distance(hero, field.Follower.Position), 0.05f, "한 칸 뒤");
+            Assert.Less(field.Follower.Position.x, hero.x, "지나온 쪽(왼쪽)에");
+            Assert.AreEqual(Direction.Right, field.Follower.Facing, "같은 쪽을 보며 걸어옴");
+
+            // 쉬게 하면 사라짐
+            session.SetPartyCompanion(null);
+            yield return null;
+            Assert.IsFalse(field.Follower.Visible, "쉬는 동료는 안 보임");
+            Object.Destroy(field.gameObject);
+        }
+
         // 지금 차례의 첫 기술을 골라(대상이 필요하면 첫 대상) 정답을 누른다
         private static IEnumerator AnswerTurn(FieldScreen field, Transform root)
         {

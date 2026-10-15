@@ -73,3 +73,35 @@ namespace WordRPG.UI
         }
     }
 }
+
+namespace WordRPG.UI
+{
+    // 주인공과 같은 배치의 Ninja Adventure 캐릭터 시트 (열 = 방향 아래·위·왼쪽·오른쪽, 행 0~3 = 걷기 4프레임, 16×16 칸).
+    // 동료가 필드에서 따라다닐 때 쓴다 (#78, 아라 = Companions/ara_sheet). 시트가 없으면 null
+    public class CharacterSheet
+    {
+        private const int Cell = 16;
+        private const int WalkFrames = 4;
+
+        private readonly Texture2D sheet;
+        private readonly Dictionary<int, Sprite> cache = new Dictionary<int, Sprite>();
+
+        public bool IsLoaded => sheet != null;
+
+        public CharacterSheet(string resourcePath) => sheet = Resources.Load<Texture2D>(resourcePath);
+
+        public Sprite Get(Direction facing, int step)
+        {
+            if (sheet == null) return null;
+            int column = facing == Direction.Down ? 0 : facing == Direction.Up ? 1 : facing == Direction.Left ? 2 : 3;
+            int row = ((step % WalkFrames) + WalkFrames) % WalkFrames;
+            int key = column * 16 + row;
+            if (cache.TryGetValue(key, out var cached) && cached != null) return cached;
+            var rect = new Rect(column * Cell, sheet.height - (row + 1) * Cell, Cell, Cell);
+            var sprite = Sprite.Create(sheet, rect, new Vector2(0.5f, 0.5f), Cell, 0, SpriteMeshType.FullRect);
+            sprite.name = $"{sheet.name}_{facing}_{row}";
+            cache[key] = sprite;
+            return sprite;
+        }
+    }
+}
