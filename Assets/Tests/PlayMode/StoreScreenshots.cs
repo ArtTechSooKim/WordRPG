@@ -278,7 +278,7 @@ namespace WordRPG.Tests
             Private<RelicAltarView>(field, "altarView").Hide();
 
             // 7) 단어 도감 + 단어 하나 자세히
-            Study(session, meadow.Words, 180, now);
+            Study(session, meadow.Words, 110, now); // 지역마다 150개 (#76) — 다 채우기 전 모습
             Private<DexView>(field, "dexView").Show(meadow.Words, session, now);
             yield return new WaitForSecondsRealtime(0.3f);
             FindButton(field.transform, "DexRow_3").onClick.Invoke();
