@@ -78,16 +78,22 @@ namespace WordRPG.Tests
             yield return HoldStick(field, Direction.Right, () => field.IsPreemptAvailable || field.IsInBattle, 6f);
             Assert.IsFalse(field.IsInBattle, "보이는 몬스터 지역에서는 풀숲 조우가 없음");
             Assert.IsTrue(field.IsPreemptAvailable, "쫓아오는 몬스터가 가까우면 [선제공격]");
+            Assert.IsTrue(field.IsPreemptLockVisible, "그 몬스터에 빨간 조준 괄호");
             Assert.IsTrue(roamer.State == RoamerState.Chasing || roamer.State == RoamerState.Noticing, "나를 발견함");
+            yield return null;
+            Assert.Less(field.Roaming.SlowFactor, 0.5f, "기회가 오면 잠깐 몬스터가 느려짐 (QTE 슬로모션 — 누를 틈)");
 
             FindButton(field.transform, "PreemptButton").onClick.Invoke();
             yield return WaitFor(() => field.Preempt.IsOpen, 2f);
-            Assert.IsTrue(field.Preempt.IsOpen, "누르면 문제 창");
+            Assert.IsTrue(field.Preempt.IsOpen, "누르면 QTE");
+            Assert.IsFalse(field.IsPreemptLockVisible, "QTE 중에는 필드 괄호 대신 QTE의 금색 괄호");
             var question = field.Preempt.Question;
             Assert.AreNotEqual(MasteryLevel.New, session.Vocabulary.GetLevel(question.Word.Id), "이미 본 단어만");
             Assert.LessOrEqual(field.Roaming.SlowFactor, 0.2f, "문제를 푸는 동안 몬스터가 느려짐");
 
             ActiveButton(field.transform, $"PreemptChoice_{question.CorrectIndex}").onClick.Invoke();
+            Assert.AreEqual("선제공격 성공!", field.Preempt.StampText, "맞히면 성공 도장");
+            Assert.IsFalse(field.Battle.IsRunning, "도장을 잠깐 보여 준 뒤 전투");
             yield return WaitFor(() => field.Battle.IsRunning, 3f);
             Assert.IsTrue(field.Battle.IsRunning, "맞히면 전투 시작");
             Assert.AreEqual(1, field.PreemptStrikes);
@@ -103,6 +109,32 @@ namespace WordRPG.Tests
             Assert.AreEqual(0, field.Roaming.Roamers.Count);
             Assert.AreEqual(0, field.RoamerViewCount);
             Assert.AreEqual(1, field.Roaming.PendingRespawns);
+            Object.Destroy(field.gameObject);
+        }
+
+        [UnityTest]
+        public IEnumerator MissingThePreemptQuizStartsAPlainBattle()
+        {
+            var session = GameSession.NewGame(Hero(), 5);
+            var (field, words) = Create(session);
+            for (int i = 0; i < 5; i++) session.Vocabulary.Discover(words.Words[i].Id, System.DateTime.UtcNow.AddDays(-1));
+            yield return null;
+            yield return null;
+
+            yield return HoldStick(field, Direction.Right, () => field.IsPreemptAvailable || field.IsInBattle, 6f);
+            Assert.IsTrue(field.IsPreemptAvailable);
+            FindButton(field.transform, "PreemptButton").onClick.Invoke();
+            yield return WaitFor(() => field.Preempt.IsOpen, 2f);
+
+            // 틀리면 '놓쳤다!' 도장 → 보너스 없이 그냥 전투 (사용자 결정)
+            int wrong = (field.Preempt.Question.CorrectIndex + 1) % field.Preempt.Question.Choices.Count;
+            ActiveButton(field.transform, $"PreemptChoice_{wrong}").onClick.Invoke();
+            Assert.AreEqual("놓쳤다!", field.Preempt.StampText);
+            yield return WaitFor(() => field.Battle.IsRunning, 3f);
+            Assert.IsTrue(field.Battle.IsRunning, "틀려도 전투는 시작");
+            Assert.AreEqual(0, field.PreemptStrikes);
+            var leader = field.Battle.Engine.Enemies[0].Monster;
+            Assert.AreEqual(leader.Stats.MaxHp, leader.CurrentHp, "HP 그대로");
             Object.Destroy(field.gameObject);
         }
 

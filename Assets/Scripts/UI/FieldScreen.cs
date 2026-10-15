@@ -123,11 +123,18 @@ namespace WordRPG.UI
         // 보이는 몬스터 조우 (#73, 사막부터 — GDD 9-5): 규칙 = RoamingMonsters, 그림 = FieldRoamerViews, [선제공격] 문제 = PreemptView
         private RoamingMonsters roaming;
         private FieldRoamerViews roamerViews;
-        private PreemptView preemptView;
+        private PreemptView preemptView;    // QTE (#74): 집중선·줄어드는 원·2×2 선택지
+        private GameObject preemptPrompt;   // 둥근 [선제공격!] 버튼 묶음 (Figma 'Preempt Prompt')
         private Button preemptButton;
+        private UiRing preemptRing;         // 버튼 둘레에서 줄어드는 금색 원 = 남은 기회 (QTE)
+        private float preemptWindow;        // 버튼이 뜬 뒤 지난 시간 (기회 슬로모션)
+        private TargetLock preemptLock;     // 선제공격 거리의 몬스터에 빨간 조준 괄호
+        private RectTransform markLayer;    // 몬스터 위치에 붙는 HUD 표시 층 (PreemptView와 같은 좌표)
         private Roamer battleRoamer; // 지금 싸우는 보이는 몬스터 (이기면 사라지고, 도망치면 잠깐 멈춤)
         private List<IReadOnlyList<WordEntry>> preemptBooks = new List<IReadOnlyList<WordEntry>>(); // 선제공격 문제 = 이미 본 단어만
-        private const float PreemptSlow = 0.15f;
+        private const float PreemptSlow = 0.15f;        // QTE 문제를 푸는 동안 몬스터 속도
+        private const float PreemptChanceSlow = 0.35f;  // 버튼이 막 떴을 때 (기회 슬로모션 — 누를 틈)
+        private const float PreemptWindowSeconds = 1.5f;
         private ConfirmDialog quitDialog; // 뒤로가기 → '게임을 끝낼까요?'
         private ConfirmDialog returnDialog; // 보스를 이긴 뒤 '시작 지점으로 돌아갈까요?' (#60)
         private Text heroName, heroHp;
@@ -160,7 +167,8 @@ namespace WordRPG.UI
                                    || (paywall != null && paywall.IsOpen) || (preemptView != null && preemptView.IsOpen);
         public SkillLearnView LearnView => learnView;
         public RoamingMonsters Roaming => roaming;
-        public bool IsPreemptAvailable => preemptButton != null && preemptButton.gameObject.activeSelf;
+        public bool IsPreemptAvailable => preemptPrompt != null && preemptPrompt.activeSelf;
+        public bool IsPreemptLockVisible => preemptLock != null && preemptLock.IsActive;
         public PreemptView Preempt => preemptView;
         public int PreemptStrikes { get; private set; } // 선제공격 성공 횟수 (테스트용)
         public int RoamerViewCount => roamerViews != null ? roamerViews.Count : 0;
@@ -1329,11 +1337,11 @@ namespace WordRPG.UI
             stick = VirtualStick.Create(hudRoot, 0.4f, 0f, 1f, 0.27f);
             // [확인]은 왼쪽 아래로 따로 (스틱을 밀면서 다른 손가락으로 누를 수 있게)
             BuildConfirmButton(UiKit.Rect("ConfirmArea", hudRoot, 0.02f, 0.03f, 0.36f, 0.24f));
-            // [선제공격] (#73): 쫓아오는 몬스터가 가까우면 [확인] 바로 위에 (왼손 엄지로 누르게)
-            preemptButton = UiKit.MakeButton("PreemptButton", hudRoot, "선제공격!", Palette.Attack, 46, 0.04f, 0.245f, 0.34f, 0.305f);
-            UiKit.Pill(preemptButton.image);
-            preemptButton.onClick.AddListener(StartPreempt);
-            preemptButton.gameObject.SetActive(false);
+            // [선제공격] (#73 → #74 QTE): 쫓아오는 몬스터가 가까우면 몬스터에 빨간 조준 괄호, [확인] 바로 위에 둥근 버튼 (왼손 엄지로)
+            markLayer = UiKit.Stretch("RoamerMarks", hudRoot);
+            preemptLock = TargetLock.Create(markLayer, Palette.Bad, false);
+            preemptLock.SetActive(false);
+            BuildPreemptPrompt(UiKit.Rect("PreemptPrompt", hudRoot, 0.19f, 0.3f, 0.19f, 0.3f));
 
             // 조우 연출용 번쩍임
             flash = UiKit.Panel("EncounterFlash", hudRoot, Color.clear);
@@ -1369,6 +1377,41 @@ namespace WordRPG.UI
             confirmRing.raycastTarget = false;
             confirmLabel = UiKit.Display(UiKit.Label("Label", confirmImage.transform, "확인", 52, Palette.Text, 0, 0, 1, 1));
             SetConfirmReady(false);
+        }
+
+        // 둥근 [선제공격!] (Figma 'Preempt Prompt' 264×284): 빨간 원 196 + 금테 + 칼 아이콘 + '선제공격!' 알약, 바깥 고리가 퍼지며 맥박
+        private void BuildPreemptPrompt(RectTransform area)
+        {
+            area.sizeDelta = new Vector2(264, 284);
+            preemptPrompt = area.gameObject;
+            var glow = UiKit.IconImage("Glow", area, UiKit.GlowSprite(), 0.5f, 0.5f, 0.5f, 0.5f);
+            glow.rectTransform.sizeDelta = new Vector2(320, 320);
+            glow.rectTransform.anchoredPosition = new Vector2(0, 18);
+            glow.color = new Color(Palette.Gold.r, Palette.Gold.g, Palette.Gold.b, 0.45f);
+            preemptRing = UiRing.Create("WindowRing", area, Palette.Gold, 6f, 300f);
+            preemptRing.rectTransform.anchoredPosition = new Vector2(0, 18);
+            var core = UiKit.Pill(UiKit.Panel("PreemptButton", area, Palette.Attack, 0.5f, 0.5f, 0.5f, 0.5f));
+            core.rectTransform.sizeDelta = new Vector2(196, 196);
+            core.rectTransform.anchoredPosition = new Vector2(0, 18);
+            preemptButton = UiKit.AddButton(core);
+            preemptButton.onClick.AddListener(StartPreempt);
+            var rim = UiRing.Create("Rim", core.transform, Palette.Gold, 6f, 196f);
+            rim.rectTransform.anchorMin = Vector2.zero;
+            rim.rectTransform.anchorMax = Vector2.one;
+            rim.rectTransform.sizeDelta = Vector2.zero;
+            var icon = UiKit.IconImage("Icon", core.transform, UiKit.Icon("skill_attack"), 0.5f, 0.5f, 0.5f, 0.5f);
+            icon.rectTransform.sizeDelta = new Vector2(92, 92);
+            icon.rectTransform.anchoredPosition = new Vector2(0, 16);
+
+            var label = UiKit.Pill(UiKit.Panel("Label", area, Palette.Attack, 0.5f, 0.5f, 0.5f, 0.5f));
+            label.raycastTarget = false;
+            var text = UiKit.Display(UiKit.OneLine(UiKit.Label("Text", label.transform, "선제공격!", 42, Palette.Text, 0, 0, 1, 1)));
+            label.rectTransform.sizeDelta = new Vector2(text.preferredWidth + 56, 58);
+            label.rectTransform.anchoredPosition = new Vector2(0, -94);
+            var edge = UiKit.Outline(UiKit.Panel("Edge", label.transform, Palette.Gold), 32, 4);
+            edge.gameObject.AddComponent<AutoPill>();
+            edge.raycastTarget = false;
+            preemptPrompt.SetActive(false);
         }
 
         private void UpdateConfirmButton()
@@ -1644,7 +1687,8 @@ namespace WordRPG.UI
             preemptView.Tick(dt);
             if (roaming == null)
             {
-                if (preemptButton.gameObject.activeSelf) preemptButton.gameObject.SetActive(false);
+                if (preemptPrompt.activeSelf) preemptPrompt.SetActive(false);
+                preemptLock.SetActive(false);
                 return;
             }
             roamerViews.Tick(dt);
@@ -1652,7 +1696,8 @@ namespace WordRPG.UI
             bool paused = inBattle || transitioning || fieldTutorialRunning || revealingGate || (IsPanelOpen && !quiz);
             if (!paused)
             {
-                roaming.SlowFactor = quiz ? PreemptSlow : 1f;
+                bool chance = preemptPrompt.activeSelf && preemptWindow < PreemptWindowSeconds;
+                roaming.SlowFactor = quiz ? PreemptSlow : chance ? PreemptChanceSlow : 1f;
                 var events = roaming.Tick(dt, walker.Position);
                 roamerViews.Apply(events, roaming.Rules, roaming.SlowFactor);
                 foreach (var e in events)
@@ -1665,23 +1710,64 @@ namespace WordRPG.UI
                     }
                 }
             }
-            UpdatePreemptButton(paused || quiz);
+            UpdatePreemptButton(paused || quiz, dt);
         }
 
-        private void UpdatePreemptButton(bool hidden)
+        private void UpdatePreemptButton(bool hidden, float dt)
         {
-            bool show = !hidden && !IsPanelOpen && preemptBooks.Count > 0 && roaming.PreemptTarget(walker.Position) != null;
-            if (preemptButton.gameObject.activeSelf != show) preemptButton.gameObject.SetActive(show);
-            if (!show) return;
-            preemptButton.transform.localScale = Vector3.one * (1f + Mathf.Abs(Mathf.Sin(Time.unscaledTime * 6f)) * 0.06f);
+            var target = hidden || IsPanelOpen || preemptBooks.Count == 0 ? null : roaming.PreemptTarget(walker.Position);
+            bool show = target != null;
+            if (preemptPrompt.activeSelf != show) preemptPrompt.SetActive(show);
+            UpdatePreemptLock(target);
+            if (!show)
+            {
+                preemptWindow = 0f;
+                return;
+            }
+            // 기회 슬로모션 (QTE): 버튼이 뜨면 1.5초 동안 몬스터가 느려지고, 버튼 둘레의 금색 원이 줄어들며 남은 기회를 보여 줌
+            // (Figma 'Preempt Prompt' Window=Open → Closing). 원이 다 줄면 원래 속도 — 그래도 부딪히기 전까지는 누를 수 있다
+            preemptWindow += dt;
+            float window = Mathf.Clamp01(preemptWindow / PreemptWindowSeconds);
+            preemptButton.transform.localScale = Vector3.one * (1f + Mathf.Sin(Time.unscaledTime * 8f) * 0.04f);
+            preemptRing.gameObject.SetActive(window < 1f);
+            preemptRing.rectTransform.sizeDelta = Vector2.one * Mathf.Lerp(300f, 204f, window);
+            preemptRing.color = window > 0.7f ? Palette.Bad : Palette.Gold;
             if (showTutorials && !guide.IsShowing && !session.Tutorials.Has(TutorialProgress.Preempt))
             {
                 StartCoroutine(guide.Run(session, TutorialProgress.Preempt, new GuideHints.Hint
                 {
                     Text = "누르고 뜻을 맞히면 먼저 한 방!", Target = () => (RectTransform)preemptButton.transform,
                     Gesture = GuideHints.Gesture.Tap, DoneWhen = () => preemptView.IsOpen || inBattle
-                }, SaveNow, () => !preemptButton.gameObject.activeSelf && !preemptView.IsOpen));
+                }, SaveNow, () => !preemptPrompt.activeSelf && !preemptView.IsOpen));
             }
+        }
+
+        // 선제공격 거리의 몬스터에 빨간 조준 괄호 (1.5칸, 천천히 숨쉬듯)
+        private void UpdatePreemptLock(Roamer target)
+        {
+            var point = target != null && roamerViews.WorldPosition(target) is Vector3 world ? MarkPoint(world) : null;
+            preemptLock.SetActive(point.HasValue);
+            if (!point.HasValue) return;
+            preemptLock.Root.anchoredPosition = point.Value;
+            preemptLock.SetSize(TilePixels() * 1.5f);
+            preemptLock.Root.localScale = Vector3.one * (1f + Mathf.Sin(Time.unscaledTime * 5f) * 0.06f);
+        }
+
+        // 월드 위치 → 몬스터 표시 층의 좌표 (가운데 기준 — PreemptView 창과 같은 좌표)
+        private Vector2? MarkPoint(Vector3 world)
+        {
+            var canvasCamera = hudCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : hudCanvas.worldCamera;
+            return RectTransformUtility.ScreenPointToLocalPointInRectangle(markLayer, cam.WorldToScreenPoint(world), canvasCamera, out var local)
+                ? local : (Vector2?)null;
+        }
+
+        // 한 칸이 HUD에서 몇 단위인지 (조준 괄호·QTE 원 크기)
+        private float TilePixels()
+        {
+            var origin = cam.transform.position;
+            var a = MarkPoint(new Vector3(origin.x, origin.y, 0f));
+            var b = MarkPoint(new Vector3(origin.x + 1f, origin.y, 0f));
+            return a.HasValue && b.HasValue ? Mathf.Max(20f, Mathf.Abs(b.Value.x - a.Value.x)) : 90f;
         }
 
         // [선제공격]: 몬스터가 느려지고 이미 본 단어 한 문제 → 맞히면 맨 앞 몬스터가 다친 채, 틀리면 그냥 전투 (사용자 결정)
@@ -1693,7 +1779,9 @@ namespace WordRPG.UI
             if (moving) SnapPlayer();
             var quiz = new TrainingQuizProvider(preemptBooks, session.Vocabulary, battle.MasteryRules, TrainingMode.All, rng);
             var question = quiz.NextQuestion(QuizDirection.EnglishToMeaning);
-            preemptButton.gameObject.SetActive(false);
+            preemptPrompt.SetActive(false);
+            preemptLock.SetActive(false);
+            Vector2? Focus() => roamerViews.WorldPosition(target) is Vector3 world ? MarkPoint(world) : null;
             preemptView.Show(question, Preemptive.AnswerSeconds, index =>
             {
                 bool correct = question.IsCorrect(index);
@@ -1708,7 +1796,7 @@ namespace WordRPG.UI
                 }
                 else intro = index < 0 ? "선제공격 실패 — 시간 초과! 정면 승부다" : "선제공격 실패 — 정면 승부다!";
                 StartRoamerBattle(target, intro);
-            });
+            }, Focus, TilePixels, Preemptive.Damage(target.Leader), settings != null && settings.Vibration);
         }
 
         private void StartRoamerBattle(Roamer roamer, string intro)
@@ -1717,7 +1805,8 @@ namespace WordRPG.UI
             if (moving) SnapPlayer();
             session.World.SetPosition(area.AreaId, walker.Position);
             battleRoamer = roamer;
-            preemptButton.gameObject.SetActive(false);
+            preemptPrompt.SetActive(false);
+            preemptLock.SetActive(false);
             StartCoroutine(Encounter(roamer.Group, intro));
         }
 

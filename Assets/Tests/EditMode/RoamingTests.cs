@@ -232,8 +232,11 @@ namespace WordRPG.Tests
         {
             var monster = new MonsterInstance(Slime, 5);
             int max = monster.Stats.MaxHp;
+            int preview = Preemptive.Damage(monster);
+            Assert.AreEqual(max, monster.CurrentHp, "미리 보기는 HP를 깎지 않음 (QTE 결과 화면의 숫자)");
             int dealt = Preemptive.Strike(monster);
             Assert.AreEqual(Mathf.RoundToInt(max * Preemptive.DamageRatio), dealt);
+            Assert.AreEqual(preview, dealt, "QTE에 띄운 숫자 = 실제 피해");
             Assert.AreEqual(max - dealt, monster.CurrentHp);
         }
 

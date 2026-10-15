@@ -13,11 +13,17 @@ namespace WordRPG.Battle
         public const float DamageRatio = 0.2f;
         public const float AnswerSeconds = 6f;
 
+        // 맞히면 줄 피해 (QTE 결과 화면에 미리 띄우는 숫자 — #74)
+        public static int Damage(MonsterInstance target)
+        {
+            if (target == null) throw new ArgumentNullException(nameof(target));
+            return Math.Max(1, (int)Math.Round(target.Stats.MaxHp * DamageRatio));
+        }
+
         // 반환값: 실제로 깎인 HP
         public static int Strike(MonsterInstance target)
         {
-            if (target == null) throw new ArgumentNullException(nameof(target));
-            int amount = Math.Max(1, (int)Math.Round(target.Stats.MaxHp * DamageRatio));
+            int amount = Damage(target); // null이면 여기서 예외
             return target.TakeDamage(amount);
         }
 
