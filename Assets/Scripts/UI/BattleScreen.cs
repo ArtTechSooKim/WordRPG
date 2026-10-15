@@ -143,6 +143,7 @@ namespace WordRPG.UI
         private int resultChoice = -1;
 
         public BattleEngine Engine => engine;
+        public MasteryRules MasteryRules => masteryRules; // 필드의 [선제공격] 문제도 같은 숙련도 규칙으로 (#73)
         public bool IsResultVisible => resultPanel != null && resultPanel.activeSelf;
         public string ResultTitle => resultTitle != null ? resultTitle.text : "";
         public GameSession Session => session;

@@ -120,6 +120,14 @@ namespace WordRPG.UI
         private MinimapView minimap;
         private MapView mapView;
         private SkillLearnView learnView;
+        // 보이는 몬스터 조우 (#73, 사막부터 — GDD 9-5): 규칙 = RoamingMonsters, 그림 = FieldRoamerViews, [선제공격] 문제 = PreemptView
+        private RoamingMonsters roaming;
+        private FieldRoamerViews roamerViews;
+        private PreemptView preemptView;
+        private Button preemptButton;
+        private Roamer battleRoamer; // 지금 싸우는 보이는 몬스터 (이기면 사라지고, 도망치면 잠깐 멈춤)
+        private List<IReadOnlyList<WordEntry>> preemptBooks = new List<IReadOnlyList<WordEntry>>(); // 선제공격 문제 = 이미 본 단어만
+        private const float PreemptSlow = 0.15f;
         private ConfirmDialog quitDialog; // 뒤로가기 → '게임을 끝낼까요?'
         private ConfirmDialog returnDialog; // 보스를 이긴 뒤 '시작 지점으로 돌아갈까요?' (#60)
         private Text heroName, heroHp;
@@ -149,8 +157,13 @@ namespace WordRPG.UI
         public bool IsPanelOpen => dexView.IsOpen || trainingView.IsOpen || altarView.IsOpen || shopView.IsOpen
                                    || inventoryView.IsOpen || settingsView.IsOpen || mapView.IsOpen || learnView.IsOpen
                                    || (quitDialog != null && quitDialog.IsOpen) || (returnDialog != null && returnDialog.IsOpen)
-                                   || (paywall != null && paywall.IsOpen);
+                                   || (paywall != null && paywall.IsOpen) || (preemptView != null && preemptView.IsOpen);
         public SkillLearnView LearnView => learnView;
+        public RoamingMonsters Roaming => roaming;
+        public bool IsPreemptAvailable => preemptButton != null && preemptButton.gameObject.activeSelf;
+        public PreemptView Preempt => preemptView;
+        public int PreemptStrikes { get; private set; } // 선제공격 성공 횟수 (테스트용)
+        public int RoamerViewCount => roamerViews != null ? roamerViews.Count : 0;
         public TrainingView TrainingView => trainingView;
         public SpeechBubble Bubble => bubble;
         public bool IsReadingDictionary { get; private set; } // 점점점 말풍선이 나오는 동안 (움직일 수 없음)
@@ -274,6 +287,7 @@ namespace WordRPG.UI
 
             if (saveMark.activeSelf && Time.unscaledTime > saveMarkUntil) saveMark.SetActive(false);
             PulseBadges();
+            UpdateRoamers(Time.unscaledDeltaTime);
 
             if (inBattle || transitioning || IsPanelOpen)
             {
@@ -335,6 +349,14 @@ namespace WordRPG.UI
 
         private void TryStep(Direction direction, bool run = false)
         {
+            var bumped = roaming?.At(walker.Position + direction.ToOffset());
+            if (bumped != null)
+            {
+                walker.Face(direction);
+                playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
+                StartRoamerBattle(bumped, null);
+                return;
+            }
             var outcome = walker.TryStep(direction);
             if (outcome.Kind != StepKind.Moved) playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
 
@@ -485,7 +507,7 @@ namespace WordRPG.UI
                 battle.HandleBack();
                 return;
             }
-            if (transitioning) return;
+            if (transitioning || preemptView.IsOpen) return;
             if (quitDialog.IsOpen) quitDialog.Hide();
             else if (returnDialog.IsOpen) returnDialog.Hide(); // = 여기 있기
             else if (learnView.IsOpen) learnView.Cancel();
@@ -630,7 +652,7 @@ namespace WordRPG.UI
                 else ShowToast("문이 굳게 닫혀 있다.");
                 return false;
             }
-            if (!fieldTutorialRunning && encounterCounter.OnStep(tile == FieldTile.Grass, rng))
+            if (!fieldTutorialRunning && encounterCounter.OnStep(tile == FieldTile.Grass && roaming == null, rng))
             {
                 StartCoroutine(Encounter());
                 return false;
@@ -770,6 +792,18 @@ namespace WordRPG.UI
         {
             bool won = outcome == BattlePhase.Victory;
             inBattle = false;
+            var foughtRoamer = battleRoamer;
+            battleRoamer = null;
+            if (foughtRoamer != null && roaming != null)
+            {
+                if (won)
+                {
+                    roaming.Defeat(foughtRoamer);
+                    roamerViews.Remove(foughtRoamer);
+                }
+                else roaming.Stun(foughtRoamer); // 도망쳤거나 져서 시작 지점으로 — 잠깐 멈춰 거리를 벌림
+            }
+            RefreshPreemptBooks();
             Sound.PlayMusic(AreaMusic);
             encounterCounter.Reset();
             bool wasBoss = bossBattle;
@@ -1040,6 +1074,7 @@ namespace WordRPG.UI
                 cell => map.Get(cell) == FieldTile.Boss && session.World.IsBossDefeated(area.BossId));
             encounterCounter = new EncounterCounter(area.EncounterRate, area.MinStepsBetweenEncounters);
             session.World.SetPosition(area.AreaId, position);
+            SetUpRoamers(position);
 
             DrawTiles(area, IsDoorLocked);
             if (!inBattle) Sound.PlayMusic(AreaMusic);
@@ -1126,6 +1161,7 @@ namespace WordRPG.UI
             player = playerGo.transform;
             playerRenderer = playerGo.GetComponent<SpriteRenderer>();
             playerRenderer.sortingOrder = 10;
+            roamerViews = new FieldRoamerViews(transform, CellCenter);
 
             cam = Camera.main;
             if (cam == null)
@@ -1293,6 +1329,11 @@ namespace WordRPG.UI
             stick = VirtualStick.Create(hudRoot, 0.4f, 0f, 1f, 0.27f);
             // [확인]은 왼쪽 아래로 따로 (스틱을 밀면서 다른 손가락으로 누를 수 있게)
             BuildConfirmButton(UiKit.Rect("ConfirmArea", hudRoot, 0.02f, 0.03f, 0.36f, 0.24f));
+            // [선제공격] (#73): 쫓아오는 몬스터가 가까우면 [확인] 바로 위에 (왼손 엄지로 누르게)
+            preemptButton = UiKit.MakeButton("PreemptButton", hudRoot, "선제공격!", Palette.Attack, 46, 0.04f, 0.245f, 0.34f, 0.305f);
+            UiKit.Pill(preemptButton.image);
+            preemptButton.onClick.AddListener(StartPreempt);
+            preemptButton.gameObject.SetActive(false);
 
             // 조우 연출용 번쩍임
             flash = UiKit.Panel("EncounterFlash", hudRoot, Color.clear);
@@ -1310,6 +1351,7 @@ namespace WordRPG.UI
             quitDialog = ConfirmDialog.Create(hudRoot);
             returnDialog = ConfirmDialog.Create(hudRoot);
             paywall = PaywallView.Create(hudRoot);
+            preemptView = PreemptView.Create(hudRoot);
             guide = GuideHints.Create(transform); // 자기 캔버스로 HUD·전투 위에 (눌림은 받지 않음)
         }
 
@@ -1412,7 +1454,7 @@ namespace WordRPG.UI
         // 풀숲 가까이 처음 오면 주인공 혼잣말 (#61) — 걸어도 잠깐 남아 있음
         private void MaybeSayGrassLine()
         {
-            if (!showTutorials || fieldTutorialRunning || session.Tutorials.Has(TutorialProgress.Grass) || bubble.IsVisible) return;
+            if (!showTutorials || fieldTutorialRunning || roaming != null || session.Tutorials.Has(TutorialProgress.Grass) || bubble.IsVisible) return;
             if (!GrassNearby(2)) return;
             session.Tutorials.Mark(TutorialProgress.Grass);
             bubble.Say("풀숲에서 뭔가 나올 것 같아…", 2.6f);
@@ -1570,6 +1612,113 @@ namespace WordRPG.UI
                 ShowToast($"★ {area.Words.RegionName} 도감 완성! 보상을 받았다", 3f);
             }
             dexView.Show(area.Words, session, DateTime.UtcNow);
+        }
+
+        // ------------------------------------------------------------------ 보이는 몬스터 · 선제공격 (#73)
+
+        private void SetUpRoamers(Vector2Int position)
+        {
+            roamerViews.Clear();
+            battleRoamer = null;
+            var table = area.Encounters;
+            roaming = area.EncounterStyle == EncounterStyle.Roaming && table != null
+                ? new RoamingMonsters(walker.Map, r => table.Roll(r), rng)
+                : null;
+            if (roaming != null)
+            {
+                roaming.Populate(position);
+                roamerViews.Sync(roaming);
+            }
+            RefreshPreemptBooks();
+        }
+
+        // 선제공격 문제를 낼 단어장 (이미 본 단어가 있는 곳만) — 지역에 들어올 때·전투가 끝날 때 다시 계산
+        private void RefreshPreemptBooks() =>
+            preemptBooks = roaming == null ? new List<IReadOnlyList<WordEntry>>()
+                : Preemptive.QuizBooks(area.Words != null ? area.Words.Words : null,
+                    TrainingBooks().ConvertAll(b => (IReadOnlyList<WordEntry>)b.Words), session.Vocabulary);
+
+        // 전투·화면 전환·창이 열려 있으면 멈춤. [선제공격] 문제를 푸는 동안은 느리게 계속 (그래도 부딪히면 문제가 끝난 뒤 전투)
+        private void UpdateRoamers(float dt)
+        {
+            preemptView.Tick(dt);
+            if (roaming == null)
+            {
+                if (preemptButton.gameObject.activeSelf) preemptButton.gameObject.SetActive(false);
+                return;
+            }
+            roamerViews.Tick(dt);
+            bool quiz = preemptView.IsOpen;
+            bool paused = inBattle || transitioning || fieldTutorialRunning || revealingGate || (IsPanelOpen && !quiz);
+            if (!paused)
+            {
+                roaming.SlowFactor = quiz ? PreemptSlow : 1f;
+                var events = roaming.Tick(dt, walker.Position);
+                roamerViews.Apply(events, roaming.Rules, roaming.SlowFactor);
+                foreach (var e in events)
+                {
+                    if (e.Kind == RoamerEventKind.Noticed) Sound.Play(Sfx.Click);
+                    if (e.Kind == RoamerEventKind.Caught && !quiz)
+                    {
+                        StartRoamerBattle(e.Roamer, null);
+                        break;
+                    }
+                }
+            }
+            UpdatePreemptButton(paused || quiz);
+        }
+
+        private void UpdatePreemptButton(bool hidden)
+        {
+            bool show = !hidden && !IsPanelOpen && preemptBooks.Count > 0 && roaming.PreemptTarget(walker.Position) != null;
+            if (preemptButton.gameObject.activeSelf != show) preemptButton.gameObject.SetActive(show);
+            if (!show) return;
+            preemptButton.transform.localScale = Vector3.one * (1f + Mathf.Abs(Mathf.Sin(Time.unscaledTime * 6f)) * 0.06f);
+            if (showTutorials && !guide.IsShowing && !session.Tutorials.Has(TutorialProgress.Preempt))
+            {
+                StartCoroutine(guide.Run(session, TutorialProgress.Preempt, new GuideHints.Hint
+                {
+                    Text = "누르고 뜻을 맞히면 먼저 한 방!", Target = () => (RectTransform)preemptButton.transform,
+                    Gesture = GuideHints.Gesture.Tap, DoneWhen = () => preemptView.IsOpen || inBattle
+                }, SaveNow, () => !preemptButton.gameObject.activeSelf && !preemptView.IsOpen));
+            }
+        }
+
+        // [선제공격]: 몬스터가 느려지고 이미 본 단어 한 문제 → 맞히면 맨 앞 몬스터가 다친 채, 틀리면 그냥 전투 (사용자 결정)
+        private void StartPreempt()
+        {
+            if (roaming == null || preemptView.IsOpen || inBattle || transitioning || preemptBooks.Count == 0) return;
+            var target = roaming.PreemptTarget(walker.Position);
+            if (target == null) return;
+            if (moving) SnapPlayer();
+            var quiz = new TrainingQuizProvider(preemptBooks, session.Vocabulary, battle.MasteryRules, TrainingMode.All, rng);
+            var question = quiz.NextQuestion(QuizDirection.EnglishToMeaning);
+            preemptButton.gameObject.SetActive(false);
+            preemptView.Show(question, Preemptive.AnswerSeconds, index =>
+            {
+                bool correct = question.IsCorrect(index);
+                quiz.SubmitAnswer(question, correct);
+                if (!roaming.Has(target)) return;
+                string intro;
+                if (correct)
+                {
+                    int dealt = Preemptive.Strike(target.Leader);
+                    PreemptStrikes++;
+                    intro = $"선제공격 성공! {target.Leader.DisplayName}에게 {dealt} 피해";
+                }
+                else intro = index < 0 ? "선제공격 실패 — 시간 초과! 정면 승부다" : "선제공격 실패 — 정면 승부다!";
+                StartRoamerBattle(target, intro);
+            });
+        }
+
+        private void StartRoamerBattle(Roamer roamer, string intro)
+        {
+            if (inBattle || transitioning) return;
+            if (moving) SnapPlayer();
+            session.World.SetPosition(area.AreaId, walker.Position);
+            battleRoamer = roamer;
+            preemptButton.gameObject.SetActive(false);
+            StartCoroutine(Encounter(roamer.Group, intro));
         }
 
         // ------------------------------------------------------------------ 수련 (#44)

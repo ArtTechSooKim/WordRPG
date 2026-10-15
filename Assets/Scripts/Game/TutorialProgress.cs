@@ -15,10 +15,11 @@ namespace WordRPG.Game
         public const string NewWord = "battle_new_word";
         public const string Quiz = "battle_quiz";
         public const string Potion = "battle_potion";
+        public const string Preempt = "field_preempt"; // 보이는 몬스터가 가까이 오면 [선제공격] 버튼 (#73)
 
         public static readonly IReadOnlyList<string> All = new[]
         {
-            Field, Confirm, Grass, Skill, Intensity, NewWord, Quiz, Potion,
+            Field, Confirm, Grass, Skill, Intensity, NewWord, Quiz, Potion, Preempt,
             MenuBadges.Dex, MenuBadges.Training, MenuBadges.Bag, MenuBadges.Map
         };
 

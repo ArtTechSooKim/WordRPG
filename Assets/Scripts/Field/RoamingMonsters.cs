@@ -136,6 +136,8 @@ namespace WordRPG.Field
 
         public Roamer At(Vector2Int cell) => roamers.Find(r => r.Position == cell);
 
+        public bool Has(Roamer roamer) => roamers.Contains(roamer);
+
         // [선제공격] 대상: 나를 발견하고 가까이 온 몬스터 중 가장 가까운 것 (없으면 null)
         public Roamer PreemptTarget(Vector2Int player)
         {
