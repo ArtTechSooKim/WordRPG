@@ -30,6 +30,7 @@ namespace WordRPG.Battle
         private readonly List<BattleUnit> party = new List<BattleUnit>();
         private readonly List<BattleUnit> enemies = new List<BattleUnit>();
         private readonly List<MasteryChange> masteryChanges = new List<MasteryChange>();
+        private readonly Dictionary<BattleUnit, int> enemyHeals = new Dictionary<BattleUnit, int>(); // 적마다 이번 전투에서 회복한 횟수 (#88)
         private readonly IQuizProvider quiz;
         private readonly BattleConfig config;
         private readonly Random rng;
@@ -274,7 +275,7 @@ namespace WordRPG.Battle
             if (Phase != BattlePhase.Victory) throw new InvalidOperationException("승리했을 때만 보상이 있습니다");
             var defeated = new List<MonsterInstance>();
             foreach (var enemy in enemies) defeated.Add(enemy.Monster);
-            return BattleRewardCalculator.Calculate(defeated, CorrectAnswers, config, rng);
+            return BattleRewardCalculator.Calculate(defeated, CorrectAnswers, config, rng, party[0].Level);
         }
 
         private void AdvanceTurn(List<BattleEvent> events)
@@ -307,10 +308,24 @@ namespace WordRPG.Battle
                 if (enemy.IsDefeated || enemy.Skills.Count == 0) continue;
                 if (FirstAlive(party) == null) return;
 
-                var skill = enemy.Skills[rng.Next(enemy.Skills.Count)];
+                var skill = ChooseEnemySkill(enemy);
+                if (skill.Kind == SkillKind.Heal) enemyHeals[enemy] = HealsUsed(enemy) + 1;
                 ExecuteSkill(enemy, skill, ChooseEnemyTarget(enemy, skill), false, events);
             }
         }
+
+        // 적의 기술 고르기 (#88): 회복 기술은 HP가 절반 아래일 때만, 한 전투에 enemyHealLimit번까지 — 나머지 중에서 무작위
+        private SkillData ChooseEnemySkill(BattleUnit enemy)
+        {
+            bool canHeal = enemy.Hp < enemy.MaxHp * config.EnemyHealBelow && HealsUsed(enemy) < config.EnemyHealLimit;
+            var choices = new List<SkillData>();
+            foreach (var skill in enemy.Skills)
+                if (skill.Kind != SkillKind.Heal || canHeal) choices.Add(skill);
+            if (choices.Count == 0) choices.AddRange(enemy.Skills); // 회복 기술뿐인 적
+            return choices[rng.Next(choices.Count)];
+        }
+
+        private int HealsUsed(BattleUnit enemy) => enemyHeals.TryGetValue(enemy, out int used) ? used : 0;
 
         private BattleUnit ChooseEnemyTarget(BattleUnit enemy, SkillData skill)
         {

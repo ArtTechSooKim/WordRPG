@@ -125,7 +125,9 @@ Assets/
     Heroes/             HeroData SO(주인공), Hero(레벨·HP·성유물 3칸·기술 칸 3개 SkillSlot), RelicData SO(성유물: 기술·각성·보너스·강화 비용), RelicUpgrade(강화 규칙),
                         CompanionData SO + Companion(동료 #77: 레벨·경험치·HP, 기본 기술 + 레벨에 배우는 기술, 성유물 없음 — 파티 = 주인공 + 동료 1명)
     Items/              ItemData SO(재료·상처약·징표·기술문서), Inventory, ShopData SO + Shop(구매 규칙)
-    Battle/             BattleEngine(기술·강도(단어 n개 연속)·상처약·도망(Flee, 보스전 canFlee=false — 몬스터 등급 MonsterSpecies.fleeTier: 약함 바로·보통 1/4·강함 늘 단어 문제 #84)·연속 정답 수), Combo(콤보 단계·글자·추가 피해), BattleFormulas, BattleReward,
+    Battle/             BattleEngine(기술·강도(단어 n개 연속)·상처약·도망(Flee, 보스전 canFlee=false — 몬스터 등급 MonsterSpecies.fleeTier: 약함 바로·보통 1/4·강함 늘 단어 문제 #84)·연속 정답 수,
+                        적 회복은 HP 절반 아래·한 전투 두 번까지 #88), 경험치는 레벨 차이 비율 BattleConfig.ExpFactor(25%씩·최소 5% #88) —
+                        숫자를 바꾸면 EditMode BalanceSimulationTests(정글 전투·보스) 확인, 표는 [Explicit] BalanceReport, Combo(콤보 단계·글자·추가 피해), BattleFormulas, BattleReward,
                         BattleSummary(한 판 결산: 새 단어·틀린 단어·기술별 피해·최대 콤보 — 결산 화면용), Preemptive(선제공격: HP 20%·이미 본 단어만)
     Field/              FieldMap(맵 글자→격자), FieldWalker(이동), StickInput(스틱 값→4방향·달리기), EncounterCounter(조우), FieldInteraction([확인] 대상·이름표 규칙), FieldAutotile(길·물가 테두리 모양),
                         FieldArea(지역 SO: 테마·출입구 연결·보스·상자·상점·조우 방식·물의 몬스터·유적 동료), EncounterTable, RoamingMonsters(보이는 몬스터: 어슬렁·발견·쫓기·포기·부딪힘),

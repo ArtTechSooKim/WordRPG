@@ -21,13 +21,13 @@ MonoBehaviour:
   sprite: {fileID: 21300000, guid: 80f7dc15ba7ead44d9ef3b63d4717cbd, type: 3}
   placeholderColor: {r: 0.45, g: 0.7, b: 0.35, a: 1}
   baseStats:
-    maxHp: 90
-    attack: 18
-    defense: 16
+    maxHp: 60
+    attack: 30
+    defense: 12
   growthPerLevel:
-    maxHp: 10
-    attack: 3
-    defense: 3
+    maxHp: 6
+    attack: 5
+    defense: 1
   skills:
   - {fileID: 11400000, guid: ecefd41c74019bf41af6160c38a3c915, type: 2}
   - {fileID: 11400000, guid: 2b280b361addffb448d7293c83abd224, type: 2}

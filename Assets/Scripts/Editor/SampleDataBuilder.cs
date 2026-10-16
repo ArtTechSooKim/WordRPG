@@ -265,9 +265,10 @@ namespace WordRPG.EditorTools
             var plateSplash = Skill("kappa_plate_splash", "물접시 튀기기", "머리 접시의 물을 사방에 튀긴다.", SkillKind.Damage, SkillTarget.AllEnemies, 14, QuizDirection.EnglishToMeaning);
             var batchimSwap = Skill("kappa_batchim_swap", "받침 바꾸기", "받침을 몰래 바꿔 철자를 헷갈리게 한다.", SkillKind.Damage, SkillTarget.SingleEnemy, 20, QuizDirection.EnglishToMeaning);
             var inkMimic = Skill("octopus_ink_mimic", "먹물 흉내", "들은 말을 엉터리로 흉내 내며 먹물을 뿜는다.", SkillKind.Damage, SkillTarget.AllEnemies, 16, QuizDirection.EnglishToMeaning);
-            var tongueLash = Skill("frog_tongue_lash", "혀 날름", "긴 혀를 날름 내밀어 후려친다.", SkillKind.Damage, SkillTarget.SingleEnemy, 30, QuizDirection.EnglishToMeaning);
-            var blankCroak = Skill("frog_blank_croak", "빈칸 울음", "개굴! 울음소리에 머릿속이 하얗게 빈칸이 된다.", SkillKind.Damage, SkillTarget.AllEnemies, 20, QuizDirection.EnglishToMeaning);
-            var gulp = Skill("frog_gulp", "꿀꺽 삼키기", "석판의 글자를 꿀꺽 삼켜 HP를 회복한다.", SkillKind.Heal, SkillTarget.Self, 16, QuizDirection.EnglishToMeaning);
+            // 빈칸두꺼비 숫자는 #88 시뮬레이션으로 맞춤 (아라와 함께 정답률 80%면 10라운드쯤, 혼자·정답률 60%면 도전)
+            var tongueLash = Skill("frog_tongue_lash", "혀 날름", "긴 혀를 날름 내밀어 후려친다.", SkillKind.Damage, SkillTarget.SingleEnemy, 40, QuizDirection.EnglishToMeaning);
+            var blankCroak = Skill("frog_blank_croak", "빈칸 울음", "개굴! 울음소리에 머릿속이 하얗게 빈칸이 된다.", SkillKind.Damage, SkillTarget.AllEnemies, 26, QuizDirection.EnglishToMeaning);
+            var gulp = Skill("frog_gulp", "꿀꺽 삼키기", "석판의 글자를 꿀꺽 삼켜 HP를 회복한다.", SkillKind.Heal, SkillTarget.Self, 10, QuizDirection.EnglishToMeaning);
             var tailLizard = Monster("tail_lizard", "말꼬리 도마뱀", "남의 말꼬리를 잡고 늘어지는 도마뱀. 정글 풀숲을 재빠르게 누빈다.", MonsterRole.Attacker,
                 new Color(0.5f, 0.75f, 0.35f), new MonsterStats(28, 14, 10), new MonsterStats(5, 3, 2), new[] { tailGrab },
                 enemyExp: 14, enemyGold: 13, drops: new[] { new ItemDrop(vineFiber, 0.4f), new ItemDrop(shinyInk, 0.2f) });
@@ -278,7 +279,7 @@ namespace WordRPG.EditorTools
                 new Color(0.4f, 0.7f, 0.45f), new MonsterStats(30, 15, 9), new MonsterStats(6, 3, 2), new[] { inkMimic },
                 enemyExp: 15, enemyGold: 14, drops: new[] { new ItemDrop(sparkleDust, 0.4f), new ItemDrop(vineFiber, 0.25f) });
             var blankFrog = Monster("boss_blank_frog", "빈칸두꺼비", "유적 석판의 글자를 꿀꺽 삼켜 빈칸으로 만든 거대한 두꺼비. 정글의 메아리를 앗아 갔다.", MonsterRole.Attacker,
-                new Color(0.45f, 0.7f, 0.35f), new MonsterStats(90, 18, 16), new MonsterStats(10, 3, 3), new[] { tongueLash, blankCroak, gulp },
+                new Color(0.45f, 0.7f, 0.35f), new MonsterStats(60, 30, 12), new MonsterStats(6, 5, 1), new[] { tongueLash, blankCroak, gulp },
                 enemyExp: 70, enemyGold: 90,
                 drops: new[] { new ItemDrop(vineFiber, 1f, 3), new ItemDrop(shinyInk, 1f, 2), new ItemDrop(hardCover, 1f, 2), new ItemDrop(sparkleDust, 1f, 2) });
             var jungleEncounters = Encounters("jungle_field", 1, 2,

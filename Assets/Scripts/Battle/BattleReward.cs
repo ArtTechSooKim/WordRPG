@@ -34,9 +34,11 @@ namespace WordRPG.Battle
 
     public static class BattleRewardCalculator
     {
-        // 경험치 = Σ(적 기본 경험치 x 레벨) + 정답 수 x 정답 보너스
+        // 경험치 = Σ(적 기본 경험치 x 레벨 x 레벨 차이 비율) + 정답 수 x 정답 보너스.
+        // partyLevel: 주인공 레벨 (0이면 레벨 차이를 보지 않음). 몬스터보다 높을수록 그 몬스터 경험치가 줄어든다 (#88 —
+        // 전에는 같은 레벨 몬스터 하나에 한 레벨 넘게 올라 정글 전투 10번이면 최고 레벨 30에 닿았음)
         public static BattleReward Calculate(IReadOnlyList<MonsterInstance> defeatedEnemies, int correctAnswers,
-            BattleConfig config, Random rng)
+            BattleConfig config, Random rng, int partyLevel = 0)
         {
             int exp = correctAnswers * config.ExpPerCorrectAnswer;
             int gold = 0;
@@ -44,7 +46,8 @@ namespace WordRPG.Battle
 
             foreach (var enemy in defeatedEnemies)
             {
-                exp += enemy.Species.ExpReward * enemy.Level;
+                float factor = partyLevel > 0 ? config.ExpFactor(partyLevel, enemy.Level) : 1f;
+                exp += (int)Math.Round(enemy.Species.ExpReward * enemy.Level * factor);
                 gold += enemy.Species.GoldReward * enemy.Level;
 
                 foreach (var drop in enemy.Species.Drops)
