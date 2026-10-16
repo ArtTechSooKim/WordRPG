@@ -6,7 +6,7 @@
   → Unity 메뉴 WordRPG > Data > Link Monster Art 가 같은 이름의 몬스터 에셋에 연결한다
 - 주인공: 4방향 × 걷기 4프레임 시트 그대로 (게임이 잘라 씀)
 - 성유물: Relics/{relicId}.png (파일 이름 = relicId) — 게임이 RelicData.icon이 비어 있으면 이 그림을 쓴다
-- 상처약 등 아이템 도트: Items/{itemId}.png (Figma로 그린 UI/Icons/Items/{itemId}.png가 없을 때 쓰임)
+- 아이템 도트: Items/{itemId}.png — 모든 아이템 (#96부터 매끈한 UI/Icons/Items 그림은 없앰, 손본 것은 ITEM_BUILDERS)
 필요한 Pillow: pip install pillow
 """
 import os
@@ -78,6 +78,9 @@ ITEMS = {
 ITEM_TINTS = {
     "jungle_key": (0.75, 1.0, 0.62),
 }
+# 직접 손본 도트 아이템 (#96): 처음 넣은 매끈한 256px 아이콘(초원 재료 3개 + 초원 징표)이 다른 도트 아이템과 그림체가 달라
+# 팩 그림을 고쳐 쓰거나(색 바꾸기·반짝임) 팩과 같은 색·외곽선으로 그림. 함수는 아래 build_item_* (copy_relics_and_items에서 저장)
+ITEM_BUILDERS = ("hard_cover", "shiny_ink", "sparkle_dust", "keepsake_meadow")
 
 # 동료 (#77, 1.1 메아리 정글): companionId → 팩 캐릭터 폴더. 얼굴(Faceset) → Companions/{id}.png, 걷기 시트 → Companions/{id}_sheet.png
 COMPANIONS = {
@@ -446,6 +449,91 @@ def pond_on(base, pond):
     return over(base, cut)
 
 
+_HEX = lambda h: tuple(int(h[i:i + 2], 16) for i in (1, 3, 5)) + (255,)
+_OUTLINE, _WHITE = _HEX("#141b1b"), _HEX("#f2eaf1")  # 팩 아이템 외곽선·흰색
+
+
+def _swap(img, mapping):
+    """정확히 같은 색만 바꾼다 (팩 그림의 몇 안 되는 색을 다른 팩 색으로)"""
+    mapping = {_HEX(k)[:3]: _HEX(v) for k, v in mapping.items()}
+    out = img.copy()
+    px = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            if px[x, y][3] and px[x, y][:3] in mapping:
+                px[x, y] = mapping[px[x, y][:3]]
+    return out
+
+
+def _on16(img, dx=0, dy=0):
+    canvas = Image.new("RGBA", (16, 16))
+    canvas.alpha_composite(img, ((16 - img.width) // 2 + dx, (16 - img.height) // 2 + dy))
+    return canvas
+
+
+def _sparkle(img, x, y, big=True):
+    """흰 점 + 금빛 십자 반짝임"""
+    px = img.load()
+    for a, b, c in [(x, y, _WHITE)] + ([(x - 1, y, None), (x + 1, y, None), (x, y - 1, None), (x, y + 1, None)] if big else []):
+        if 0 <= a < 16 and 0 <= b < 16:
+            px[a, b] = c or _HEX("#f1c471")
+    return img
+
+
+def build_item_hard_cover(pack):
+    """단단한 표지: 팩 책을 가죽 갈색으로 (성유물 '책'은 주황 그대로라 구별됨)"""
+    book = Image.open(os.path.join(pack, "Items/Object/Book.png")).convert("RGBA")
+    return _swap(book, {"#ff8b62": "#b0663f", "#e66a3a": "#7c4030", "#abc2bc": "#d9c9a8"})
+
+
+def build_item_shiny_ink(pack):
+    """반짝 잉크: 팩 물병 안을 남색 잉크로 채우고 반짝임"""
+    pot = Image.open(os.path.join(pack, "Items/Potion/WaterPot.png")).convert("RGBA")
+    pot = _swap(pot, {"#79b8ce": "#3a4aa8", "#8feff1": "#7a90e8"})
+    px = pot.load()
+    for y in (4, 5):
+        for x in range(2, 7):
+            if px[x, y][3] == 0:
+                px[x, y] = _HEX("#2b3580")
+    return _sparkle(_on16(pot, -1, 1), 12, 3)
+
+
+def build_item_sparkle_dust(pack):
+    """반짝 가루: 팩 주머니를 모래빛으로 + 금빛 반짝임 두 개"""
+    bag = Image.open(os.path.join(pack, "Items/Object/Bag.png")).convert("RGBA")
+    bag = _swap(bag, {"#e66a3a": "#e8b35e", "#965340": "#a0683a"})
+    return _sparkle(_sparkle(_on16(bag, 0, 1), 13, 2), 2, 3, big=False)
+
+
+def build_item_keepsake_meadow(pack):
+    """네잎클로버 책갈피 (초원 도감 완성 징표): 팩에 클로버가 없어 팩 풀잎 색(Grass·TeaLeaf)과 외곽선으로 그림 — 동그란 잎 네 장 + 줄기"""
+    img = Image.new("RGBA", (16, 16))
+    px = img.load()
+    dark, mid, light = _HEX("#56864c"), _HEX("#74a334"), _HEX("#adbc3a")
+    radius, centers = 2.6, [(4.9, 4.9), (10.1, 4.9), (4.9, 10.1), (10.1, 10.1)]
+    leaf = {}
+    for y in range(16):
+        for x in range(16):
+            for cx, cy in centers:
+                dx, dy = x + 0.5 - cx, y + 0.5 - cy
+                if dx * dx + dy * dy <= radius * radius and (x, y) not in leaf:
+                    t = (dx + dy) / (2 * radius)  # 왼위 밝게 → 오른아래 어둡게
+                    leaf[(x, y)] = light if t < -0.25 else (dark if t > 0.3 else mid)
+    for (x, y), c in leaf.items():
+        px[x, y] = c
+    for x in range(16):  # 잎마다 외곽선 (잎 사이에도 → 네 장이 또렷)
+        for y in range(16):
+            if (x, y) not in leaf and any((x + a, y + b) in leaf for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                px[x, y] = _OUTLINE
+    px[7, 7] = px[8, 8] = dark
+    for x, y in ((12, 12), (13, 13), (13, 14)):  # 줄기
+        px[x, y] = dark
+        for a, b in ((1, 0), (0, 1), (-1, 0)):
+            if 0 <= x + a < 16 and 0 <= y + b < 16 and px[x + a, y + b][3] == 0:
+                px[x + a, y + b] = _OUTLINE
+    return img
+
+
 def copy_relics_and_items(pack):
     for folder in ("Relics", "Items"):
         os.makedirs(os.path.join(OUT, folder), exist_ok=True)
@@ -461,7 +549,9 @@ def copy_relics_and_items(pack):
             save_if_changed(tint(Image.open(os.path.join(pack, rel)).convert("RGBA"), ITEM_TINTS[item_id]), dst)
         else:
             shutil.copyfile(os.path.join(pack, rel), dst)
-    print("relics", len(RELICS), "+ items", len(ITEMS), "->", OUT)
+    for item_id in ITEM_BUILDERS:
+        save_if_changed(globals()["build_item_" + item_id](pack), os.path.join(OUT, "Items", item_id + ".png"))
+    print("relics", len(RELICS), "+ items", len(ITEMS) + len(ITEM_BUILDERS), "->", OUT)
 
 
 def save_if_changed(img, path):

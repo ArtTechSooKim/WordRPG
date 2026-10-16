@@ -166,7 +166,8 @@ Assets/
                         UiKit(Palette·글꼴·둥근 패널·아이콘 + WithJosa 한국어 조사), AutoPill — 세로 1080x1920
     Editor/             WordRPG.Editor.asmdef — CSV 임포터, 샘플 데이터 생성기, UiAssetImporter(아이콘·도트·소리 가져오기 설정),
                         MonsterArtLinker(몬스터 그림 연결), MobileBuild(모바일 설정·아이폰 Xcode/안드로이드 빌드)
-  Resources/UI/         Fonts(Jua, Noto Sans KR + OFL 라이선스), Icons(UI 아이콘 128px), Icons/Items(아이템 256px, 파일명 = itemId)
+  Resources/UI/         Fonts(Jua, Noto Sans KR + OFL 라이선스), Icons(UI 아이콘 128px) — 아이템 그림은 모두 도트 Art/NinjaAdventure/Items (#96: 매끈한 256px 4개를 도트로 통일.
+                        Icons/Items/{itemId}.png를 두면 그게 먼저 쓰이지만 그림체가 섞이니 쓰지 말 것)
   Resources/Art/NinjaAdventure/  Monsters(speciesId.png), Relics(relicId.png), Items(itemId.png), Player(Boy 시트), Tiles(합성 타일 + _auto 테두리 아틀라스 + _prop 큰 그림),
                                  Field(raft.png 뗏목 · ripple.png 물살 물결 — 필드 위 그림, #80),
                                  Title(title_scene.png 타이틀 배경 풍경), LICENSE.txt(CC0)
