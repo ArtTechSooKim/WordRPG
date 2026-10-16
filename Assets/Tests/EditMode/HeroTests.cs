@@ -1,3 +1,4 @@
+using System.Linq;
 using NUnit.Framework;
 using WordRPG.Heroes;
 using WordRPG.Items;
@@ -169,6 +170,46 @@ namespace WordRPG.Tests
             int before = hero.Stats.Attack;
             RelicUpgrade.TryUpgrade(owned, inventory);
             Assert.AreEqual(before + 2, hero.Stats.Attack);
+        }
+    }
+
+    // 성유물 바로 바꿔 끼우기 (#91 사용자 요청): 그 칸의 성유물과 바꾸고, 기술 칸의 순서는 그대로
+    public class RelicSwapTests
+    {
+        private static RelicData Relic(string id, int power) =>
+            TestData.Relic(id, TestData.Skill(id + "_skill", SkillKind.Damage, SkillTarget.SingleEnemy, power), new MonsterStats(0, power, 0), null);
+
+        [Test]
+        public void SwapKeepsTheSkillInTheSamePlace()
+        {
+            var a = Relic("a", 1); var b = Relic("b", 2); var c = Relic("c", 3); var d = Relic("d", 4);
+            var hero = new Hero(TestData.Hero(new MonsterStats(100, 10, 10)), 5);
+            var ra = hero.AddRelic(a); var rb = hero.AddRelic(b); var rc = hero.AddRelic(c); var rd = hero.AddRelic(d); // 얻으면 빈 칸에 바로 끼워짐
+            Assert.IsTrue(hero.IsEquipped(ra) && hero.IsEquipped(rb) && hero.IsEquipped(rc));
+            Assert.IsFalse(hero.IsEquipped(rd), "네 번째는 칸이 없어 가방에만");
+            Assert.IsFalse(hero.HasEmptySlot);
+            Assert.IsFalse(hero.Equip(rd), "칸이 가득 차서 그냥 장착은 안 됨");
+
+            Assert.IsTrue(hero.SwapInto(rd, 1), "가운데 칸(b)과 바꿈");
+            Assert.AreSame(rd, hero.SlotAt(1));
+            Assert.IsFalse(hero.IsEquipped(rb), "b는 빠짐");
+            CollectionAssert.AreEqual(new[] { "relic:a", "relic:d", "relic:c" }, hero.SkillSlots.Select(s => s.Key).ToArray(), "기술 칸 순서 그대로, b 자리에 d");
+            Assert.AreEqual(10 + 1 + 4 + 3, hero.Stats.Attack, "능력치 보너스도 바뀜");
+
+            Assert.IsFalse(hero.SwapInto(ra, 2), "이미 끼운 성유물은 못 바꿈");
+            Assert.IsFalse(hero.SwapInto(rb, 5), "없는 칸");
+        }
+
+        [Test]
+        public void SwapIntoAnEmptySlotJustEquips()
+        {
+            var a = Relic("a", 1); var b = Relic("b", 2);
+            var hero = new Hero(TestData.Hero(new MonsterStats(100, 10, 10)), 5);
+            var ra = hero.AddRelic(a); var rb = hero.AddRelic(b);
+            hero.Unequip(rb);
+            Assert.IsTrue(hero.SwapInto(rb, 2), "빈 3번 칸에");
+            Assert.AreSame(rb, hero.SlotAt(2));
+            Assert.IsTrue(hero.HasSkillOf(rb), "빈 기술 칸이 있으면 기술도");
         }
     }
 }

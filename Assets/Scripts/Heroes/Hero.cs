@@ -216,6 +216,22 @@ namespace WordRPG.Heroes
             return true;
         }
 
+        // 바로 바꿔 끼우기 (#91 사용자 요청 — 전에는 빼기 → 장착하기 두 번): 그 칸의 성유물을 빼고 incoming을 끼운다.
+        // 빠진 성유물의 기술이 기술 칸에 있었으면 같은 자리에 새 성유물 기술이 들어가 기술 순서가 그대로, 없었으면 빈 기술 칸이 있을 때만 넣는다.
+        // 빈 칸을 고르면 그 칸에 끼운다. 이미 끼운 성유물이거나 칸 번호가 틀리면 false
+        public bool SwapInto(OwnedRelic incoming, int slot)
+        {
+            if (incoming == null || !relics.Contains(incoming) || IsEquipped(incoming)) return false;
+            if (slot < 0 || slot >= slots.Length) return false;
+            var outgoing = slots[slot];
+            slots[slot] = incoming;
+            int skillIndex = outgoing != null ? skillSlots.FindIndex(s => s.Relic == outgoing) : -1;
+            if (skillIndex >= 0) skillSlots[skillIndex] = new SkillSlot(incoming);
+            else if (HasSkillRoom) PlaceRelicSkill(incoming);
+            ClampHp();
+            return true;
+        }
+
         // 칸에서 뺀다 (그 성유물 기술도 기술 칸에서 빠진다). 최대 HP가 줄면 현재 HP도 맞춘다
         public bool Unequip(OwnedRelic relic)
         {

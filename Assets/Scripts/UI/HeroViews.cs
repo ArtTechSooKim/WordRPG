@@ -52,10 +52,12 @@ namespace WordRPG.UI
             return row;
         }
 
-        // selected: 금테를 두를 칸 (-1 = 없음)
-        public void Show(Hero hero, int selected = -1)
+        // selected: 금테를 두를 칸 (-1 = 없음). choosing: 바꿀 칸을 고르는 중 (#91 — 모든 칸에 금테 + 안내)
+        public void Show(Hero hero, int selected = -1, bool choosing = false, string note = null)
         {
-            subtitle.text = $"{hero.EquippedCount} / {hero.SlotCount}칸 · 칸을 누르면 성유물 탭에서 보기";
+            subtitle.text = note ?? (choosing ? "바꿀 칸을 고르세요 — 누른 칸의 성유물과 바꿔요"
+                : $"{hero.EquippedCount} / {hero.SlotCount}칸 · 칸을 누르면 성유물 탭에서 보기");
+            subtitle.color = choosing ? Palette.Gold : Palette.TextDim;
             for (int i = 0; i < cells.Count; i++)
             {
                 var relic = hero.SlotAt(i);
@@ -66,7 +68,7 @@ namespace WordRPG.UI
                 cell.LevelBack.gameObject.SetActive(relic != null);
                 cell.Level.text = relic != null ? $"+{relic.Level}" : "";
                 cell.Empty.enabled = relic == null;
-                cell.Border.enabled = i == selected && relic != null;
+                cell.Border.enabled = choosing || (i == selected && relic != null);
             }
         }
     }
@@ -320,8 +322,10 @@ namespace WordRPG.UI
 
         public GameObject Root { get; private set; }
         public OwnedRelic Selected { get; private set; }
+        public bool ChoosingSlot { get; private set; } // 바꿔 끼울 칸을 고르는 중 (#91)
 
         private RelicSlotsRow slotsRow;
+        private string swapNote; // 방금 바꾼 결과 ("등불 ↔ 깃펜 바꿔 끼웠어요")
         private Text countText;
         private RectTransform grid;
         private readonly List<Cell> cells = new List<Cell>();
@@ -449,15 +453,30 @@ namespace WordRPG.UI
                     if (relic != null && !catalog.Contains(relic)) catalog.Add(relic);
         }
 
+        // 칸을 누름: 바꿀 칸을 고르는 중이면 그 칸과 바꿔 끼우고, 아니면 그 칸의 성유물을 본다
         private void OnSlotClicked(int slot)
         {
-            var relic = session.Hero.SlotAt(slot);
+            var hero = session.Hero;
+            if (ChoosingSlot && Selected != null)
+            {
+                var outgoing = hero.SlotAt(slot);
+                ChoosingSlot = false;
+                if (hero.SwapInto(Selected, slot))
+                {
+                    swapNote = outgoing != null ? $"{Selected.Data.DisplayName} ↔ {outgoing.Data.DisplayName} 바꿔 끼웠어요" : $"{Selected.Data.DisplayName}을(를) 끼웠어요";
+                    onChanged?.Invoke();
+                }
+                Select(Selected, -1);
+                return;
+            }
+            var relic = hero.SlotAt(slot);
             if (relic != null) Select(relic, -1);
         }
 
         private void SelectCell(int index)
         {
             if (index >= catalog.Count) return;
+            ChoosingSlot = false;
             var owned = session.Hero.Find(catalog[index]);
             Select(owned, owned == null ? index : -1);
         }
@@ -465,9 +484,10 @@ namespace WordRPG.UI
         // owned가 null이면 못 찾은 성유물 칸(unknownIndex)을 고른 것
         private void Select(OwnedRelic owned, int unknownIndex)
         {
+            if (owned != Selected) swapNote = null;
             Selected = owned;
             var hero = session.Hero;
-            slotsRow.Show(hero, owned != null ? hero.SlotOf(owned) : -1);
+            slotsRow.Show(hero, owned != null ? hero.SlotOf(owned) : -1, ChoosingSlot, ChoosingSlot ? null : swapNote);
             countText.text = $"모은 성유물  {hero.Relics.Count} / {Mathf.Max(hero.Relics.Count, catalog.Count)}";
             LayoutCells();
 
@@ -559,9 +579,13 @@ namespace WordRPG.UI
             {
                 SetAction("장착하기 (빈 칸에)", Palette.Gold, true);
             }
+            else if (ChoosingSlot)
+            {
+                SetAction("취소", Palette.Neutral, true);
+            }
             else
             {
-                SetAction("칸이 가득 찼어요 — 먼저 하나를 빼세요", Palette.Disabled, false);
+                SetAction("바꿔 끼우기 — 바꿀 칸 고르기", Palette.Gold, true); // #91: 칸이 가득 차도 바로 바꿈 (Figma '가방 — 성유물 바꿔 끼우기')
             }
         }
 
@@ -577,10 +601,27 @@ namespace WordRPG.UI
         {
             if (Selected == null) return;
             var hero = session.Hero;
+            swapNote = null;
+            if (!hero.IsEquipped(Selected) && !hero.HasEmptySlot)
+            {
+                ChoosingSlot = !ChoosingSlot; // 바꿔 끼우기: 위의 칸을 고르게 (다시 누르면 취소)
+                Select(Selected, -1);
+                return;
+            }
+            ChoosingSlot = false;
             if (hero.IsEquipped(Selected)) hero.Unequip(Selected);
             else hero.Equip(Selected);
             onChanged?.Invoke();
             Select(Selected, -1);
+        }
+
+        // 뒤로가기: 칸 고르기 중이면 그것만 취소 (true)
+        public bool CancelChoosing()
+        {
+            if (!ChoosingSlot) return false;
+            ChoosingSlot = false;
+            if (Selected != null) Select(Selected, -1);
+            return true;
         }
     }
 }

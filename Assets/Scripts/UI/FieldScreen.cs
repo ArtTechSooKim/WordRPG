@@ -581,7 +581,10 @@ namespace WordRPG.UI
             {
                 if (!altarView.Cutscene.IsPlaying) altarView.Hide(); // 각성 연출 중에는 끝까지 보기
             }
-            else if (inventoryView.IsOpen) inventoryView.Hide();
+            else if (inventoryView.IsOpen)
+            {
+                if (!inventoryView.CancelRelicChoosing()) inventoryView.Hide(); // 바꿀 칸 고르기 중이면 그것만 취소 (#91)
+            }
             else if (shopView.IsOpen) shopView.Hide();
             else if (dexView.IsOpen) dexView.Hide();
             else if (trainingView.IsOpen) trainingView.Hide();

@@ -258,6 +258,9 @@ namespace WordRPG.UI
 
         public void Hide() => Root.SetActive(false);
 
+        // 뒤로가기 (#91): 성유물 바꿀 칸을 고르는 중이면 그것만 취소하고 true
+        public bool CancelRelicChoosing() => relicPage.Root.activeSelf && relicPage.CancelChoosing();
+
         public SkillLearnView LearnView => learnView;
 
         private void SelectTab(BagTab tab) => SelectTab(tab, null);

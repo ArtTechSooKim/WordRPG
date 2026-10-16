@@ -188,6 +188,49 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // 성유물 바로 바꿔 끼우기 (#91): 칸이 가득 찼을 때 [바꿔 끼우기] → 위의 칸을 누르면 그 칸의 성유물과 바뀜 (기술 칸 순서 그대로)
+        [UnityTest]
+        public IEnumerator RelicSwapsStraightIntoAFullSlot()
+        {
+            var wand = TestData.Relic("relic_wand", TestData.Skill("bolt", SkillKind.Damage, SkillTarget.SingleEnemy, 26).Set("displayName", "철자 번개"),
+                new MonsterStats(0, 6, 0), cover).Set("displayName", "마법 지팡이");
+            session.GrantRelic(book);
+            session.GrantRelic(lantern);   // 세 칸 가득 (깃펜·백과사전·등불)
+            session.GrantRelic(wand);      // 칸이 없어 가방에만
+            var hero = session.Hero;
+            Assert.IsFalse(hero.HasEmptySlot);
+            var field = MakeField();
+            yield return null;
+            yield return null;
+            var bag = field.transform.Find("FieldHud/SafeArea/InventoryView");
+            FindButton(field.transform.Find("FieldHud/SafeArea"), "BagButton").onClick.Invoke();
+            FindButton(bag, "TabRelics").onClick.Invoke();
+            var relicPage = bag.Find("RelicPage");
+            FindButton(relicPage.Find("Grid/RelicCell_3"), "Back").onClick.Invoke();
+            StringAssert.Contains("마법 지팡이", AllText(relicPage));
+            StringAssert.Contains("바꿔 끼우기", AllText(FindButton(relicPage, "RelicActionButton")), "칸이 가득해도 바로 바꿀 수 있음");
+
+            FindButton(relicPage, "RelicActionButton").onClick.Invoke();
+            StringAssert.Contains("바꿀 칸을 고르세요", AllText(relicPage));
+            StringAssert.Contains("취소", AllText(FindButton(relicPage, "RelicActionButton")));
+            FindButton(relicPage, "EquipSlot_0").onClick.Invoke();
+            Assert.AreSame(hero.Find(wand), hero.SlotAt(0), "1번 칸 = 마법 지팡이");
+            Assert.IsFalse(hero.IsEquipped(hero.Find(quill)), "깃펜은 빠짐");
+            Assert.AreEqual("relic:relic_wand", hero.SkillSlots[0].Key, "기술 칸 첫 자리도 지팡이 기술");
+            StringAssert.Contains("마법 지팡이 ↔ 깃펜 바꿔 끼웠어요", AllText(relicPage));
+            StringAssert.Contains("빼기", AllText(FindButton(relicPage, "RelicActionButton")));
+
+            // 칸 고르기 중 뒤로가기 = 그것만 취소
+            FindButton(relicPage.Find("Grid"), "Back").onClick.Invoke(); // 첫 칸 = 마법 지팡이? → 깃펜을 고름
+            FindButton(relicPage.Find("Grid/RelicCell_0"), "Back").onClick.Invoke();
+            FindButton(relicPage, "RelicActionButton").onClick.Invoke();
+            field.HandleBack();
+            Assert.IsTrue(bag.gameObject.activeSelf, "가방은 그대로");
+            StringAssert.DoesNotContain("바꿀 칸을 고르세요", AllText(relicPage));
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
         // 가방 > 아이템: 상처약 [사용하기] — HP가 가득이면 잠금, 다치면 회복 + 개수 감소
         [UnityTest]
         public IEnumerator PotionCanBeUsedFromBag()
