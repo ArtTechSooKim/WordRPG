@@ -1,4 +1,4 @@
-# 1.2 '어두운 밀림 동굴' 맵 초안 (50×62 ≈ 숲 36×44의 2배 넓이, GDD 9-7) — 사용자 확인용 미리보기
+# 1.2 '어두운 밀림 동굴' 맵 초안 (50×62 ≈ 숲 36×44의 2배 넓이, GDD 9-7) — 정글 깊은 강 가운데 섬 밑의 동굴 (사막과는 안 이어짐)
 #
 #   python Tools/cave_map.py   → Builds/maps/CaveMap.txt (글자 맵) + CaveMap_preview.png (색 미리보기, 이름표)
 #                                 + CaveMap_dark.png (어둠 미리보기: 처음 들어왔을 때 / 반딧돌을 다 밝힌 뒤)
@@ -9,7 +9,6 @@
 #   'F' 샘  'S' 가게  'E' 성유물 제단  'L' 사전 받침대  'C' 상자  'B' 말줄임덩굴(보스)  'G' 보스 방 문  'K' 열쇠 받침대 (#76 규칙)
 #   'Y' 레버 → 'H' 덩굴 다리 (정글 규칙 그대로 — 먹물 개울을 건너 쉼터로 돌아오는 지름길, 레버는 먼 쪽에)
 #   'Q' 꾸밈(막힘 — 석순·버섯·광부 상자, 종류는 게임이 둘레를 보고 고름)
-#   'O' 사막으로 이어지는 틈 (2.0 — 1.2에선 막힘, 보스를 이기면 무너져 열림)
 #   새: 'I' 글자 반딧돌 — [확인] → 이미 본 단어 한 문제(틀려도 벌점 없이 다시) → 영영 밝아져 둘레를 비춤 (세이브)
 # 마지막에 한 칸 통로를 두 칸으로 (#67 규칙 — widen_maps.py를 바위만 걷게 해서 씀)
 # 검사: 줄 길이 · P 하나 · 모든 물건이 시작에서 닿음 · 다리를 안 놓아도 다 닿음(다리는 지름길일 뿐, 레버도 다리 없이 닿음) ·
@@ -26,9 +25,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "Builds", "maps")
 W, H = 50, 62
 WALK = set(".:,PD")
-OBJECTS = set("FSELCBKYIO")
+OBJECTS = set("FSELCBKYI")
 BLOCK_DECOR = "Q"
-HERO_LIGHT = 3.5      # 주인공 둘레 빛 (칸)
+HERO_LIGHT = 3.5      # 주인공 둘레 빛 (칸, 사용자 확정) — 아라를 데려가면 횃불로 +1칸
 STONE_LIGHT = 6.0     # 밝힌 반딧돌 둘레 빛 (칸)
 CAMP_LIGHT = 8.5      # 쉼터 모닥불 (처음부터 밝음)
 
@@ -218,7 +217,6 @@ def obj(c, x, y):
 obj("P", 25, 56); obj("F", 20, 52); obj("S", 30, 51); obj("E", 21, 56); obj("L", 29, 56)     # 반딧불 쉼터
 obj("Y", 10, 56)                                                    # 레버 — 개울 건너 먼 쪽 (서쪽을 다 돌고 나서 쉼터로 지름길)
 g[8][25] = "B"                                                      # 말줄임덩굴
-g[4][25] = "O"                                                      # 사막으로 이어지는 틈 (보스 방 맨 위, 2.0)
 obj("K", 43, 10)                                                    # 보스 방 열쇠 — 수정 굴 (가장 먼 곳)
 STONES = [(25, 30), (4, 38), (8, 18), (5, 55), (45, 45), (46, 31), (38, 13), (21, 22)]
 for x, y in STONES:                                                 # 글자 반딧돌 8개 — 방마다 하나, 벽 가까이
@@ -296,7 +294,7 @@ for y in range(H):
         c = g[y][x]
         if (c in OBJECTS or c in "GH") and not touches(reach, x, y):
             problems.append((c, x, y))
-        if c in OBJECTS and c != "B" and c != "O" and not touches(no_bridge, x, y):
+        if c in OBJECTS and c != "B" and not touches(no_bridge, x, y):
             problems.append(("다리 없이 못 감", c, x, y))
         if (x in (0, W - 1) or y in (0, H - 1)) and c not in "#D":
             problems.append(("가장자리", c, x, y))
@@ -316,7 +314,7 @@ os.makedirs(OUT, exist_ok=True)
 with open(os.path.join(OUT, "CaveMap.txt"), "w", encoding="utf-8") as f:
     f.write(text)
 walk = sum(1 for y in range(H) for x in range(W) if g[y][x] in WALK)
-counts = {c: text.count(c) for c in "CIYHKGOBQ~,"}
+counts = {c: text.count(c) for c in "CIYHKGBQ~,"}
 print(f"{W}x{H} 걸을 칸 {walk} (숲 709칸의 약 {walk / 709:.1f}배) · {counts} · 남은 한 칸 통로 {len(kept)}곳",
       [(seg[0], len(seg)) for seg in kept])
 
@@ -324,7 +322,7 @@ print(f"{W}x{H} 걸을 칸 {walk} (숲 709칸의 약 {walk / 709:.1f}배) · {co
 COLORS = {"#": (58, 62, 70), ":": (128, 118, 104), ".": (170, 150, 116), ",": (96, 150, 120), "~": (36, 32, 58),
           "P": (170, 150, 116), "D": (90, 60, 40), "H": (150, 110, 60), "G": (200, 40, 40), "Q": (92, 84, 74)}
 OBJ_COLORS = {"C": (255, 220, 40), "I": (120, 220, 255), "B": (200, 0, 0), "F": (0, 200, 255), "S": (0, 160, 80),
-              "E": (160, 60, 255), "L": (250, 250, 250), "K": (255, 170, 0), "Y": (255, 90, 0), "O": (240, 200, 120)}
+              "E": (160, 60, 255), "L": (250, 250, 250), "K": (255, 170, 0), "Y": (255, 90, 0)}
 S = 14
 LEGEND_W = 360
 try:
@@ -355,7 +353,7 @@ for x, y in STONES:                    # 밝힌 반딧돌이 비추는 범위 (�
 for name, x, y in places:
     d.text((x * S, y * S), name, font=font, fill=(0, 0, 0), anchor="mm", stroke_width=3, stroke_fill=(255, 255, 255))
 legend = [("I", "글자 반딧돌 (8) — 단어 한 문제로 밝힘"), ("C", "보물상자 (10)"), ("K", "보스 방 열쇠"), ("B", "말줄임덩굴 (보스)"),
-          ("Y", "레버 (먼 쪽 → 지름길 다리)"), ("O", "사막으로 이어지는 틈 (2.0)"), ("F", "회복의 샘"), ("S", "가게"),
+          ("Y", "레버 (먼 쪽 → 지름길 다리)"), ("F", "회복의 샘"), ("S", "가게"),
           ("E", "성유물 제단"), ("L", "사전 받침대")]
 lx, ly = W * S + 16, 20
 d.text((lx, ly), f"어두운 밀림 동굴 {W}×{H} (초안)", font=font, fill=(0, 0, 0)); ly += 36
@@ -363,11 +361,11 @@ for c, label in legend:
     d.ellipse([lx, ly, lx + 14, ly + 14], fill=OBJ_COLORS[c], outline=(0, 0, 0))
     d.text((lx + 22, ly - 3), label, font=font, fill=(0, 0, 0)); ly += 27
 for c, label in [(",", "빛이끼 덤불 (몬스터 서식지)"), (".", "다져진 길 (큰길)"), (":", "바위 바닥 (조우 없음)"), ("#", "바위벽 (막힘)"),
-                 ("~", "먹물 웅덩이·개울 (도롱뇽이 숨음)"), ("H", "덩굴 다리 (레버)"), ("G", "보스 방 문"), ("Q", "석순·버섯 (꾸밈)")]:
+                 ("~", "먹물 웅덩이·개울 (먹물도롱뇽이 숨음)"), ("H", "덩굴 다리 (레버)"), ("G", "보스 방 문"), ("Q", "석순·버섯 (꾸밈)")]:
     d.rectangle([lx, ly, lx + 14, ly + 14], fill=COLORS[c], outline=(0, 0, 0))
     d.text((lx + 22, ly - 3), label, font=font, fill=(0, 0, 0)); ly += 27
 ly += 8
-for line in ["점선 원 = 밝힌 반딧돌이 비추는 범위", "정글 섬 동굴(아래 출입구)로 들어옴",
+for line in ["점선 원 = 밝힌 반딧돌이 비추는 범위", "정글 강 가운데 섬 밑의 동굴 —", "아래 출입구로 내려옴 (사막과는 안 이어짐)",
              "쉼터 → 대동굴 → 문, 서쪽 고리(버섯 굴 →", "먹물 호수 → 개울가 굴 → 레버 → 다리로 쉼터)",
              "동쪽 고리(거미 굴 → 깊은 곳 → 대동굴),", "가장 먼 수정 굴에 열쇠"]:
     d.text((lx, ly), line, font=small, fill=(40, 40, 40)); ly += 22
@@ -404,7 +402,7 @@ def dark_panel(lights, title):
 
 camp = (25, 53, CAMP_LIGHT)
 hero = (38, 52, HERO_LIGHT)                   # 주인공이 거미 굴로 가는 굴 속에 있을 때
-a = dark_panel([camp, hero], "처음: 쉼터 모닥불 + 주인공 빛")
+a = dark_panel([camp, hero], "처음: 쉼터 모닥불 + 주인공 빛 3.5칸 (아라와 함께면 4.5칸)")
 b = dark_panel([camp, hero] + [(x, y, STONE_LIGHT) for x, y in STONES], "반딧돌 8개를 다 밝힌 뒤")
 both = Image.new("RGB", (a.width * 2 + 12, a.height), (236, 234, 230))
 both.paste(a, (0, 0)); both.paste(b, (a.width + 12, 0))
