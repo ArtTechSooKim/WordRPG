@@ -117,7 +117,7 @@
     `MinimapArt.ColorOf`·`FieldArt`·`PlaceholderArt`에도 추가 (MinimapTests·AudioArtTests가 빠진 것을 잡음).
     길·물은 이웃 모양으로 테두리 조각을 고른다 (FieldAutotile → FieldArt.AutoTile, 그림 = Tiles/{테마}_{Floor|Water}_auto.png 256칸).
     벽·풀숲도 그림이 있는 테마만: 초원 덤불 Meadow_Wall_auto(짙은 덤불 + 그늘 바탕, #100) · 초원 풀숲 Meadow_Grass_auto(풀숲이 아닌 쪽은 풀잎 모양 테두리, #102) ·
-    서고 바닥 안개 = 아주 옅은 Library_Grass_auto + 위에 겹치는 안개 띠 `FieldFog`(자리 FieldDecor.FogPuffs, 그림 Tiles/{테마}_Fog_Wide·Small_n, 천천히 흔들림 #102).
+    서고 바닥 안개 = 몬스터 칸은 돌 + 위에 이어진 안개 한 장 `FieldFog`(그림은 규칙 `FogMap`이 맵에서 바로 — 구름 무늬, 벽엔 안 번짐, 쓰는 테마 = FieldFog.StyleFor #103).
     필드 그림을 바꿀 땐 벽과 땅이 한눈에 구분되는지 실제 맵 시안으로 먼저 확인 (사용자 #100)
 
 ## 폴더 구조

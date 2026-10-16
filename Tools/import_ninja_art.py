@@ -451,61 +451,6 @@ def meadow_wall_atlas(pack, template, bush):
     return atlas
 
 
-LIBRARY_FOG = (159, 179, 201)   # 옅은 푸른 회색 (사용자 참고 그림의 안개)
-LIBRARY_FOG_OPACITY = 0.16      # 바닥은 자리만 살짝 (#102 — 60%의 고른 막은 유리 같다고 함)
-
-
-def library_fog_cell(mask, stone, fade=6.0):
-    """서고 바닥 안개 한 칸 (#101). mask 비트(위·오른위·오른·오른아래·아래·왼아래·왼·왼위 = 게임 FieldAutotile과 같은 순서) = 그쪽도 안개거나 막힌 칸.
-    비트가 없는 쪽(열린 바닥·카펫)으로만 fade px에 걸쳐 2×2 디더로 옅어진다. 안쪽 옅은 물결 띠는 16px 주기라 칸 사이 이음새가 없다"""
-    import math
-    sp = stone.load()
-    out = Image.new("RGBA", (16, 16))
-    op = out.load()
-    bayer = [[0, 2], [3, 1]]
-    for y in range(16):
-        for x in range(16):
-            cx, cy = x + 0.5, y + 0.5
-            d = 99.0
-            if not mask & AUTO_N: d = min(d, cy)
-            if not mask & AUTO_S: d = min(d, 16 - cy)
-            if not mask & AUTO_W: d = min(d, cx)
-            if not mask & AUTO_E: d = min(d, 16 - cx)
-            for bit, (px, py) in ((AUTO_NE, (16, 0)), (AUTO_SE, (16, 16)), (AUTO_SW, (0, 16)), (AUTO_NW, (0, 0))):
-                if not mask & bit:
-                    d = min(d, math.hypot(cx - px, cy - py))
-            t = max(0.0, min(1.0, d / fade))
-            level = t * 4
-            a = LIBRARY_FOG_OPACITY if level >= 4 else (LIBRARY_FOG_OPACITY * (0.55 + 0.45 * t) if bayer[y % 2][x % 2] < level else 0.0)
-            s = sp[x, y]
-            op[x, y] = tuple(int(s[i] + (LIBRARY_FOG[i] - s[i]) * a) for i in range(3)) + (255,)
-    return out
-
-
-def library_fog_puff(w, h, seed, core=0.3, light=(214, 226, 240), shade=(150, 168, 192)):
-    """안개 띠 한 장 (#102): 타원 몇 개를 합친 넓고 납작한 모양. 위는 밝고 아래는 살짝 그늘, 가장자리는 4×4 디더로 점점이 옅어짐.
-    게임(FieldFog)이 몬스터 칸마다 조금씩 어긋나게 겹쳐 놓고 천천히 흔든다"""
-    import random
-    bayer = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]
-    rnd = random.Random(seed)
-    blobs = [(w * 0.5, h * 0.55, w * 0.42, h * 0.38)]
-    for _ in range(3):
-        blobs.append((rnd.uniform(w * 0.25, w * 0.75), rnd.uniform(h * 0.4, h * 0.65), rnd.uniform(w * 0.18, w * 0.3), rnd.uniform(h * 0.22, h * 0.34)))
-    img = Image.new("RGBA", (w, h))
-    px = img.load()
-    for y in range(h):
-        for x in range(w):
-            v = max(1 - ((x + 0.5 - cx) / rx) ** 2 - ((y + 0.5 - cy) / ry) ** 2 for cx, cy, rx, ry in blobs)
-            if v <= 0:
-                continue
-            a = core * min(1.0, v * 1.6)
-            if a < core * 0.9 and bayer[y % 4][x % 4] / 16 > a / core:
-                continue
-            k = max(0.0, y / h - 0.35) * 1.2
-            px[x, y] = tuple(int(light[i] + (shade[i] - light[i]) * k) for i in range(3)) + (int(255 * a),)
-    return img
-
-
 def meadow_grass_atlas(pack, lawn, base, blades):
     """초원 풀숲 자동 테두리 (#102 사용자가 빨간 선으로 표시): 덩어리 안쪽은 지금처럼 짙은 바탕(풀 사이 그늘),
     풀숲이 아닌 쪽 3px 안에서는 풀잎이 아닌 곳을 잔디로 지우고 풀잎 둘레에 검은 외곽선. 아래가 열려 있으면 밑 2줄을 비워 둥근 밑변"""
@@ -527,12 +472,19 @@ def meadow_grass_atlas(pack, lawn, base, blades):
                     or (not mask & AUTO_NE and x > 15 - band and y < band) or (not mask & AUTO_SE and x > 15 - band and y > 15 - band)
                     or (not mask & AUTO_SW and x < band and y > 15 - band) or (not mask & AUTO_NW and x < band and y < band))
         keep = [[blade[y][x] or not open_near(x, y) for x in range(16)] for y in range(16)]
+        # 위 칸도 풀숲이면 풀 그림을 8px 위로 올려 한 번 더 깔아 풀잎 위쪽 빈틈을 메운다 (#103 사용자: 덜 따진 느낌 — 빈틈 없게)
+        under = base.copy()
+        if mask & AUTO_N:
+            back = Image.new("RGBA", (16, 16))
+            back.alpha_composite(blades, (0, -8))
+            under.alpha_composite(back)
+        up = under.load()
         out = lawn.copy()
         op = out.load()
         for y in range(16):
             for x in range(16):
                 if keep[y][x]:
-                    op[x, y] = bp[x, y] if blade[y][x] else bs[x, y]
+                    op[x, y] = bp[x, y] if blade[y][x] else up[x, y]
         for y in range(16):
             for x in range(16):
                 if not keep[y][x] and any(0 <= x + dx < 16 and 0 <= y + dy < 16 and keep[y + dy][x + dx]
@@ -543,13 +495,6 @@ def meadow_grass_atlas(pack, lawn, base, blades):
     atlas = Image.new("RGBA", (256, 256))
     for mask in range(256):
         atlas.paste(cell(auto_normalize(mask)), ((mask % 16) * 16, (mask // 16) * 16))
-    return atlas
-
-
-def library_fog_atlas(stone):
-    atlas = Image.new("RGBA", (256, 256))
-    for mask in range(256):
-        atlas.paste(library_fog_cell(auto_normalize(mask), stone), ((mask % 16) * 16, (mask // 16) * 16))
     return atlas
 
 
@@ -783,7 +728,6 @@ def build_tiles(pack):
     autos["Meadow_Wall_auto"] = meadow_wall_atlas(pack, template, meadow_bush)
     library_stone = pack.tile("Interior/TilesetInteriorFloor.png", 16, 13)
     autos["Library_Water_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6, lambda t: library_ink_rim(t, library_stone))
-    autos["Library_Grass_auto"] = library_fog_atlas(library_stone)
     # 초원 풀숲 테두리 따기 (#102 사용자: 풀숲 바탕이 네모라 어색 — 풀잎 모양대로 테두리를)
     autos["Meadow_Grass_auto"] = meadow_grass_atlas(pack, pack.tile("TilesetField.png", 1, 4), pack.tile("TilesetField.png", 1, 7),
                                                     pack.tile("TilesetNature.png", 7, 10))
@@ -791,13 +735,13 @@ def build_tiles(pack):
     #       받침대 위 파란 구슬(회복 지점), 작은 트렁크. 풀숲 = 바닥에 흩어진 바랜 종이 조각
     # #98 다듬기 (사용자: 서고가 가장 아쉬움): 하얀 지그재그(흰 풀 그림)가 400칸 넘게 깔려 시끄럽던 것 → 양피지색으로 바랜 종이 조각 3가지,
     #     책장 3가지(_v1·_v2 — 게임이 칸 위치로 섞음), 열람실 카펫에 옅은 무늬, 잉크 웅덩이 물가 테두리(Library_Water_auto)
-#     #101: 바랜 종이도 '가시밭길 같다'(사용자) → 몬스터 칸은 옅은 푸른 바닥 안개 (Library_Grass_auto)
+#     #101~103: 바랜 종이도 '가시밭길 같다'(사용자) → 몬스터 칸은 바닥 안개 한 장 (게임의 FieldFog/FogMap)
     stone = pack.tile("Interior/TilesetInteriorFloor.png", 16, 13)
     carpet = pack.tile("Interior/TilesetInteriorFloor.png", 12, 7)
     themes["Library"] = {
         "Floor": stone,
         "Lawn": Image.blend(carpet, pack.tile("Interior/TilesetInteriorFloor.png", 20, 9), 0.35),  # 열람실 카펫 + 옅은 꽃무늬 (조우 없음)
-        "Grass": library_fog_cell(255, stone),  # 바닥 안개 자리 (아주 옅게 — 진짜 안개는 위에 겹치는 안개 띠 FieldFog, #102). 테두리는 Library_Grass_auto
+        "Grass": stone.copy(),  # 몬스터 칸 = 돌바닥 + 게임이 위에 얹는 바닥 안개 한 장 (FieldFog/FogMap, #103 — 사용자 참고 그림)
         "Wall": over(stone, pack.tile("TilesetElement.png", 3, 8)),
         "Wall_v1": over(stone, pack.tile("TilesetElement.png", 8, 8)),  # 넓은 책장 왼쪽
         "Wall_v2": over(stone, pack.tile("TilesetElement.png", 9, 8)),  # 넓은 책장 오른쪽
@@ -869,12 +813,6 @@ def build_tiles(pack):
     dark_tuft = lambda c: tint(floor_detail(c, 2), (0.7, 0.85, 0.7))
     for i, sprite in enumerate([floor_detail(c, 0) for c in (0, 1, 5, 6, 15)] + [dark_tuft(0), dark_tuft(3)]):
         themes["Forest"][f"Scatter_Lawn_{i}"] = sprite
-
-    # 안개 띠 (#102 사용자: 고른 막은 유리 같음 → 참고 그림처럼 뭉게뭉게): 넓고 납작한 것(양옆도 안개 칸일 때) · 작은 것(책장 옆)
-    for i in range(4):
-        themes["Library"][f"Fog_Wide_{i}"] = library_fog_puff(64, 20, i)
-    for i in range(3):
-        themes["Library"][f"Fog_Small_{i}"] = library_fog_puff(30, 14, 20 + i)
 
     folder = os.path.join(OUT, "Tiles")
     os.makedirs(folder, exist_ok=True)

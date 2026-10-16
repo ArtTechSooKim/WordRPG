@@ -31,7 +31,7 @@ namespace WordRPG.Tests
         {
             Assert.AreEqual(2, FieldArt.VariantCount(FieldTile.Wall, FieldTheme.Library), "책장 3가지 = 기본 + _v1·_v2");
             Assert.AreEqual(0, FieldArt.VariantCount(FieldTile.Grass, FieldTheme.Library), "몬스터 칸은 바닥 안개 (#101)");
-            Assert.IsNotNull(FieldArt.AutoTile(FieldTile.Grass, FieldTheme.Library, 255), "안개 자리 (아주 옅게)");
+            Assert.IsNull(FieldArt.AutoTile(FieldTile.Grass, FieldTheme.Library, 255), "서고 몬스터 칸은 돌 + 위에 안개 한 장 (#103)");
             Assert.IsNotNull(FieldArt.AutoTile(FieldTile.Grass, FieldTheme.Meadow, 0), "초원 풀숲 테두리 따기 (#102)");
             Assert.IsNull(FieldArt.AutoTile(FieldTile.Grass, FieldTheme.Forest, 0), "숲 고사리는 바탕이 잔디와 같아 그대로");
             Assert.AreEqual(0, FieldArt.VariantCount(FieldTile.Floor, FieldTheme.Library));
@@ -39,27 +39,29 @@ namespace WordRPG.Tests
             Assert.IsNotNull(FieldArt.AutoTile(FieldTile.Water, FieldTheme.Library, 0), "잉크 웅덩이 물가 테두리 (#98)");
         }
 
-        // #102 서고 바닥 안개 띠: 풀숲 칸마다 한 장, 양옆도 풀숲이면 넓은 띠, 자리는 늘 같음. 그림은 서고에만
+        // #103 서고 바닥 안개 한 장: 풀숲을 다 덮고(구름 무늬로 짙기만 다름), 풀숲 밖으로 몇 px만 옅어짐, 늘 같은 그림. 서고만
         [Test]
-        public void FogPuffsSitOnGrassAndOnlyTheLibraryHasFogArt()
+        public void FogCoversGrassAsOneSheetAndFadesJustOutside()
         {
-            var map = FieldMap.Parse("#####\n#,,,#\n#.,P#\n#####");
-            var puffs = FieldDecor.FogPuffs(map);
-            Assert.AreEqual(4, puffs.Count, "풀숲 4칸");
-            foreach (var p in puffs)
-            {
-                Assert.AreEqual(FieldTile.Grass, map.Get(p.Cell));
-                Assert.That(p.Offset.x, Is.InRange(-4, 4));
-                Assert.That(p.Offset.y, Is.InRange(-2, 2));
-            }
-            Assert.IsTrue(puffs.Find(p => p.Cell == new Vector2Int(2, 2)).Wide, "가운데 칸은 양옆이 풀숲 → 넓은 띠");
-            Assert.IsFalse(puffs.Find(p => p.Cell == new Vector2Int(1, 2)).Wide, "책장 옆은 작은 것");
-            CollectionAssert.AreEqual(puffs.ConvertAll(p => p.Variant), FieldDecor.FogPuffs(map).ConvertAll(p => p.Variant), "다시 그려도 같은 자리");
-
-            Assert.AreEqual(4, FieldArt.Fog(FieldTheme.Library, true).Length);
-            Assert.AreEqual(3, FieldArt.Fog(FieldTheme.Library, false).Length);
-            Assert.AreEqual(16f, FieldArt.Fog(FieldTheme.Library, true)[0].pixelsPerUnit, "칸보다 큰 그림 — 16px = 1칸");
-            Assert.AreEqual(0, FieldArt.Fog(FieldTheme.Meadow, true).Length, "초원엔 안개 없음");
+            var map = FieldMap.Parse("######\n#,,,.#\n#.,.P#\n######");
+            var light = new Color32(206, 218, 232, 255);
+            var shade = new Color32(150, 168, 192, 255);
+            var pixels = FogMap.Render(map, light, shade, 0.5f);
+            int width = map.Width * 16;
+            byte A(int px, int py) => pixels[py * width + px].a;
+            Assert.AreEqual(map.Width * 16 * map.Height * 16, pixels.Length);
+            // 풀숲 칸(2,2) 안쪽은 거의 다 안개 (디더 빈칸만 조금)
+            int covered = 0;
+            for (int y = 32; y < 48; y++) for (int x = 32; x < 48; x++) if (A(x, y) > 0) covered++;
+            Assert.Greater(covered, 200, "풀숲 칸은 안개로 덮임");
+            Assert.LessOrEqual(A(40, 40), (byte)128, "가장 짙어도 50%");
+            Assert.AreEqual(0, A(4 * 16 + 12, 2 * 16 + 8), "풀숲에서 6px 넘게 떨어진 길은 맑음");
+            Assert.AreEqual(0, A(5 * 16 + 8, 1 * 16 + 8), "멀리 떨어진 칸은 안개 없음");
+            Assert.AreEqual(0, A(15, 2 * 16 + 8), "풀숲 바로 옆 벽(책장)에도 안 번짐 — 벽이 또렷하게");
+            Assert.Greater(A(4 * 16 + 1, 2 * 16 + 8) + A(4 * 16 + 2, 2 * 16 + 8) + A(4 * 16 + 3, 2 * 16 + 9), 0, "길 쪽으로는 몇 px 번짐");
+            CollectionAssert.AreEqual(pixels, FogMap.Render(map, light, shade, 0.5f), "다시 그려도 같은 그림");
+            Assert.IsTrue(FieldFog.StyleFor(FieldTheme.Library, out _, out _, out _));
+            Assert.IsFalse(FieldFog.StyleFor(FieldTheme.Meadow, out _, out _, out _), "초원엔 안개 없음");
         }
 
         // #99: 숲은 나무·풀숲 3가지씩, 초원·숲 잔디 흩뿌림. #100: 초원은 섞지 않고 덤불 벽 자동 테두리 (벽·땅이 헷갈리지 않게)
