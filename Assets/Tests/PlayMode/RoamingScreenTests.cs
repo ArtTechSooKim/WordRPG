@@ -36,7 +36,7 @@ namespace WordRPG.Tests
             return string.Join("\n", rows);
         }
 
-        private static (FieldScreen field, WordDatabase words) Create(GameSession session)
+        private static (FieldScreen field, WordDatabase words) Create(GameSession session, bool tutorials = false)
         {
             var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 3);
             var enemy = TestData.Species("lizard", new MonsterStats(60, 1, 5), new MonsterStats(0, 0, 0), bite).Set("displayName", "도마뱀");
@@ -51,7 +51,7 @@ namespace WordRPG.Tests
                 .Set("encounterRate", 1f).Set("minStepsBetweenEncounters", 0)
                 .Set("encounterStyle", EncounterStyle.Roaming);
             var field = new GameObject("RoamingField").AddComponent<FieldScreen>();
-            field.Configure(area, session, step: 0.05f, animScale: 0.01f);
+            field.Configure(area, session, step: 0.05f, animScale: 0.01f, tutorials: tutorials);
             return (field, words);
         }
 
@@ -109,6 +109,44 @@ namespace WordRPG.Tests
             Assert.AreEqual(0, field.Roaming.Roamers.Count);
             Assert.AreEqual(0, field.RoamerViewCount);
             Assert.AreEqual(1, field.Roaming.PendingRespawns);
+            Object.Destroy(field.gameObject);
+        }
+
+        // #79: 처음 [선제공격] 기회 → 화면이 멈추고 세 단계 설명 (사용자가 정한 말) → 마지막은 버튼을 직접 눌러 봐야 끝
+        [UnityTest]
+        public IEnumerator FirstPreemptChancePausesWithATutorial()
+        {
+            var session = GameSession.NewGame(Hero(), 5);
+            foreach (var id in new[] { TutorialProgress.Field, TutorialProgress.Confirm, TutorialProgress.Grass }) session.Tutorials.Mark(id);
+            var (field, words) = Create(session, tutorials: true);
+            for (int i = 0; i < 5; i++) session.Vocabulary.Discover(words.Words[i].Id, System.DateTime.UtcNow.AddDays(-1));
+            yield return null;
+            yield return null;
+
+            yield return HoldStick(field, Direction.Right, () => field.PauseTutorial.IsShowing || field.IsInBattle, 6f);
+            Assert.IsTrue(field.PauseTutorial.IsShowing, "처음 선제공격 기회 → 화면을 멈추고 설명");
+            Assert.AreEqual("정글에 오신걸 환영합니다. 이제 적이 당신을 직접 싸우러 옵니다.", field.PauseTutorial.Message);
+            var roamer = field.Roaming.Roamers[0];
+            var held = roamer.Position;
+            yield return new WaitForSecondsRealtime(0.5f);
+            Assert.AreEqual(held, roamer.Position, "멈춘 동안 몬스터도 멈춤");
+            Assert.IsTrue(field.IsPreemptAvailable, "[선제공격] 버튼은 밝게 그대로");
+
+            ActiveButton(field.transform, "TutorialNextButton").onClick.Invoke();
+            yield return null;
+            Assert.AreEqual("일정 거리 적과 가까워지면 선제공격을 할 수 있습니다.", field.PauseTutorial.Message);
+            Assert.IsTrue(field.IsPreemptRangeVisible, "몬스터 둘레에 선제공격 범위");
+            ActiveButton(field.transform, "TutorialNextButton").onClick.Invoke();
+            yield return null;
+            Assert.AreEqual("버튼을 눌러보세요!", field.PauseTutorial.Message);
+            Assert.IsFalse(field.IsPreemptRangeVisible);
+            Assert.IsNull(ActiveButton(field.transform, "TutorialNextButton"), "마지막 단계는 [다음] 없이 직접 눌러 보기");
+
+            FindButton(field.transform, "PreemptButton").onClick.Invoke();
+            yield return WaitFor(() => !field.PauseTutorial.IsShowing, 2f);
+            Assert.IsFalse(field.PauseTutorial.IsShowing);
+            Assert.IsTrue(field.Preempt.IsOpen, "누르면 바로 QTE");
+            Assert.IsTrue(session.Tutorials.Has(TutorialProgress.Preempt), "본 것으로 저장 — 다시 안 나옴");
             Object.Destroy(field.gameObject);
         }
 

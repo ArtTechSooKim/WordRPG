@@ -130,6 +130,9 @@ namespace WordRPG.UI
         private float preemptWindow;        // 버튼이 뜬 뒤 지난 시간 (기회 슬로모션)
         private TargetLock preemptLock;     // 선제공격 거리의 몬스터에 빨간 조준 괄호
         private RectTransform markLayer;    // 몬스터 위치에 붙는 HUD 표시 층 (PreemptView와 같은 좌표)
+        private PauseTutorial pauseTutorial; // 처음 [선제공격] 기회에 화면을 멈추고 설명 (#79)
+        private UiRing preemptRange;        // 튜토리얼 2단계: 몬스터 둘레 '선제공격 범위' 점선
+        private bool preemptTutorialRunning;
         private Roamer battleRoamer; // 지금 싸우는 보이는 몬스터 (이기면 사라지고, 도망치면 잠깐 멈춤)
         private List<IReadOnlyList<WordEntry>> preemptBooks = new List<IReadOnlyList<WordEntry>>(); // 선제공격 문제 = 이미 본 단어만
         private const float PreemptSlow = 0.15f;        // QTE 문제를 푸는 동안 몬스터 속도
@@ -170,7 +173,10 @@ namespace WordRPG.UI
                                    || inventoryView.IsOpen || settingsView.IsOpen || mapView.IsOpen || learnView.IsOpen
                                    || (quitDialog != null && quitDialog.IsOpen) || (returnDialog != null && returnDialog.IsOpen)
                                    || (paywall != null && paywall.IsOpen) || (preemptView != null && preemptView.IsOpen)
-                                   || (companionCutscene != null && companionCutscene.IsPlaying);
+                                   || (companionCutscene != null && companionCutscene.IsPlaying)
+                                   || (pauseTutorial != null && pauseTutorial.IsShowing);
+        public PauseTutorial PauseTutorial => pauseTutorial;
+        public bool IsPreemptRangeVisible => preemptRange != null && preemptRange.gameObject.activeSelf;
         public CompanionCutscene CompanionCutscene => companionCutscene;
         public FieldFollower Follower => follower;
         public bool IsCompanionBadgeVisible => companionBadge != null && companionBadge.gameObject.activeSelf;
@@ -1416,6 +1422,8 @@ namespace WordRPG.UI
             markLayer = UiKit.Stretch("RoamerMarks", hudRoot);
             preemptLock = TargetLock.Create(markLayer, Palette.Bad, false);
             preemptLock.SetActive(false);
+            preemptRange = UiRing.Create("PreemptRange", markLayer, Palette.Gold, 5f, 100f, 28);
+            preemptRange.gameObject.SetActive(false);
             BuildPreemptPrompt(UiKit.Rect("PreemptPrompt", hudRoot, 0.19f, 0.3f, 0.19f, 0.3f));
 
             // 조우 연출용 번쩍임
@@ -1435,6 +1443,7 @@ namespace WordRPG.UI
             returnDialog = ConfirmDialog.Create(hudRoot);
             paywall = PaywallView.Create(hudRoot);
             companionCutscene = CompanionCutscene.Create(hudRoot);
+            pauseTutorial = PauseTutorial.Create(hudRoot);
             preemptView = PreemptView.Create(hudRoot);
             guide = GuideHints.Create(transform); // 자기 캔버스로 HUD·전투 위에 (눌림은 받지 않음)
         }
@@ -1863,6 +1872,13 @@ namespace WordRPG.UI
 
         private void UpdatePreemptButton(bool hidden, float dt)
         {
+            if (pauseTutorial.IsShowing)
+            {
+                // 튜토리얼로 멈춘 동안 (#79): 버튼·괄호는 밝게 그대로, 기회 원은 멈춤
+                if (!preemptPrompt.activeSelf) preemptPrompt.SetActive(true);
+                UpdatePreemptLock(roaming.PreemptTarget(walker.Position));
+                return;
+            }
             var target = hidden || IsPanelOpen || preemptBooks.Count == 0 ? null : roaming.PreemptTarget(walker.Position);
             bool show = target != null;
             if (preemptPrompt.activeSelf != show) preemptPrompt.SetActive(show);
@@ -1880,14 +1896,31 @@ namespace WordRPG.UI
             preemptRing.gameObject.SetActive(window < 1f);
             preemptRing.rectTransform.sizeDelta = Vector2.one * Mathf.Lerp(300f, 204f, window);
             preemptRing.color = window > 0.7f ? Palette.Bad : Palette.Gold;
-            if (showTutorials && !guide.IsShowing && !session.Tutorials.Has(TutorialProgress.Preempt))
-            {
-                StartCoroutine(guide.Run(session, TutorialProgress.Preempt, new GuideHints.Hint
-                {
-                    Text = "누르고 뜻을 맞히면 먼저 한 방!", Target = () => (RectTransform)preemptButton.transform,
-                    Gesture = GuideHints.Gesture.Tap, DoneWhen = () => preemptView.IsOpen || inBattle
-                }, SaveNow, () => !preemptPrompt.activeSelf && !preemptView.IsOpen));
-            }
+            if (showTutorials && !preemptTutorialRunning && !session.Tutorials.Has(TutorialProgress.Preempt))
+                StartCoroutine(RunPreemptTutorial());
+        }
+
+        // 정글에서 처음 [선제공격] 기회 (#79, 사용자 요청 — 사용자가 정한 말): 화면을 멈추고 세 단계. 마지막은 버튼을 직접 눌러 봐야 끝
+        private static readonly string[] PreemptTutorialLines =
+        {
+            "정글에 오신걸 환영합니다. 이제 적이 당신을 직접 싸우러 옵니다.",
+            "일정 거리 적과 가까워지면 선제공격을 할 수 있습니다.",
+            "버튼을 눌러보세요!"
+        };
+
+        private IEnumerator RunPreemptTutorial()
+        {
+            preemptTutorialRunning = true;
+            if (moving) SnapPlayer();
+            guide.Hide();
+            pauseTutorial.RaiseBelow(markLayer); // 조준 괄호·범위·[선제공격] 버튼은 막 위에서 밝게, 버튼만 눌림
+            bool completed = false;
+            yield return pauseTutorial.Run(PreemptTutorialLines, () => preemptView.IsOpen,
+                () => inBattle || roaming == null, step => preemptRange.gameObject.SetActive(step == 1), ok => completed = ok);
+            preemptTutorialRunning = false;
+            if (!completed) yield break;
+            session.Tutorials.Mark(TutorialProgress.Preempt);
+            SaveNow();
         }
 
         // 선제공격 거리의 몬스터에 빨간 조준 괄호 (1.5칸, 천천히 숨쉬듯)
@@ -1898,6 +1931,12 @@ namespace WordRPG.UI
             if (!point.HasValue) return;
             preemptLock.Root.anchoredPosition = point.Value;
             preemptLock.SetSize(TilePixels() * 1.5f);
+            if (preemptRange.gameObject.activeSelf)
+            {
+                // '선제공격 범위' = 몬스터에게서 PreemptRadius칸 (그 칸까지 감싸게 반 칸 더)
+                preemptRange.rectTransform.anchoredPosition = point.Value;
+                preemptRange.rectTransform.sizeDelta = Vector2.one * (roaming.Rules.PreemptRadius * 2 + 1) * TilePixels();
+            }
             preemptLock.Root.localScale = Vector3.one * (1f + Mathf.Sin(Time.unscaledTime * 5f) * 0.06f);
         }
 
