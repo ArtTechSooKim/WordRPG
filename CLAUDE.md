@@ -115,7 +115,9 @@
 13. **맵은 글자 데이터로만**: 미니맵·지도(`MapViews.cs`)가 FieldMap에서 자동으로 그려진다. 탐험 안개는 `WorldState.Reveal/IsExplored`
     (지역별 비트 기록 `ExploredArea`, 세이브에 포함). 새 맵 글자(타일 종류)를 추가하면
     `MinimapArt.ColorOf`·`FieldArt`·`PlaceholderArt`에도 추가 (MinimapTests·AudioArtTests가 빠진 것을 잡음).
-    길·물은 이웃 모양으로 테두리 조각을 고른다 (FieldAutotile → FieldArt.AutoTile, 그림 = Tiles/{테마}_{Floor|Water}_auto.png 256칸)
+    길·물은 이웃 모양으로 테두리 조각을 고른다 (FieldAutotile → FieldArt.AutoTile, 그림 = Tiles/{테마}_{Floor|Water}_auto.png 256칸).
+    벽·풀숲도 그림이 있는 테마만: 초원 덤불 Meadow_Wall_auto(짙은 덤불 + 그늘 바탕, #100) · 서고 바닥 안개 Library_Grass_auto(열린 바닥 쪽으로만 옅어짐, #101).
+    필드 그림을 바꿀 땐 벽과 땅이 한눈에 구분되는지 실제 맵 시안으로 먼저 확인 (사용자 #100)
 
 ## 폴더 구조
 

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: f0163198ec449a44e8faae1f4a30d57e
+guid: 52393e14d3fea6a4ca5cf9b6db80312d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8219290653751122565
-    second: Meadow_Wall_v1_0
+      213: 245754456548214893
+    second: Library_Grass_auto_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -139,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Meadow_Wall_v1_0
+      name: Library_Grass_auto_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 16
-        height: 16
+        width: 256
+        height: 256
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 58a168a4d49c01270800000000000000
-      internalID: 8219290653751122565
+      spriteID: d68868c4068196300800000000000000
+      internalID: 245754456548214893
       vertices: []
       indices: 
       edges: []

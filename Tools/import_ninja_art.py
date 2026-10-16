@@ -423,18 +423,73 @@ def auto_atlas(pack, template, sheet, col0, row0, recolor=None):
     return out
 
 
-def library_paper(detail, flip=False):
-    """흰 풀 그림을 바랜 종이 조각으로: 밝기를 어두운 돌색~양피지색 사이로 (돌바닥보다 조금 밝게, 하얗지 않게 — #98)"""
-    dark, light = (107, 95, 88), (200, 184, 160)
-    out = detail.copy()
-    px = out.load()
-    for y in range(out.height):
-        for x in range(out.width):
-            r, g, b, a = px[x, y]
-            if a:
-                t = (r + g + b) / 765
-                px[x, y] = tuple(int(dark[i] + (light[i] - dark[i]) * t) for i in range(3)) + (a,)
-    return out.transpose(Image.FLIP_LEFT_RIGHT) if flip else out
+MEADOW_BUSH_TINT = (0.66, 0.8, 0.6)
+
+
+def meadow_wall_atlas(pack, template, bush):
+    """초원 덤불 벽 (#100 사용자: 덤불 칸 바탕이 잔디와 같은 색이라 벽·땅이 헷갈리고 바닥이 네모로 갈라져 보임):
+    흙길 조각(TilesetFloor 0,7)의 흙을 짙은 그늘 풀로 칠하면 '그늘진 덤불숲 + 잔디로 번지는 둥근 풀 테두리'가 된다. 칸마다 짙은 덤불을 위에"""
+    dark, light = (47, 77, 44), (79, 125, 62)
+
+    def shade(t):
+        out = t.copy()
+        px = out.load()
+        for y in range(out.height):
+            for x in range(out.width):
+                r, g, b, a = px[x, y]
+                if a and r > g + 25 and r > 110:  # 흙 → 그늘 풀 (밝기 유지)
+                    k = (r + g + b) / 765
+                    px[x, y] = tuple(int(dark[i] + (light[i] - dark[i]) * k) for i in range(3)) + (a,)
+        return out
+
+    atlas = auto_atlas(pack, template, "TilesetFloor.png", 0, 7, shade)
+    for mask in range(256):
+        box = ((mask % 16) * 16, (mask // 16) * 16, (mask % 16) * 16 + 16, (mask // 16) * 16 + 16)
+        cell = atlas.crop(box)
+        cell.alpha_composite(bush)
+        atlas.paste(cell, box[:2])
+    return atlas
+
+
+LIBRARY_FOG = (162, 182, 205)   # 옅은 푸른 회색 (사용자 참고 그림의 안개)
+LIBRARY_FOG_OPACITY = 0.6
+
+
+def library_fog_cell(mask, stone, fade=6.0):
+    """서고 바닥 안개 한 칸 (#101). mask 비트(위·오른위·오른·오른아래·아래·왼아래·왼·왼위 = 게임 FieldAutotile과 같은 순서) = 그쪽도 안개거나 막힌 칸.
+    비트가 없는 쪽(열린 바닥·카펫)으로만 fade px에 걸쳐 2×2 디더로 옅어진다. 안쪽 옅은 물결 띠는 16px 주기라 칸 사이 이음새가 없다"""
+    import math
+    sp = stone.load()
+    out = Image.new("RGBA", (16, 16))
+    op = out.load()
+    bayer = [[0, 2], [3, 1]]
+    for y in range(16):
+        for x in range(16):
+            cx, cy = x + 0.5, y + 0.5
+            d = 99.0
+            if not mask & AUTO_N: d = min(d, cy)
+            if not mask & AUTO_S: d = min(d, 16 - cy)
+            if not mask & AUTO_W: d = min(d, cx)
+            if not mask & AUTO_E: d = min(d, 16 - cx)
+            for bit, (px, py) in ((AUTO_NE, (16, 0)), (AUTO_SE, (16, 16)), (AUTO_SW, (0, 16)), (AUTO_NW, (0, 0))):
+                if not mask & bit:
+                    d = min(d, math.hypot(cx - px, cy - py))
+            t = max(0.0, min(1.0, d / fade))
+            level = t * 4
+            a = LIBRARY_FOG_OPACITY if level >= 4 else (LIBRARY_FOG_OPACITY * (0.55 + 0.45 * t) if bayer[y % 2][x % 2] < level else 0.0)
+            band = math.sin((x + 2 * y) * 2 * math.pi / 16) + math.sin((y * 3 + x) * 2 * math.pi / 16)
+            if a > 0 and band > 1.2:
+                a = min(1.0, a + 0.12)
+            s = sp[x, y]
+            op[x, y] = tuple(int(s[i] + (LIBRARY_FOG[i] - s[i]) * a) for i in range(3)) + (255,)
+    return out
+
+
+def library_fog_atlas(stone):
+    atlas = Image.new("RGBA", (256, 256))
+    for mask in range(256):
+        atlas.paste(library_fog_cell(auto_normalize(mask), stone), ((mask % 16) * 16, (mask // 16) * 16))
+    return atlas
 
 
 def library_ink_rim(t, stone):
@@ -637,12 +692,13 @@ def build_tiles(pack):
     # 상자·제단·상점·보스는 잔디 위 (길이 아닌 칸이라 길 테두리가 둘레를 감싼다)
     sand = pack.tile("TilesetFloor.png", 1, 1)
     lime = pack.tile("TilesetField.png", 1, 4)
+    meadow_bush = tint(pack.tile("TilesetNature.png", 1, 10), MEADOW_BUSH_TINT)  # #100: 잔디(연두)보다 짙게 → 벽이 한눈에
     path = pack.tile("TilesetFloor.png", 1, 8)  # 흙길 가운데 조각
     themes["Meadow"] = {
         "Floor": path,
         "Lawn": lime,  # 짧은 잔디 (조우 없음)
         "Grass": over(pack.tile("TilesetField.png", 1, 7), pack.tile("TilesetNature.png", 7, 10)),
-        "Wall": over(lime, pack.tile("TilesetNature.png", 1, 10)),
+        "Wall": over(lime, meadow_bush),  # 자동 테두리(Meadow_Wall_auto)가 없을 때만
         "Water": pack.tile("TilesetWater.png", 1, 7),
         "Door": over(lime, pack.tile("TilesetNature.png", 7, 13)),
         "Door_locked": over(lime, brambles),
@@ -663,21 +719,23 @@ def build_tiles(pack):
     }
     autos["Meadow_Floor_auto"] = auto_atlas(pack, template, "TilesetFloor.png", 0, 7)
     autos["Meadow_Water_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6)
+    autos["Meadow_Wall_auto"] = meadow_wall_atlas(pack, template, meadow_bush)
+    library_stone = pack.tile("Interior/TilesetInteriorFloor.png", 16, 13)
+    # 잉크 웅덩이는 모두 안개 낀 몬스터 칸 안에 있어서 물가도 안개 낀 돌로 (#101 — 안개 속에 돌 네모가 남지 않게)
     autos["Library_Water_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6,
-                                             lambda t: library_ink_rim(t, pack.tile("Interior/TilesetInteriorFloor.png", 16, 13)))
+                                             lambda t: library_ink_rim(t, library_fog_cell(255, library_stone)))
+    autos["Library_Grass_auto"] = library_fog_atlas(library_stone)
     # 서고: 어두운 돌바닥(책장과 잘 구분되게), 책장 벽, 잉크 웅덩이, 나무 문,
     #       받침대 위 파란 구슬(회복 지점), 작은 트렁크. 풀숲 = 바닥에 흩어진 바랜 종이 조각
     # #98 다듬기 (사용자: 서고가 가장 아쉬움): 하얀 지그재그(흰 풀 그림)가 400칸 넘게 깔려 시끄럽던 것 → 양피지색으로 바랜 종이 조각 3가지,
     #     책장 3가지(_v1·_v2 — 게임이 칸 위치로 섞음), 열람실 카펫에 옅은 무늬, 잉크 웅덩이 물가 테두리(Library_Water_auto)
+#     #101: 바랜 종이도 '가시밭길 같다'(사용자) → 몬스터 칸은 옅은 푸른 바닥 안개 (Library_Grass_auto)
     stone = pack.tile("Interior/TilesetInteriorFloor.png", 16, 13)
-    paper = lambda c, r, flip=False: library_paper(pack.tile("TilesetFloorDetail.png", c, r), flip)
     carpet = pack.tile("Interior/TilesetInteriorFloor.png", 12, 7)
     themes["Library"] = {
         "Floor": stone,
         "Lawn": Image.blend(carpet, pack.tile("Interior/TilesetInteriorFloor.png", 20, 9), 0.35),  # 열람실 카펫 + 옅은 꽃무늬 (조우 없음)
-        "Grass": over(stone, paper(1, 3)),  # 흩어진 종이 조각 (바랜 양피지색)
-        "Grass_v1": over(stone, paper(4, 3, True)),
-        "Grass_v2": over(stone, paper(2, 3)),
+        "Grass": library_fog_cell(255, stone),  # 바닥 안개 (#101 사용자: 바랜 종이는 가시밭길 같음 → 옅은 푸른 도트 안개). 테두리는 Library_Grass_auto
         "Wall": over(stone, pack.tile("TilesetElement.png", 3, 8)),
         "Wall_v1": over(stone, pack.tile("TilesetElement.png", 8, 8)),  # 넓은 책장 왼쪽
         "Wall_v2": over(stone, pack.tile("TilesetElement.png", 9, 8)),  # 넓은 책장 오른쪽
@@ -738,10 +796,7 @@ def build_tiles(pack):
     nature = lambda c, r: pack.tile("TilesetNature.png", c, r)
     floor_detail = lambda c, r: pack.tile("TilesetFloorDetail.png", c, r)
     lime, field_grass = pack.tile("TilesetField.png", 1, 4), pack.tile("TilesetField.png", 1, 7)
-    themes["Meadow"]["Wall_v1"] = over(lime, nature(0, 10))
-    themes["Meadow"]["Wall_v2"] = over(lime, nature(6, 10))
-    themes["Meadow"]["Grass_v1"] = over(field_grass, nature(5, 10))
-    themes["Meadow"]["Grass_v2"] = over(field_grass, nature(8, 10))
+    # 초원은 나무·풀숲을 섞지 않음 (#100 사용자: 섞으니 벽과 땅이 헷갈림) — 대신 덤불을 짙게 + 그늘 바탕 자동 테두리(Meadow_Wall_auto)
     for i, sprite in enumerate([nature(2, 11)] + [floor_detail(c, 2) for c in (0, 1, 3, 5, 6)]):
         themes["Meadow"][f"Scatter_Lawn_{i}"] = sprite
     forest_ground, forest_tree = tint(field_grass, (0.62, 0.72, 0.62)), (0.55, 0.75, 0.55)

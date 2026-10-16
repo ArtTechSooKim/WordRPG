@@ -136,7 +136,7 @@ namespace WordRPG.UI
                 case FieldTheme.Library:
                     switch (tile)
                     {
-                        case FieldTile.Grass: return Rgb(0xE6DCCB); // 흩어진 종이 조각 — 바랜 종이 가루 (#98)
+                        case FieldTile.Grass: return Rgb(0xD2DCE8); // 바닥 안개 — 옅은 푸른 물보라 (#101)
                         case FieldTile.Lawn: return Rgb(0xDCE2D2);  // 카펫·이끼
                         default: return Rgb(0xC9C0BC);              // 돌바닥 (보스 빈자리도 돌바닥)
                     }

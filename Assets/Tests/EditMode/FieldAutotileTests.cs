@@ -47,6 +47,13 @@ namespace WordRPG.Tests
             Assert.IsTrue((left & FieldAutotile.S) == 0, "아래는 잔디");
             Assert.AreEqual(0, FieldAutotile.Mask(FieldMap.Parse("P"), Vector2Int.zero), "길은 맵 밖과 안 이어짐");
             Assert.IsFalse(FieldAutotile.IsAutotiled(FieldTile.Lawn));
+            Assert.IsTrue(FieldAutotile.IsAutotiled(FieldTile.Wall), "덤불 벽도 이웃 모양으로 (#100)");
+            Assert.IsTrue(FieldAutotile.Connects(FieldTile.Wall, FieldTile.Wall));
+            Assert.IsFalse(FieldAutotile.Connects(FieldTile.Wall, FieldTile.Lawn), "잔디 쪽은 둥근 풀 테두리");
+            Assert.IsTrue(FieldAutotile.Connects(FieldTile.Grass, FieldTile.Wall), "안개는 책장 쪽으로 끝까지 (#101)");
+            Assert.IsTrue(FieldAutotile.Connects(FieldTile.Grass, FieldTile.Water));
+            Assert.IsFalse(FieldAutotile.Connects(FieldTile.Grass, FieldTile.Floor), "길 쪽으로만 옅어짐");
+            Assert.IsFalse(FieldAutotile.Connects(FieldTile.Grass, FieldTile.Lawn));
             Assert.IsFalse(FieldAutotile.Connects(FieldTile.Floor, FieldTile.Chest), "물건 칸은 잔디 위 — 길 테두리가 감쌈");
         }
 

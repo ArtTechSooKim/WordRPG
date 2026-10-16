@@ -16,8 +16,10 @@ namespace WordRPG.Field
             new Vector2Int(0, -1), new Vector2Int(-1, -1), new Vector2Int(-1, 0), new Vector2Int(-1, 1)
         };
 
-        // 테두리를 자동으로 그리는 칸: 길, 물, 얕은 강 (#80)
-        public static bool IsAutotiled(FieldTile tile) => tile == FieldTile.Floor || tile == FieldTile.Water || tile == FieldTile.Stream;
+        // 테두리를 자동으로 그리는 칸: 길, 물, 얕은 강 (#80), 벽 (#100 — 초원 덤불 덩어리가 잔디와 둥글게 갈리게. 그림이 있는 테마만)
+        // 풀숲 (#101): 서고의 바닥 안개가 열린 바닥 쪽으로만 옅어지게
+        public static bool IsAutotiled(FieldTile tile) => tile == FieldTile.Floor || tile == FieldTile.Water || tile == FieldTile.Stream
+                                                          || tile == FieldTile.Wall || tile == FieldTile.Grass;
 
         // 이어지는 이웃: 길은 길·출입구(길이 문까지 이어지게), 물은 물. 얕은 강·덩굴 다리(물 위)·깊은 물은 한 물줄기로 이어진다 (#80)
         public static bool Connects(FieldTile tile, FieldTile neighbor)
@@ -27,11 +29,14 @@ namespace WordRPG.Field
                 case FieldTile.Floor: return neighbor == FieldTile.Floor || neighbor == FieldTile.Door || neighbor == FieldTile.Gate; // 보스 방 문은 길이 이어지는 자리
                 case FieldTile.Water:
                 case FieldTile.Stream: return neighbor == FieldTile.Water || neighbor == FieldTile.Stream || neighbor == FieldTile.Bridge;
+                case FieldTile.Wall: return neighbor == FieldTile.Wall;
+                // 안개는 책장·잉크·물건 쪽으로는 끝까지 차고, 걸어 다니는 열린 땅(길·카펫·출입구·보스 방 문) 쪽으로만 옅어진다
+                case FieldTile.Grass: return neighbor != FieldTile.Floor && neighbor != FieldTile.Lawn && neighbor != FieldTile.Door && neighbor != FieldTile.Gate;
                 default: return false;
             }
         }
 
-        // 맵 밖: 물은 이어진 것으로 (강이 맵 끝까지 흘러가게), 길은 막힌 것으로
+        // 맵 밖: 물·벽은 이어진 것으로 (강이 맵 끝까지 흘러가게, 맵 가장자리 덤불은 바깥으로 이어진 숲), 길은 막힌 것으로
         public static int Mask(FieldMap map, Vector2Int cell)
         {
             var tile = map.Get(cell);
@@ -39,7 +44,7 @@ namespace WordRPG.Field
             for (int i = 0; i < Offsets.Length; i++)
             {
                 var next = cell + Offsets[i];
-                bool joined = map.InBounds(next) ? Connects(tile, map.Get(next)) : tile == FieldTile.Water;
+                bool joined = map.InBounds(next) ? Connects(tile, map.Get(next)) : tile == FieldTile.Water || tile == FieldTile.Wall || tile == FieldTile.Grass;
                 if (joined) mask |= 1 << i;
             }
             return Normalize(mask);

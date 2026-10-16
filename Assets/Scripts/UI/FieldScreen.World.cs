@@ -33,7 +33,7 @@ namespace WordRPG.UI
                 if (kind == FieldTile.Door) tile = DoorTile(fieldArea, cell, lockedDoor(cell));
                 else if (kind == FieldTile.Bridge) tile = BridgeTile(fieldArea.Theme, done, map.IsBridgeHorizontal(cell));
                 else if (kind == FieldTile.Decor) tile = DecorTile(fieldArea.Theme, FieldDecor.Variant(map, cell));
-                else if (FieldAutotile.IsAutotiled(kind)) tile = AutoTile(fieldArea.Theme, kind, FieldAutotile.Mask(map, cell)) ?? TileFor(kind, done, fieldArea.Theme);
+                else if (FieldAutotile.IsAutotiled(kind) && AutoTile(fieldArea.Theme, kind, FieldAutotile.Mask(map, cell)) is Tile auto) tile = auto;
                 else if (!done && FieldArt.VariantCount(kind, fieldArea.Theme) > 0)
                     tile = VariantTile(fieldArea.Theme, kind, FieldDecor.TileVariant(cell, FieldArt.VariantCount(kind, fieldArea.Theme)));
                 else tile = TileFor(kind, done, fieldArea.Theme);

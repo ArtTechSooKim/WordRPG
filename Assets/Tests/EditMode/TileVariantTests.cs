@@ -30,22 +30,26 @@ namespace WordRPG.Tests
         public void LibraryHasShelfAndPaperVariantsButOtherKindsStayPlain()
         {
             Assert.AreEqual(2, FieldArt.VariantCount(FieldTile.Wall, FieldTheme.Library), "책장 3가지 = 기본 + _v1·_v2");
-            Assert.AreEqual(2, FieldArt.VariantCount(FieldTile.Grass, FieldTheme.Library), "바랜 종이 3가지");
+            Assert.AreEqual(0, FieldArt.VariantCount(FieldTile.Grass, FieldTheme.Library), "몬스터 칸은 바닥 안개 (#101)");
+            Assert.IsNotNull(FieldArt.AutoTile(FieldTile.Grass, FieldTheme.Library, 255), "안개 자동 테두리");
+            Assert.IsNull(FieldArt.AutoTile(FieldTile.Grass, FieldTheme.Meadow, 255), "다른 지역 풀숲은 그대로");
             Assert.AreEqual(0, FieldArt.VariantCount(FieldTile.Floor, FieldTheme.Library));
             Assert.IsNotNull(FieldArt.ForTileVariant(FieldTile.Wall, FieldTheme.Library, 2));
             Assert.IsNotNull(FieldArt.AutoTile(FieldTile.Water, FieldTheme.Library, 0), "잉크 웅덩이 물가 테두리 (#98)");
         }
 
-        // #99: 초원·숲 나무·풀숲 3가지씩 + 잔디 흩뿌림
+        // #99: 숲은 나무·풀숲 3가지씩, 초원·숲 잔디 흩뿌림. #100: 초원은 섞지 않고 덤불 벽 자동 테두리 (벽·땅이 헷갈리지 않게)
         [Test]
-        public void MeadowAndForestMixTreesAndScatterOnLawn()
+        public void ForestMixesTreesMeadowKeepsOneBushWithShadedEdges()
         {
+            Assert.AreEqual(2, FieldArt.VariantCount(FieldTile.Wall, FieldTheme.Forest), "숲 나무 3가지");
+            Assert.AreEqual(2, FieldArt.VariantCount(FieldTile.Grass, FieldTheme.Forest), "숲 풀숲 3가지");
+            Assert.AreEqual(0, FieldArt.VariantCount(FieldTile.Wall, FieldTheme.Meadow), "초원 덤불은 한 가지");
+            Assert.AreEqual(0, FieldArt.VariantCount(FieldTile.Grass, FieldTheme.Meadow));
+            Assert.IsNotNull(FieldArt.AutoTile(FieldTile.Wall, FieldTheme.Meadow, 0), "초원 덤불 그늘 테두리 (#100)");
+            Assert.IsNull(FieldArt.AutoTile(FieldTile.Wall, FieldTheme.Forest, 0), "숲은 그대로 (사용자 OK)");
             foreach (var theme in new[] { FieldTheme.Meadow, FieldTheme.Forest })
-            {
-                Assert.AreEqual(2, FieldArt.VariantCount(FieldTile.Wall, theme), $"{theme} 나무 3가지");
-                Assert.AreEqual(2, FieldArt.VariantCount(FieldTile.Grass, theme), $"{theme} 풀숲 3가지");
                 Assert.GreaterOrEqual(FieldArt.Scatter(theme, FieldTile.Lawn).Length, 5, $"{theme} 잔디 흩뿌림");
-            }
         }
     }
 }
