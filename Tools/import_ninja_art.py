@@ -762,6 +762,34 @@ def build_jungle(pack, themes, autos, template, lectern, key_stand, keyhole, big
         "Shrine_prop": statue,                                               # 이끼 낀 앉은 석상 2×2 (잠든 아라)
         "Cave_prop": cave,                                                   # 판자로 막은 동굴 3×3 (1.2)
     }
+    # 꾸밈 'Q' (#86, 막힘): 둘레를 보고 종류를 고름 (FieldDecor.Variant) — 야영지 = 나무 상자·통·통나무 / 들판 = 그루터기·통나무·바위 /
+    # 유적 = 이끼 기둥·부서진 석상(1×2 큰 그림) · 돌무더기 · 이끼 바위. 바닥은 이끼 땅(유적은 유적 바닥)
+    def deco(base, top):
+        return over(base, top)
+    village = TILESETS + "TilesetVillageAbandoned.png"
+    themes["Jungle"].update({
+        "Decor": deco(moss, pack.tile("TilesetNature.png", 5, 8)),                       # 기본 = 통나무
+        "Decor_Crate": deco(moss, pack.tile("TilesetElement.png", 0, 0)),
+        "Decor_Barrel": deco(moss, pack.tile("TilesetElement.png", 1, 0)),
+        "Decor_Log": deco(moss, pack.tile("TilesetNature.png", 5, 8)),
+        "Decor_Stump": deco(moss, pack.tile("TilesetNature.png", 13, 13)),
+        "Decor_Rock": deco(moss, pack.tile("TilesetReliefDetail.png", 4, 0)),
+        "Decor_Rubble": deco(ruin_floor, pack.image(village).crop((32, 80, 48, 96))),
+        "Decor_MossRock": deco(ruin_floor, pack.image(village).crop((112, 48, 128, 64))),
+        "Decor_Pillar": ruin_floor.copy(),                                                # 위에 큰 그림 _prop
+        "Decor_Pillar_prop": pack.image(village).crop((32, 48, 48, 80)),                  # 이끼 낀 기둥 1×2
+        "Decor_Statue": ruin_floor.copy(),
+        "Decor_Statue_prop": pack.image(village).crop((48, 48, 64, 80)),                  # 부서진 석상 1×2
+    })
+    # 흩뿌림 (#86, 걸을 수 있는 칸 위 그림일 뿐 — 막지 않음): 이끼 땅의 풀·꽃, 깊은 강의 연잎, 유적 바닥의 돌 부스러기
+    detail = TILESETS + "TilesetFloorDetail.png"
+    for i, col in enumerate((0, 1, 2, 3, 5, 6)):
+        themes["Jungle"][f"Scatter_Lawn_{i}"] = pack.image(detail).crop((col * 16, 32, col * 16 + 16, 48))
+    lily = pack.tile("TilesetWater.png", 11, 3)
+    themes["Jungle"]["Scatter_Water_0"] = keep_green(lily)
+    themes["Jungle"]["Scatter_Water_1"] = keep_green(lily).transpose(Image.FLIP_LEFT_RIGHT)
+    themes["Jungle"]["Scatter_RuinFloor_0"] = pack.tile("TilesetReliefDetail.png", 0, 0)
+    themes["Jungle"]["Scatter_RuinFloor_1"] = pack.tile("TilesetReliefDetail.png", 0, 2)
     autos["Jungle_Floor_auto"] = auto_atlas(pack, template, "TilesetFloor.png", 11, 7, jungle_mud)
     autos["Jungle_Water_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6, jungle_water)
     autos["Jungle_Stream_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6, jungle_stream)
@@ -771,6 +799,18 @@ def build_jungle(pack, themes, autos, template, lectern, key_stand, keyhole, big
     os.makedirs(field, exist_ok=True)
     save_if_changed(log_raft(planks), os.path.join(field, "raft.png"))
     save_if_changed(flow_streaks(), os.path.join(field, "ripple.png"))
+
+
+def keep_green(t):
+    """연잎 타일에서 물(파랑)을 지우고 잎(초록)만 남긴다"""
+    out = t.copy()
+    px = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            r, g, b, a = px[x, y]
+            if b > g or (b > r and g - b < 30):
+                px[x, y] = (0, 0, 0, 0)
+    return out
 
 
 def log_raft(planks):

@@ -312,4 +312,70 @@ namespace WordRPG.Tests
             Assert.AreEqual(1, roaming.Roamers.Count(r => r.Aquatic), "다시 강에서 나타남");
         }
     }
+
+    // 꾸밈 (#86): 꾸밈 칸 'Q'는 막힌 칸이고 둘레를 보고 종류를 고름, 흩뿌림은 걸을 수 있는 바닥 위 그림일 뿐
+    public class DecorTests
+    {
+        //  y=4  #UUUUU::::#
+        //  y=3  #U;Q;U:::Q#   유적 안 꾸밈 (3,3) · 들판 꾸밈 (9,3)
+        //  y=2  #U;;;U::::#
+        //  y=1  #P::::FQ::#   야영지 꾸밈 (7,1) — 샘 (6,1) 바로 옆
+        private const string Map =
+            "###########\n" +
+            "#UUUUU::::#\n" +
+            "#U;Q;U:::Q#\n" +
+            "#U;;;U::::#\n" +
+            "#P::::FQ::#\n" +
+            "###########";
+
+        [Test]
+        public void DecorBlocksAndPicksItsKindFromTheNeighbourhood()
+        {
+            var map = FieldMap.Parse(Map);
+            Assert.AreEqual(FieldTile.Decor, map.Get(new Vector2Int(3, 3)));
+            Assert.IsFalse(FieldMap.IsWalkable(FieldTile.Decor), "꾸밈은 막힘");
+            Assert.IsFalse(FieldMap.IsInteractive(FieldTile.Decor), "[확인]할 것 없음");
+            Assert.IsTrue(FieldThemes.Supports(FieldTheme.Jungle, FieldTile.Decor));
+            Assert.IsFalse(FieldThemes.Supports(FieldTheme.Meadow, FieldTile.Decor), "지금은 정글에서만");
+
+            CollectionAssert.Contains(FieldDecor.Ruins, FieldDecor.Variant(map, new Vector2Int(3, 3)), "유적 옆 = 기둥·석상·돌무더기");
+            CollectionAssert.Contains(FieldDecor.Camp, FieldDecor.Variant(map, new Vector2Int(7, 1)), "샘 가까이 = 야영지 상자·통·통나무");
+            Assert.AreEqual(FieldDecor.Variant(map, new Vector2Int(9, 3)), FieldDecor.Variant(map, new Vector2Int(9, 3)), "같은 칸은 늘 같은 종류");
+
+            var walker = new FieldWalker(map, new Vector2Int(8, 1));
+            Assert.AreEqual(StepKind.Blocked, walker.TryStep(Direction.Left).Kind, "꾸밈에 막힘");
+        }
+
+        [Test]
+        public void EveryDecorKindAndScatterHasJungleArt()
+        {
+            foreach (var variant in FieldDecor.Ruins.Concat(FieldDecor.Camp).Concat(FieldDecor.Wild).Distinct())
+            {
+                Assert.IsNotNull(Resources.Load<Texture2D>($"Art/NinjaAdventure/Tiles/Jungle_Decor_{variant}"), $"Jungle_Decor_{variant}.png 없음");
+                if (FieldDecor.IsTall(variant))
+                    Assert.IsNotNull(UI.FieldArt.DecorProp(FieldTheme.Jungle, variant), $"{variant} 큰 그림(_prop) 없음");
+            }
+            foreach (var ground in new[] { FieldTile.Lawn, FieldTile.Water, FieldTile.RuinFloor })
+                Assert.Greater(UI.FieldArt.Scatter(FieldTheme.Jungle, ground).Length, 0, $"{ground} 흩뿌림 그림 없음");
+        }
+
+        [Test]
+        public void ScatterOnlyOnOpenGroundAndNeverBlocks()
+        {
+            var jungle = UnityEditor.AssetDatabase.LoadAssetAtPath<FieldArea>("Assets/Data/Areas/jungle.asset");
+            var map = jungle.Map;
+            int count = 0;
+            for (int y = 0; y < map.Height; y++)
+            for (int x = 0; x < map.Width; x++)
+            {
+                var cell = new Vector2Int(x, y);
+                if (FieldDecor.ScatterAt(map, cell, 4) < 0) continue;
+                count++;
+                var tile = map.Get(cell);
+                Assert.IsTrue(tile == FieldTile.Lawn || tile == FieldTile.RuinFloor || map.IsRaftWater(cell), $"{cell}: {tile}에 흩뿌림");
+            }
+            Assert.Greater(count, 50, "정글 곳곳에 풀·꽃·연잎");
+            Assert.Greater(map.FindAll(FieldTile.Decor).Count, 20, "야영지·들판·유적 꾸밈 칸");
+        }
+    }
 }

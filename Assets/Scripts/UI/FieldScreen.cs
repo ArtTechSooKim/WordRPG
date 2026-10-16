@@ -154,6 +154,7 @@ namespace WordRPG.UI
         private readonly List<string> tabletFilled = new List<string>();
         private bool tabletBusy;                // 맞힌 뒤 다음 문제로 넘어가는 중
         private FieldStreams streams;           // 얕은 강 물결
+        private FieldScatter scatter;           // 흩뿌림 꾸밈 — 풀·꽃·연잎·돌 부스러기 (#86)
         private SpriteRenderer raftRenderer;    // 타고 있는 뗏목
         private Sprite raftSprite;
         private readonly List<GameObject> mooredRafts = new List<GameObject>(); // 나루터마다 묶인 뗏목 (타는 동안은 숨김)
@@ -199,6 +200,7 @@ namespace WordRPG.UI
         public bool IsRaftVisible => raftRenderer != null && raftRenderer.gameObject.activeSelf;
         public int MooredRaftsVisible => mooredRafts.FindAll(r => r != null && r.activeSelf).Count;
         public int StreamRipples => streams != null ? streams.ActiveCount : 0;
+        public int ScatterCount => scatter != null ? scatter.Count : 0;
         public float LastStepSeconds => currentStep; // 마지막 한 칸에 걸린 시간 (물살·뗏목 확인용)
         public int LeversPulled { get; private set; }
         public bool IsCameraPanning => cameraFocus.HasValue;
@@ -1441,6 +1443,7 @@ namespace WordRPG.UI
 
             DrawTiles(area, IsDoorLocked);
             streams.SetMap(map);
+            scatter.Build(map, area.Theme);
             RefreshMooredRafts();
             if (!inBattle) Sound.PlayMusic(AreaMusic);
             session.World.Reveal(area.AreaId, map.Width, map.Height, position);
@@ -1466,6 +1469,7 @@ namespace WordRPG.UI
                 Tile tile;
                 if (kind == FieldTile.Door) tile = DoorTile(fieldArea, cell, lockedDoor(cell));
                 else if (kind == FieldTile.Bridge) tile = BridgeTile(fieldArea.Theme, done, map.IsBridgeHorizontal(cell));
+                else if (kind == FieldTile.Decor) tile = DecorTile(fieldArea.Theme, FieldDecor.Variant(map, cell));
                 else if (FieldAutotile.IsAutotiled(kind)) tile = AutoTile(fieldArea.Theme, kind, FieldAutotile.Mask(map, cell)) ?? TileFor(kind, done, fieldArea.Theme);
                 else tile = TileFor(kind, done, fieldArea.Theme);
                 tilemap.SetTile(new Vector3Int(x, y, 0), tile);
@@ -1484,7 +1488,9 @@ namespace WordRPG.UI
             for (int y = 0; y < map.Height; y++)
             {
                 var cell = new Vector2Int(x, y);
-                var sprite = FieldArt.Prop(map.Get(cell), fieldArea.Theme, CellState.IsDone(fieldArea, session, cell));
+                var sprite = map.Get(cell) == FieldTile.Decor
+                    ? FieldArt.DecorProp(fieldArea.Theme, FieldDecor.Variant(map, cell))
+                    : FieldArt.Prop(map.Get(cell), fieldArea.Theme, CellState.IsDone(fieldArea, session, cell));
                 if (sprite == null) continue;
                 var go = new GameObject("Prop_" + map.Get(cell), typeof(SpriteRenderer));
                 go.transform.SetParent(transform, false);
@@ -1497,6 +1503,17 @@ namespace WordRPG.UI
         }
 
         public int PropCount => props.Count; // 큰 그림 수 (테스트용)
+
+        private Tile DecorTile(FieldTheme theme, string variant)
+        {
+            string key = $"{theme}_Decor_{variant}";
+            if (!tileCache.TryGetValue(key, out var tile))
+            {
+                tile = MakeTile(FieldArt.ForDecor(theme, variant));
+                tileCache[key] = tile;
+            }
+            return tile;
+        }
 
         private Tile BridgeTile(FieldTheme theme, bool built, bool horizontal)
         {
@@ -1564,6 +1581,7 @@ namespace WordRPG.UI
             follower = new FieldFollower(transform);
             roamerViews = new FieldRoamerViews(transform, CellCenter);
             streams = new FieldStreams(transform);
+            scatter = new FieldScatter(transform);
             var raftTexture = Resources.Load<Texture2D>("Art/NinjaAdventure/Field/raft");
             if (raftTexture != null)
                 raftSprite = Sprite.Create(raftTexture, new Rect(0, 0, raftTexture.width, raftTexture.height), new Vector2(0.5f, 0.5f), 16);

@@ -29,7 +29,8 @@ namespace WordRPG.Field
         RuinFloor,// 유적 바닥 ';': 걸을 수 있고 조우 없음 (보이는 몬스터도 들어오지 않음)
         Tablet,   // 단어 석판 'T' (막힘): [확인] → 빈칸 단어 문제
         Shrine,   // 유적 제단 'A' (막힘): 석판을 다 풀고 단어를 모으면 동료(아라)가 깨어남
-        Cave      // 동굴 입구 'O' (막힘): 1.2 어두운 밀림 동굴로 이어질 자리 — 지금은 무너진 바위로 막힘
+        Cave,     // 동굴 입구 'O' (막힘): 1.2 어두운 밀림 동굴로 이어질 자리 — 지금은 무너진 바위로 막힘
+        Decor     // 꾸밈 'Q' (#86, 막힘): 둘레를 보고 상자·통나무·그루터기·바위·이끼 기둥·석상 중 하나 (FieldDecor.Variant)
     }
 
     // 지역 분위기에 따라 같은 칸도 다르게 그린다 (초원: 나무·풀숲·물 / 서고: 책장·흩어진 책장·잉크 웅덩이 / 숲: 짙은 덤불·고사리·늪)
@@ -76,7 +77,7 @@ namespace WordRPG.Field
     //   옆에서 [확인]으로 쓰는 칸: 'F' 회복의 샘   'C' 보물상자   'E' 성유물 제단   'S' 상점   'B' 보스   'L' 사전 받침대   'G' 보스 방 문   'K' 열쇠
     //   'D' 출입구 (밟으면 다른 지역으로)
     //   정글 (#80): '>' '<' '^' 'v' 얕은 강(물살 방향)   'J' 나루터   'Y' 레버   'H' 덩굴 다리   'U' 유적 돌벽   ';' 유적 바닥
-    //               'T' 단어 석판   'A' 유적 제단   'O' 동굴 입구
+    //               'T' 단어 석판   'A' 유적 제단   'O' 동굴 입구   'Q' 꾸밈(#86, 막힘)
     // 좌표: x는 오른쪽, y는 위쪽 (맨 아래 줄이 y=0) — Unity 월드 좌표와 같은 방향
     public class FieldMap
     {
@@ -160,6 +161,7 @@ namespace WordRPG.Field
                         case 'T': tiles[x, y] = FieldTile.Tablet; break;
                         case 'A': tiles[x, y] = FieldTile.Shrine; break;
                         case 'O': tiles[x, y] = FieldTile.Cave; break;
+                        case 'Q': tiles[x, y] = FieldTile.Decor; break;
                         case 'D':
                             tiles[x, y] = FieldTile.Door;
                             doors.Add(new Vector2Int(x, y));

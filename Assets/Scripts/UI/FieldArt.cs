@@ -26,12 +26,41 @@ namespace WordRPG.UI
         public static Sprite ForBridge(FieldTheme theme, bool built, bool horizontal) =>
             Load($"{theme}_Bridge{(horizontal ? "_h" : "")}{(built ? "_done" : "")}") ?? ForTile(FieldTile.Bridge, theme, built);
 
+        // 꾸밈 칸 (#86): 종류별 그림 Tiles/{테마}_Decor_{종류}.png (없으면 {테마}_Decor)
+        public static Sprite ForDecor(FieldTheme theme, string variant) =>
+            Load($"{theme}_Decor_{variant}") ?? ForTile(FieldTile.Decor, theme, false);
+
+        // 꾸밈 중 칸보다 큰 것(이끼 기둥·석상 1×2): Tiles/{테마}_Decor_{종류}_prop.png
+        public static Sprite DecorProp(FieldTheme theme, string variant) => FieldDecor.IsTall(variant) ? LoadProp($"{theme}_Decor_{variant}_prop") : null;
+
+        // 흩뿌림 그림 (#86): Tiles/{테마}_Scatter_{바닥}_0, _1 … (없으면 빈 배열)
+        public static Sprite[] Scatter(FieldTheme theme, FieldTile ground)
+        {
+            string key = $"{theme}_Scatter_{ground}";
+            if (ScatterCache.TryGetValue(key, out var cached)) return cached;
+            var list = new List<Sprite>();
+            for (int i = 0; i < 16; i++)
+            {
+                var sprite = Load($"{key}_{i}");
+                if (sprite == null) break;
+                list.Add(sprite);
+            }
+            return ScatterCache[key] = list.ToArray();
+        }
+
+        private static readonly Dictionary<string, Sprite[]> ScatterCache = new Dictionary<string, Sprite[]>();
+
         // 칸보다 큰 그림 (#80): 유적 제단의 잠든 석상(2×2), 동굴 입구(3×3) — Tiles/{테마}_{종류}_prop.png, 16px = 1칸.
         // 바닥 칸 위에 아래 가운데를 맞춰 따로 그린다. 끝난 칸(동료가 깨어난 제단)은 없음
         public static Sprite Prop(FieldTile tile, FieldTheme theme, bool done)
         {
             if (done || (tile != FieldTile.Shrine && tile != FieldTile.Cave)) return null;
-            string key = $"{theme}_{tile}_prop";
+            return LoadProp($"{theme}_{tile}_prop");
+        }
+
+        // 큰 그림: 16px = 1칸, 아래 가운데 기준 (칸 아래쪽에 맞춰 위로 그림)
+        private static Sprite LoadProp(string key)
+        {
             if (PropCache.TryGetValue(key, out var cached)) return cached;
             var texture = Resources.Load<Texture2D>(Folder + key);
             Sprite sprite = null;

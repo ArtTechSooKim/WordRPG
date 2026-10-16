@@ -11,6 +11,8 @@
 #           강 가운데 모래톱의 상자는 뗏목에 탄 채 [확인]. 강 위에도 보이는 몬스터(흉내문어)
 #       'Y' 레버  'H' 덩굴 다리(레버를 당기면 놓임, 그 전엔 막힘)  'U' 유적 돌벽(막힘)  ';' 유적 바닥(조우 없음)
 #       'T' 단어 석판  'A' 유적 제단(동료 아라)  'O' 섬의 동굴 입구(1.2 어두운 밀림 동굴 — 1.1에선 막힘)
+#       'Q' 꾸밈(#86, 막힘 — 야영지 상자·통나무 / 들판 그루터기·바위 / 유적 기둥·석상, 종류는 게임이 둘레를 보고 고름)
+# 마지막에 한 칸 통로를 두 칸으로 (#67 규칙 — widen_maps.py를 나무만 걷게 해서 씀). 남은 진짜 한 칸 통로 수를 알려 줌
 # 검사: 줄 길이 · P 하나 · 모든 물건이 시작에서 닿음(다리·문은 열린 것으로, 걷기 + 뗏목) ·
 #       문을 안 열면 보스에게 못 감 · 열쇠는 문 없이 닿음 · 한 칸 통로 경고
 import os
@@ -25,6 +27,7 @@ OUT = os.path.join(ROOT, "Builds", "maps")
 W, H = 72, 88
 WALK = set(".:,;PD<>^v")
 OBJECTS = set("FSELCBKTAOYJ")
+BLOCK_DECOR = "Q"
 DOCKS = [(49, 70), (52, 44), (58, 44), (60, 16)]          # 나루터: 서쪽 기슭(버섯 늪) · 섬 서쪽·동쪽 · 동쪽 기슭
 SANDBARS = [(53, 5), (57, 9), (52, 81), (56, 84)]        # 강 위쪽·아래쪽 모래톱 상자 (뗏목으로만, 사용자 요청)
 
@@ -83,6 +86,7 @@ def blob(cx, cy, size, c, only):
 rect(2, 2, W - 3, H - 3, ":")
 rect(50, 2, 59, H - 3, "~")                      # 깊은 강 (동쪽, 남→북) — 뗏목으로만
 ellipse(55, 44, 3, 5, ":")                       # 강 가운데 섬
+put(55, 39, "~"); put(55, 49, "~")               # 섬 위·아래 끝의 한 칸 뾰족한 곳은 물로 (#86)
 rect(3, 46, 49, 48, ">")                         # 얕은 강 (서→동, 깊은 강으로 흘러듦) — 물살 따라 걸으면 빨라짐
 places += [("깊은 강 (뗏목 직접 몰기)", 55, 24), ("얕은 강 → 물살", 18, 45), ("섬 · 동굴 입구 (1.2)", 55, 37)]
 
@@ -92,13 +96,14 @@ rect(4, 4, 27, 30, "U")
 rect(5, 5, 26, 29, ";")
 rect(10, 5, 19, 13, "U"); rect(11, 6, 18, 12, ";"); rect(14, 13, 15, 13, ";")      # 안쪽 성소 (제단)
 for x0, x1, door in ((5, 9, 9), (20, 26, 20)):                                    # 석판 방 4개 (왼쪽 둘·오른쪽 둘)
-    for y0, y1 in ((16, 21), (23, 29)):
+    for y0, y1 in ((15, 20), (23, 29)):           # 위 방은 한 줄 올려서 방 사이 통로가 두 줄 (#86)
         rect(x0, y0, x1, y1, "U")
         rect(x0 + 1, y0 + 1, x1 - 1, y1 - 1, ";")
         rect(door, y0 + 2, door, y0 + 3, ";")
 rect(14, 30, 15, 30, ";")                                                          # 유적 입구 (두 칸)
 rect(3, 31, 30, 31, "#"); rect(14, 31, 15, 31, ";")
 rect(3, 32, 30, 33, "~")                                                           # 골짜기
+rect(2, 31, 2, 33, "#")                                                            # 골짜기 서쪽 끝 한 칸 길 막기 — 다리를 거치지 않고 돌아가지 못하게 (#86)
 rect(14, 32, 15, 33, "H")                                                          # 덩굴 다리 (레버로)
 places += [("고대 유적", 15, 2), ("덩굴 다리", 21, 33)]
 
@@ -186,7 +191,7 @@ def obj(c, x, y):
 obj("P", 6, 78); obj("F", 10, 71); obj("S", 17, 73); obj("E", 5, 73); obj("L", 15, 82); obj("C", 23, 84)   # 야영지
 obj("Y", 24, 72)                                                    # 지름길 다리 레버 (야영지 쪽)
 obj("Y", 18, 36)                                                    # 유적 다리 레버 (골짜기 앞)
-for x, y in ((6, 18), (25, 18), (6, 27), (25, 27)):                 # 단어 석판 4개
+for x, y in ((6, 16), (25, 16), (6, 24), (25, 24)):                 # 단어 석판 4개 — 방 위쪽 벽에 붙여서 옆에 한 칸 구석이 안 생기게 (#86)
     g[y][x] = "T"
 g[8][14] = "A"                                                      # 유적 제단 (아라)
 g[6][6] = "C"; g[6][25] = "C"                                       # 유적 보물
@@ -199,8 +204,50 @@ for x, y in SANDBARS:                                               # 강 한가
 obj("K", 66, 7)                                                     # 보스 방 열쇠 — 동쪽 기슭 끝 (뗏목으로, 아라가 힌트)
 for x, y in [(33, 82), (47, 78), (64, 66), (67, 82), (45, 36), (5, 36), (35, 50), (66, 44)]:
     obj("C", x, y)
-places += [("석판", 6, 15), ("석판", 25, 15), ("제단 (아라)", 14, 5), ("열쇠", 66, 4), ("나루터", 46, 70),
+places += [("석판", 6, 13), ("석판", 25, 13), ("제단 (아라)", 14, 5), ("열쇠", 66, 4), ("나루터", 46, 70),
            ("강 위쪽 모래톱", 55, 12), ("강 아래쪽 모래톱", 54, 78)]
+
+
+# ---------------------------------------------------------------- 7-2) 꾸밈 'Q' (#86) — 길·물건을 막지 않게 8방향이 모두 탁 트인 칸에만
+def open_around(x, y):
+    return all(g[y + dy][x + dx] in ":," for dy in (-1, 0, 1) for dx in (-1, 0, 1))
+
+
+def deco(x, y):
+    if 2 <= x < W - 2 and 2 <= y < H - 2 and open_around(x, y):
+        g[y][x] = BLOCK_DECOR
+        return True
+    return False
+
+
+def ruin_deco(x, y):
+    # 유적 안: 둘레 8칸이 모두 유적 바닥일 때
+    if all(g[y + dy][x + dx] == ";" for dy in (-1, 0, 1) for dx in (-1, 0, 1)):
+        g[y][x] = BLOCK_DECOR
+
+
+for x, y in [(8, 70), (18, 70), (20, 76), (17, 81), (8, 84), (5, 80), (21, 79), (11, 73)]:   # 야영지 — 상자·통·통나무
+    deco(x, y)
+for x, y in [(7, 8), (23, 8), (7, 11), (23, 11), (12, 15), (17, 15), (12, 27), (17, 27)]:  # 유적 — 기둥·석상·돌무더기
+    ruin_deco(x, y)
+placed = 0
+for _ in range(600):                                                                     # 들판 — 그루터기·통나무·바위
+    if placed >= 26:
+        break
+    x, y = rng.randrange(3, W - 3), rng.randrange(3, H - 3)
+    if not free(x, y) or any(g[yy][xx] == BLOCK_DECOR for yy in range(y - 4, y + 5) for xx in range(x - 4, x + 5)
+                             if 0 <= xx < W and 0 <= yy < H):
+        continue
+    if deco(x, y):
+        placed += 1
+
+# ---------------------------------------------------------------- 7-3) 한 칸 통로 → 두 칸 (#67 규칙) — widen_maps.py를 나무(#)만 걷게
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import widen_maps
+widen_maps.WALK = set(".:,DP;<>^vJ")
+widen_maps.convertible = lambda grid, x, y: 0 < x < len(grid[0]) - 1 and 0 < y < len(grid) - 1 and grid[y][x] == "#"
+widened, kept = widen_maps.widen(["".join(r) for r in g])
+g = [list(r) for r in widened]
 
 
 # ---------------------------------------------------------------- 8) 검사
@@ -271,22 +318,22 @@ if not touches(closed, *key):
 assert sum(r.count("P") for r in g) == 1
 if problems:
     sys.exit(f"문제: {problems}")
-narrow = [(x, y) for y in range(1, H - 1) for x in range(1, W - 1) if g[y][x] in ".:,;"
-          and ((g[y - 1][x] not in WALK and g[y + 1][x] not in WALK and (g[y][x - 1] in WALK or g[y][x + 1] in WALK))
-               or (g[y][x - 1] not in WALK and g[y][x + 1] not in WALK and (g[y - 1][x] in WALK or g[y + 1][x] in WALK)))]
+narrow = kept   # 넓히지 못한 진짜 한 칸 통로 (물건 옆 구석·막다른 곳은 통로로 치지 않음 — widen_maps 기준)
 
 text = "\n".join("".join(r) for r in g) + "\n"
 os.makedirs(OUT, exist_ok=True)
 with open(os.path.join(OUT, "JungleMap.txt"), "w", encoding="utf-8") as f:
     f.write(text)
 walk = sum(1 for y in range(H) for x in range(W) if g[y][x] in WALK)
-counts = {c: text.count(c) for c in "CTJYHKGOBA"}
-print(f"{W}x{H} 걸을 칸 {walk} (숲 709칸의 약 {walk / 709:.1f}배) · 물건 {counts} · 한 칸 통로 {len(narrow)}곳")
+counts = {c: text.count(c) for c in "CTJYHKGOBAQ"}
+print(f"{W}x{H} 걸을 칸 {walk} (숲 709칸의 약 {walk / 709:.1f}배) · 물건 {counts} · 남은 한 칸 통로 {len(narrow)}곳",
+      [(seg[0], len(seg)) for seg in narrow])
 
 # ---------------------------------------------------------------- 미리보기
 COLORS = {"#": (34, 92, 46), ":": (120, 170, 80), ".": (176, 128, 84), ",": (168, 190, 60), "~": (40, 90, 150),
           ">": (110, 180, 220), "<": (110, 180, 220), "^": (110, 180, 220), "v": (110, 180, 220), "P": (176, 128, 84),
-          "D": (90, 60, 40), "U": (120, 116, 104), ";": (196, 188, 160), "H": (150, 110, 60), "G": (200, 40, 40)}
+          "D": (90, 60, 40), "U": (120, 116, 104), ";": (196, 188, 160), "H": (150, 110, 60), "G": (200, 40, 40),
+          "Q": (110, 78, 48)}
 OBJ_COLORS = {"C": (255, 220, 40), "T": (255, 255, 255), "A": (255, 120, 200), "B": (200, 0, 0), "F": (0, 200, 255),
               "S": (0, 160, 80), "E": (160, 60, 255), "L": (250, 250, 250), "K": (255, 170, 0), "Y": (255, 90, 0),
               "J": (140, 90, 40), "O": (20, 20, 20)}

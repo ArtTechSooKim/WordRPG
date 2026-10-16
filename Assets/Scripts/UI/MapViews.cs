@@ -73,6 +73,7 @@ namespace WordRPG.UI
                 case FieldTile.Tablet: return done ? ruinFloor : Tablet;
                 case FieldTile.Shrine: return done ? ruinFloor : Shrine;
                 case FieldTile.Cave: return Cave;
+                case FieldTile.Decor: return new Color32(92, 74, 50, 255); // 꾸밈 (#86) — 막힌 칸, 은은한 갈색
                 case FieldTile.Chest: return done ? floor : Chest;
                 case FieldTile.Boss: return done ? floor : Boss;
                 case FieldTile.Fountain: return Fountain;
