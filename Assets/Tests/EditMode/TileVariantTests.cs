@@ -35,5 +35,17 @@ namespace WordRPG.Tests
             Assert.IsNotNull(FieldArt.ForTileVariant(FieldTile.Wall, FieldTheme.Library, 2));
             Assert.IsNotNull(FieldArt.AutoTile(FieldTile.Water, FieldTheme.Library, 0), "잉크 웅덩이 물가 테두리 (#98)");
         }
+
+        // #99: 초원·숲 나무·풀숲 3가지씩 + 잔디 흩뿌림
+        [Test]
+        public void MeadowAndForestMixTreesAndScatterOnLawn()
+        {
+            foreach (var theme in new[] { FieldTheme.Meadow, FieldTheme.Forest })
+            {
+                Assert.AreEqual(2, FieldArt.VariantCount(FieldTile.Wall, theme), $"{theme} 나무 3가지");
+                Assert.AreEqual(2, FieldArt.VariantCount(FieldTile.Grass, theme), $"{theme} 풀숲 3가지");
+                Assert.GreaterOrEqual(FieldArt.Scatter(theme, FieldTile.Lawn).Length, 5, $"{theme} 잔디 흩뿌림");
+            }
+        }
     }
 }

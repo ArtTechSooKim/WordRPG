@@ -733,6 +733,26 @@ def build_tiles(pack):
 
     build_jungle(pack, themes, autos, template, lectern, key_stand, keyhole, big_chest, gem, stall, brambles, pond, gold_key)
 
+    # 초원·숲 다듬기 (#99, 사용자: 나무가 한 그림만 되풀이·빈 잔디가 밋밋): 나무·풀숲 3가지씩 섞기(_v1·_v2 — 게임이 칸 위치로 고름)
+    # + 잔디에 작은 흩뿌림(초원 = 클로버·풀 포기·작은 꽃, 숲 = 낙엽·잔가지·돌멩이·짙은 풀). 흰 데이지·해바라기처럼 튀는 것은 뺌 (은은하게 #95)
+    nature = lambda c, r: pack.tile("TilesetNature.png", c, r)
+    floor_detail = lambda c, r: pack.tile("TilesetFloorDetail.png", c, r)
+    lime, field_grass = pack.tile("TilesetField.png", 1, 4), pack.tile("TilesetField.png", 1, 7)
+    themes["Meadow"]["Wall_v1"] = over(lime, nature(0, 10))
+    themes["Meadow"]["Wall_v2"] = over(lime, nature(6, 10))
+    themes["Meadow"]["Grass_v1"] = over(field_grass, nature(5, 10))
+    themes["Meadow"]["Grass_v2"] = over(field_grass, nature(8, 10))
+    for i, sprite in enumerate([nature(2, 11)] + [floor_detail(c, 2) for c in (0, 1, 3, 5, 6)]):
+        themes["Meadow"][f"Scatter_Lawn_{i}"] = sprite
+    forest_ground, forest_tree = tint(field_grass, (0.62, 0.72, 0.62)), (0.55, 0.75, 0.55)
+    themes["Forest"]["Wall_v1"] = over(forest_ground, tint(nature(1, 10), forest_tree))
+    themes["Forest"]["Wall_v2"] = over(forest_ground, tint(nature(0, 10), forest_tree))
+    themes["Forest"]["Grass_v1"] = over(field_grass, tint(nature(5, 11), (0.75, 0.85, 0.75)))
+    themes["Forest"]["Grass_v2"] = over(field_grass, nature(4, 11).transpose(Image.FLIP_LEFT_RIGHT))
+    dark_tuft = lambda c: tint(floor_detail(c, 2), (0.7, 0.85, 0.7))
+    for i, sprite in enumerate([floor_detail(c, 0) for c in (0, 1, 5, 6, 15)] + [dark_tuft(0), dark_tuft(3)]):
+        themes["Forest"][f"Scatter_Lawn_{i}"] = sprite
+
     folder = os.path.join(OUT, "Tiles")
     os.makedirs(folder, exist_ok=True)
     for theme, tiles in themes.items():
