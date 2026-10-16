@@ -192,6 +192,19 @@ namespace WordRPG.Tests
             Assert.IsFalse(old.Rafting);
         }
 
+        [Test]
+        public void BagGetsARedDotWhenTheFirstCompanionJoins()
+        {
+            var area = Area();
+            var session = Session();
+            Assert.IsFalse(MenuBadges.ShouldShow(MenuBadges.Companion, session), "동료가 없으면 점 없음");
+            session.AddCompanion(area.ShrineCompanion);
+            Assert.IsTrue(MenuBadges.ShouldShow(MenuBadges.Companion, session), "동료를 얻으면 가방에 빨간 점 ('동료' 탭)");
+            session.Tutorials.Mark(MenuBadges.Companion);
+            Assert.IsFalse(MenuBadges.ShouldShow(MenuBadges.Companion, session), "가방을 열어 보면 꺼짐");
+            CollectionAssert.Contains(TutorialProgress.All, TutorialProgress.CompanionTurn, "튜토리얼 다시 보기에 포함");
+        }
+
         private static FieldArea Area(int shrineWords = 60)
         {
             var words = ScriptableObject.CreateInstance<WordDatabase>();
@@ -206,5 +219,97 @@ namespace WordRPG.Tests
         }
 
         private static GameSession Session() => GameSession.NewGame(TestData.Hero(new MonsterStats(100, 10, 10)), 5);
+    }
+
+    // 단어 석판 문제 (#81): 석판마다 3문제, 틀리면 벌점 없이 다시 고름, 숙련도는 처음 고른 답만
+    public class TabletQuizTests
+    {
+        [Test]
+        public void ThreeRightAnswersFillTheTablet()
+        {
+            var provider = new FakeQuizProvider(); // 정답 = 0번
+            var quiz = new TabletQuiz(provider);
+            Assert.AreEqual(QuizDirection.MeaningToEnglish, provider.AskedDirections[0], "뜻을 보고 영단어를 고름");
+            Assert.AreEqual(TabletAnswer.Wrong, quiz.Answer(2), "틀림");
+            Assert.AreEqual(TabletAnswer.Wrong, quiz.Answer(1), "또 틀려도 그대로");
+            Assert.AreEqual(0, quiz.Solved, "틀려도 진행이 줄지 않음");
+            Assert.AreEqual(TabletAnswer.Correct, quiz.Answer(0));
+            Assert.AreEqual(TabletAnswer.Ignored, quiz.Answer(0), "맞힌 뒤엔 Next()까지 무시");
+            CollectionAssert.AreEqual(new[] { false }, provider.Submitted, "숙련도엔 처음 고른 답(틀림) 하나만");
+            quiz.Next();
+            Assert.AreEqual(TabletAnswer.Correct, quiz.Answer(0));
+            quiz.Next();
+            Assert.IsFalse(quiz.IsComplete);
+            Assert.AreEqual(TabletAnswer.Correct, quiz.Answer(0));
+            Assert.IsTrue(quiz.IsComplete);
+            Assert.AreEqual(3, quiz.Solved);
+            Assert.AreEqual(2, quiz.Mistakes);
+            quiz.Next();
+            Assert.AreEqual(3, provider.AskedDirections.Count, "문제는 3개만");
+            CollectionAssert.AreEqual(new[] { false, true, true }, provider.Submitted);
+            Assert.AreEqual(TabletAnswer.Ignored, quiz.Answer(0));
+        }
+    }
+
+    // 물에 사는 보이는 몬스터 (#81 흉내문어): 뗏목이 다니는 강에서만 나타나고 다닌다. 땅 몬스터는 강에 못 들어감
+    public class WaterRoamerTests
+    {
+        private static readonly MonsterSpecies Octopus = TestData.Species("mimic_octopus", new MonsterStats(30, 6, 5), new MonsterStats(5, 1, 1));
+        private static readonly MonsterSpecies Lizard = TestData.Species("tail_lizard", new MonsterStats(30, 6, 5), new MonsterStats(5, 1, 1));
+
+        // 왼쪽 땅(서식지 ,) · 가운데 나루터 J · 오른쪽 강(물 ~ 30칸 높이 4칸 폭)
+        private static FieldMap Map()
+        {
+            var rows = new List<string>();
+            for (int r = 0; r < 32; r++)
+            {
+                if (r == 0 || r == 31) { rows.Add(new string('#', 40)); continue; }
+                var row = "#" + new string(r % 2 == 0 ? ',' : ':', 30) + (r == 16 ? "J" : "#") + "~~~~~~~" + "#";
+                rows.Add(row);
+            }
+            var bottom = rows[29].ToCharArray(); bottom[1] = 'P'; rows[29] = new string(bottom);
+            return FieldMap.Parse(string.Join("\n", rows));
+        }
+
+        [Test]
+        public void WaterMonstersLiveOnlyOnRaftWater()
+        {
+            var map = Map();
+            var roaming = new RoamingMonsters(map, r => new List<MonsterInstance> { new MonsterInstance(Lizard, 5) }, new System.Random(3),
+                new RoamingRules { CellsPerRoamer = 60, WaterCellsPerRoamer = 40, SpawnMinDistance = 2, MinSpacing = 3 },
+                r => new List<MonsterInstance> { new MonsterInstance(Octopus, 5) });
+            Assert.AreEqual(7 * 30, roaming.WaterHabitat.Count, "강 칸 전부");
+            Assert.Greater(roaming.WaterTargetCount, 0);
+            roaming.Populate(new Vector2Int(1, 2));
+            var water = roaming.Roamers.Where(r => r.Aquatic).ToList();
+            var land = roaming.Roamers.Where(r => !r.Aquatic).ToList();
+            Assert.AreEqual(roaming.WaterTargetCount, water.Count);
+            Assert.AreEqual(roaming.TargetCount, land.Count);
+            Assert.IsTrue(water.All(r => r.Leader.Species == Octopus), "물에는 물의 출현표");
+            for (float t = 0; t < 30f; t += 0.05f)
+            {
+                roaming.Tick(0.05f, new Vector2Int(1, 2));
+                foreach (var r in roaming.Roamers)
+                    Assert.AreEqual(r.Aquatic, map.IsRaftWater(r.Position), $"{r.Leader.Species.SpeciesId} {r.Position}: 물 몬스터는 물에만, 땅 몬스터는 땅에만");
+            }
+
+            var dry = new RoamingMonsters(map, r => new List<MonsterInstance> { new MonsterInstance(Lizard, 5) }, new System.Random(3));
+            Assert.AreEqual(0, dry.WaterTargetCount, "물의 출현표가 없으면 물엔 없음");
+        }
+
+        [Test]
+        public void DefeatedWaterMonsterComesBackInTheWater()
+        {
+            var map = Map();
+            var roaming = new RoamingMonsters(map, r => new List<MonsterInstance> { new MonsterInstance(Lizard, 5) }, new System.Random(5),
+                new RoamingRules { CellsPerRoamer = 10000, WaterCellsPerRoamer = 1000, SpawnMinDistance = 2, RespawnSeconds = 1f },
+                r => new List<MonsterInstance> { new MonsterInstance(Octopus, 5) });
+            roaming.Populate(new Vector2Int(1, 2));
+            var octopus = roaming.Roamers.First(r => r.Aquatic);
+            roaming.Defeat(octopus);
+            Assert.IsFalse(roaming.Roamers.Any(r => r.Aquatic));
+            for (int i = 0; i < 30; i++) roaming.Tick(0.1f, new Vector2Int(1, 2));
+            Assert.AreEqual(1, roaming.Roamers.Count(r => r.Aquatic), "다시 강에서 나타남");
+        }
     }
 }

@@ -466,6 +466,9 @@ namespace WordRPG.UI
             if (Tip(TutorialProgress.Skill) && skillButtons[0].gameObject.activeInHierarchy)
                 ShowTip(TutorialProgress.Skill, "기술을 고르면 단어 문제!", () => (RectTransform)skillButtons[0].transform, chosen,
                     GuideHints.Gesture.Tap);
+            else if (actor.Companion != null && Tip(TutorialProgress.CompanionTurn) && skillButtons[0].gameObject.activeInHierarchy)
+                ShowTip(TutorialProgress.CompanionTurn, $"{actor.DisplayName} 차례 — {actor.DisplayName}도 단어를 맞혀야 기술이 나가요",
+                    () => (RectTransform)skillButtons[0].transform, chosen, GuideHints.Gesture.Tap); // 처음 함께 싸울 때 (#81, GDD 9-6)
 
             while (pickedSkill == null && pickedItem == null && !TrainingEnding && !engine.IsOver)
             {

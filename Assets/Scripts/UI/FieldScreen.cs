@@ -147,6 +147,18 @@ namespace WordRPG.UI
         private Text companionName;
         private CompanionCutscene companionCutscene;                  // 동료 조우 연출 (#77)
         private FieldFollower follower;                               // 주인공을 따라다니는 동료 그림 (#78)
+        // 1.1 메아리 정글 기믹 (#81)
+        private TabletQuizView tabletView;      // 단어 석판 문제 (Figma '석판 문제 (#81)')
+        private TabletQuiz tabletQuiz;          // 지금 푸는 석판
+        private Vector2Int tabletCell;
+        private readonly List<string> tabletFilled = new List<string>();
+        private bool tabletBusy;                // 맞힌 뒤 다음 문제로 넘어가는 중
+        private FieldStreams streams;           // 얕은 강 물결
+        private SpriteRenderer raftRenderer;    // 타고 있는 뗏목
+        private Sprite raftSprite;
+        private readonly List<GameObject> mooredRafts = new List<GameObject>(); // 나루터마다 묶인 뗏목 (타는 동안은 숨김)
+        private const float StreamStepRatio = 0.55f; // 물살을 따라 걸으면 한 칸 시간 × (사용자: 방향대로 이속 버프)
+        private const float RaftStepRatio = 0.8f;    // 뗏목 한 칸 시간 × (걷기보다 조금 빠르게)
         private Image heroHpFill;
         private readonly List<(Image back, Image icon, Text level, Text empty)> relicSlots = new List<(Image, Image, Text, Text)>();
 
@@ -175,11 +187,21 @@ namespace WordRPG.UI
                                    || (quitDialog != null && quitDialog.IsOpen) || (returnDialog != null && returnDialog.IsOpen)
                                    || (paywall != null && paywall.IsOpen) || (preemptView != null && preemptView.IsOpen)
                                    || (companionCutscene != null && companionCutscene.IsPlaying)
-                                   || (pauseTutorial != null && pauseTutorial.IsShowing);
+                                   || (pauseTutorial != null && pauseTutorial.IsShowing)
+                                   || (tabletView != null && tabletView.IsOpen);
         public PauseTutorial PauseTutorial => pauseTutorial;
         public bool IsPreemptRangeVisible => preemptRange != null && preemptRange.gameObject.activeSelf;
         public CompanionCutscene CompanionCutscene => companionCutscene;
         public FieldFollower Follower => follower;
+        public TabletQuizView TabletView => tabletView;
+        public QuizQuestion TabletQuestion => tabletQuiz?.Current; // 테스트용
+        public bool IsRafting => walker != null && walker.Rafting;
+        public bool IsRaftVisible => raftRenderer != null && raftRenderer.gameObject.activeSelf;
+        public int MooredRaftsVisible => mooredRafts.FindAll(r => r != null && r.activeSelf).Count;
+        public int StreamRipples => streams != null ? streams.ActiveCount : 0;
+        public float LastStepSeconds => currentStep; // 마지막 한 칸에 걸린 시간 (물살·뗏목 확인용)
+        public int LeversPulled { get; private set; }
+        public bool IsCameraPanning => cameraFocus.HasValue;
         public bool IsCompanionBadgeVisible => companionBadge != null && companionBadge.gameObject.activeSelf;
         public SkillLearnView LearnView => learnView;
         public RoamingMonsters Roaming => roaming;
@@ -314,6 +336,9 @@ namespace WordRPG.UI
             if (saveMark.activeSelf && Time.unscaledTime > saveMarkUntil) saveMark.SetActive(false);
             PulseBadges();
             UpdateRoamers(Time.unscaledDeltaTime);
+            streams.Tick(Time.deltaTime, walker.Position);
+            tabletView.Tick(Time.unscaledDeltaTime);
+            UpdateRaft();
 
             if (inBattle || transitioning || IsPanelOpen)
             {
@@ -330,7 +355,8 @@ namespace WordRPG.UI
                 player.position = Vector3.Lerp(moveFrom, moveTo, Mathf.Clamp01(moveT));
                 walkTime += Time.deltaTime * (running ? 1.8f : 1f); // 달리면 발도 빠르게
                 int frame = Mathf.FloorToInt(walkTime * PlayerArt.FramesPerSecond);
-                playerRenderer.sprite = running ? PlayerArt.GetRun(walker.Facing, frame) : PlayerArt.Get(walker.Facing, frame);
+                playerRenderer.sprite = walker.Rafting ? PlayerArt.Get(walker.Facing, 0)
+                    : running ? PlayerArt.GetRun(walker.Facing, frame) : PlayerArt.Get(walker.Facing, frame);
                 if (moveT >= 1f)
                 {
                     float leftover = (moveT - 1f) * currentStep;
@@ -383,6 +409,8 @@ namespace WordRPG.UI
                 StartRoamerBattle(bumped, null);
                 return;
             }
+            var from = walker.Position;
+            bool wasRafting = walker.Rafting;
             var outcome = walker.TryStep(direction);
             if (outcome.Kind != StepKind.Moved) playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
 
@@ -395,6 +423,8 @@ namespace WordRPG.UI
                     // 달리면 걸음마다 발뒤꿈치 뒤로 흙먼지가 튀어 흩어진다 (#51 사용자 레퍼런스: 달리는 발 뒤로 날리는 먼지).
                     // 그림 = 폭발 시트의 마지막 3칸(회색조). 떠난 칸의 바닥 색을 입힌다 — 흙길은 흙빛, 풀숲은 풀빛, 서고는 돌가루 (#53).
                     // #53 기기 확인: 작아서 잘 안 보임 → 1.5칸, 0.5초 동안 남고 덜 옅어짐. 달리는 반대 방향으로 조금 밀려난다
+                    if (outcome.Boarded || outcome.Landed) Board(outcome.Boarded);
+                    if (wasRafting || walker.Rafting) run = false; // 뗏목은 달리기 없음 (먼지도 없음)
                     runSteps = run ? runSteps + 1 : 0;
                     if (run)
                     {
@@ -408,6 +438,8 @@ namespace WordRPG.UI
                             back * 1.0f + Vector3.up * 0.2f, 0.45f, direction == Direction.Left, LastDustColor));
                     }
                     currentStep = stepDuration * (run ? runStepRatio : 1f);
+                    if (wasRafting && walker.Rafting) currentStep = stepDuration * RaftStepRatio;
+                    else if (walker.Map.IsWithStream(from, direction)) currentStep *= StreamStepRatio; // 물살을 따라가면 빨라짐 (#81)
                     moveT = 0f;
                     moveFrom = player.position;
                     moveTo = CellCenter(outcome.Target);
@@ -534,6 +566,11 @@ namespace WordRPG.UI
                 return;
             }
             if (transitioning || preemptView.IsOpen) return;
+            if (tabletView.IsOpen)
+            {
+                if (!tabletBusy) CloseTablet();
+                return;
+            }
             if (quitDialog.IsOpen) quitDialog.Hide();
             else if (returnDialog.IsOpen) returnDialog.Hide(); // = 여기 있기
             else if (learnView.IsOpen) learnView.Cancel();
@@ -576,6 +613,246 @@ namespace WordRPG.UI
                 case FieldTile.Lectern: ReadDictionary(); break;
                 case FieldTile.Gate: KnockGate(); break;
                 case FieldTile.Key: TakeKey(cell); break;
+                case FieldTile.Lever: PullLever(cell); break;
+                case FieldTile.Tablet: ReadTablet(cell); break;
+                case FieldTile.Shrine: TouchShrine(cell); break;
+                case FieldTile.Cave:
+                    bubble.Say("무너진 바위와 판자로 막혀 있다…\n언젠가 들어갈 수 있을 것 같다", 3.5f);
+                    break;
+            }
+        }
+
+        // ------------------------------------------------------------------ 1.1 메아리 정글 기믹 (#81)
+
+        // 레버 (사용자: 피곤하지 않게, 무엇이 생기는지 잘 보이게): 당기면 카메라가 덩굴 다리로 가서 판자가 하나씩 놓이는 걸 보여 주고 돌아온다
+        private void PullLever(Vector2Int lever)
+        {
+            if (Levers.IsPulled(area, session.World, lever))
+            {
+                ShowToast("이미 당긴 레버다. 덩굴 다리가 놓여 있다.");
+                return;
+            }
+            if (moving) SnapPlayer();
+            StartCoroutine(BuildBridge(lever));
+        }
+
+        private IEnumerator BuildBridge(Vector2Int lever)
+        {
+            transitioning = true;
+            var bridge = new List<Vector2Int>(Levers.Pull(area, session.World, lever));
+            LeversPulled++;
+            tilemap.SetTile(new Vector3Int(lever.x, lever.y, 0), TileFor(FieldTile.Lever, true));
+            Sound.Play(Sfx.Click);
+            SaveNow();
+            if (bridge.Count > 0)
+            {
+                bridge.Sort((a, b) => (a - lever).sqrMagnitude.CompareTo((b - lever).sqrMagnitude)); // 레버 쪽부터 자람
+                var center = Vector3.zero;
+                foreach (var cell in bridge) center += CellCenter(cell);
+                center /= bridge.Count;
+                yield return PanCamera(center, 0.6f);
+                yield return WaitUnscaled(0.25f);
+                bool horizontal = walker.Map.IsBridgeHorizontal(bridge[0]);
+                foreach (var cell in bridge)
+                {
+                    tilemap.SetTile(new Vector3Int(cell.x, cell.y, 0), BridgeTile(area.Theme, true, horizontal));
+                    StartCoroutine(FieldFx.Play(transform, CellCenter(cell), Fx.Sparkle, 1.3f, animationScale, 12, tint: new Color(0.6f, 1f, 0.5f)));
+                    Sound.Play(Sfx.EvolveLight);
+                    yield return WaitUnscaled(0.22f);
+                }
+                ShowToast("덩굴 다리가 놓였다!", 2.5f);
+                yield return WaitUnscaled(0.7f);
+                yield return PanCamera(null, 0.5f);
+            }
+            transitioning = false;
+            AfterFieldChange();
+        }
+
+        // 카메라를 to(없으면 주인공)로 부드럽게
+        private IEnumerator PanCamera(Vector3? to, float seconds)
+        {
+            var visibleHeight = tilesAcross / Mathf.Max(0.1f, cam.aspect);
+            var start = cameraFocus ?? player.position + Vector3.down * (visibleHeight * 0.10f);
+            var end = to ?? player.position + Vector3.down * (visibleHeight * 0.10f);
+            float duration = seconds * animationScale;
+            for (float t = 0; t < duration; t += Time.unscaledDeltaTime)
+            {
+                cameraFocus = Vector3.Lerp(start, end, Mathf.SmoothStep(0f, 1f, t / duration));
+                yield return null;
+            }
+            cameraFocus = to;
+        }
+
+        // 단어 석판: 이미 본 단어로 3문제 (선제공격과 같은 단어장). 다 채우면 금빛 석판(세이브), ✕로 그만두면 그 석판은 처음부터
+        private void ReadTablet(Vector2Int cell)
+        {
+            if (Ruins.IsTabletSolved(area, session.World, cell))
+            {
+                bubble.Say("이미 빈칸을 채운 석판이다.", 2.5f);
+                return;
+            }
+            var books = Preemptive.QuizBooks(area.Words != null ? area.Words.Words : null,
+                TrainingBooks().ConvertAll(b => (IReadOnlyList<WordEntry>)b.Words), session.Vocabulary);
+            if (books.Count == 0)
+            {
+                bubble.Say("아직 읽을 수 있는 글자가 없다…\n정글에서 단어를 더 만나 보자", 3.5f);
+                return;
+            }
+            if (moving) SnapPlayer();
+            tabletQuiz = new TabletQuiz(new TrainingQuizProvider(books, session.Vocabulary, battle.MasteryRules, TrainingMode.All, rng));
+            tabletCell = cell;
+            tabletFilled.Clear();
+            tabletBusy = false;
+            tabletView.Show(Ruins.TabletsSolved(area, session.World) + 1, Ruins.Tablets(area).Count, PickTablet, CloseTablet);
+            tabletView.ShowQuestion(tabletQuiz.Current, 0, "틀려도 괜찮아요 — 다시 고르면 돼요");
+        }
+
+        private void PickTablet(int index)
+        {
+            if (tabletQuiz == null || tabletBusy) return;
+            var question = tabletQuiz.Current;
+            switch (tabletQuiz.Answer(index))
+            {
+                case TabletAnswer.Wrong:
+                    Sound.Play(Sfx.Wrong);
+                    tabletView.MarkWrong(index);
+                    break;
+                case TabletAnswer.Correct:
+                    Sound.Play(Sfx.Correct);
+                    tabletFilled.Add(question.CorrectAnswer);
+                    tabletView.MarkCorrect(index, question.CorrectAnswer, tabletQuiz.Solved);
+                    StartCoroutine(NextTabletQuestion());
+                    break;
+            }
+        }
+
+        private IEnumerator NextTabletQuestion()
+        {
+            tabletBusy = true;
+            yield return WaitUnscaled(0.8f);
+            if (tabletQuiz == null) yield break;
+            tabletQuiz.Next();
+            if (tabletQuiz.IsComplete)
+            {
+                Ruins.SolveTablet(area, session.World, tabletCell);
+                SaveNow();
+                tilemap.SetTile(new Vector3Int(tabletCell.x, tabletCell.y, 0), TileFor(FieldTile.Tablet, true));
+                StartCoroutine(FieldFx.Play(transform, CellCenter(tabletCell), Fx.Sparkle, 1.5f, animationScale, 12));
+                Sound.Play(Sfx.Evolve);
+                int remaining = Ruins.Tablets(area).Count - Ruins.TabletsSolved(area, session.World);
+                string region = area.Words != null ? area.Words.RegionName : area.DisplayName;
+                string words = $"{region} 단어 {BossGate.WordsFound(area, session)} / {area.ShrineWords}";
+                tabletView.ShowComplete(tabletFilled, remaining > 0 ? $"남은 석판 {remaining}개 · {words}" : $"석판을 모두 채웠다! · {words}");
+            }
+            else tabletView.ShowQuestion(tabletQuiz.Current, tabletQuiz.Solved, "틀려도 괜찮아요 — 다시 고르면 돼요");
+            tabletBusy = false;
+        }
+
+        private void CloseTablet()
+        {
+            bool solved = tabletQuiz != null && tabletQuiz.IsComplete;
+            tabletQuiz = null;
+            tabletView.Hide();
+            interactCooldown = 0.5f;
+            if (!solved) return;
+            AfterFieldChange();
+            if (Ruins.HasShrine(area) && Ruins.State(area, session) != ShrineState.NeedTablets) return;
+            if (Ruins.TabletsSolved(area, session.World) >= Ruins.Tablets(area).Count)
+                bubble.Say("석판을 모두 채웠다!\n유적 안쪽 제단으로 가 보자", 3.5f);
+        }
+
+        // 유적 제단 (GDD 9-6 '처음 깨어날 때', 사용자 '이대로가자'): 조건이 덜 차면 혼잣말, 다 갖추면 동료 조우 연출 → 열쇠 힌트
+        private void TouchShrine(Vector2Int cell)
+        {
+            int solved = Ruins.TabletsSolved(area, session.World), total = Ruins.Tablets(area).Count;
+            string region = area.Words != null ? area.Words.RegionName : area.DisplayName;
+            switch (Ruins.State(area, session))
+            {
+                case ShrineState.NeedTablets:
+                    bubble.Say("석판의 빈칸을 먼저 채워야 할 것 같다", 3.5f, $"채운 석판 {solved} / {total}");
+                    break;
+                case ShrineState.NeedWords:
+                    bubble.Say("메아리가 아직 약하다…\n정글 단어를 더 모으자", 4f, $"{region}에서 발견한 단어 {BossGate.WordsFound(area, session)} / {area.ShrineWords}");
+                    break;
+                case ShrineState.Ready:
+                    StartCoroutine(AwakenShrine(cell));
+                    break;
+                case ShrineState.Awakened:
+                    bubble.Say("잠들어 있던 석상이 사라진 빈 제단이다.", 2.5f);
+                    break;
+                default:
+                    bubble.Say("오래된 제단이다.", 2f);
+                    break;
+            }
+        }
+
+        private IEnumerator AwakenShrine(Vector2Int cell)
+        {
+            var companion = area.ShrineCompanion;
+            transitioning = true;
+            StartCoroutine(FieldFx.Play(transform, CellCenter(cell) + Vector3.up * 0.5f, Fx.Sparkle, 2.4f, animationScale, 12));
+            Sound.PlayJingle(Sfx.GateOpen);
+            yield return WaitUnscaled(0.9f);
+            transitioning = false;
+            yield return MeetCompanion(companion);
+            tilemap.SetTile(new Vector3Int(cell.x, cell.y, 0), TileFor(FieldTile.Shrine, true));
+            DrawProps(area);
+            AfterFieldChange();
+            // 깨어난 동료의 첫마디 = 넓은 정글에서 보스 방 열쇠 찾기 힌트 (GDD 9-6)
+            if (companion != null && BossGate.HasGate(area) && !BossGate.HasKey(area, session))
+                bubble.Say("빈칸두꺼비가 석판 글자를 삼켰어…\n보스 방 열쇠는 강 건너 동쪽 기슭에 있을 거야", 6f, companion.DisplayName);
+        }
+
+        // 뗏목에 타고 내림 (사용자: 직접 몰기): 폴짝 소리. 처음 타면 안내를 본 것으로
+        private void Board(bool boarding)
+        {
+            Sound.Play(Sfx.Flee);
+            if (boarding) session.Tutorials.Mark(TutorialProgress.Raft);
+            UpdateRaft();
+        }
+
+        // 타고 있는 뗏목 그림: 주인공은 앞쪽, 뒤쪽엔 동료가 앉음. 바라보는 방향으로 놓이고 살짝 출렁임
+        private void UpdateRaft()
+        {
+            bool on = walker != null && walker.Rafting;
+            if (raftRenderer.gameObject.activeSelf != on)
+            {
+                raftRenderer.gameObject.SetActive(on);
+                foreach (var moored in mooredRafts) if (moored != null) moored.SetActive(!on);
+            }
+            if (!on) return;
+            var facing = walker.Facing;
+            var offset = (Vector3)(Vector2)facing.ToOffset();
+            float bob = Mathf.Sin(Time.unscaledTime * 3f) * 0.04f;
+            raftRenderer.transform.position = player.position - offset * 0.5f + new Vector3(0f, -0.28f + bob, 0f);
+            bool vertical = facing == Direction.Up || facing == Direction.Down;
+            raftRenderer.transform.localEulerAngles = new Vector3(0f, 0f, vertical ? 90f : 0f);
+            raftRenderer.flipX = facing == Direction.Left || facing == Direction.Down;
+        }
+
+        // 나루터마다 묶인 뗏목 (어느 나루터에서든 탈 수 있음 — 타는 동안은 숨김)
+        private void RefreshMooredRafts()
+        {
+            foreach (var moored in mooredRafts) if (moored != null) Destroy(moored);
+            mooredRafts.Clear();
+            if (raftSprite == null) return;
+            var map = walker.Map;
+            foreach (var dock in map.FindAll(FieldTile.Dock))
+            {
+                foreach (var step in new[] { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down })
+                {
+                    if (!map.IsRaftWater(dock + step)) continue;
+                    var go = new GameObject("MooredRaft", typeof(SpriteRenderer));
+                    go.transform.SetParent(transform, false);
+                    go.transform.position = CellCenter(dock + step) + new Vector3(0f, -0.2f, 0f);
+                    go.transform.localEulerAngles = new Vector3(0f, 0f, step.x == 0 ? 90f : 0f);
+                    var renderer = go.GetComponent<SpriteRenderer>();
+                    renderer.sprite = raftSprite;
+                    renderer.sortingOrder = 2;
+                    go.SetActive(!walker.Rafting);
+                    mooredRafts.Add(go);
+                    break;
+                }
             }
         }
 
@@ -725,6 +1002,11 @@ namespace WordRPG.UI
             if (session.World.Reveal(area.AreaId, walker.Map.Width, walker.Map.Height, walker.Position) > 0) minimap.Redraw();
             MaybeSayGrassLine();
             var tile = walker.Map.Get(walker.Position);
+            if (tile == FieldTile.Dock && showTutorials && !session.Tutorials.Has(TutorialProgress.Raft) && !bubble.IsVisible)
+            {
+                bubble.Say("뗏목이 묶여 있다.\n물 쪽으로 가면 탈 수 있을 것 같다", 3.5f);
+                bubbleKeepUntil = Time.unscaledTime + 1.5f;
+            }
             if (tile == FieldTile.Door)
             {
                 var exit = area.GetExit(walker.Position);
@@ -1158,6 +1440,8 @@ namespace WordRPG.UI
             SetUpRoamers(position);
 
             DrawTiles(area, IsDoorLocked);
+            streams.SetMap(map);
+            RefreshMooredRafts();
             if (!inBattle) Sound.PlayMusic(AreaMusic);
             session.World.Reveal(area.AreaId, map.Width, map.Height, position);
             minimap.SetArea(map, area.Theme, IsCellDone, cell => session.World.IsExplored(area.AreaId, cell));
@@ -1279,6 +1563,16 @@ namespace WordRPG.UI
             playerRenderer.sortingOrder = 10;
             follower = new FieldFollower(transform);
             roamerViews = new FieldRoamerViews(transform, CellCenter);
+            streams = new FieldStreams(transform);
+            var raftTexture = Resources.Load<Texture2D>("Art/NinjaAdventure/Field/raft");
+            if (raftTexture != null)
+                raftSprite = Sprite.Create(raftTexture, new Rect(0, 0, raftTexture.width, raftTexture.height), new Vector2(0.5f, 0.5f), 16);
+            var raftGo = new GameObject("Raft", typeof(SpriteRenderer));
+            raftGo.transform.SetParent(transform, false);
+            raftRenderer = raftGo.GetComponent<SpriteRenderer>();
+            raftRenderer.sprite = raftSprite;
+            raftRenderer.sortingOrder = 8; // 주인공(10)·동료(9·11) 아래
+            raftGo.SetActive(false);
 
             cam = Camera.main;
             if (cam == null)
@@ -1367,6 +1661,7 @@ namespace WordRPG.UI
                     0, topY - 120f / menuHeight, 1, topY);
                 button.onClick.AddListener(entries[i].open);
                 if (badgeOf.TryGetValue(entries[i].name, out var badgeId)) AddBadge(badgeId, (RectTransform)button.transform);
+                if (entries[i].name == "BagButton") AddBadge(MenuBadges.Companion, (RectTransform)button.transform); // 같은 자리의 점 (#81)
             }
             AddBadge(MenuBadges.Map, (RectTransform)minimap.Button.transform);
 
@@ -1473,6 +1768,7 @@ namespace WordRPG.UI
             returnDialog = ConfirmDialog.Create(hudRoot);
             paywall = PaywallView.Create(hudRoot);
             companionCutscene = CompanionCutscene.Create(hudRoot);
+            tabletView = TabletQuizView.Create(hudRoot);
             pauseTutorial = PauseTutorial.Create(hudRoot);
             preemptView = PreemptView.Create(hudRoot);
             guide = GuideHints.Create(transform); // 자기 캔버스로 HUD·전투 위에 (눌림은 받지 않음)
@@ -1562,7 +1858,13 @@ namespace WordRPG.UI
         {
             if (follower == null || walker == null || session == null) return;
             follower.SetCompanion(session.PartyCompanion?.Data, player.position, walker.Facing, CanFollowerStand); // 바뀌었을 때만
-            follower.Tick(player.position, walker.Facing, CanFollowerStand);
+            if (walker.Rafting)
+            {
+                UpdateRaft();
+                var offset = (Vector3)(Vector2)walker.Facing.ToOffset();
+                follower.Ride(raftRenderer.transform.position - offset * 0.5f + new Vector3(0f, 0.28f, 0f), player.position, walker.Facing);
+            }
+            else follower.Tick(player.position, walker.Facing, CanFollowerStand);
         }
 
         private void RefreshCompanionBadge()
@@ -1807,6 +2109,7 @@ namespace WordRPG.UI
         {
             if (!CanOpenMenu) return;
             ClearBadge(MenuBadges.Bag);
+            ClearBadge(MenuBadges.Companion);
             var relic = session.Hero.SlotAt(slot);
             inventoryView.Show(session, database, tab, relic, OnTownChanged);
         }
@@ -1841,8 +2144,9 @@ namespace WordRPG.UI
             roamerViews.Clear();
             battleRoamer = null;
             var table = area.Encounters;
+            var water = area.WaterEncounters; // 뗏목이 다니는 강의 몬스터 (#80 흉내문어)
             roaming = area.EncounterStyle == EncounterStyle.Roaming && table != null
-                ? new RoamingMonsters(walker.Map, r => table.Roll(r), rng)
+                ? new RoamingMonsters(walker.Map, r => table.Roll(r), rng, null, water != null ? r => water.Roll(r) : (Func<System.Random, List<MonsterInstance>>)null)
                 : null;
             if (roaming != null)
             {

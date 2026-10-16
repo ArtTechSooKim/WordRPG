@@ -766,11 +766,56 @@ def build_jungle(pack, themes, autos, template, lectern, key_stand, keyhole, big
     autos["Jungle_Water_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6, jungle_water)
     autos["Jungle_Stream_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6, jungle_stream)
 
-    # 필드 위 그림 (#80): 뗏목(32×16, 가로), 물살 물결(16×16 4프레임 — 얕은 강 위를 물살 방향으로 흘러감)
+    # 필드 위 그림 (#80·#81): 뗏목 · 물살 줄 — Field/raft.png, Field/ripple.png
     field = os.path.join(OUT, "Field")
     os.makedirs(field, exist_ok=True)
-    save_if_changed(pack.image(TILESETS + "TilesetWater.png").crop((26 * 16, 0, 28 * 16, 16)), os.path.join(field, "raft.png"))
-    save_if_changed(pack.image("Backgrounds/Animated/Water Ripples/SpriteSheet16x16.png"), os.path.join(field, "ripple.png"))
+    save_if_changed(log_raft(planks), os.path.join(field, "raft.png"))
+    save_if_changed(flow_streaks(), os.path.join(field, "ripple.png"))
+
+
+def log_raft(planks):
+    """통나무 뗏목 36×24 (가로, 16px = 1칸 → 2¼×1½칸): 나무 판자 색으로 통나무 4개 + 밧줄 두 줄 + 어두운 테두리.
+    주인공(앞)과 동료(뒤)가 둘 다 올라선 게 보이게 캐릭터보다 넓게 (#81 캡처: 팩의 작은 배는 캐릭터에 가려 안 보였음)"""
+    colors = sorted({px for px in planks.getdata() if px[3] > 0}, key=lambda c: c[0] + c[1] + c[2])
+    dark, mid, light = colors[0], colors[len(colors) // 2], colors[-1]
+    w, h = 36, 24
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    px = img.load()
+    outline = (40, 26, 16, 255)
+    rope = (222, 196, 140, 255)
+    for i in range(4):                       # 통나무 4개 (위→아래), 각 5줄 + 줄 사이 1줄
+        y0 = 2 + i * 5
+        for y in range(y0, y0 + 5):
+            inset = 1 if y in (y0, y0 + 4) else 0   # 통나무 끝을 둥글게
+            for x in range(1 + inset, w - 1 - inset):
+                edge = y in (y0, y0 + 4)
+                shade = light if y == y0 + 1 else dark if y == y0 + 3 else mid
+                px[x, y] = outline if edge else shade
+            px[inset, y] = px[w - 1 - inset, y] = outline
+    for x0 in (8, 26):                       # 밧줄
+        for y in range(1, h - 1):
+            for x in (x0, x0 + 1):
+                if px[x, y][3]:
+                    px[x, y] = rope if (y + x) % 3 else outline
+    return img
+
+
+def flow_streaks():
+    """물살 줄 4프레임 (16×16 가로 이어 붙임, 투명 바탕): 흰 물결선 '∼'이 생겨 길어졌다 옅어진다 — 게임이 물살 방향으로 흘리고 돌린다"""
+    frames = []
+    for length, alpha in ((4, 150), (8, 220), (11, 220), (11, 120)):
+        f = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+        x0 = (16 - length) // 2
+        for i in range(length):
+            y = 8 + (1 if (i // 2) % 2 else 0)   # 살짝 물결치는 선
+            f.putpixel((x0 + i, y), (255, 255, 255, alpha))
+            if 0 < i < length - 1:
+                f.putpixel((x0 + i, y + 3), (255, 255, 255, alpha // 3))  # 아래 옅은 줄
+        frames.append(f)
+    sheet = Image.new("RGBA", (64, 16), (0, 0, 0, 0))
+    for i, f in enumerate(frames):
+        sheet.alpha_composite(f, (i * 16, 0))
+    return sheet
 
 
 def main():

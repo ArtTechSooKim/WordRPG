@@ -65,6 +65,21 @@ namespace WordRPG.UI
             Show(false);
         }
 
+        // 뗏목 (#81, 사용자: 아라도 같은 뗏목에 앉은 모습): 뗏목 뒤쪽 자리에 같은 쪽을 보고 선다. 자취는 지금 자리에서 다시 시작
+        public void Ride(Vector3 seat, Vector3 hero, Direction heroFacing)
+        {
+            if (!Visible) return;
+            trail.Clear();
+            trail.Add(seat);
+            trail.Add(hero);
+            root.position = seat;
+            lastHero = hero;
+            facing = heroFacing;
+            walked = 0f;
+            Show(false);
+            body.sortingOrder = seat.y < hero.y - 0.01f ? 11 : 9;
+        }
+
         // 매 프레임: 주인공 위치를 자취에 더하고, 자취를 따라 주인공에게서 한 칸 떨어진 곳으로
         public void Tick(Vector3 hero, Direction heroFacing, Func<Vector3, bool> canStand)
         {

@@ -69,7 +69,8 @@
    - 맵 원본은 SampleDataBuilder의 MeadowMap·LibraryMap·ForestMap 상수. 이미 있는 에셋은 Create Sample Data가 덮어쓰지 않으므로
      맵을 바꿀 땐 에셋의 map 칸도 같이 고칠 것 (상자 id는 위치 기준이라 상자를 옮기면 새 상자)
    - 조우 방식은 FieldArea `encounterStyle`: Grass(풀숲 확률 조우) / Roaming(보이는 몬스터 — 마른 덤불 ','이 서식지, 발견하면 쫓아옴·부딪히면 전투,
-     가까우면 [선제공격] = QTE(기회 슬로모션 → 줄어드는 원 + 이미 본 단어 한 문제), 맞히면 HP 20%. 규칙 `RoamingMonsters`·`Preemptive`, 그림 `FieldRoamerViews`·`PreemptView`, #73~75. 사막부터)
+     가까우면 [선제공격] = QTE(기회 슬로모션 → 줄어드는 원 + 이미 본 단어 한 문제), 맞히면 HP 20%. 규칙 `RoamingMonsters`·`Preemptive`, 그림 `FieldRoamerViews`·`PreemptView`, #73~75. 정글부터 — 1.1).
+     FieldArea `waterEncounters`가 있으면 뗏목이 다니는 강에도 물에 사는 몬스터(`Roamer.Aquatic`, 정글의 흉내문어 #81). 첫 선제공격 기회엔 `PauseTutorial` 설명(#79)
    - 정글 맵 글자 (#80, 1.1): '>' '<' '^' 'v' 얕은 강(걸을 수 있음, 물살 방향으로 걸으면 빨라짐 — `FieldMap.StreamDirection/IsWithStream`) ·
      'J' 나루터(여기서 깊은 강 쪽으로 가면 뗏목 — `FieldWalker.Rafting`, 뗏목이 다니는 물 = 나루터에 이어진 물 `FieldMap.IsRaftWater`, 세이브 `WorldState.Rafting`) ·
      'Y' 레버 → 가장 가까운 'H' 덩굴 다리가 놓임(`FieldMap.BridgeOf`, 규칙 `Levers`, 세이브 pulledLevers) · 'U' 유적 돌벽 · ';' 유적 바닥 ·
@@ -133,7 +134,8 @@ Assets/
                         Objectives(목표 한 줄) · MenuBadges(메뉴 빨간 점) · BattleUnlocks(강도 고르기는 전투 2번 뒤),
                         BossDictionary(보스의 사전: 받침대 L, 하루 한 번 새 단어 — 읽은 날은 WorldState),
                         BossGate(보스 방 문: 열쇠 K + 단어 40개 → G가 열림 — #76),
-                        Ruins(유적: 석판 T 4개 + 정글 단어 60개 → 제단 A에서 동료) · Levers(레버 Y → 덩굴 다리 H) · CellState(칸의 끝난 모습·지나갈 수 있음) — #80
+                        Ruins(유적: 석판 T 4개 + 정글 단어 60개 → 제단 A에서 동료) · Levers(레버 Y → 덩굴 다리 H) · CellState(칸의 끝난 모습·지나갈 수 있음) — #80,
+                        TabletQuiz(석판 3문제: 틀리면 벌점 없이 다시, 숙련도는 처음 답만 — #81)
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
     UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투 + 보스 결정타 연출 + 전투 결산, 단독 연습 모드도 있음),
                         DexView(도감), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기),
@@ -145,6 +147,7 @@ Assets/
                         TitleScreen(타이틀), Haptics(진동), UnitView, VirtualStick(가상 스틱 — 누른 자리에 생김, 끝까지 밀면 달리기),
                         GuideHints(튜토리얼: 화면을 막지 않는 한 줄 알약 + 손끝 끌기·톡톡·화살표, 해 보면 끝 — #61),
                         PauseTutorial(예외로 화면을 멈추는 단계 설명 — 정글 첫 선제공격 기회 #79, 강조할 버튼만 막 위로),
+                        TabletQuizView(단어 석판 문제 창 — #81) · FieldStreams(얕은 강 물결선 — #81),
                         PaywallView(정식판 안내: 구매·구매 복원·나중에), CompanionViews(가방 > 동료 탭 CompanionPage · 동료 조우 연출 CompanionCutscene — #77),
                         FieldFollower(필드에서 주인공 자취를 한 칸 뒤 따라오는 동료 그림 — 보이기만 함, 칸 영향 없음 #78) · CharacterSheet(주인공과 같은 배치의 캐릭터 시트 자르기), FieldRoamerViews(필드 위 보이는 몬스터 그림·'!') · PreemptView([선제공격] QTE: 집중선·줄어드는 원·2×2 선택지·결과 도장 + TargetLock 조준 괄호),
                         UiRing(두께가 일정한 원 테두리 — 코드로 만들 땐 CanvasRenderer를 먼저 붙임),

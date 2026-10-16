@@ -61,6 +61,8 @@ namespace WordRPG.Field
         public int MinSpacing = 6;             // 몬스터끼리 떨어진 거리
         public int CellsPerRoamer = 120;       // 서식지 칸 수 ÷ 이 값 = 마릿수
         public int MaxRoamers = 30;
+        public int WaterCellsPerRoamer = 140;  // 물에 사는 몬스터 (#80 흉내문어): 뗏목이 다니는 물 칸 수 ÷ 이 값
+        public int MaxWaterRoamers = 8;
         public int ActiveRadius = 26;          // 이보다 먼 어슬렁 몬스터는 쉰다 (계산 아끼기)
     }
 
@@ -74,35 +76,41 @@ namespace WordRPG.Field
         public RoamerState State { get; internal set; } = RoamerState.Wandering;
         public List<MonsterInstance> Group { get; }
         public MonsterInstance Leader => Group[0];
+        public bool Aquatic { get; } // 물에 사는 몬스터 — 뗏목이 다니는 깊은 강만 다닌다 (#80)
         internal float Timer;
 
-        public Roamer(int id, Vector2Int home, List<MonsterInstance> group)
+        public Roamer(int id, Vector2Int home, List<MonsterInstance> group, bool aquatic = false)
         {
             if (group == null || group.Count == 0) throw new ArgumentException("무리가 비었습니다", nameof(group));
             Id = id;
             Home = home;
             Position = home;
             Group = group;
+            Aquatic = aquatic;
         }
     }
 
     // 보이는 몬스터 조우 규칙 (순수 C#, 시간은 Tick(dt), 랜덤은 주입 — GDD 9-5).
-    // 서식지 = 마른 덤불(',', FieldTile.Grass) 칸. 몬스터는 길·모래·덤불만 걷고 출입구·물건 칸에는 서지 않는다
+    // 서식지 = 마른 덤불(',', FieldTile.Grass) 칸. 몬스터는 길·모래·덤불·얕은 강만 걷고 출입구·물건 칸에는 서지 않는다.
+    // 물에 사는 몬스터(#80, 정글의 흉내문어)는 뗏목이 다니는 깊은 강(FieldMap.IsRaftWater)이 서식지이자 다니는 곳
     public class RoamingMonsters
     {
         private static readonly Direction[] Directions = { Direction.Up, Direction.Down, Direction.Left, Direction.Right };
 
         private readonly FieldMap map;
         private readonly Func<System.Random, List<MonsterInstance>> rollGroup;
+        private readonly Func<System.Random, List<MonsterInstance>> rollWaterGroup;
         private readonly System.Random rng;
         private readonly List<Vector2Int> habitat = new List<Vector2Int>();
+        private readonly List<Vector2Int> waterHabitat = new List<Vector2Int>();
         private readonly List<Roamer> roamers = new List<Roamer>();
-        private readonly List<float> respawns = new List<float>();
+        private readonly List<(float seconds, bool aquatic)> respawns = new List<(float, bool)>();
         private int nextId;
 
         public RoamingRules Rules { get; }
         public IReadOnlyList<Roamer> Roamers => roamers;
         public IReadOnlyList<Vector2Int> Habitat => habitat;
+        public IReadOnlyList<Vector2Int> WaterHabitat => waterHabitat;
         public int PendingRespawns => respawns.Count;
 
         // 1이면 보통, 작으면 느려짐 ([선제공격] 문제를 푸는 동안)
@@ -110,26 +118,41 @@ namespace WordRPG.Field
 
         public int TargetCount => habitat.Count == 0 ? 0 : Mathf.Clamp(habitat.Count / Mathf.Max(1, Rules.CellsPerRoamer), 1, Rules.MaxRoamers);
 
-        public RoamingMonsters(FieldMap map, Func<System.Random, List<MonsterInstance>> rollGroup, System.Random rng, RoamingRules rules = null)
+        public int WaterTargetCount => waterHabitat.Count == 0 ? 0
+            : Mathf.Clamp(waterHabitat.Count / Mathf.Max(1, Rules.WaterCellsPerRoamer), 1, Rules.MaxWaterRoamers);
+
+        // rollWaterGroup: 물에 사는 몬스터 무리 (없으면 물엔 몬스터 없음 — FieldArea.WaterEncounters)
+        public RoamingMonsters(FieldMap map, Func<System.Random, List<MonsterInstance>> rollGroup, System.Random rng, RoamingRules rules = null,
+            Func<System.Random, List<MonsterInstance>> rollWaterGroup = null)
         {
             this.map = map ?? throw new ArgumentNullException(nameof(map));
             this.rollGroup = rollGroup ?? throw new ArgumentNullException(nameof(rollGroup));
+            this.rollWaterGroup = rollWaterGroup;
             this.rng = rng ?? throw new ArgumentNullException(nameof(rng));
             Rules = rules ?? new RoamingRules();
             for (int y = 0; y < map.Height; y++)
             for (int x = 0; x < map.Width; x++)
                 if (map.Get(new Vector2Int(x, y)) == FieldTile.Grass) habitat.Add(new Vector2Int(x, y));
+            if (rollWaterGroup != null)
+            {
+                waterHabitat.AddRange(map.RaftWaterCells());
+                waterHabitat.Sort((a, b) => a.y != b.y ? a.y.CompareTo(b.y) : a.x.CompareTo(b.x)); // 랜덤 결과가 매번 같게
+            }
         }
 
         // 지역에 들어올 때: 정해진 마릿수만큼 주인공에게서 먼 서식지에
         public List<RoamerEvent> Populate(Vector2Int player)
         {
             var events = new List<RoamerEvent>();
-            while (roamers.Count < TargetCount)
+            foreach (bool aquatic in new[] { false, true })
             {
-                var roamer = TrySpawn(player);
-                if (roamer == null) break;
-                events.Add(new RoamerEvent(RoamerEventKind.Spawned, roamer, roamer.Position));
+                int target = aquatic ? WaterTargetCount : TargetCount;
+                while (roamers.FindAll(r => r.Aquatic == aquatic).Count < target)
+                {
+                    var roamer = TrySpawn(player, aquatic);
+                    if (roamer == null) break;
+                    events.Add(new RoamerEvent(RoamerEventKind.Spawned, roamer, roamer.Position));
+                }
             }
             return events;
         }
@@ -159,7 +182,7 @@ namespace WordRPG.Field
         // 전투에서 이김 → 사라지고 얼마 뒤 다른 곳에서 새로 나타남
         public void Defeat(Roamer roamer)
         {
-            if (roamers.Remove(roamer)) respawns.Add(Rules.RespawnSeconds);
+            if (roamers.Remove(roamer)) respawns.Add((Rules.RespawnSeconds, roamer.Aquatic));
         }
 
         // 도망침 → 잠깐 멈춤 (그동안 거리를 벌림)
@@ -175,9 +198,9 @@ namespace WordRPG.Field
             var events = new List<RoamerEvent>();
             for (int i = respawns.Count - 1; i >= 0; i--)
             {
-                respawns[i] -= dt;
-                if (respawns[i] > 0f) continue;
-                var roamer = TrySpawn(player);
+                respawns[i] = (respawns[i].seconds - dt, respawns[i].aquatic);
+                if (respawns[i].seconds > 0f) continue;
+                var roamer = TrySpawn(player, respawns[i].aquatic);
                 if (roamer == null) continue; // 자리가 없으면 다음 Tick에 다시
                 respawns.RemoveAt(i);
                 events.Add(new RoamerEvent(RoamerEventKind.Spawned, roamer, roamer.Position));
@@ -240,7 +263,7 @@ namespace WordRPG.Field
         // 반환값: 주인공에게 부딪혔는지
         private bool Chase(Roamer roamer, Vector2Int player, List<RoamerEvent> events)
         {
-            var next = NextStepToward(roamer.Position, player, Rules.GiveUpRadius + 6);
+            var next = NextStepToward(roamer.Position, player, Rules.GiveUpRadius + 6, roamer.Aquatic);
             if (!next.HasValue) return false;
             roamer.Facing = Toward(roamer.Position, next.Value);
             if (next.Value == player)
@@ -259,7 +282,7 @@ namespace WordRPG.Field
             var direction = Directions[rng.Next(Directions.Length)];
             var target = roamer.Position + direction.ToOffset();
             roamer.Facing = direction;
-            if (target == player || !CanStand(target) || Distance2(target, roamer.Home) > Rules.LeashRadius * Rules.LeashRadius) return;
+            if (target == player || !CanStand(target, roamer.Aquatic) || Distance2(target, roamer.Home) > Rules.LeashRadius * Rules.LeashRadius) return;
             Move(roamer, target, events);
         }
 
@@ -271,8 +294,8 @@ namespace WordRPG.Field
                 roamer.State = RoamerState.Wandering;
                 return;
             }
-            var next = NextStepToward(roamer.Position, roamer.Home, Rules.GiveUpRadius + Rules.LeashRadius + 10);
-            if (!next.HasValue || next.Value == player || !CanStand(next.Value))
+            var next = NextStepToward(roamer.Position, roamer.Home, Rules.GiveUpRadius + Rules.LeashRadius + 10, roamer.Aquatic);
+            if (!next.HasValue || next.Value == player || !CanStand(next.Value, roamer.Aquatic))
             {
                 roamer.State = RoamerState.Wandering; // 길이 막혔으면 그 자리에서 다시 어슬렁
                 return;
@@ -294,16 +317,24 @@ namespace WordRPG.Field
             events.Add(new RoamerEvent(RoamerEventKind.Moved, roamer, from));
         }
 
-        // 몬스터가 설 수 있는 칸: 길·모래·덤불, 다른 몬스터가 없는 곳 (출입구·물건 칸은 아님)
-        private bool CanStand(Vector2Int cell)
+        // 몬스터가 설 수 있는 칸: 길·모래·덤불·얕은 강, 다른 몬스터가 없는 곳 (출입구·물건·나루터·유적 칸은 아님).
+        // 물에 사는 몬스터는 뗏목이 다니는 깊은 강만
+        private bool CanStand(Vector2Int cell, bool aquatic)
         {
-            var tile = map.Get(cell);
-            if (tile != FieldTile.Floor && tile != FieldTile.Lawn && tile != FieldTile.Grass) return false;
+            if (aquatic)
+            {
+                if (!map.IsRaftWater(cell)) return false;
+            }
+            else
+            {
+                var tile = map.Get(cell);
+                if (tile != FieldTile.Floor && tile != FieldTile.Lawn && tile != FieldTile.Grass && tile != FieldTile.Stream) return false;
+            }
             return At(cell) == null;
         }
 
         // 너비 우선 탐색으로 목표까지의 첫 걸음 (목표 칸 자체는 막혀 있어도 됨 — 주인공 자리). 길이 없으면 null
-        private Vector2Int? NextStepToward(Vector2Int from, Vector2Int goal, int searchRadius)
+        private Vector2Int? NextStepToward(Vector2Int from, Vector2Int goal, int searchRadius, bool aquatic)
         {
             if (from == goal) return null;
             var parent = new Dictionary<Vector2Int, Vector2Int> { [from] = from };
@@ -317,7 +348,7 @@ namespace WordRPG.Field
                 {
                     var next = cell + direction.ToOffset();
                     if (parent.ContainsKey(next) || Distance2(next, from) > limit) continue;
-                    if (next != goal && !CanStand(next)) continue;
+                    if (next != goal && !CanStand(next, aquatic)) continue;
                     parent[next] = cell;
                     if (next == goal)
                     {
@@ -331,17 +362,18 @@ namespace WordRPG.Field
             return null;
         }
 
-        private Roamer TrySpawn(Vector2Int player)
+        private Roamer TrySpawn(Vector2Int player, bool aquatic)
         {
-            if (habitat.Count == 0) return null;
+            var cells = aquatic ? waterHabitat : habitat;
+            if (cells.Count == 0) return null;
             int far = Rules.SpawnMinDistance * Rules.SpawnMinDistance;
             int spacing = Rules.MinSpacing * Rules.MinSpacing;
             for (int attempt = 0; attempt < 200; attempt++)
             {
-                var cell = habitat[rng.Next(habitat.Count)];
-                if (Distance2(cell, player) < far || !CanStand(cell)) continue;
+                var cell = cells[rng.Next(cells.Count)];
+                if (Distance2(cell, player) < far || !CanStand(cell, aquatic)) continue;
                 if (roamers.Exists(r => Distance2(r.Position, cell) < spacing)) continue;
-                var roamer = new Roamer(nextId++, cell, rollGroup(rng));
+                var roamer = new Roamer(nextId++, cell, aquatic ? rollWaterGroup(rng) : rollGroup(rng), aquatic);
                 roamer.Timer = (float)rng.NextDouble() * Rules.WanderStepSeconds; // 모두 같은 박자로 걷지 않게
                 roamers.Add(roamer);
                 return roamer;
