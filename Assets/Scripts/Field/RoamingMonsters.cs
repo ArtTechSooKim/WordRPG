@@ -105,6 +105,7 @@ namespace WordRPG.Field
         private readonly List<Vector2Int> waterHabitat = new List<Vector2Int>();
         private readonly List<Roamer> roamers = new List<Roamer>();
         private readonly List<(float seconds, bool aquatic)> respawns = new List<(float, bool)>();
+        private readonly List<RoamerEvent> tickEvents = new List<RoamerEvent>();
         private int nextId;
 
         public RoamingRules Rules { get; }
@@ -193,9 +194,11 @@ namespace WordRPG.Field
             roamer.Timer = Rules.StunSeconds;
         }
 
-        public List<RoamerEvent> Tick(float dt, Vector2Int player)
+        // 돌려주는 목록은 다음 Tick에서 다시 쓴다 (매 프레임 새 목록을 만들지 않게 — #93). 바로 읽고 버릴 것
+        public IReadOnlyList<RoamerEvent> Tick(float dt, Vector2Int player)
         {
-            var events = new List<RoamerEvent>();
+            var events = tickEvents;
+            events.Clear();
             for (int i = respawns.Count - 1; i >= 0; i--)
             {
                 respawns[i] = (respawns[i].seconds - dt, respawns[i].aquatic);

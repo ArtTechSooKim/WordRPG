@@ -57,8 +57,8 @@ namespace WordRPG.UI
             closeImage.rectTransform.sizeDelta = new Vector2(64, 64);
             closeImage.rectTransform.anchoredPosition = new Vector2(-32, 0);
             view.close = UiKit.AddButton(closeImage);
-            var x = UiKit.Label("X", closeImage.transform, "✕", 30, Palette.Text, 0, 0, 1, 1, TextAnchor.MiddleCenter, FontStyle.Bold);
-            x.font = UiFonts.Bold; // ✕는 Jua에 없을 수 있음
+            var x = UiKit.Label("X", closeImage.transform, "×", 30, Palette.Text, 0, 0, 1, 1, TextAnchor.MiddleCenter, FontStyle.Bold);
+            x.font = UiFonts.Bold; // ✕(U+2715)는 Noto에도 없어 ×로 (#48·#93)
             view.close.onClick.AddListener(() => view.onClose?.Invoke());
 
             for (int i = 0; i < 3; i++)

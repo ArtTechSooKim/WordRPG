@@ -94,7 +94,10 @@
     - 색은 `Palette`(Figma 변수와 같은 값), 모서리 `UiKit.RadiusSm/Md/Lg`(8/16/24): `RoundPanel`, `Pill`(양끝 완전 둥글게), `Outline`(테두리)
     - 글꼴: 제목·숫자·버튼 = Jua(`UiKit.Display`, `MakeButton` 기본), 본문 = Noto Sans KR(`Label`, Bold 지원). `Assets/Resources/UI/Fonts/` (OFL)
     - 아이콘: `UiKit.Icon("gold")`, 아이템은 `UiKit.ItemIcon(item)`. PNG를 `Assets/Resources/UI/Icons/`에 넣으면 `UiAssetImporter`가 스프라이트로 설정
-    - 새 화면은 Figma에 먼저 그리고 같은 컴포넌트로 조립. 기호(✓ ✕ ▲ ◀ 등)는 Jua에 없을 수 있으니 Noto 글꼴로 쓰고 `font.HasCharacter`로 확인
+    - 새 화면은 Figma에 먼저 그리고 같은 컴포넌트로 조립. 기호(✓ ▲ ◀ 등)는 Jua에 없을 수 있으니 Noto 글꼴로 (✕는 Noto에도 없음 → ×)
+    - 본문 글꼴 Noto는 한자·가나를 뺀 부분 집합 (#93 앱 크기 — 원본 `Tools/FontSource/`, `python Tools/subset_fonts.py`).
+      한글 11,172자는 전부 있음. 단어 뜻·코드 문자열에 새 한자·기호를 쓰면 EditMode `FontCoverageTests`가 잡음 → 스크립트 다시 실행 또는 다른 기호로.
+      (`font.HasCharacter`는 에디터에서 OS 글꼴까지 찾아 주므로 글꼴 검사에 못 씀 — 테스트는 cmap 표를 직접 읽음)
 12. **도트 그림·소리는 Ninja Adventure 팩(CC0)**: `python Tools/import_ninja_art.py` 가 쓸 파일만 골라 복사·가공한다 (원본 팩 경로는 스크립트 안)
     - 적 몬스터: `Assets/Resources/Art/NinjaAdventure/Monsters/{speciesId}.png` → `WordRPG > Data > Link Monster Art`(Create All Scenes에도 포함)가 Sprite 칸에 연결
     - 성유물: `Art/NinjaAdventure/Relics/{relicId}.png` (`UiKit.RelicIcon`, RelicData.icon이 비면 사용), 상처약 등 도트 아이템: `Art/NinjaAdventure/Items/{itemId}.png`
@@ -141,7 +144,10 @@ Assets/
                         Ruins(유적: 석판 T 4개 + 정글 단어 60개 → 제단 A에서 동료) · Levers(레버 Y → 덩굴 다리 H) · CellState(칸의 끝난 모습·지나갈 수 있음) — #80,
                         TabletQuiz(석판 3문제: 틀리면 벌점 없이 다시, 숙련도는 처음 답만 — #81)
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
-    UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투 + 보스 결정타 연출 + 전투 결산, 단독 연습 모드도 있음),
+    UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투 + 보스 결정타 연출 + 전투 결산, 단독 연습 모드도 있음)
+                        — 둘 다 partial로 나눔 (#93): FieldScreen.cs(상태·이동·입력) + .Places([확인] 장소)·.Jungle(정글 기믹)·.Battles(조우·전투 뒤·수련)·
+                        .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout.
+                        새 기능은 맞는 파일에, 기능 묶음이 커지면 새 partial 파일로,
                         DexView(도감), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기),
                         InventoryView(소지품: 주인공·성유물·아이템·징표) + HeroViews(HeroInfoPage·RelicPage·RelicSlotsRow·SkillRowView),
                         SettingsView(설정) + ConfirmDialog(확인 창), SwitchView, GateCutscene(보스가 연 길을 보여 주는 연출),
@@ -173,7 +179,7 @@ Assets/
 Docs/                   PRD.txt, GDD.md, 아트에셋목록.md, 아이폰출시방법.txt(TestFlight 올리는 순서), 작업메모.md
 .github/workflows/      ios-testflight.yml (GitHub Mac 서버에서 서명·TestFlight 업로드)
 Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow 필요), zip_ios_for_mac.py (Xcode 프로젝트 → Mac용 zip, 실행 권한 유지),
-                        widen_maps.py (맵의 한 칸 통로 → 두 칸), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구)
+                        widen_maps.py (맵의 한 칸 통로 → 두 칸), subset_fonts.py (본문 글꼴에서 한자·가나 빼기 — 앱 크기, fontTools 필요), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구)
 ```
 
 ## 명령어
