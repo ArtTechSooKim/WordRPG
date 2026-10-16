@@ -9,7 +9,7 @@ namespace WordRPG.UI
     // 지금은 서고만 (StyleFor). 막지 않는 그림일 뿐 (조우는 그대로 풀숲 규칙)
     public class FieldFog
     {
-        private const float DriftPixelsPerSecond = 2.5f; // 구름 무늬가 흘러가는 빠르기 — 아주 살짝 (#104)
+        private const float DriftPixelsPerSecond = 1f; // 구름 무늬가 흘러가는 빠르기 — 1초에 한 번만 다시 칠함 (#105 사용자: 폰 부담이면 느려도 됨, 멈춘 것만 아니면)
         private readonly Transform parent;
         private GameObject layer;
         private Texture2D texture;
@@ -60,7 +60,7 @@ namespace WordRPG.UI
             renderer.sortingOrder = 3; // 타일·흩뿌림(1) 위, 큰 그림(5)·주인공(10) 아래
         }
 
-        // 구름 무늬를 천천히 흘려보냄 (#104): 한 픽셀 흘러갈 때만 다시 칠한다 (1초에 2~3번). 가장자리는 그대로
+        // 구름 무늬를 천천히 흘려보냄 (#104·#105): 한 픽셀 흘러갈 때만 다시 칠한다 (1초에 한 번). 가장자리는 그대로
         public void Tick(float dt)
         {
             if (texture == null) return;

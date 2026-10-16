@@ -31,9 +31,9 @@ namespace WordRPG.Tests
             yield return null;
             Assert.IsTrue(field.HasFog, "서고 몬스터 칸에 안개");
             int before = field.FogRepaints;
-            yield return new WaitForSeconds(1.2f);
-            Assert.Greater(field.FogRepaints, before, "구름 무늬가 흘러감 (1초에 2~3번 다시 칠함)");
-            Assert.LessOrEqual(field.FogRepaints - before, 6, "아주 살짝 — 매 프레임 다시 칠하지 않음");
+            yield return new WaitForSeconds(2.3f);
+            Assert.Greater(field.FogRepaints, before, "구름 무늬가 흘러감 — 멈춘 것처럼 보이지 않게");
+            Assert.LessOrEqual(field.FogRepaints - before, 3, "1초에 한 번만 다시 칠함 (폰 부담 적게)");
             Object.Destroy(field.gameObject);
             yield return null;
         }
