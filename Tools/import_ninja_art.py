@@ -423,6 +423,42 @@ def auto_atlas(pack, template, sheet, col0, row0, recolor=None):
     return out
 
 
+def library_paper(detail, flip=False):
+    """흰 풀 그림을 바랜 종이 조각으로: 밝기를 어두운 돌색~양피지색 사이로 (돌바닥보다 조금 밝게, 하얗지 않게 — #98)"""
+    dark, light = (107, 95, 88), (200, 184, 160)
+    out = detail.copy()
+    px = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            r, g, b, a = px[x, y]
+            if a:
+                t = (r + g + b) / 765
+                px[x, y] = tuple(int(dark[i] + (light[i] - dark[i]) * t) for i in range(3)) + (a,)
+    return out.transpose(Image.FLIP_LEFT_RIGHT) if flip else out
+
+
+def library_ink_rim(t, stone):
+    """초원 호수 물가 조각 → 서고 잉크 웅덩이: 물은 잉크색, 물가(풀·흙)는 그 자리 돌바닥, 물에 닿은 한 줄만 젖은 돌(어둡게) — #98"""
+    px, sp = t.load(), stone.load()
+    w, h = t.size
+    water = [[px[x, y][3] > 0 and px[x, y][2] > px[x, y][0] + 40 for x in range(w)] for y in range(h)]
+    out = Image.new("RGBA", t.size)
+    op = out.load()
+    dark, light = (26, 20, 52), (110, 86, 150)
+    for y in range(h):
+        for x in range(w):
+            if water[y][x]:
+                r, g, b, _ = px[x, y]
+                k = (r + g + b) / 765
+                op[x, y] = tuple(int(dark[i] + (light[i] - dark[i]) * k) for i in range(3)) + (255,)
+            else:
+                s = sp[x, y]
+                wet = any(0 <= x + dx < w and 0 <= y + dy < h and water[y + dy][x + dx]
+                          for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+                op[x, y] = (int(s[0] * 0.55), int(s[1] * 0.5), int(s[2] * 0.6), 255) if wet else (s[0], s[1], s[2], 255)
+    return out
+
+
 def forest_water(t):
     """연두 물가를 숲의 진초록으로, 물은 초록빛 늪으로"""
     out = t.copy()
@@ -627,14 +663,24 @@ def build_tiles(pack):
     }
     autos["Meadow_Floor_auto"] = auto_atlas(pack, template, "TilesetFloor.png", 0, 7)
     autos["Meadow_Water_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6)
+    autos["Library_Water_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6,
+                                             lambda t: library_ink_rim(t, pack.tile("Interior/TilesetInteriorFloor.png", 16, 13)))
     # 서고: 어두운 돌바닥(책장과 잘 구분되게), 책장 벽, 잉크 웅덩이, 나무 문,
-    #       받침대 위 파란 구슬(회복 지점), 작은 트렁크. 풀숲 = 바닥에 흩어진 하얀 종이 조각
+    #       받침대 위 파란 구슬(회복 지점), 작은 트렁크. 풀숲 = 바닥에 흩어진 바랜 종이 조각
+    # #98 다듬기 (사용자: 서고가 가장 아쉬움): 하얀 지그재그(흰 풀 그림)가 400칸 넘게 깔려 시끄럽던 것 → 양피지색으로 바랜 종이 조각 3가지,
+    #     책장 3가지(_v1·_v2 — 게임이 칸 위치로 섞음), 열람실 카펫에 옅은 무늬, 잉크 웅덩이 물가 테두리(Library_Water_auto)
     stone = pack.tile("Interior/TilesetInteriorFloor.png", 16, 13)
+    paper = lambda c, r, flip=False: library_paper(pack.tile("TilesetFloorDetail.png", c, r), flip)
+    carpet = pack.tile("Interior/TilesetInteriorFloor.png", 12, 7)
     themes["Library"] = {
         "Floor": stone,
-        "Lawn": pack.tile("Interior/TilesetInteriorFloor.png", 12, 7),  # 열람실 초록 카펫 (조우 없음)
-        "Grass": over(stone, pack.tile("TilesetFloorDetail.png", 1, 3)),  # 흩어진 종이 조각
+        "Lawn": Image.blend(carpet, pack.tile("Interior/TilesetInteriorFloor.png", 20, 9), 0.35),  # 열람실 카펫 + 옅은 꽃무늬 (조우 없음)
+        "Grass": over(stone, paper(1, 3)),  # 흩어진 종이 조각 (바랜 양피지색)
+        "Grass_v1": over(stone, paper(4, 3, True)),
+        "Grass_v2": over(stone, paper(2, 3)),
         "Wall": over(stone, pack.tile("TilesetElement.png", 3, 8)),
+        "Wall_v1": over(stone, pack.tile("TilesetElement.png", 8, 8)),  # 넓은 책장 왼쪽
+        "Wall_v2": over(stone, pack.tile("TilesetElement.png", 9, 8)),  # 넓은 책장 오른쪽
         "Water": ink(pack.tile("TilesetWater.png", 11, 2)),
         "Door": over(stone, pack.tile("TilesetElement.png", 8, 13)),
         "Door_locked": over(stone, pack.tile("TilesetElement.png", 1, 11)),  # 쇠창살

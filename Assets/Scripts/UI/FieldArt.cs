@@ -22,6 +22,20 @@ namespace WordRPG.UI
             return Load($"{theme}_{tile}{(hasDone ? "_done" : "")}") ?? PlaceholderArt.ForTile(tile, theme, done);
         }
 
+        // 칸 그림 변형 (#98): Tiles/{테마}_{종류}_v1, _v2 … 가 있으면 그 수 (없으면 0 → 한 그림). 고르는 규칙은 FieldDecor.TileVariant
+        public static int VariantCount(FieldTile tile, FieldTheme theme)
+        {
+            string key = $"{theme}_{tile}";
+            if (VariantCounts.TryGetValue(key, out int count)) return count;
+            while (count < 8 && Load($"{key}_v{count + 1}") != null) count++;
+            return VariantCounts[key] = count;
+        }
+
+        public static Sprite ForTileVariant(FieldTile tile, FieldTheme theme, int variant) =>
+            variant <= 0 ? ForTile(tile, theme, false) : Load($"{theme}_{tile}_v{variant}") ?? ForTile(tile, theme, false);
+
+        private static readonly Dictionary<string, int> VariantCounts = new Dictionary<string, int>();
+
         // 덩굴 다리 (#80): 놓기 전엔 물 위 희미한 판자 윤곽(무엇이 생기는지 보이게), 놓으면 덩굴 난간 판자 다리. 가로로 건너면 _h 그림
         public static Sprite ForBridge(FieldTheme theme, bool built, bool horizontal) =>
             Load($"{theme}_Bridge{(horizontal ? "_h" : "")}{(built ? "_done" : "")}") ?? ForTile(FieldTile.Bridge, theme, built);
@@ -122,7 +136,7 @@ namespace WordRPG.UI
                 case FieldTheme.Library:
                     switch (tile)
                     {
-                        case FieldTile.Grass: return Rgb(0xF0EAEE); // 흩어진 책장 — 종이 가루
+                        case FieldTile.Grass: return Rgb(0xE6DCCB); // 흩어진 종이 조각 — 바랜 종이 가루 (#98)
                         case FieldTile.Lawn: return Rgb(0xDCE2D2);  // 카펫·이끼
                         default: return Rgb(0xC9C0BC);              // 돌바닥 (보스 빈자리도 돌바닥)
                     }

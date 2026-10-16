@@ -34,6 +34,8 @@ namespace WordRPG.UI
                 else if (kind == FieldTile.Bridge) tile = BridgeTile(fieldArea.Theme, done, map.IsBridgeHorizontal(cell));
                 else if (kind == FieldTile.Decor) tile = DecorTile(fieldArea.Theme, FieldDecor.Variant(map, cell));
                 else if (FieldAutotile.IsAutotiled(kind)) tile = AutoTile(fieldArea.Theme, kind, FieldAutotile.Mask(map, cell)) ?? TileFor(kind, done, fieldArea.Theme);
+                else if (!done && FieldArt.VariantCount(kind, fieldArea.Theme) > 0)
+                    tile = VariantTile(fieldArea.Theme, kind, FieldDecor.TileVariant(cell, FieldArt.VariantCount(kind, fieldArea.Theme)));
                 else tile = TileFor(kind, done, fieldArea.Theme);
                 tilemap.SetTile(new Vector3Int(x, y, 0), tile);
             }
@@ -66,6 +68,18 @@ namespace WordRPG.UI
         }
 
         public int PropCount => props.Count; // 큰 그림 수 (테스트용)
+
+        // 칸 그림 변형 (#98): 서고 책장 3가지·바랜 종이 3가지처럼 같은 종류의 다른 그림
+        private Tile VariantTile(FieldTheme theme, FieldTile kind, int variant)
+        {
+            string key = $"{theme}_{kind}_v{variant}";
+            if (!tileCache.TryGetValue(key, out var tile))
+            {
+                tile = MakeTile(FieldArt.ForTileVariant(kind, theme, variant));
+                tileCache[key] = tile;
+            }
+            return tile;
+        }
 
         private Tile DecorTile(FieldTheme theme, string variant)
         {

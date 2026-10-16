@@ -24,6 +24,9 @@ namespace WordRPG.Field
         }
 
         // 흩뿌림: 그 칸에 그릴 그림 번호 (없으면 -1). count = 그 바닥의 그림 수
+        // 칸 그림 변형 (#98): 같은 종류 칸(책장·나무·풀숲)이 한 그림만 되풀이되지 않게 0(기본) ~ variants 중 하나를 칸 위치로 고른다
+        public static int TileVariant(Vector2Int cell, int variants) => variants <= 0 ? 0 : Hash(cell, 97) % (variants + 1);
+
         public static int ScatterAt(FieldMap map, Vector2Int cell, int count)
         {
             if (count <= 0) return -1;

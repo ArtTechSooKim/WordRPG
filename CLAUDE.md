@@ -102,7 +102,7 @@
     - 적 몬스터: `Assets/Resources/Art/NinjaAdventure/Monsters/{speciesId}.png` → `WordRPG > Data > Link Monster Art`(Create All Scenes에도 포함)가 Sprite 칸에 연결
     - 성유물: `Art/NinjaAdventure/Relics/{relicId}.png` (`UiKit.RelicIcon`, RelicData.icon이 비면 사용), 상처약 등 도트 아이템: `Art/NinjaAdventure/Items/{itemId}.png`
     - 주인공 얼굴: HeroData.portrait가 비면 필드 주인공 정면 (`UiKit.HeroPortrait`)
-    - 필드 타일 `FieldArt`(Tiles/{테마}_{종류}[_done].png), 주인공 `PlayerArt`(4방향×걷기 4프레임 시트를 코드로 자름, 달리기 = 걷기 + 점프 행 `GetRun`). 없으면 `PlaceholderArt`
+    - 필드 타일 `FieldArt`(Tiles/{테마}_{종류}[_done].png — 같은 종류 변형 _v1·_v2…가 있으면 칸 위치로 섞음 `FieldDecor.TileVariant` #98, 예: 서고 책장·바랜 종이), 주인공 `PlayerArt`(4방향×걷기 4프레임 시트를 코드로 자름, 달리기 = 걷기 + 점프 행 `GetRun`). 없으면 `PlaceholderArt`
     - `Assets/Resources/Art/` 그림은 가져올 때 16px = 1칸, Point 필터 (`UiAssetImporter`)
     - 소리: `Sound.PlayMusic(Music.X)` / `Sound.Play(Sfx.X)`, 파일 = `Resources/Audio/Music|Sfx/{열거형 소문자}`. 음량은 설정을 따름.
       `UiKit.AddButton`/`MakeButton`은 누르면 딸깍 소리 (`clickSound: false`로 끔). 새 소리를 쓰면 열거형 + 스크립트 표에 같이 추가 (AudioArtTests가 검사)
