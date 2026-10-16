@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using WordRPG.Items;
 using WordRPG.Words;
 
@@ -42,7 +43,8 @@ namespace WordRPG.Game
             return entries;
         }
 
-        // 게임 데이터의 모든 지역에서 단어장을 모은다 (던전처럼 같은 단어장을 쓰는 지역은 Collect가 하나로 합침)
+        // 게임 데이터의 모든 지역에서 단어장을 모은다 (던전처럼 같은 단어장을 쓰는 지역은 Collect가 하나로 합침).
+        // 진열장은 이야기 순서(WordDatabase.storyOrder: 초원 → 서고 → 숲 → 정글) — 번호가 없으면 맨 뒤 (#97)
         public static List<KeepsakeEntry> Collect(GameDatabase database, GameSession session)
         {
             var regions = new List<WordDatabase>();
@@ -50,10 +52,10 @@ namespace WordRPG.Game
             {
                 foreach (var area in database.Areas)
                 {
-                    if (area != null) regions.Add(area.Words);
+                    if (area != null && area.Words != null) regions.Add(area.Words);
                 }
             }
-            return Collect(regions, session);
+            return Collect(regions.OrderBy(r => r.StoryOrder > 0 ? r.StoryOrder : int.MaxValue), session);
         }
     }
 }

@@ -72,6 +72,11 @@ namespace WordRPG.UI
         private GameDatabase database;
         private readonly List<ItemData> materials = new List<ItemData>();
         private List<KeepsakeEntry> keepsakes = new List<KeepsakeEntry>();
+        private int keepsakePage;                    // 진열장 쪽 (3칸씩, #97 — 지역이 3개를 넘음)
+        private GameObject keepsakePager;
+        private Button keepsakePrev, keepsakeNext;
+        private Text keepsakePageLabel;
+        public int KeepsakePageCount => Mathf.Max(1, (keepsakes.Count + ShelfCount - 1) / ShelfCount);
 
         public static InventoryView Create(Transform parent)
         {
@@ -154,7 +159,8 @@ namespace WordRPG.UI
         {
             var page = UiKit.Rect("KeepsakesPage", root, 0.022f, 0.53f, 0.978f, 0.8f);
             keepsakesPage = page.gameObject;
-            UiKit.Label("Intro", page, "지역 단어 도감을 모두 채우면 그 지역의 징표를 받아요", 30, Palette.TextDim, 0, 0.9f, 1, 1);
+            UiKit.Label("Intro", page, "지역 도감을 모두 채우면 징표를 받아요", 30, Palette.TextDim, 0.01f, 0.9f, 0.72f, 1, TextAnchor.MiddleLeft);
+            BuildKeepsakePager(page);
             UiKit.Pill(UiKit.Panel("Plank", page, new Color(0.42f, 0.31f, 0.22f), 0, 0.02f, 1, 0.06f)).raycastTarget = false;
             const float gap = 36f / 1032f;
             float w = (1f - 2 * gap) / ShelfCount;
@@ -180,6 +186,38 @@ namespace WordRPG.UI
                 shelf.Border.raycastTarget = false;
                 shelves.Add(shelf);
             }
+        }
+
+        // 진열장 쪽 넘기기: 안내 줄 오른쪽 ◀ 1 / 2 ▶ (한 쪽뿐이면 숨김). 끝 쪽의 화살표는 흐리게·누를 수 없음
+        private void BuildKeepsakePager(RectTransform page)
+        {
+            var pager = UiKit.Rect("KeepsakePager", page, 1, 0.885f, 1, 1.015f);
+            pager.pivot = new Vector2(1, 0.5f);
+            pager.sizeDelta = new Vector2(250, 0);
+            keepsakePager = pager.gameObject;
+            Button Arrow(string name, string glyph, float side)
+            {
+                var image = UiKit.Pill(UiKit.Panel(name, pager, Palette.Button, side, 0.5f, side, 0.5f));
+                image.rectTransform.pivot = new Vector2(side, 0.5f);
+                image.rectTransform.sizeDelta = new Vector2(60, 60);
+                var label = UiKit.Label("Glyph", image.transform, glyph, 26, Palette.Text, 0, 0, 1, 1, TextAnchor.MiddleCenter, FontStyle.Bold);
+                label.font = UiFonts.Bold; // ◀ ▶ 는 Jua에 없을 수 있음
+                return UiKit.AddButton(image);
+            }
+            keepsakePrev = Arrow("KeepsakePrev", "◀", 0);
+            keepsakeNext = Arrow("KeepsakeNext", "▶", 1);
+            keepsakePageLabel = UiKit.Label("KeepsakePage", pager, "1 / 1", 34, Palette.Gold, 0.25f, 0, 0.75f, 1, TextAnchor.MiddleCenter);
+            keepsakePageLabel.font = UiFonts.Display;
+            keepsakePrev.onClick.AddListener(() => TurnKeepsakePage(-1));
+            keepsakeNext.onClick.AddListener(() => TurnKeepsakePage(1));
+        }
+
+        private void TurnKeepsakePage(int delta)
+        {
+            int next = Mathf.Clamp(keepsakePage + delta, 0, KeepsakePageCount - 1);
+            if (next == keepsakePage) return;
+            keepsakePage = next;
+            ShowKeepsake(0);
         }
 
         // 고른 아이템 상세: 그림 · 이름 · 보유 수 · 설명 · 쓰는 곳
@@ -283,7 +321,11 @@ namespace WordRPG.UI
             if (tab == BagTab.Relics) relicPage.Show(session, database, relic, onChanged);
             else relicPage.Hide();
             if (tab == BagTab.Items) ShowMaterial(0);
-            if (tab == BagTab.Keepsakes) ShowKeepsake(0);
+            if (tab == BagTab.Keepsakes)
+            {
+                keepsakePage = 0;
+                ShowKeepsake(0);
+            }
         }
 
         private static void StyleTab(Button tab, bool selected)
@@ -435,12 +477,23 @@ namespace WordRPG.UI
 
         // ------------------------------------------------------------------ 징표 진열장
 
-        private void ShowKeepsake(int selected)
+        // slot = 이 쪽의 몇 번째 칸 (진열장 전체에서는 keepsakePage * 3 + slot)
+        private void ShowKeepsake(int slot)
         {
+            keepsakePage = Mathf.Clamp(keepsakePage, 0, KeepsakePageCount - 1);
+            int first = keepsakePage * ShelfCount;
+            int selected = slot;
+            int pages = KeepsakePageCount;
+            keepsakePager.SetActive(pages > 1);
+            keepsakePageLabel.text = $"{keepsakePage + 1} / {pages}";
+            keepsakePrev.interactable = keepsakePage > 0;
+            keepsakeNext.interactable = keepsakePage < pages - 1;
+            UiKit.SetColor(keepsakePrev, keepsakePrev.interactable ? Palette.Button : Palette.Track);
+            UiKit.SetColor(keepsakeNext, keepsakeNext.interactable ? Palette.Button : Palette.Track);
             for (int i = 0; i < shelves.Count; i++)
             {
                 var shelf = shelves[i];
-                var entry = i < keepsakes.Count ? keepsakes[i] : null;
+                var entry = first + i < keepsakes.Count ? keepsakes[first + i] : null;
                 bool owned = entry != null && entry.Owned;
                 shelf.Root.GetComponent<Image>().color = i == selected ? Palette.PanelLight : Palette.Panel;
                 shelf.Border.enabled = owned || i == selected;
@@ -458,7 +511,7 @@ namespace WordRPG.UI
 
             usageBox.SetActive(false);
             useButton.gameObject.SetActive(false);
-            var chosen = selected < keepsakes.Count ? keepsakes[selected] : null;
+            var chosen = first + selected < keepsakes.Count ? keepsakes[first + selected] : null;
             if (chosen == null)
             {
                 SetDetail(UiKit.Icon("lock"), "???", "다음 지역", "새 지역이 열리면 그 지역의 징표 자리가 생겨요");

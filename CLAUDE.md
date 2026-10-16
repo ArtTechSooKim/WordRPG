@@ -57,7 +57,7 @@
      결제는 `IStore`(실제 `UnityIapStore` = Unity IAP 5, 테스트는 가짜 — `GameManager.StoreOverride`/`FieldScreen.Configure`).
      정식판이 필요한 지역은 FieldArea `requiresFullVersion` (지금은 숲) → 입구에서 `PaywallView`, 어디서든 설정 > 정식판(보기·구매 복원).
      앱 버전(PlayerSettings.bundleVersion)은 앱스토어 버전과 같아야 함 (지금 main = 1.1 — 1.0 심사 코드는 태그 v1.0-build3, 1.0을 고쳐 다시 내야 하면 그 태그에서 가지를 땀). 지원·개인정보 웹 페이지 = `gh-pages` 브랜치 (작업메모)
-   - 새 지역(단어장)은 regionId·regionName·징표 아이템(종류 Keepsake)·골드를 지정해야 함 (RegionDataTests가 검사)
+   - 새 지역(단어장)은 regionId·regionName·징표 아이템(종류 Keepsake)·골드·storyOrder(이야기 순서 = 징표 진열장 순서, 다음 번호)를 지정해야 함 (RegionDataTests가 검사)
    - 수련용 허수아비는 MonsterSpecies `trainingDummy`(맞아도 HP 그대로, 기술 없음) — 게임에 하나, 출현표에 넣지 말 것 (TrainingTests)
    - 필드 맵은 FieldArea의 글자 맵 (GDD 7·9장). 상자 수 = 내용물 수, 출입구 수 = 연결 수(서로 왕복), B ↔ 보스 지정,
      모든 상자·샘·출입구 도달 가능 (AreaDataTests·DungeonDataTests가 검사). 지역을 새로 만들면 Refresh Game Database

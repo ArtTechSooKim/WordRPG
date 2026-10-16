@@ -17,6 +17,7 @@ MonoBehaviour:
   regionName: "\uC232"
   completionKeepsake: {fileID: 11400000, guid: 05119db81daf98c49945dbb01ce077ad, type: 2}
   completionGold: 700
+  storyOrder: 3
   words:
   - id: abuse
     english: abuse

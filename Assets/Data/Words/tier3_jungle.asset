@@ -17,6 +17,7 @@ MonoBehaviour:
   regionName: "\uBA54\uC544\uB9AC \uC815\uAE00"
   completionKeepsake: {fileID: 11400000, guid: d7331af346374d9498d7f7ff5e31ae27, type: 2}
   completionGold: 800
+  storyOrder: 4
   words:
   - id: federal
     english: federal

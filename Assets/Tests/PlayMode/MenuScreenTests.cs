@@ -118,11 +118,63 @@ namespace WordRPG.Tests
             StringAssert.Contains("네잎클로버 책갈피", shelfText);
             StringAssert.Contains("다음 지역", shelfText);
             StringAssert.Contains("500 골드", AllText(bag.transform.Find("DetailBox")));
+            Assert.IsFalse(bag.transform.Find("KeepsakesPage/KeepsakePager").gameObject.activeSelf, "한 쪽뿐이면 쪽 넘기기 숨김");
 
             FindButton(bag.transform, "InventoryCloseButton").onClick.Invoke();
             Assert.IsFalse(bag.activeSelf);
             Assert.IsFalse(field.IsPanelOpen);
 
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
+        // 징표 진열장 (#97): 이야기 순서로 3칸씩, 넘치면 ◀ 1 / 2 ▶ — 전에는 에셋 순서 + 3칸 고정이라 지역이 4개면 하나가 안 보였음
+        [UnityTest]
+        public IEnumerator KeepsakeShelfPagesInStoryOrder()
+        {
+            WordDatabase Region(string id, string name, int order, string keepsakeName)
+            {
+                var item = TestData.Item("keepsake_" + id).Set("displayName", keepsakeName).Set("kind", ItemKind.Keepsake);
+                session.Inventory.Add(item);
+                var book = ScriptableObject.CreateInstance<WordDatabase>().Set("regionId", id).Set("regionName", name)
+                    .Set("completionKeepsake", item).Set("completionGold", 100 * order).Set("storyOrder", order);
+                book.ReplaceWords(TestData.SampleWords());
+                return book;
+            }
+            area.Words.Set("storyOrder", 1);
+            FieldArea Area(string id, WordDatabase words) =>
+                ScriptableObject.CreateInstance<FieldArea>().Set("areaId", id).Set("displayName", id).Set("map", Map).Set("words", words);
+            // 일부러 이야기 순서와 다르게 넣음 (에셋 이름 순: forest · jungle · library · meadow)
+            var areas = new[] { Area("forest", Region("forest", "숲", 3, "도토리 책갈피")), Area("jungle", Region("jungle", "메아리 정글", 4, "메아리 풀잎 책갈피")),
+                Area("library", Region("library", "잊혀진 서고", 2, "깃털 책갈피")), area };
+            database.ReplaceContents(new MonsterSpecies[0], new[] { ink, cover, keepsake, potion }, areas, new[] { quill, book, lantern });
+            var field = MakeField();
+            yield return null;
+            var hud = field.transform.Find("FieldHud/SafeArea");
+            FindButton(hud, "BagButton").onClick.Invoke();
+            var bag = hud.Find("InventoryView");
+            FindButton(bag, "TabKeepsakes").onClick.Invoke();
+            var page = bag.Find("KeepsakesPage");
+            string Slot(int i) => AllText(page.Find($"KeepsakeSlot_{i}"));
+            StringAssert.Contains("초원", Slot(0));
+            StringAssert.Contains("잊혀진 서고", Slot(1));
+            StringAssert.Contains("숲", Slot(2));
+            Assert.IsTrue(page.Find("KeepsakePager").gameObject.activeSelf);
+            StringAssert.Contains("1 / 2", AllText(page.Find("KeepsakePager")));
+            Assert.IsFalse(FindButton(page, "KeepsakePrev").interactable, "첫 쪽에선 ◀ 못 누름");
+
+            FindButton(page, "KeepsakeNext").onClick.Invoke();
+            StringAssert.Contains("2 / 2", AllText(page.Find("KeepsakePager")));
+            StringAssert.Contains("메아리 풀잎 책갈피", Slot(0));
+            StringAssert.Contains("다음 지역", Slot(1));
+            StringAssert.Contains("메아리 풀잎 책갈피", AllText(bag.Find("DetailBox")), "넘기면 그 쪽 첫 칸을 보여 줌");
+            StringAssert.Contains("400 골드", AllText(bag.Find("DetailBox")));
+            Assert.IsFalse(FindButton(page, "KeepsakeNext").interactable, "마지막 쪽에선 ▶ 못 누름");
+            FindButton(page, "KeepsakeSlot_2").onClick.Invoke();
+            StringAssert.Contains("새 지역이 열리면", AllText(bag.Find("DetailBox")));
+
+            FindButton(page, "KeepsakePrev").onClick.Invoke();
+            StringAssert.Contains("네잎클로버 책갈피", Slot(0));
             Object.Destroy(field.gameObject);
             yield return null;
         }

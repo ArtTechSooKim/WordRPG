@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using WordRPG.Heroes;
 using UnityEditor;
 using UnityEngine;
 using WordRPG.Game;
@@ -178,9 +179,24 @@ namespace WordRPG.Tests
                 Assert.IsNotNull(book.CompletionKeepsake, $"{book.name}: 완성 징표가 없음");
                 Assert.AreEqual(ItemKind.Keepsake, book.CompletionKeepsake.Kind, $"{book.name}: 징표 아이템의 종류가 Keepsake가 아님");
                 Assert.Greater(book.CompletionGold, 0, $"{book.name}: 완성 골드가 0");
+                Assert.Greater(book.StoryOrder, 0, $"{book.name}: storyOrder(이야기 순서)가 없음 — 징표 진열장 순서 (#97)");
                 Assert.AreSame(book.CompletionKeepsake, database.FindItem(book.CompletionKeepsake.ItemId),
                     $"{book.name}: 징표가 GameDatabase에 없음 (WordRPG > Data > Refresh Game Database)");
             }
+        }
+
+        // #97: 진열장은 이야기 순서 — 전에는 에셋 이름 순(숲·정글·서고·초원)이라 칸 3개에 초원이 안 보였음
+        [Test]
+        public void KeepsakeShelfFollowsTheStory()
+        {
+            var database = AssetDatabase.LoadAssetAtPath<GameDatabase>("Assets/Data/GameDatabase.asset");
+            var books = AssetDatabase.FindAssets("t:WordDatabase", new[] { "Assets/Data" })
+                .Select(g => AssetDatabase.LoadAssetAtPath<WordDatabase>(AssetDatabase.GUIDToAssetPath(g))).ToList();
+            Assert.AreEqual(books.Count, books.Select(b => b.StoryOrder).Distinct().Count(), "storyOrder가 겹침");
+
+            var hero = AssetDatabase.LoadAssetAtPath<HeroData>("Assets/Data/Hero/hero.asset");
+            var shelf = Keepsakes.Collect(database, GameSession.NewGame(hero, 1)).Select(e => e.Region.RegionId).ToList();
+            CollectionAssert.AreEqual(new[] { "meadow", "library", "forest", "jungle" }, shelf.Take(4).ToArray(), "초원 → 서고 → 숲 → 정글");
         }
 
         // #62 교육과정 기본 어휘로 바꾼 뒤: 지역마다 자기 단어장, 단어는 한 단어장에만 (도감이 겹치지 않게), 뜻은 비어 있지 않음

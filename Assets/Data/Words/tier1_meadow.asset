@@ -17,6 +17,7 @@ MonoBehaviour:
   regionName: "\uCD08\uC6D0"
   completionKeepsake: {fileID: 11400000, guid: 2dd71ba23711eac418813eea2da4c791, type: 2}
   completionGold: 500
+  storyOrder: 1
   words:
   - id: able
     english: able

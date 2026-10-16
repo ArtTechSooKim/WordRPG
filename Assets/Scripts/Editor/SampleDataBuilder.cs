@@ -156,10 +156,10 @@ namespace WordRPG.EditorTools
 
             // 단어장(CSV에서 만들어짐)에 지역 정보와 도감 완성 보상 지정. 이미 지정돼 있으면 건드리지 않음
             WordCsvImporter.ImportAll();
-            ConfigureRegion("Assets/Data/Words/tier1_meadow.asset", "meadow", "초원", meadowKeepsake, 500);
-            ConfigureRegion("Assets/Data/Words/tier2_forest.asset", "forest", "숲", forestKeepsake, 700);
+            ConfigureRegion("Assets/Data/Words/tier1_meadow.asset", "meadow", "초원", meadowKeepsake, 500, 1);
+            ConfigureRegion("Assets/Data/Words/tier2_forest.asset", "forest", "숲", forestKeepsake, 700, 3);
             // (#62) 서고도 자기 단어장: 교육과정 기본 어휘 중·고 공통 중 어려운 600
-            ConfigureRegion("Assets/Data/Words/tier1_library.asset", "library", "잊혀진 서고", libraryKeepsake, 600);
+            ConfigureRegion("Assets/Data/Words/tier1_library.asset", "library", "잊혀진 서고", libraryKeepsake, 600, 2);
 
             // --- 필드: 초원. 보물상자는 맵의 C를 위→아래, 왼→오른 순으로 대응 (강화 재료·성유물을 얻는 곳) ---
             Area("meadow", "초원", MeadowMap, meadowEncounters,
@@ -288,7 +288,7 @@ namespace WordRPG.EditorTools
             var riverEncounters = Encounters("jungle_river", 1, 2,
                 new EncounterTable.Entry(mimicOctopus, 13, 15, 10));
 
-            ConfigureRegion("Assets/Data/Words/tier3_jungle.asset", "jungle", "메아리 정글", jungleKeepsake, 800);
+            ConfigureRegion("Assets/Data/Words/tier3_jungle.asset", "jungle", "메아리 정글", jungleKeepsake, 800, 4);
             const string junglePath = "Assets/Data/Areas/jungle.asset";
             // 보물상자 15개 (맵의 C를 위→아래, 왼→오른 순). 강 위쪽·아래쪽 모래톱 4개는 뗏목에서 [확인] (사용자)
             Area("jungle", "메아리 정글", JungleMap, jungleEncounters,
@@ -773,7 +773,7 @@ namespace WordRPG.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void ConfigureRegion(string wordBookPath, string regionId, string regionName, ItemData keepsake, int gold)
+        private static void ConfigureRegion(string wordBookPath, string regionId, string regionName, ItemData keepsake, int gold, int storyOrder)
         {
             var book = AssetDatabase.LoadAssetAtPath<WordDatabase>(wordBookPath);
             if (book == null)
@@ -788,6 +788,7 @@ namespace WordRPG.EditorTools
             Prop(so, "regionName").stringValue = regionName;
             Prop(so, "completionKeepsake").objectReferenceValue = keepsake;
             Prop(so, "completionGold").intValue = gold;
+            Prop(so, "storyOrder").intValue = storyOrder;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
