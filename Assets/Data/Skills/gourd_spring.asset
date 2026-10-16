@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71c0dd365e2553c48922bec3a339f174, type: 3}
+  m_Name: gourd_spring
+  m_EditorClassIdentifier: WordRPG::WordRPG.Monsters.SkillData
+  skillId: gourd_spring
+  displayName: "\uC19F\uC544\uB098\uB294 \uC0D8"
+  description: "\uC870\uB871\uBC15\uC5D0\uC11C \uC0D8\uBB3C\uC774 \uC19F\uC544 \uBAA8\uB450\uC758
+    HP\uB97C \uD06C\uAC8C \uD68C\uBCF5\uD55C\uB2E4."
+  kind: 1
+  target: 3
+  power: 20
+  quizDirection: 1

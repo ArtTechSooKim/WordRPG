@@ -21,6 +21,10 @@ namespace WordRPG.Game
         [SerializeField] private List<ExploredArea> explored = new List<ExploredArea>(); // 예전 세이브에는 없음 → 처음부터 탐험
         [SerializeField] private List<DictionaryReadDay> dictionaryReads = new List<DictionaryReadDay>(); // 사전을 읽은 날 (#45, 예전 세이브엔 없음)
         [SerializeField] private List<string> openedGates = new List<string>(); // 연 보스 방 문의 지역 id (#76, 예전 세이브엔 없음)
+        // 1.1 정글 (#80, 예전 세이브엔 없음 → 기본값): 마지막 위치가 뗏목 위인지, 당긴 레버 · 푼 석판 (id = "지역:x,y" — 상자 id와 같은 방식)
+        [SerializeField] private bool rafting;
+        [SerializeField] private List<string> pulledLevers = new List<string>();
+        [SerializeField] private List<string> solvedTablets = new List<string>();
 
         public string AreaId => hasPosition ? areaId : null;
         public IReadOnlyList<string> OpenedChests => openedChests;
@@ -31,12 +35,16 @@ namespace WordRPG.Game
             return hasPosition && areaId == area;
         }
 
-        public void SetPosition(string area, Vector2Int position)
+        // 마지막 위치가 뗏목 위인지 (그 위치의 지역에서만 의미가 있음)
+        public bool Rafting => hasPosition && rafting;
+
+        public void SetPosition(string area, Vector2Int position, bool onRaft = false)
         {
             areaId = area;
             x = position.x;
             y = position.y;
             hasPosition = true;
+            rafting = onRaft;
         }
 
         public void ClearPosition() => hasPosition = false;
@@ -85,6 +93,22 @@ namespace WordRPG.Game
         public void MarkChestOpened(string chestId)
         {
             if (!openedChests.Contains(chestId)) openedChests.Add(chestId);
+        }
+
+        public bool IsLeverPulled(string leverId) => pulledLevers != null && pulledLevers.Contains(leverId);
+
+        public void MarkLeverPulled(string leverId)
+        {
+            if (pulledLevers == null) pulledLevers = new List<string>();
+            if (!pulledLevers.Contains(leverId)) pulledLevers.Add(leverId);
+        }
+
+        public bool IsTabletSolved(string tabletId) => solvedTablets != null && solvedTablets.Contains(tabletId);
+
+        public void MarkTabletSolved(string tabletId)
+        {
+            if (solvedTablets == null) solvedTablets = new List<string>();
+            if (!solvedTablets.Contains(tabletId)) solvedTablets.Add(tabletId);
         }
 
         // 그 지역 사전을 마지막으로 읽은 날 ("yyyy-MM-dd", 없으면 null)

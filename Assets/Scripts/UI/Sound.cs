@@ -4,7 +4,7 @@ using WordRPG.Game;
 
 namespace WordRPG.UI
 {
-    public enum Music { None, Title, Meadow, Library, Battle, Boss, Forest }
+    public enum Music { None, Title, Meadow, Library, Battle, Boss, Forest, Jungle }
 
     public enum Sfx
     {

@@ -136,8 +136,9 @@ namespace WordRPG.Tests
                     var exit = area.Exits[i];
                     var boss = exit.OpenedByBossOf;
                     if (boss == null) continue;
-                    Assert.AreNotSame(area, boss, $"{area.name}: 자기 지역 보스로 잠그면 안 됨 (보스 방에 못 들어갈 수 있음)");
-                    Assert.IsTrue(Reachable(boss, ignoreLocks: false), $"{area.name}의 {i}번 출입구: {boss.name} 보스에 잠긴 문 없이 갈 수 있어야 함");
+                    // 자기 지역 보스로 잠가도 됨 (#80 숲 보스 공터 위의 정글 출입구) — 보스는 그 지역 맵 안에 있고,
+                    // 그 지역에는 다른 출입구로 들어오므로(아래 Reachable) 잠긴 문을 지나지 않고 보스에게 갈 수 있다
+                    Assert.IsTrue(Reachable(boss, ignoreLocks: false), $"{area.name}의 {i}번 출입구: {boss.name} 보스에 앞 보스들을 물리치며 갈 수 있어야 함 (이 문 없이)");
                 }
             }
         }
@@ -168,23 +169,33 @@ namespace WordRPG.Tests
             Assert.IsNotNull(forest.Shop, "숲 야영지 상점");
         }
 
-        // 시작 지역(없으면 그 지역 자신 기준 초원)에서 출입구를 따라 target까지 갈 수 있는지
+        // 시작 지역(없으면 초원)에서 출입구를 따라 target까지 갈 수 있는지.
+        // ignoreLocks가 아니면 정상 진행대로: 갈 수 있는 지역의 보스를 물리치면 그 보스가 여는 문이 열리고, 다시 넓혀 본다
+        // (서고 보스 → 숲, 숲 보스 → 정글처럼 이어지는 잠금, #80)
         private static bool Reachable(FieldArea target, bool ignoreLocks, FieldArea from = null)
         {
             from = from ?? AssetDatabase.LoadAssetAtPath<FieldArea>("Assets/Data/Areas/meadow.asset");
-            var seen = new HashSet<FieldArea> { from };
-            var queue = new Queue<FieldArea>(seen);
-            while (queue.Count > 0)
+            var defeated = new HashSet<FieldArea>();
+            while (true)
             {
-                var area = queue.Dequeue();
-                if (area == target) return true;
-                foreach (var exit in area.Exits)
+                var seen = new HashSet<FieldArea> { from };
+                var queue = new Queue<FieldArea>(seen);
+                while (queue.Count > 0)
                 {
-                    if (exit.Target == null || !ignoreLocks && exit.OpenedByBossOf != null) continue;
-                    if (seen.Add(exit.Target)) queue.Enqueue(exit.Target);
+                    var area = queue.Dequeue();
+                    if (area == target) return true;
+                    foreach (var exit in area.Exits)
+                    {
+                        if (exit.Target == null) continue;
+                        if (!ignoreLocks && exit.OpenedByBossOf != null && !defeated.Contains(exit.OpenedByBossOf)) continue;
+                        if (seen.Add(exit.Target)) queue.Enqueue(exit.Target);
+                    }
                 }
+                int before = defeated.Count;
+                foreach (var area in seen)
+                    if (area.Boss != null) defeated.Add(area);
+                if (defeated.Count == before) return false;
             }
-            return false;
         }
     }
 }

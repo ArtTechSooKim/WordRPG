@@ -31,6 +31,7 @@ namespace WordRPG.UI
             {
                 case FieldTheme.Library: return new Color(0.12f, 0.08f, 0.06f);
                 case FieldTheme.Forest: return new Color(0.05f, 0.14f, 0.08f);
+                case FieldTheme.Jungle: return new Color(0.03f, 0.12f, 0.07f);
                 default: return OutsideMap;
             }
         }
@@ -62,6 +63,16 @@ namespace WordRPG.UI
                     return opened ? Make(t + "gate_open", ground) : Make(t + "gate", Keyhole);
                 case FieldTile.Key: // 열쇠 받침대 (#76): 받침 위 금 열쇠 → 가져가면 빈 받침
                     return opened ? Make(t + "key_taken", Layer(Pedestal, ground)) : Make(t + "key", Layer(KeyPixel, Layer(Pedestal, ground)));
+                // 정글 칸 (#80) — 그림(Tiles/Jungle_*)이 없을 때만
+                case FieldTile.Stream: return Make(t + "stream", Shallow);
+                case FieldTile.Dock: return Make(t + "dock", Dock);
+                case FieldTile.Lever: return opened ? Make(t + "lever_on", Layer(LeverPixel(true), ground)) : Make(t + "lever", Layer(LeverPixel(false), ground));
+                case FieldTile.Bridge: return opened ? Make(t + "bridge", Dock) : Make(t + "bridge_ghost", GhostBridge);
+                case FieldTile.RuinWall: return Make(t + "ruin_wall", RuinWall);
+                case FieldTile.RuinFloor: return Make(t + "ruin_floor", RuinFloor);
+                case FieldTile.Tablet: return opened ? Make(t + "tablet_done", Layer(TabletPixel(true), RuinFloor)) : Make(t + "tablet", Layer(TabletPixel(false), RuinFloor));
+                case FieldTile.Shrine: return opened ? Make(t + "shrine_done", Layer(Pedestal, RuinFloor)) : Make(t + "shrine", Layer(ShrinePixel, RuinFloor));
+                case FieldTile.Cave: return Make(t + "cave", (x, y) => DoorPixel(x, y, false, false));
                 default: return Make(t + "floor", ground);
             }
         }
@@ -200,6 +211,61 @@ namespace WordRPG.UI
                 return y == 7 ? new Color(0.4f, 0.25f, 0.1f) : new Color(0.6f, 0.4f, 0.2f);
             }
             if ((x == 2 || x == 13) && y >= 8 && y <= 10) return new Color(0.4f, 0.25f, 0.1f);
+            return Color.clear;
+        }
+
+        // ------------------------------------------------------------ 정글 칸 (#80)
+
+        // 얕은 강: 옅은 물 + 물살 줄
+        private static Color Shallow(int x, int y) => (x + y * 2) % 7 == 0 ? new Color(0.85f, 0.95f, 1f) : new Color(0.45f, 0.75f, 0.9f);
+
+        // 나루터·놓인 덩굴 다리: 나무 판자
+        private static Color Dock(int x, int y)
+        {
+            if (x % 5 == 0) return new Color(0.42f, 0.26f, 0.12f);
+            return Noise(x, y, 17) < 0.1f ? new Color(0.62f, 0.42f, 0.22f) : new Color(0.72f, 0.5f, 0.28f);
+        }
+
+        // 놓이기 전 덩굴 다리: 물 위에 희미한 판자 윤곽 (레버를 당기면 무엇이 생기는지 보이게)
+        private static Color GhostBridge(int x, int y) =>
+            x % 5 == 0 && y % 2 == 0 ? new Color(0.75f, 0.68f, 0.5f) : (x + y * 3) % 8 == 0 ? new Color(0.4f, 0.6f, 0.75f) : new Color(0.18f, 0.4f, 0.58f);
+
+        private static Func<int, int, Color> LeverPixel(bool pulled) => (x, y) =>
+        {
+            if (y <= 3 && x >= 4 && x <= 11) return new Color(0.4f, 0.4f, 0.45f); // 받침
+            int top = pulled ? 12 - (y - 4) : 4 + (y - 4);                           // 막대가 기운 쪽
+            if (y >= 4 && y <= 12 && Math.Abs(x - top / 2 - 2) <= 0) return new Color(0.45f, 0.28f, 0.12f);
+            if (y >= 12 && Distance(pulled ? x + 3 : x - 3, y - 6) <= 1.6f) return new Color(0.95f, 0.45f, 0.15f); // 손잡이
+            return Color.clear;
+        };
+
+        private static Color RuinWall(int x, int y)
+        {
+            if (y % 5 == 0 || (x + (y / 5) * 4) % 8 == 0) return new Color(0.28f, 0.3f, 0.26f);
+            return Noise(x, y, 19) < 0.18f ? new Color(0.36f, 0.5f, 0.3f) : new Color(0.46f, 0.47f, 0.42f); // 이끼 낀 돌
+        }
+
+        private static Color RuinFloor(int x, int y)
+        {
+            if (x % 8 == 0 || y % 8 == 0) return new Color(0.55f, 0.57f, 0.5f);
+            return Noise(x, y, 23) < 0.06f ? new Color(0.5f, 0.62f, 0.45f) : new Color(0.66f, 0.68f, 0.6f);
+        }
+
+        // 단어 석판: 회색 돌판에 글자 줄 (풀면 금빛)
+        private static Func<int, int, Color> TabletPixel(bool solved) => (x, y) =>
+        {
+            if (x < 3 || x > 12 || y < 1 || y > 14) return Color.clear;
+            if (x == 3 || x == 12 || y == 1 || y == 14) return new Color(0.22f, 0.22f, 0.24f);
+            if (y % 3 == 0 && x >= 5 && x <= 10) return solved ? new Color(1f, 0.85f, 0.3f) : new Color(0.3f, 0.3f, 0.34f);
+            return solved ? new Color(0.78f, 0.72f, 0.5f) : new Color(0.58f, 0.58f, 0.62f);
+        };
+
+        // 유적 제단: 잠든 석상 (깨어나면 빈 받침)
+        private static Color ShrinePixel(int x, int y)
+        {
+            if (y <= 3 && x >= 2 && x <= 13) return new Color(0.42f, 0.44f, 0.4f);
+            if (Distance(x, y - 4) <= 3.2f && y >= 9) return new Color(0.55f, 0.66f, 0.5f);
+            if (y >= 4 && y <= 9 && x >= 5 && x <= 10) return new Color(0.5f, 0.6f, 0.46f);
             return Color.clear;
         }
 

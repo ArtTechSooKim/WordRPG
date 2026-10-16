@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71c0dd365e2553c48922bec3a339f174, type: 3}
+  m_Name: doc_fill_blank
+  m_EditorClassIdentifier: WordRPG::WordRPG.Monsters.SkillData
+  skillId: doc_fill_blank
+  displayName: "\uBE48\uCE78 \uCC44\uC6B0\uAE30"
+  description: "\uBE48\uCE78\uC5D0 \uAF2D \uB9DE\uB294 \uB2E8\uC5B4\uB97C \uB5A0\uC62C\uB824
+    \uC801 \uD558\uB098\uB97C \uD06C\uAC8C \uACF5\uACA9\uD55C\uB2E4."
+  kind: 0
+  target: 0
+  power: 38
+  quizDirection: 1

@@ -12,13 +12,39 @@ namespace WordRPG.UI
         private const string Folder = "Art/NinjaAdventure/Tiles/";
         private static readonly Dictionary<string, Sprite> Cache = new Dictionary<string, Sprite>();
 
-        // done: 연 보물상자, 쓰러뜨린 보스 자리(빈자리), 사전이 놓인 받침대, 연 보스 방 문(길), 열쇠를 가져간 빈 받침대
+        // done: 연 보물상자, 쓰러뜨린 보스 자리(빈자리), 사전이 놓인 받침대, 연 보스 방 문(길), 열쇠를 가져간 빈 받침대,
+        //       당긴 레버, 놓인 덩굴 다리, 푼 석판, 깨어난 유적 제단(빈 받침) (#80)
         public static Sprite ForTile(FieldTile tile, FieldTheme theme, bool done)
         {
             bool hasDone = done && (tile == FieldTile.Chest || tile == FieldTile.Boss || tile == FieldTile.Lectern
-                                    || tile == FieldTile.Gate || tile == FieldTile.Key);
+                                    || tile == FieldTile.Gate || tile == FieldTile.Key || tile == FieldTile.Lever
+                                    || tile == FieldTile.Bridge || tile == FieldTile.Tablet || tile == FieldTile.Shrine);
             return Load($"{theme}_{tile}{(hasDone ? "_done" : "")}") ?? PlaceholderArt.ForTile(tile, theme, done);
         }
+
+        // 덩굴 다리 (#80): 놓기 전엔 물 위 희미한 판자 윤곽(무엇이 생기는지 보이게), 놓으면 덩굴 난간 판자 다리. 가로로 건너면 _h 그림
+        public static Sprite ForBridge(FieldTheme theme, bool built, bool horizontal) =>
+            Load($"{theme}_Bridge{(horizontal ? "_h" : "")}{(built ? "_done" : "")}") ?? ForTile(FieldTile.Bridge, theme, built);
+
+        // 칸보다 큰 그림 (#80): 유적 제단의 잠든 석상(2×2), 동굴 입구(3×3) — Tiles/{테마}_{종류}_prop.png, 16px = 1칸.
+        // 바닥 칸 위에 아래 가운데를 맞춰 따로 그린다. 끝난 칸(동료가 깨어난 제단)은 없음
+        public static Sprite Prop(FieldTile tile, FieldTheme theme, bool done)
+        {
+            if (done || (tile != FieldTile.Shrine && tile != FieldTile.Cave)) return null;
+            string key = $"{theme}_{tile}_prop";
+            if (PropCache.TryGetValue(key, out var cached)) return cached;
+            var texture = Resources.Load<Texture2D>(Folder + key);
+            Sprite sprite = null;
+            if (texture != null)
+            {
+                sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0f), 16, 0, SpriteMeshType.FullRect);
+                sprite.name = key;
+            }
+            PropCache[key] = sprite;
+            return sprite;
+        }
+
+        private static readonly Dictionary<string, Sprite> PropCache = new Dictionary<string, Sprite>();
 
         // 출입구: 잠겼으면 {테마}_Door_locked(막힌 길), 아니면 도착 지역 테마 전용 그림 {테마}_Door_{도착 테마}
         // (예: 초원 → 숲은 그늘진 숲길 입구)이 있으면 그것, 없으면 {테마}_Door
@@ -78,6 +104,17 @@ namespace WordRPG.UI
                         case FieldTile.Lawn:
                         case FieldTile.Boss: return Rgb(0xD2EBA0);  // 숲 풀 (보스 빈자리는 풀밭)
                         default: return Rgb(0xE3CDB8);              // 숲 흙길
+                    }
+                case FieldTheme.Jungle: // 정글 (#80): 진흙길 · 짙은 풀 · 이끼 땅 · 얕은 강은 물보라 · 유적은 돌가루
+                    switch (tile)
+                    {
+                        case FieldTile.Grass: return Rgb(0xC8E89A);
+                        case FieldTile.Lawn:
+                        case FieldTile.Boss: return Rgb(0xB5DC8C);
+                        case FieldTile.Stream: return Rgb(0xD6F2FF);
+                        case FieldTile.RuinFloor:
+                        case FieldTile.Bridge: return Rgb(0xDDE0CC);
+                        default: return Rgb(0xD9B79A);
                     }
                 default:
                     switch (tile)

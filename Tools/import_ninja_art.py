@@ -30,6 +30,11 @@ MONSTERS = {
     "squiggle_snake": ("Actor/Monsters/Snake2/Snake2.png", 16),          # 꼬부랑뱀
     "question_owl": ("Actor/Monsters/Owl/Owl.png", 16),                  # 물음표부엉이
     "boss_muddle_raccoon": ("Actor/Boss/GiantRacoon/Idle.png", 60),      # 헷갈너구리
+    # 1.1 메아리 정글 (#80, 이름·그림 사용자 결정 — 받침갓파는 KappaGreen이 이미 까먹깨비라 같은 갓파의 빨간 그림)
+    "tail_lizard": ("Actor/Monsters/Lizard/Lizard.png", 16),             # 말꼬리 도마뱀
+    "batchim_kappa": ("Actor/Monsters/KappaRed/SpriteSheet.png", 16),    # 받침갓파
+    "mimic_octopus": ("Actor/Monsters/GreenOctopus/SpriteSheet.png", 16),  # 흉내문어 (강·뗏목 길)
+    "boss_blank_frog": ("Actor/Boss/GiantFrog/Idle40x40.png", 40),       # 빈칸두꺼비
 }
 
 PLAYER = "Actor/Characters/Boy/SpriteSheet.png"
@@ -44,6 +49,10 @@ RELICS = {
     "relic_whip": ("Items/Weapons/Whip/Sprite.png", None),                # 덩굴 채찍 (숲 상자)
     "relic_hourglass": ("Items/Object/Hourglass.png", None),              # 시간의 모래시계 (숲 상자)
     "relic_leaf": ("Items/Food/TeaLeaf.png", None),                       # 세계수 잎 (숲 보스 보상)
+    # 1.1 메아리 정글 (#80)
+    "relic_flute": ("Items/Object/PanFlute.png", None),                   # 메아리 피리 (유적 상자)
+    "relic_gourd": ("Items/Object/Gourd.png", None),                      # 정글 조롱박 (강 위쪽 모래톱 상자)
+    "relic_letter_gem": ("Items/Resource/GemGreen.png", None),            # 글자 구슬 (빈칸두꺼비 보상)
 }
 
 # itemId: 그림 경로 (도트 아이템)
@@ -59,6 +68,15 @@ ITEMS = {
     # 보스 방 열쇠 (#76): 맵 'K' 받침대에서 찾음
     "library_key": "Items/Treasure/GoldKey.png",
     "forest_key": "Items/Treasure/SilverKey.png",
+    # 1.1 메아리 정글 (#80)
+    "jungle_key": "Items/Treasure/GoldKey.png",            # 이끼빛으로 물들임 (ITEM_TINTS)
+    "keepsake_jungle": "Items/Resource/Grass.png",         # 메아리 풀잎 책갈피 (정글 도감 완성 징표)
+    "vine_fiber": "Items/Resource/Branch.png",             # 덩굴 섬유 (정글 성유물 강화 재료)
+    "skilldoc_fill_blank": "Items/Scroll/ScrollEmpty.png", # 기술문서: 빈칸 채우기 (빈칸두꺼비) — 빈 두루마리
+}
+# 같은 그림을 다른 색으로 (채널별 곱)
+ITEM_TINTS = {
+    "jungle_key": (0.75, 1.0, 0.62),
 }
 
 # 동료 (#77, 1.1 메아리 정글): companionId → 팩 캐릭터 폴더. 얼굴(Faceset) → Companions/{id}.png, 걷기 시트 → Companions/{id}_sheet.png
@@ -84,6 +102,7 @@ MUSIC = {
     "battle": "Audio/Musics/17 - Fight.ogg",
     "boss": "Audio/Musics/28 - Tension.ogg",
     "forest": "Audio/Musics/11 - Clearing.ogg",
+    "jungle": "Audio/Musics/30 - Ruins.ogg",  # 1.1 메아리 정글 (#80) — 고대 유적이 있는 정글
 }
 SFX = {
     "click": "Audio/Sounds/Menu/Move2.wav",  # 가벼운 찰칵 (0.04초)
@@ -437,7 +456,11 @@ def copy_relics_and_items(pack):
         else:
             shutil.copyfile(os.path.join(pack, rel), dst)
     for item_id, rel in ITEMS.items():
-        shutil.copyfile(os.path.join(pack, rel), os.path.join(OUT, "Items", item_id + ".png"))
+        dst = os.path.join(OUT, "Items", item_id + ".png")
+        if item_id in ITEM_TINTS:
+            save_if_changed(tint(Image.open(os.path.join(pack, rel)).convert("RGBA"), ITEM_TINTS[item_id]), dst)
+        else:
+            shutil.copyfile(os.path.join(pack, rel), dst)
     print("relics", len(RELICS), "+ items", len(ITEMS), "->", OUT)
 
 
@@ -569,6 +592,10 @@ def build_tiles(pack):
     # 숲: 흙길(진초록 테두리), 늪 물가(연두를 이끼색으로)
     autos["Forest_Floor_auto"] = auto_atlas(pack, template, "TilesetFloor.png", 11, 7)
     autos["Forest_Water_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6, forest_water)
+    # 숲 → 정글 출입구: 덩굴이 드리운 그늘진 길 (#80)
+    themes["Forest"]["Door_Jungle"] = over(shade_top(tint(dirt, (0.8, 0.95, 0.8)), 10, 0.4), pack.tile("TilesetFloorDetail.png", 7, 2))
+
+    build_jungle(pack, themes, autos, template, lectern, key_stand, keyhole, big_chest, gem, stall, brambles, pond, gold_key)
 
     folder = os.path.join(OUT, "Tiles")
     os.makedirs(folder, exist_ok=True)
@@ -578,6 +605,172 @@ def build_tiles(pack):
     for name, img in autos.items():
         save_if_changed(img, os.path.join(folder, name + ".png"))
     print("tiles", sum(len(t) for t in themes.values()), "+ autotile", len(autos), "->", folder)
+
+
+# ------------------------------------------------------------------ 1.1 메아리 정글 (#80, GDD 9-6)
+# 진흙길(짙은 초록 테두리) · 짙은 이끼 땅 · 고사리 풀숲(보이는 몬스터 서식지) · 야자 덤불 벽 · 청록 깊은 강 · 옅은 얕은 강 ·
+# 나루터 판자 · 레버(막대) · 덩굴 다리(놓기 전엔 물 위 희미한 판자 윤곽 — 사용자: 무엇이 생기는지 미리 보이게) ·
+# 이끼 낀 유적 돌벽·바닥 · 단어 석판(풀면 금빛) · 잠든 석상(유적 제단 — 깨어나면 빈 받침) · 바리케이드 친 동굴 입구(1.2) · 빈칸두꺼비
+
+def jungle_mud(t):
+    """숲 흙길 조각을 정글 진흙길로: 흙은 붉은 진흙빛, 테두리 풀은 짙은 초록"""
+    out = t.copy()
+    px = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            r, g, b, a = px[x, y]
+            if g > r:   # 풀 테두리 — 이끼 땅(Lawn)과 같은 비율로 (팩의 풀색이 같아서 경계가 안 보이게)
+                px[x, y] = (int(r * 0.6), int(g * 0.8), int(b * 0.62), a)
+            else:       # 흙
+                px[x, y] = (int(r * 0.85), int(g * 0.72), int(b * 0.62), a)
+    return out
+
+
+def jungle_water(t):
+    """깊은 강: 물은 짙은 청록, 물가 풀은 짙은 초록"""
+    out = t.copy()
+    px = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            r, g, b, a = px[x, y]
+            if b > r + 50:
+                px[x, y] = (int(r * 0.35), int(g * 0.62), int(b * 0.72), a)
+            elif g >= r * 0.9 and g > b + 30:  # 물가 연두 → 이끼 땅 색 (173,188,58 → 69,130,32)
+                px[x, y] = (int(r * 0.4), int(g * 0.69), int(b * 0.55), a)
+    return out
+
+
+def jungle_stream(t):
+    """얕은 강: 깊은 강보다 옅은 물빛 (걸을 수 있다는 게 보이게 — 바닥 모래가 비치는 느낌), 물가는 정글 초록"""
+    out = t.copy()
+    px = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            r, g, b, a = px[x, y]
+            if b > r + 50:
+                px[x, y] = (int(r * 0.55 + 52), int(g * 0.72 + 40), int(b * 0.78 + 20), a)
+            elif g >= r * 0.9 and g > b + 30:  # 물가 연두 → 이끼 땅 색 (173,188,58 → 69,130,32)
+                px[x, y] = (int(r * 0.4), int(g * 0.69), int(b * 0.55), a)
+    return out
+
+
+def flagstones(t):
+    """유적 바닥: 옛 돌판 줄눈(8칸마다 어두운 줄) + 군데군데 이끼"""
+    out = t.copy()
+    px = out.load()
+    moss = {(3, 5), (4, 5), (12, 11), (13, 12), (11, 2)}
+    for y in range(out.height):
+        for x in range(out.width):
+            r, g, b, a = px[x, y]
+            if x in (7, 15) or y in (7, 15):
+                px[x, y] = (int(r * 0.78), int(g * 0.8), int(b * 0.78), a)
+            elif (x, y) in moss:
+                px[x, y] = (int(r * 0.7), min(255, int(g * 1.08)), int(b * 0.65), a)
+    return out
+
+
+def mirror(img):
+    return img.transpose(Image.FLIP_LEFT_RIGHT)
+
+
+def faded(img, alpha):
+    out = img.copy()
+    px = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            r, g, b, a = px[x, y]
+            px[x, y] = (r, g, b, int(a * alpha))
+    return out
+
+
+def vine_rails(planks, vertical):
+    """판자 다리 양옆에 덩굴 난간 (세로 다리 = 왼·오른쪽, 가로 다리 = 위·아래)"""
+    out = planks.copy()
+    px = out.load()
+    leaf, dark = (92, 168, 64, 255), (40, 96, 44, 255)
+    for i in range(16):
+        for edge in (0, 15):
+            x, y = (edge, i) if vertical else (i, edge)
+            px[x, y] = dark
+            inner = (1 if edge == 0 else 14)
+            if i % 4 in (0, 1):
+                ix, iy = (inner, i) if vertical else (i, inner)
+                px[ix, iy] = leaf
+    return out
+
+
+def build_jungle(pack, themes, autos, template, lectern, key_stand, keyhole, big_chest, gem, stall, brambles, pond, gold_key):
+    moss = tint(pack.tile("TilesetField.png", 1, 7), (0.6, 0.8, 0.62))       # 짙은 이끼 땅 (조우 없음) — 숲보다 어둡고 푸르게
+    deep = tint(moss, (0.6, 0.72, 0.62))
+    mud = jungle_mud(pack.tile("TilesetFloor.png", 12, 8))                  # 진흙길 가운데 조각
+    water = jungle_water(pack.tile("TilesetWater.png", 1, 7))
+    stream = jungle_stream(pack.tile("TilesetWater.png", 1, 7))
+    ruin_floor = flagstones(pack.tile("Interior/TilesetInteriorFloor.png", 12, 7))  # 초록빛 옛 돌바닥
+    ruin_wall = tint(pack.tile("TilesetReliefDetail.png", 1, 2), (0.92, 1.05, 0.88))  # 이끼 낀 돌벽
+    planks = pack.tile("TilesetWater.png", 1, 13)                           # 세로 판자
+    frog = pack.frame("Actor/Boss/GiantFrog/Idle40x40.png", 0, 40)
+    frog = frog.crop(frog.getbbox())
+    stele = pack.tile("TilesetElement.png", 5, 2)                           # 글자가 새겨진 비석 = 단어 석판
+    lever = pack.tile("TilesetElement.png", 6, 4)                           # 받침에 꽂힌 막대 = 레버
+    statue = pack.image(TILESETS + "TilesetVillageAbandoned.png").crop((0, 48, 32, 80))  # 이끼 낀 앉은 석상 (2×2)
+    cave = pack.image(TILESETS + "TilesetReliefDetail.png").crop((0, 112, 48, 160))     # 판자로 막은 동굴 (3×3)
+    fern = pack.tile("TilesetNature.png", 9, 11)                            # 밝은 고사리
+    palm = pack.tile("TilesetNature.png", 5, 11)                            # 짙은 야자잎
+    bush = tint(pack.tile("TilesetNature.png", 10, 9), (0.45, 0.78, 0.5))
+    jungle_key = tint(gold_key, (0.75, 1.0, 0.62))                          # 이끼빛 열쇠
+
+    wall = over(deep, bush)
+    wall.alpha_composite(palm, (0, 0), (0, 3))  # 야자잎을 조금 위로
+    themes["Jungle"] = {
+        "Floor": mud,
+        "Lawn": moss,
+        "Grass": over(moss, fern),
+        "Wall": wall,
+        "Water": water,
+        "Door": shade_top(tint(mud, (1.1, 1.05, 0.95)), 16, 1.2),          # 밝은 길 = 숲으로 돌아가는 길
+        "Door_locked": over(moss, brambles),
+        "Fountain": pond_on(moss, pond),
+        "Chest": over(moss, big_chest[0]),
+        "Chest_done": over(moss, big_chest[1]),
+        "Altar": over(moss, gem),
+        "Shop": over(moss, stall),
+        "Boss": over(moss, frog, scale=3),
+        "Boss_done": moss.copy(),
+        "Lectern": lectern(moss, False),
+        "Lectern_done": lectern(moss, True),
+        "Gate": tint(keyhole[0], (0.7, 0.92, 0.62)),                        # 덩굴 낀 열쇠 구멍 블록
+        "Gate_done": mud,
+        "Key": key_stand(moss, jungle_key),
+        "Key_done": lectern(moss, False),
+        # 정글 칸
+        "Stream": stream,
+        "Dock": over(water, planks.rotate(90)),                              # 물가에 놓인 가로 판자
+        "Lever": over(moss, lever),
+        "Lever_done": over(moss, tint(mirror(lever), (1.15, 1.1, 0.8))),     # 반대쪽으로 넘어간 막대
+        "Bridge": over(water, faded(planks, 0.38)),                          # 놓이기 전: 희미한 다리 윤곽
+        "Bridge_done": vine_rails(planks, True),                             # 세로로 건너는 덩굴 다리
+        "Bridge_h": over(water, faded(planks.rotate(90), 0.38)),
+        "Bridge_h_done": vine_rails(planks.rotate(90), False),               # 가로로 건너는 덩굴 다리
+        "RuinWall": ruin_wall,
+        "RuinFloor": ruin_floor,
+        "Tablet": over(ruin_floor, stele),
+        "Tablet_done": over(ruin_floor, tint(stele, (1.3, 1.12, 0.55))),     # 빈칸을 채워 금빛
+        "Shrine": lectern(ruin_floor, False),                                # 받침 (위에 석상 그림 Shrine_prop)
+        "Shrine_done": lectern(ruin_floor, False),                           # 깨어나 빈 받침
+        "Cave": moss.copy(),                                                 # 바닥 (위에 동굴 그림 Cave_prop)
+        # 큰 그림 (FieldArt.Prop — 16px = 1칸이라 칸보다 크게, 아래 가운데를 칸에 맞춰 그 위에 그림)
+        "Shrine_prop": statue,                                               # 이끼 낀 앉은 석상 2×2 (잠든 아라)
+        "Cave_prop": cave,                                                   # 판자로 막은 동굴 3×3 (1.2)
+    }
+    autos["Jungle_Floor_auto"] = auto_atlas(pack, template, "TilesetFloor.png", 11, 7, jungle_mud)
+    autos["Jungle_Water_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6, jungle_water)
+    autos["Jungle_Stream_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6, jungle_stream)
+
+    # 필드 위 그림 (#80): 뗏목(32×16, 가로), 물살 물결(16×16 4프레임 — 얕은 강 위를 물살 방향으로 흘러감)
+    field = os.path.join(OUT, "Field")
+    os.makedirs(field, exist_ok=True)
+    save_if_changed(pack.image(TILESETS + "TilesetWater.png").crop((26 * 16, 0, 28 * 16, 16)), os.path.join(field, "raft.png"))
+    save_if_changed(pack.image("Backgrounds/Animated/Water Ripples/SpriteSheet16x16.png"), os.path.join(field, "ripple.png"))
 
 
 def main():

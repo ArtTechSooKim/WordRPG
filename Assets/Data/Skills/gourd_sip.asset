@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71c0dd365e2553c48922bec3a339f174, type: 3}
+  m_Name: gourd_sip
+  m_EditorClassIdentifier: WordRPG::WordRPG.Monsters.SkillData
+  skillId: gourd_sip
+  displayName: "\uC870\uB871\uBC15 \uD55C \uBAA8\uAE08"
+  description: "\uC2DC\uC6D0\uD55C \uC815\uAE00 \uC0D8\uBB3C\uC744 \uB098\uB220 \uB9C8\uC154
+    \uBAA8\uB450\uC758 HP\uB97C \uD68C\uBCF5\uD55C\uB2E4."
+  kind: 1
+  target: 3
+  power: 12
+  quizDirection: 1

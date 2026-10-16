@@ -19,16 +19,21 @@ namespace WordRPG.Field
 
         public bool EnteredGrass => Kind == StepKind.Moved && TargetTile == FieldTile.Grass;
         public bool EnteredDoor => Kind == StepKind.Moved && TargetTile == FieldTile.Door;
+        public bool Boarded { get; } // 나루터에서 깊은 강으로 → 뗏목에 탐 (#80)
+        public bool Landed { get; }  // 뗏목으로 나루터에 닿음 → 내림
 
-        public StepOutcome(StepKind kind, Vector2Int target, FieldTile targetTile)
+        public StepOutcome(StepKind kind, Vector2Int target, FieldTile targetTile, bool boarded = false, bool landed = false)
         {
             Kind = kind;
             Target = target;
             TargetTile = targetTile;
+            Boarded = boarded;
+            Landed = landed;
         }
     }
 
-    // 격자 위 한 칸씩 이동. 막힌 칸 쪽으로 누르면 방향만 바뀐다 (상자·제단 등은 그쪽을 보고 [확인])
+    // 격자 위 한 칸씩 이동. 막힌 칸 쪽으로 누르면 방향만 바뀐다 (상자·제단 등은 그쪽을 보고 [확인]).
+    // 뗏목 (#80, 사용자 결정 '직접 몰기'): 나루터에서 깊은 강 쪽으로 가면 타고, 그 강 위만 다니다가 나루터에 닿으면 내린다 (땅에는 못 올라감)
     public class FieldWalker
     {
         private readonly Func<Vector2Int, bool> isLockedDoor;
@@ -37,18 +42,26 @@ namespace WordRPG.Field
         public FieldMap Map { get; }
         public Vector2Int Position { get; private set; }
         public Direction Facing { get; private set; } = Direction.Down;
+        public bool Rafting { get; private set; }
 
         // lockedDoor: 그 칸의 출입구가 지금 잠겨 있는지 (없으면 모든 출입구가 열림)
         // cleared: 원래 막힌 칸이지만 이제 지나갈 수 있는 칸 (쓰러뜨린 보스 자리 — 사전이 쉼터로 옮겨져 빈자리, #45)
-        public FieldWalker(FieldMap map, Vector2Int position, Func<Vector2Int, bool> lockedDoor = null, Func<Vector2Int, bool> cleared = null)
+        // rafting: 뗏목에 탄 채로 시작 (세이브가 강 위였을 때)
+        public FieldWalker(FieldMap map, Vector2Int position, Func<Vector2Int, bool> lockedDoor = null, Func<Vector2Int, bool> cleared = null,
+            bool rafting = false)
         {
             Map = map ?? throw new ArgumentNullException(nameof(map));
             isLockedDoor = lockedDoor;
             isCleared = cleared;
-            WarpTo(position);
+            WarpTo(position, rafting);
         }
 
-        public bool CanStand(Vector2Int position) => Map.IsWalkable(position) || (isCleared != null && Map.InBounds(position) && isCleared(position));
+        public bool CanStand(Vector2Int position) => CanStand(position, Rafting);
+
+        // rafting: 뗏목에 탄 채로 설 수 있는지 (뗏목은 강 물 위, 걸어서는 걸을 수 있는 칸)
+        public bool CanStand(Vector2Int position, bool rafting) =>
+            rafting ? Map.IsRaftWater(position)
+                    : Map.IsWalkable(position) || (isCleared != null && Map.InBounds(position) && isCleared(position));
 
         public StepOutcome TryStep(Direction direction)
         {
@@ -56,35 +69,50 @@ namespace WordRPG.Field
             var target = Position + direction.ToOffset();
             var tile = Map.Get(target);
 
+            if (Rafting)
+            {
+                if (Map.IsRaftWater(target))
+                {
+                    Position = target;
+                    return new StepOutcome(StepKind.Moved, target, tile);
+                }
+                if (tile == FieldTile.Dock)
+                {
+                    Rafting = false;
+                    Position = target;
+                    return new StepOutcome(StepKind.Moved, target, tile, landed: true);
+                }
+                return new StepOutcome(FieldMap.IsInteractive(tile) ? StepKind.BlockedByObject : StepKind.Blocked, target, tile);
+            }
+
             if (tile == FieldTile.Door && isLockedDoor != null && isLockedDoor(target))
                 return new StepOutcome(StepKind.BlockedByGate, target, tile);
 
-            switch (tile)
+            if (Map.Get(Position) == FieldTile.Dock && Map.IsRaftWater(target))
             {
-                case FieldTile.Floor:
-                case FieldTile.Lawn:
-                case FieldTile.Grass:
-                case FieldTile.Door:
-                    Position = target;
-                    return new StepOutcome(StepKind.Moved, target, tile);
-                default:
-                    if (isCleared != null && isCleared(target))
-                    {
-                        Position = target;
-                        return new StepOutcome(StepKind.Moved, target, tile);
-                    }
-                    return new StepOutcome(FieldMap.IsInteractive(tile) ? StepKind.BlockedByObject : StepKind.Blocked, target, tile);
+                Rafting = true;
+                Position = target;
+                return new StepOutcome(StepKind.Moved, target, tile, boarded: true);
             }
+
+            if (FieldMap.IsWalkable(tile) || (isCleared != null && isCleared(target)))
+            {
+                Position = target;
+                return new StepOutcome(StepKind.Moved, target, tile);
+            }
+            return new StepOutcome(FieldMap.IsInteractive(tile) ? StepKind.BlockedByObject : StepKind.Blocked, target, tile);
         }
 
         // [확인]으로 옆 칸을 쓸 때 그쪽을 바라보게
         public void Face(Direction direction) => Facing = direction;
 
-        public void WarpTo(Vector2Int position)
+        // rafting: 뗏목에 탄 채로 (세이브에서 강 위로 돌아올 때)
+        public void WarpTo(Vector2Int position, bool rafting = false)
         {
-            if (!CanStand(position))
+            if (!CanStand(position, rafting))
                 throw new ArgumentException($"{position}은(는) 걸을 수 없는 칸입니다", nameof(position));
             Position = position;
+            Rafting = rafting;
         }
     }
 

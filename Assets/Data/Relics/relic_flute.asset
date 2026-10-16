@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35710cec1d88f164fb5d9f37dda09273, type: 3}
+  m_Name: relic_flute
+  m_EditorClassIdentifier: WordRPG::WordRPG.Heroes.RelicData
+  relicId: relic_flute
+  displayName: "\uBA54\uC544\uB9AC \uD53C\uB9AC"
+  description: "\uC720\uC801\uC5D0 \uC7A0\uB4E4\uC5B4 \uC788\uB358 \uD53C\uB9AC.
+    \uBD88\uBA74 \uBA54\uC544\uB9AC\uAC00 \uC7A5\uB9C9\uCC98\uB7FC \uB458\uB7EC\uC2FC\uB2E4."
+  role: 1
+  icon: {fileID: 0}
+  placeholderColor: {r: 0.75, g: 0.55, b: 0.3, a: 1}
+  skill: {fileID: 11400000, guid: cdf206dc3261ac141816b3518c7c3945, type: 2}
+  awakenedSkill: {fileID: 11400000, guid: ad12c2b54c3bf0b4d9737135c2cc82fa, type: 2}
+  awakenLevel: 3
+  baseBonus:
+    maxHp: 20
+    attack: 0
+    defense: 6
+  bonusPerLevel:
+    maxHp: 6
+    attack: 0
+    defense: 2
+  upgradeItem: {fileID: 11400000, guid: 1d092ce90d9d84943b83f6cc850b7c01, type: 2}
+  upgradeCosts:
+  - itemCount: 1
+    gold: 30
+  - itemCount: 2
+    gold: 60
+  - itemCount: 2
+    gold: 90
+  - itemCount: 3
+    gold: 120
+  - itemCount: 3
+    gold: 150

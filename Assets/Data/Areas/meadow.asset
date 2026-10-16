@@ -112,6 +112,8 @@ MonoBehaviour:
   words: {fileID: 11400000, guid: 89d1f80701129f84bad1df742f174dae, type: 2}
   encounterRate: 0.12
   minStepsBetweenEncounters: 4
+  encounterStyle: 0
+  waterEncounters: {fileID: 0}
   shop: {fileID: 11400000, guid: 8910f903f6d24d547b0b0e158f0d6404, type: 2}
   chests:
   - item: {fileID: 11400000, guid: 83903ba43d39288409cddb3a5f7b0f43, type: 2}
@@ -143,10 +145,16 @@ MonoBehaviour:
     targetDoorIndex: 0
     openedByBossOf: {fileID: 0}
   - target: {fileID: 11400000, guid: a3e19a296f3df11468a130c5e27e87f5, type: 2}
-    targetDoorIndex: 0
+    targetDoorIndex: 1
     openedByBossOf: {fileID: 11400000, guid: 2f0f21b4f39acf14fab8b7273b5e1a17, type: 2}
   boss:
     species: {fileID: 0}
     level: 7
     rewardRelic: {fileID: 0}
     rewardItem: {fileID: 0}
+  bossKey: {fileID: 0}
+  bossGateWords: 40
+  shrineCompanion: {fileID: 0}
+  shrineWords: 60
+  requiresFullVersion: 0
+  dictionaryName: 

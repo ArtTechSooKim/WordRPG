@@ -19,11 +19,17 @@ namespace WordRPG.UI
         public static readonly Color32 Lectern = new Color32(240, 150, 70, 255); // 사전 받침대 (#45)
         public static readonly Color32 Gate = new Color32(214, 120, 60, 255);    // 보스 방 문 (#76)
         public static readonly Color32 Key = new Color32(255, 214, 64, 255);     // 열쇠 받침대 (#76)
+        public static readonly Color32 Lever = new Color32(255, 140, 40, 255);   // 레버 (#80) — 멀리서도 눈에 띄게
+        public static readonly Color32 Tablet = new Color32(240, 240, 232, 255); // 단어 석판
+        public static readonly Color32 Shrine = new Color32(255, 128, 200, 255); // 유적 제단 (동료)
+        public static readonly Color32 Cave = new Color32(28, 26, 30, 255);      // 동굴 입구 (1.2)
+        public static readonly Color32 Dock = new Color32(176, 112, 56, 255);    // 나루터
         public static readonly Color32 Fog = new Color32(20, 22, 34, 255); // 아직 안 가 본 칸
 
         // done: 연 상자·쓰러뜨린 보스 → 바닥색으로
         public static Color32 ColorOf(FieldTile tile, FieldTheme theme, bool done)
         {
+            if (theme == FieldTheme.Jungle) return JungleColorOf(tile, done);
             bool library = theme == FieldTheme.Library;
             bool forest = theme == FieldTheme.Forest;
             var floor = library ? new Color32(74, 63, 69, 255) : forest ? new Color32(150, 100, 64, 255) : new Color32(205, 140, 100, 255); // 초원 길 = 흙길
@@ -46,6 +52,45 @@ namespace WordRPG.UI
             }
         }
 
+        // 정글 (#80): 짙은 초록 바탕에 진흙길, 얕은 강은 밝은 하늘색(깊은 강보다 옅게), 유적은 돌빛
+        private static Color32 JungleColorOf(FieldTile tile, bool done)
+        {
+            var floor = new Color32(140, 96, 62, 255);
+            var water = new Color32(38, 104, 150, 255);
+            var ruinFloor = new Color32(168, 170, 140, 255);
+            switch (tile)
+            {
+                case FieldTile.Wall: return new Color32(14, 58, 30, 255);
+                case FieldTile.Grass: return new Color32(82, 150, 52, 255);
+                case FieldTile.Lawn: return new Color32(44, 108, 52, 255);
+                case FieldTile.Water: return water;
+                case FieldTile.Stream: return new Color32(104, 182, 222, 255);
+                case FieldTile.Bridge: return done ? new Color32(160, 116, 60, 255) : water; // 놓이기 전엔 물(골짜기)로
+                case FieldTile.RuinWall: return new Color32(104, 104, 96, 255);
+                case FieldTile.RuinFloor: return ruinFloor;
+                case FieldTile.Dock: return Dock;
+                case FieldTile.Lever: return Lever;
+                case FieldTile.Tablet: return done ? ruinFloor : Tablet;
+                case FieldTile.Shrine: return done ? ruinFloor : Shrine;
+                case FieldTile.Cave: return Cave;
+                case FieldTile.Chest: return done ? floor : Chest;
+                case FieldTile.Boss: return done ? floor : Boss;
+                case FieldTile.Fountain: return Fountain;
+                case FieldTile.Altar: return Altar;
+                case FieldTile.Shop: return Shop;
+                case FieldTile.Door: return Door;
+                case FieldTile.Lectern: return Lectern;
+                case FieldTile.Gate: return done ? floor : Gate;
+                case FieldTile.Key: return done ? Lectern : Key;
+                default: return floor;
+            }
+        }
+
+        // 미니맵에서 '끝난' 모습이 따로 있는 칸 (연 상자·쓰러뜨린 보스·연 문·가져간 열쇠·놓인 다리·푼 석판·깨어난 제단)
+        public static bool HasDoneLook(FieldTile tile) =>
+            tile == FieldTile.Chest || tile == FieldTile.Boss || tile == FieldTile.Gate || tile == FieldTile.Key
+            || tile == FieldTile.Bridge || tile == FieldTile.Tablet || tile == FieldTile.Shrine;
+
         // explored: 가 본 칸인지 (null = 전부 보임). 안 가 본 칸은 안개색 — 그 안의 상자·보스도 숨는다
         public static Texture2D Build(FieldMap map, FieldTheme theme, Func<Vector2Int, bool> done, Texture2D reuse = null,
             Func<Vector2Int, bool> explored = null)
@@ -67,8 +112,7 @@ namespace WordRPG.UI
             {
                 var cell = new Vector2Int(x, y);
                 var tile = map.Get(cell);
-                bool isDone = (tile == FieldTile.Chest || tile == FieldTile.Boss || tile == FieldTile.Gate || tile == FieldTile.Key)
-                              && done != null && done(cell);
+                bool isDone = HasDoneLook(tile) && done != null && done(cell);
                 bool seen = explored == null || explored(cell);
                 pixels[y * map.Width + x] = seen ? ColorOf(tile, theme, isDone) : Fog;
             }

@@ -239,12 +239,104 @@ namespace WordRPG.EditorTools
             Companion("ara", "아라", "유적에 갇혀 고대 단어를 지키던 정글 소녀. 석판의 빈칸을 채워 준 주인공을 따라 함께 떠난다.",
                 "정글 소녀 · 회복·보조", new MonsterStats(52, 11, 11), new MonsterStats(6, 2, 2), araPebble, (1, araSprout), (8, araEcho));
 
-            // --- 출입구 연결 (맵의 D를 위→아래, 왼→오른 순): 초원 0 = 서고, 초원 1 = 숲(서고 보스를 물리치면 열림) ---
+            // --- 1.1 메아리 정글 (#80, GDD 9-6): 숲 보스 뒤 새 지역(정식판). 보이는 몬스터 + [선제공격], 깊은 강은 뗏목, 유적에서 아라 ---
+            var vineFiber = Item("vine_fiber", "덩굴 섬유", "정글 덩굴에서 뽑은 질긴 섬유. 정글의 성유물을 강화한다.", new Color(0.4f, 0.65f, 0.25f));
+            var jungleKeepsake = Item("keepsake_jungle", "메아리 풀잎 책갈피",
+                "메아리 정글 도감을 완성한 증표. 귀에 대면 단어가 메아리처럼 들리는 풀잎이 끼워져 있다.", new Color(0.35f, 0.75f, 0.4f), ItemKind.Keepsake);
+            var jungleKey = Item("jungle_key", "정글 열쇠", "메아리 정글 깊은 곳, 빈칸두꺼비의 공터 문을 여는 이끼 낀 열쇠.",
+                new Color(0.6f, 0.85f, 0.4f), ItemKind.Key);
+            var echoVeil = Skill("flute_echo_veil", "메아리 장막", "피리 소리가 메아리 장막이 되어 모두를 지킨다.", SkillKind.Guard, SkillTarget.AllAllies, 10, QuizDirection.MeaningToEnglish);
+            var echoWall = Skill("flute_echo_wall", "겹메아리 방벽", "메아리가 겹겹이 울려 단단한 방벽을 세운다.", SkillKind.Guard, SkillTarget.AllAllies, 16, QuizDirection.MeaningToEnglish);
+            var gourdSip = Skill("gourd_sip", "조롱박 한 모금", "시원한 정글 샘물을 나눠 마셔 모두의 HP를 회복한다.", SkillKind.Heal, SkillTarget.AllAllies, 12, QuizDirection.MeaningToEnglish);
+            var gourdSpring = Skill("gourd_spring", "솟아나는 샘", "조롱박에서 샘물이 솟아 모두의 HP를 크게 회복한다.", SkillKind.Heal, SkillTarget.AllAllies, 20, QuizDirection.MeaningToEnglish);
+            var letterShower = Skill("gem_letter_shower", "글자 소나기", "구슬에 갇혀 있던 글자들이 쏟아져 적 전체를 때린다.", SkillKind.Damage, SkillTarget.AllEnemies, 24, QuizDirection.MeaningToEnglish);
+            var letterEcho = Skill("gem_letter_echo", "메아리 글자비", "되찾은 글자가 메아리치며 적 전체에 쏟아진다.", SkillKind.Damage, SkillTarget.AllEnemies, 34, QuizDirection.MeaningToEnglish);
+            var flute = Relic("relic_flute", "메아리 피리", "유적에 잠들어 있던 피리. 불면 메아리가 장막처럼 둘러싼다.", MonsterRole.Defender,
+                new Color(0.75f, 0.55f, 0.3f), echoVeil, echoWall, new MonsterStats(20, 0, 6), new MonsterStats(6, 0, 2), vineFiber);
+            var gourd = Relic("relic_gourd", "정글 조롱박", "강 위쪽 모래톱에 떠밀려 온 조롱박. 함께 다니는 동료까지 시원하게 회복시킨다.", MonsterRole.Supporter,
+                new Color(0.85f, 0.7f, 0.35f), gourdSip, gourdSpring, new MonsterStats(25, 0, 2), new MonsterStats(6, 0, 1), vineFiber);
+            var letterGem = Relic("relic_letter_gem", "글자 구슬", "빈칸두꺼비가 삼켰던 석판의 글자들이 뭉친 구슬.", MonsterRole.Attacker,
+                new Color(0.4f, 0.85f, 0.5f), letterShower, letterEcho, new MonsterStats(0, 8, 0), new MonsterStats(0, 3, 0), vineFiber);
+            var fillBlank = Skill("doc_fill_blank", "빈칸 채우기", "빈칸에 꼭 맞는 단어를 떠올려 적 하나를 크게 공격한다.", SkillKind.Damage, SkillTarget.SingleEnemy, 38, QuizDirection.MeaningToEnglish);
+            var fillBlankDoc = Item("skilldoc_fill_blank", "기술문서: 빈칸 채우기", "읽으면 기술 '빈칸 채우기'를 배운다. 배워도 사라지지 않아 언제든 다시 배울 수 있다.",
+                new Color(0.9f, 0.9f, 0.8f), ItemKind.SkillDocument, taughtSkill: fillBlank);
+
+            var tailGrab = Skill("lizard_tail_grab", "말꼬리 잡기", "말꼬리를 붙잡고 늘어져 끝말을 흐리게 만든다.", SkillKind.Damage, SkillTarget.SingleEnemy, 22, QuizDirection.EnglishToMeaning);
+            var plateSplash = Skill("kappa_plate_splash", "물접시 튀기기", "머리 접시의 물을 사방에 튀긴다.", SkillKind.Damage, SkillTarget.AllEnemies, 14, QuizDirection.EnglishToMeaning);
+            var batchimSwap = Skill("kappa_batchim_swap", "받침 바꾸기", "받침을 몰래 바꿔 철자를 헷갈리게 한다.", SkillKind.Damage, SkillTarget.SingleEnemy, 20, QuizDirection.EnglishToMeaning);
+            var inkMimic = Skill("octopus_ink_mimic", "먹물 흉내", "들은 말을 엉터리로 흉내 내며 먹물을 뿜는다.", SkillKind.Damage, SkillTarget.AllEnemies, 16, QuizDirection.EnglishToMeaning);
+            var tongueLash = Skill("frog_tongue_lash", "혀 날름", "긴 혀를 날름 내밀어 후려친다.", SkillKind.Damage, SkillTarget.SingleEnemy, 30, QuizDirection.EnglishToMeaning);
+            var blankCroak = Skill("frog_blank_croak", "빈칸 울음", "개굴! 울음소리에 머릿속이 하얗게 빈칸이 된다.", SkillKind.Damage, SkillTarget.AllEnemies, 20, QuizDirection.EnglishToMeaning);
+            var gulp = Skill("frog_gulp", "꿀꺽 삼키기", "석판의 글자를 꿀꺽 삼켜 HP를 회복한다.", SkillKind.Heal, SkillTarget.Self, 16, QuizDirection.EnglishToMeaning);
+            var tailLizard = Monster("tail_lizard", "말꼬리 도마뱀", "남의 말꼬리를 잡고 늘어지는 도마뱀. 정글 풀숲을 재빠르게 누빈다.", MonsterRole.Attacker,
+                new Color(0.5f, 0.75f, 0.35f), new MonsterStats(28, 14, 10), new MonsterStats(5, 3, 2), new[] { tailGrab },
+                enemyExp: 14, enemyGold: 13, drops: new[] { new ItemDrop(vineFiber, 0.4f), new ItemDrop(shinyInk, 0.2f) });
+            var batchimKappa = Monster("batchim_kappa", "받침갓파", "머리 접시에 받침을 담고 다니며 몰래 바꿔 치는 갓파. 강가 풀숲에 산다.", MonsterRole.Defender,
+                new Color(0.85f, 0.35f, 0.3f), new MonsterStats(36, 13, 13), new MonsterStats(7, 2, 3), new[] { plateSplash, batchimSwap },
+                enemyExp: 16, enemyGold: 15, drops: new[] { new ItemDrop(vineFiber, 0.35f), new ItemDrop(hardCover, 0.25f) });
+            var mimicOctopus = Monster("mimic_octopus", "흉내문어", "들은 말을 엉터리로 흉내 내는 문어. 깊은 강에 살며 뗏목을 쫓아온다.", MonsterRole.Attacker,
+                new Color(0.4f, 0.7f, 0.45f), new MonsterStats(30, 15, 9), new MonsterStats(6, 3, 2), new[] { inkMimic },
+                enemyExp: 15, enemyGold: 14, drops: new[] { new ItemDrop(sparkleDust, 0.4f), new ItemDrop(vineFiber, 0.25f) });
+            var blankFrog = Monster("boss_blank_frog", "빈칸두꺼비", "유적 석판의 글자를 꿀꺽 삼켜 빈칸으로 만든 거대한 두꺼비. 정글의 메아리를 앗아 갔다.", MonsterRole.Attacker,
+                new Color(0.45f, 0.7f, 0.35f), new MonsterStats(90, 18, 16), new MonsterStats(10, 3, 3), new[] { tongueLash, blankCroak, gulp },
+                enemyExp: 70, enemyGold: 90,
+                drops: new[] { new ItemDrop(vineFiber, 1f, 3), new ItemDrop(shinyInk, 1f, 2), new ItemDrop(hardCover, 1f, 2), new ItemDrop(sparkleDust, 1f, 2) });
+            var jungleEncounters = Encounters("jungle_field", 1, 2,
+                new EncounterTable.Entry(tailLizard, 12, 14, 10),
+                new EncounterTable.Entry(batchimKappa, 13, 15, 8));
+            var riverEncounters = Encounters("jungle_river", 1, 2,
+                new EncounterTable.Entry(mimicOctopus, 13, 15, 10));
+
+            ConfigureRegion("Assets/Data/Words/tier3_jungle.asset", "jungle", "메아리 정글", jungleKeepsake, 800);
+            const string junglePath = "Assets/Data/Areas/jungle.asset";
+            // 보물상자 15개 (맵의 C를 위→아래, 왼→오른 순). 강 위쪽·아래쪽 모래톱 4개는 뗏목에서 [확인] (사용자)
+            Area("jungle", "메아리 정글", JungleMap, jungleEncounters,
+                AssetDatabase.LoadAssetAtPath<WordDatabase>("Assets/Data/Words/tier3_jungle.asset"),
+                new ChestContent(null, 0, 80, gourd),     // 강 위쪽 모래톱 — 정글 조롱박
+                new ChestContent(null, 0, 60, flute),     // 유적 북서 방 — 메아리 피리
+                new ChestContent(null, 0, 200),           // 유적 북동 방
+                new ChestContent(vineFiber, 3),           // 강 위쪽 모래톱 둘째
+                new ChestContent(potion, 3),              // 유적 다리 앞 서쪽 풀밭
+                new ChestContent(hardCover, 3),           // 보스 길 옆 풀숲
+                new ChestContent(shinyInk, 3),            // 동쪽 기슭 (뗏목)
+                new ChestContent(vineFiber, 2),           // 얕은 강 남쪽 풀숲
+                new ChestContent(sparkleDust, 3),         // 동쪽 기슭 남쪽
+                new ChestContent(largePotion, 1),         // 버섯 늪 나루터 옆
+                new ChestContent(null, 0, 150),           // 강 아래쪽 모래톱
+                new ChestContent(vineFiber, 3),           // 버섯 늪
+                new ChestContent(sparkleDust, 2, 60),     // 동쪽 기슭 맨 아래
+                new ChestContent(potion, 2),              // 야영지
+                new ChestContent(null, 0, 200));          // 강 아래쪽 모래톱 둘째
+            var jungleShop = ShopAsset("jungle_shop", "메아리 야영지 가게",
+                new ShopEntry(potion, 30), new ShopEntry(largePotion, 90));
+            AssignShopIfEmpty(junglePath, jungleShop);
+            SetFullVersionArea(junglePath); // 정식판에 포함 (추가 결제 없음 — 사용자)
+            SetDictionary(junglePath, "정글의 사전");
+            SetBossGate(junglePath, jungleKey, 40);
+            ConfigureAreaIfNew(junglePath, so =>
+            {
+                Prop(so, "theme").enumValueIndex = (int)FieldTheme.Jungle;
+                Prop(so, "encounterStyle").enumValueIndex = (int)EncounterStyle.Roaming;
+                Prop(so, "waterEncounters").objectReferenceValue = riverEncounters;
+                Prop(so, "shrineCompanion").objectReferenceValue = AssetDatabase.LoadAssetAtPath<CompanionData>($"{Root}/Companions/ara.asset");
+                Prop(so, "shrineWords").intValue = 60;
+                var boss = Prop(so, "boss");
+                boss.FindPropertyRelative("species").objectReferenceValue = blankFrog;
+                boss.FindPropertyRelative("level").intValue = 17;
+                boss.FindPropertyRelative("rewardRelic").objectReferenceValue = letterGem;
+                boss.FindPropertyRelative("rewardItem").objectReferenceValue = fillBlankDoc;
+            });
+
+            // --- 출입구 연결 (맵의 D를 위→아래, 왼→오른 순): 초원 0 = 서고, 초원 1 = 숲(서고 보스를 물리치면 열림).
+            //     숲 0 = 정글(숲 보스를 물리치면 열림, #80 — 보스 공터 위쪽), 숲 1 = 초원 ---
             const string meadowPath = "Assets/Data/Areas/meadow.asset", libraryPath = "Assets/Data/Areas/library.asset",
                 forestPath = "Assets/Data/Areas/forest.asset";
-            SetExitsIfMismatch(meadowPath, (libraryPath, 0, null), (forestPath, 0, libraryPath));
+            UpgradeMapIf(forestPath, ForestMap, "D"); // 숲 보스 공터 위쪽에 정글 출입구가 생김 (#80)
+            SetExitDoorIf(meadowPath, 1, 0, 1);         // 그래서 숲의 초원 출입구는 0번 → 1번
+            SetExitsIfMismatch(meadowPath, (libraryPath, 0, null), (forestPath, 1, libraryPath));
             SetExitsIfMismatch(libraryPath, (meadowPath, 0, null));
-            SetExitsIfMismatch(forestPath, (meadowPath, 1, null));
+            SetExitsIfMismatch(forestPath, (junglePath, 0, forestPath), (meadowPath, 1, null));
+            SetExitsIfMismatch(junglePath, (forestPath, 0, null));
 
             AssetDatabase.SaveAssets();
             GameDatabaseBuilder.Refresh();
@@ -407,7 +499,7 @@ namespace WordRPG.EditorTools
         // 36×44. 왼쪽 아래 출입구 옆 야영지(샘·상점·제단) → 굽이진 숲길(고사리 덤불) → 늪 · 부엉이 골짜기 · 버섯 공터 · 개울
         // → 오른쪽 위 공터의 보스 헷갈너구리
         public const string ForestMap =
-                "####################################\n" +
+                "#############################D######\n" +
                 "###########################:::::####\n" +
                 "########################:::::B:::::#\n" +
                 "##C,,,,#################::.......::#\n" +
@@ -451,6 +543,100 @@ namespace WordRPG.EditorTools
                 "###################,,,,,,,,,,,,,,,##\n" +
                 "###################,,#,,,,#,,,,,,C##\n" +
                 "####################################\n";
+
+        // 1.1 메아리 정글 (#80, GDD 9-6) 72×88 — 원본은 python Tools/jungle_map.py (Builds/maps/JungleMap.txt를 여기로 옮김).
+        // . 진흙길  : 이끼 땅  , 짙은 풀숲(보이는 몬스터 서식지)  # 정글 나무  ~ 깊은 강·골짜기  > < ^ v 얕은 강(물살)  J 나루터(뗏목)
+        // Y 레버  H 덩굴 다리  U 유적 돌벽  ; 유적 바닥  T 단어 석판  A 유적 제단(아라)  O 동굴 입구(1.2)  G 보스 방 문  K 열쇠
+        // 남서 야영지(D·P·F·S·E·L) → 얕은 강 → 북서 고대 유적 · 북쪽 빈칸두꺼비 공터 · 동쪽 깊은 강(섬·모래톱 상자) · 남동 버섯 늪
+        public const string JungleMap =
+                "########################################################################\n" +
+                "########################################################################\n" +
+                "##:::::::::::::::::::::::::::#####################~~~~~~~~~~::::::::::##\n" +
+                "##:::::::::::::::::::::::::::#####################~~~~~~~~~~::::::::::##\n" +
+                "##::UUUUUUUUUUUUUUUUUUUUUUUU######################~~~~~~~~~~:::::###::##\n" +
+                "##::U;;;;;UUUUUUUUUU;;;;;;;U###########::#########~~~C~~~~~~::::::######\n" +
+                "##::U;C;;;U;;;;;;;;U;;;;;C;U#######:::::::::######~~~~~~~~~~::::::######\n" +
+                "##::U;;;;;U;;;;;;;;U;;;;;;;U######:::::::::::#####~~~~~~~~~~::::K###::##\n" +
+                "##::U;;;;;U;;;A;;;;U;;;;;;;U#####:::::::::::::####~~~~~~~~~~:::::##:::##\n" +
+                "##::U;;;;;U;;;;;;;;U;;;;;;;U####:::::::B:::::::###~~~~~~~C~~:::,###,::##\n" +
+                "##::U;;;;;U;;;;;;;;U;;;;;;;U####:::::::::::::::###~~~~~~~~~~::,,,,,,::##\n" +
+                "##::U;;;;;U;;;;;;;;U;;;;;;;U###:::::::::::::::::##~~~~~~~~~~,,:::,,:::##\n" +
+                "##::U;;;;;U;;;;;;;;U;;;;;;;U###:::::::::::::::::##~~~~~~~~~~::,:#:::::##\n" +
+                "##::U;;;;;UUUU;;UUUU;;;;;;;U####:::::::::::::::###~~~~~~~~~~:::##:::::##\n" +
+                "##::U;;;;;;;;;;;;;;;;;;;;;;U#####:::::::::::::####~~~~~~~~~~:::####:::##\n" +
+                "##::U;;;;;;;;;;;;;;;;;;;;;;U######:::::::::::#####~~~~~~~~~~::#####:::##\n" +
+                "##::UUUUUU;;;;;;;;;;UUUUUUUU#######:::::::::######~~~~~~~~~~J:####::::##\n" +
+                "##::UU;;;U;;;;;;;;;;U;;;;;UU##########:::#########~~~~~~~~~~:::#::::::##\n" +
+                "##::UUT;;;;;;;;;;;;;;;;;;TUU##########:::#########~~~~~~~~~~::::::::::##\n" +
+                "##::UU;;;;;;;;;;;;;;;;;;;;UU##########GGG#########~~~~~~~~~~:::::::#::##\n" +
+                "##::UU;;;U;;;;;;;;;;U;;;;;UU##########...#########~~~~~~~~~~::::::#:::##\n" +
+                "##::UUUUUU;;;;;;;;;;UUUUUUUU##########...#########~~~~~~~~~~::::::#:::##\n" +
+                "##::U;;;;;;;;;;;;;;;;;;;;;;U##########...#########~~~~~~~~~~:::::::#####\n" +
+                "##::UUUUUU;;;;;;;;;;UUUUUUUU##########...#########~~~~~~~~~~::::::::::##\n" +
+                "##::UU;;;U;;;;;;;;;;U;;;;;UU##########...#########~~~~~~~~~~::::::::::##\n" +
+                "##::UU;;;;;;;;;;;;;;;;;;;;UU##########...#########~~~~~~~~~~::#:::##::##\n" +
+                "##::UU;;;;;;;;;;;;;;;;;;;;UU##########...#########~~~~~~~~~~::##::##::##\n" +
+                "##::UUT;;U;;;;;;;;;;U;;;;TUU##########...#########~~~~~~~~~~#::::#:::,##\n" +
+                "##::UU;;;U;;;;;;;;;;U;;;;;UU##########...#########~~~~~~~~~~##::::,,,:##\n" +
+                "##::UUUUUU;;;;;;;;;;UUUUUUUU##########...#########~~~~~~~~~~###::,,,,,##\n" +
+                "##::UUUUUUUUUU;;UUUUUUUUUUUU##########...#########~~~~~~~~~~::::,,,,,,##\n" +
+                "##::##########;;######################...#########~~~~~~~~~~:::::,,,,:##\n" +
+                "##:~~~~~~~~~~~HH~~~~~~~~~~~~~#########...#########~~~~~~~~~~::,,,,,#####\n" +
+                "##:~~~~~~~~~~~HH~~~~~~~~~~~~~#########...#########~~~~~~~~~~::::,::#::##\n" +
+                "##::::::::###:..::::::::::::::::#:,:::..::::::::::~~~~~~~~~~:::,,::#::##\n" +
+                "##:::::::::##:..:::::::::::::::,,:::....:::::,::::~~~~~~~~~~,:::::::::##\n" +
+                "##:::C:::::#::...:Y:::::::::::,,,#,....,,,:,,C#:::~~~~~~~~~~::::::::::##\n" +
+                "######::::::::....:::::::::::,,,,....::,,,,,,,#:::~~~~~~~~~~,:::::::::##\n" +
+                "##::###,,##::#::.....::::::,,,,.....:::,:,,,,,##::~~~~~~~~~~,,,:::::::##\n" +
+                "##::##,,,::##::::.....::::,,,.....:::::,,:,,,,:#::~~~~~:~~~~,,,,###:::##\n" +
+                "##:::#,,,::#::::::::....:::.....::::::::::,,::::::~~~~:::~~~:,,,####::##\n" +
+                "####:::,,,,#::::::#::...:.....,,,##:::::::,:::::::~~~::O::~~::,,########\n" +
+                "#####:,,,,::::#::###::......,##,:##:::::::,,###:::~~~:::::~~:::,####::##\n" +
+                "##::#:,::,:::###::##::....,,,::###::::::::####::::~~~:::::~~:::,,,:#::##\n" +
+                "##:::,::::::#####::#::..:,,,,::#::::::::::::#:::::~~J:::::J~:::,,,C#::##\n" +
+                "##:::::::::::####::##:..:::,::##::::::::::::::::::~~~:::::~~::::,:::::##\n" +
+                "##:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>~~~:::::~~::::::::::##\n" +
+                "##:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>~~~:::::~~::::::::::##\n" +
+                "##:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>~~~~:::~~~::::::::::##\n" +
+                "##::::::::::::::::::::..::::::::,,,,,:::::::::::::~~~~~:~~~~####::::::##\n" +
+                "##::::::,:::::::::::::..::::::::,,,C,:::::::::::::~~~~~~~~~~##::::#:::##\n" +
+                "##:::::,,,,,,:::::::::..::::#:::,,,,,:::::::::::::~~~~~~~~~~:,,::::#::##\n" +
+                "##:::,:,,,,,,::::,,::...:::###:::,,,,:::::::::::::~~~~~~~~~~,,,::::#####\n" +
+                "##::::,,,,,,::::,,,.....::::###::,,,::::::,:::::::~~~~~~~~~~,,:,::######\n" +
+                "##:::::::,,:::::......:....::##::::::::::::,,,,:::~~~~~~~~~~,:,,:::#::##\n" +
+                "##::::::::::::......:::..........::::::::::,,,::::~~~~~~~~~~::,,,:::::##\n" +
+                "##::::::::::.....,,:::::::...........::::,,,,,::::~~~~~~~~~~,::,::::::##\n" +
+                "##::::::::::...:,,::::::::::::::.........:,,,,,:::~~~~~~~~~~::::::::::##\n" +
+                "##::::::::::..::::::::::::::::::::::.......:,,,,::~~~~~~~~~~::::::::::##\n" +
+                "###########...##########################...#######~~~~~~~~~~::,,,::#::##\n" +
+                "##::::::::::..:::::::::::::~~::##::::::::..,,,:,:#~~~~~~~~~~,:,,,#######\n" +
+                "##::::::::::..:::::::::::::~~::##::::::::...,:,::#~~~~~~~~~~,,##########\n" +
+                "##::::::::::..:::::::::::::~~:::::::::::::..::::##~~~~~~~~~~::##,::#::##\n" +
+                "##::::::::::..:::::::::::::~~:::::::::::,:..::::##~~~~~~~~~~::##,:::::##\n" +
+                "##::::::::::..:::::::::::::~~::::::::::,::...::#::~~~~~~~~~~::::,:::::##\n" +
+                "##::::::::::..:::::::::::::~~:::::::,:,,,::...::::~~~~~~~~~~::::,:::::##\n" +
+                "##::::::::::..:::::::::::::~~:::::::,,,,,:::..::::~~~~~~~~~~:::,C:::::##\n" +
+                "##::::::::::..:::::::::::::~~::::::,#,,:::::...:::~~~~~~~~~~::::::::::##\n" +
+                "##::::::::::..:::::::::::::~~::::,,,###,:::::...::~~~~~~~~~~::###:::::##\n" +
+                "##::::::::::..:::::::::::::~~:::::,,,####:::::..::~~~~~~~~~~:::###::::##\n" +
+                "##::::::::::..:::::::::::::~~:::::,,,####:::::...J~~~~~~~~~~::,:#:::::##\n" +
+                "##::::::::F:..:::::::::::::~~:::::,:::####:::::..:~~~~~~~~~~:,,:,:#:::##\n" +
+                "##:::::::::...::::::::::Y::~~:::::::::##::#...::::~~~~~~~~~~,,,#::::::##\n" +
+                "##:::E::::...::::S:::::::::~~::::::::###::....::::~~~~~~~~~~,:,,##::::##\n" +
+                "##::::::::..:::::::::::::::HH...::::::#.....::::::~~~~~~~~~~:::,,##:::##\n" +
+                "##::::::::..:::::::::::::::HH.......::.....:::::::~~~~~~~~~~:::,:,,:::##\n" +
+                "##:::::::...:::::::::::::::~~::.........,:::::,:::~~~~~~~~~~::::,,::::##\n" +
+                "##::::::...::::::::::::::::~~::::::....,,,::,,,:::~~~~~~~~~~::::,:#:::##\n" +
+                "D.....P...:::::::::::::::::~~:::::::,,,,,:,,,,,C::~~~~~~~~~~::,:,,:#::##\n" +
+                "#.........:::::::::::::::::~~::#:::,#,,,#::,,,::,:~~~~~~~~~~:::,::::::##\n" +
+                "##:::::::::::::::::::::::::~~::#:::###:,:#:,,,::::~~~~~~~~~~::::::::::##\n" +
+                "##:::::::::::::::::::::::::~~:::#####,,,,#:,,,::::~~C~~~~~~~:::#::::::##\n" +
+                "##:::::::::::::L:::::::::::~~::::C:##,,:##,,,:::::~~~~~~~~~~::::#::C::##\n" +
+                "##:::::::::::::::::::::::::~~::::::,#:::#:,,:,::::~~~~~~~~~~::#::#::::##\n" +
+                "##:::::::::::::::::::::C:::~~:::::::::::::::,:::::~~~~~~C~~~:::#::#:::##\n" +
+                "##:::::::::::::::::::::::::~~:::::::::::::::::::::~~~~~~~~~~:::#::#:::##\n" +
+                "########################################################################\n" +
+                "########################################################################\n";
 
         // 새로 만든 지역에만 추가 설정 (보스가 아직 없을 때 = 처음 만들 때). 인스펙터에서 바꾼 값은 유지
         // 정식판을 사야 들어가는 지역 표시 (이미 켜져 있으면 그대로)
@@ -497,6 +683,33 @@ namespace WordRPG.EditorTools
             for (int i = 0; i < source.Length; i++)
                 if (source[i] != 'G' && source[i] != 'K' && source[i] != current[i]) return;
             prop.stringValue = source;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // 원본 맵에 새 칸(added 글자들)이 생겼을 때: 에셋의 맵이 그 칸만 빼고 원본과 같으면 원본으로 바꾼다 (#80 숲의 정글 출입구 D)
+        private static void UpgradeMapIf(string areaPath, string map, string added)
+        {
+            var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);
+            if (area == null) return;
+            var so = new SerializedObject(area);
+            var prop = Prop(so, "map");
+            string current = prop.stringValue.Replace("\r\n", "\n"), source = map.Replace("\r\n", "\n");
+            if (current == source || current.Length != source.Length) return;
+            for (int i = 0; i < source.Length; i++)
+                if (source[i] != current[i] && added.IndexOf(source[i]) < 0) return;
+            prop.stringValue = source;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // 도착 지역 맵에 출입구가 늘어 번호가 밀렸을 때: 그 연결의 도착 번호가 from이면 to로
+        private static void SetExitDoorIf(string areaPath, int exitIndex, int from, int to)
+        {
+            var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);
+            if (area == null || exitIndex >= area.Exits.Count || area.Exits[exitIndex].TargetDoorIndex != from) return;
+            var target = area.Exits[exitIndex].Target;
+            if (target == null || target.Map.Doors.Count <= to) return;
+            var so = new SerializedObject(area);
+            Prop(so, "exits").GetArrayElementAtIndex(exitIndex).FindPropertyRelative("targetDoorIndex").intValue = to;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 

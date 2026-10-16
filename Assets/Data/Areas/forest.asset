@@ -15,7 +15,7 @@ MonoBehaviour:
   areaId: forest
   displayName: "\uC232"
   theme: 2
-  map: '####################################
+  map: '#############################D######
 
     ###########################:::::####
 
@@ -109,6 +109,7 @@ MonoBehaviour:
   encounterRate: 0.13
   minStepsBetweenEncounters: 4
   encounterStyle: 0
+  waterEncounters: {fileID: 0}
   shop: {fileID: 11400000, guid: 89dce7e0f28ae414e9caa28cfe12028b, type: 2}
   chests:
   - item: {fileID: 0}
@@ -136,6 +137,9 @@ MonoBehaviour:
     gold: 150
     relic: {fileID: 0}
   exits:
+  - target: {fileID: 11400000, guid: 768fa7c9e98d0ef48bcfa114628de9e5, type: 2}
+    targetDoorIndex: 0
+    openedByBossOf: {fileID: 11400000}
   - target: {fileID: 11400000, guid: a2d06106feb91f048ad3b3d9f1f26ff0, type: 2}
     targetDoorIndex: 1
     openedByBossOf: {fileID: 0}
@@ -146,5 +150,7 @@ MonoBehaviour:
     rewardItem: {fileID: 11400000, guid: 06a736217507a204db83f20e3d6dcb23, type: 2}
   bossKey: {fileID: 11400000, guid: f7d1bd7717ac67f4bb0ce50b193977b0, type: 2}
   bossGateWords: 40
+  shrineCompanion: {fileID: 0}
+  shrineWords: 60
   requiresFullVersion: 1
   dictionaryName: "\uC232\uC758 \uC0AC\uC804"

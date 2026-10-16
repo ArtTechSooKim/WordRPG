@@ -152,22 +152,8 @@ namespace WordRPG.Tests
 
         private static readonly Vector2Int[] Steps = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
 
-        private static HashSet<Vector2Int> Flood(FieldMap map, bool gateOpen)
-        {
-            var seen = new HashSet<Vector2Int> { map.Start };
-            var queue = new Queue<Vector2Int>(seen);
-            while (queue.Count > 0)
-            {
-                var cell = queue.Dequeue();
-                foreach (var d in Steps)
-                {
-                    var next = cell + d;
-                    bool passable = map.IsWalkable(next) || gateOpen && map.Get(next) == FieldTile.Gate;
-                    if (passable && seen.Add(next)) queue.Enqueue(next);
-                }
-            }
-            return seen;
-        }
+        // 덩굴 다리는 놓은 것으로 (레버는 문 밖에서 당길 수 있어야 함 — 그건 AreaDataTests가 봄), 뗏목 포함 (#80)
+        private static HashSet<Vector2Int> Flood(FieldMap map, bool gateOpen) => FieldReach.Flood(map, gatesOpen: gateOpen);
 
         private static bool Touches(HashSet<Vector2Int> reachable, Vector2Int cell) => Steps.Any(d => reachable.Contains(cell + d));
 

@@ -13,19 +13,25 @@ MonoBehaviour:
   m_Name: GameDatabase
   m_EditorClassIdentifier: WordRPG::WordRPG.Game.GameDatabase
   monsters:
+  - {fileID: 11400000, guid: 6dacaaacb6430234bb6f1467d5d686c0, type: 2}
+  - {fileID: 11400000, guid: 20eb48a5ccf86b846ab748e3cfd4307d, type: 2}
   - {fileID: 11400000, guid: d12a616f9221242458895cf41f4ebaed, type: 2}
   - {fileID: 11400000, guid: 104b35434b4f9bc46aba8820d3c16227, type: 2}
   - {fileID: 11400000, guid: 9507c4de3ec057e4ab55cc3e9121a137, type: 2}
   - {fileID: 11400000, guid: a9849eb4d6ef12c4f99d035f411e7e52, type: 2}
+  - {fileID: 11400000, guid: 940cb1c84831f1f49856101082c4f7f8, type: 2}
   - {fileID: 11400000, guid: e53a882f026616341beffe424ef7bb04, type: 2}
   - {fileID: 11400000, guid: f6441ca533a7e6b4a94eb940b2b1d1e0, type: 2}
   - {fileID: 11400000, guid: fb83df6feb783b64b8a3b2a0470bbfba, type: 2}
   - {fileID: 11400000, guid: 473b0ab9c95af2843b517ded7ef3f447, type: 2}
+  - {fileID: 11400000, guid: ab1ace9e2eff2b744b7ecf96e9251ff6, type: 2}
   - {fileID: 11400000, guid: d975f1a93081f3846bd6257612c0e4de, type: 2}
   items:
   - {fileID: 11400000, guid: f7d1bd7717ac67f4bb0ce50b193977b0, type: 2}
   - {fileID: 11400000, guid: 4ef0a20b2f82e9c4c8ea2a134a013bf4, type: 2}
+  - {fileID: 11400000, guid: 3754fc86bfc73ef42af9f87a064dbd92, type: 2}
   - {fileID: 11400000, guid: 05119db81daf98c49945dbb01ce077ad, type: 2}
+  - {fileID: 11400000, guid: d7331af346374d9498d7f7ff5e31ae27, type: 2}
   - {fileID: 11400000, guid: 6895b77d6b1d0cf47a02ff6b21e9fcea, type: 2}
   - {fileID: 11400000, guid: 2dd71ba23711eac418813eea2da4c791, type: 2}
   - {fileID: 11400000, guid: e2d52f7fbc559d2459414dddf06ac7b5, type: 2}
@@ -33,19 +39,25 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 03136cba480d605499404eebbaaac6f5, type: 2}
   - {fileID: 11400000, guid: d068093b31fa6bd479a9978022d8bc1f, type: 2}
   - {fileID: 11400000, guid: 4185a811547fb65468699483f65b7fdf, type: 2}
+  - {fileID: 11400000, guid: 296875e2b8c144241a537aec31c871df, type: 2}
   - {fileID: 11400000, guid: 06a736217507a204db83f20e3d6dcb23, type: 2}
   - {fileID: 11400000, guid: a6816b62f01230a4e8a4d4cdbcab5d89, type: 2}
   - {fileID: 11400000, guid: 83903ba43d39288409cddb3a5f7b0f43, type: 2}
+  - {fileID: 11400000, guid: 1d092ce90d9d84943b83f6cc850b7c01, type: 2}
   areas:
   - {fileID: 11400000, guid: a3e19a296f3df11468a130c5e27e87f5, type: 2}
+  - {fileID: 11400000, guid: 768fa7c9e98d0ef48bcfa114628de9e5, type: 2}
   - {fileID: 11400000, guid: 2f0f21b4f39acf14fab8b7273b5e1a17, type: 2}
   - {fileID: 11400000, guid: a2d06106feb91f048ad3b3d9f1f26ff0, type: 2}
   relics:
   - {fileID: 11400000, guid: 0a6bb6350c64997468755f814f9f9371, type: 2}
+  - {fileID: 11400000, guid: 06210a911078d3644a1fbbd663124d76, type: 2}
+  - {fileID: 11400000, guid: 29358ee9eb0002246a4b541533b5e92d, type: 2}
   - {fileID: 11400000, guid: c3cf9b0f8943bed43976182ff5144417, type: 2}
   - {fileID: 11400000, guid: 32a554c15e5393343bba57e9ec78dd36, type: 2}
   - {fileID: 11400000, guid: 0ba3987476a72634fa572485e2677452, type: 2}
   - {fileID: 11400000, guid: 1b7f999bdd3edb8409ff80aa0c65e454, type: 2}
+  - {fileID: 11400000, guid: c1b6fa3bfe04f3f419423dc9bc22b3e6, type: 2}
   - {fileID: 11400000, guid: 0e6430d280433c24a9d7318f56367003, type: 2}
   - {fileID: 11400000, guid: ff050fa09ca22b7468f3aa60eedd749f, type: 2}
   - {fileID: 11400000, guid: eef2fb082a5a0ae4b8da35987d1ae574, type: 2}

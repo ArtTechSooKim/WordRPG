@@ -16,16 +16,17 @@ namespace WordRPG.Field
             new Vector2Int(0, -1), new Vector2Int(-1, -1), new Vector2Int(-1, 0), new Vector2Int(-1, 1)
         };
 
-        // 테두리를 자동으로 그리는 칸: 길, 물
-        public static bool IsAutotiled(FieldTile tile) => tile == FieldTile.Floor || tile == FieldTile.Water;
+        // 테두리를 자동으로 그리는 칸: 길, 물, 얕은 강 (#80)
+        public static bool IsAutotiled(FieldTile tile) => tile == FieldTile.Floor || tile == FieldTile.Water || tile == FieldTile.Stream;
 
-        // 이어지는 이웃: 길은 길·출입구(길이 문까지 이어지게), 물은 물
+        // 이어지는 이웃: 길은 길·출입구(길이 문까지 이어지게), 물은 물. 얕은 강·덩굴 다리(물 위)·깊은 물은 한 물줄기로 이어진다 (#80)
         public static bool Connects(FieldTile tile, FieldTile neighbor)
         {
             switch (tile)
             {
                 case FieldTile.Floor: return neighbor == FieldTile.Floor || neighbor == FieldTile.Door || neighbor == FieldTile.Gate; // 보스 방 문은 길이 이어지는 자리
-                case FieldTile.Water: return neighbor == FieldTile.Water;
+                case FieldTile.Water:
+                case FieldTile.Stream: return neighbor == FieldTile.Water || neighbor == FieldTile.Stream || neighbor == FieldTile.Bridge;
                 default: return false;
             }
         }

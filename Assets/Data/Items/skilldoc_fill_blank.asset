@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6217c2ef872fb4a45905f118eb0cc94f, type: 3}
+  m_Name: skilldoc_fill_blank
+  m_EditorClassIdentifier: WordRPG::WordRPG.Items.ItemData
+  itemId: skilldoc_fill_blank
+  displayName: "\uAE30\uC220\uBB38\uC11C: \uBE48\uCE78 \uCC44\uC6B0\uAE30"
+  description: "\uC77D\uC73C\uBA74 \uAE30\uC220 '\uBE48\uCE78 \uCC44\uC6B0\uAE30'\uB97C
+    \uBC30\uC6B4\uB2E4. \uBC30\uC6CC\uB3C4 \uC0AC\uB77C\uC9C0\uC9C0 \uC54A\uC544
+    \uC5B8\uC81C\uB4E0 \uB2E4\uC2DC \uBC30\uC6B8 \uC218 \uC788\uB2E4."
+  kind: 3
+  icon: {fileID: 0}
+  placeholderColor: {r: 0.9, g: 0.9, b: 0.8, a: 1}
+  healAmount: 0
+  taughtSkill: {fileID: 11400000, guid: 3dfcfdc2da54c64468d3b46cce31def0, type: 2}

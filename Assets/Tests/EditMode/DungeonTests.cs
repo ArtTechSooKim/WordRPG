@@ -157,16 +157,7 @@ namespace WordRPG.Tests
             foreach (var area in Areas())
             {
                 var map = area.Map;
-                var seen = new HashSet<Vector2Int> { map.Start };
-                var queue = new Queue<Vector2Int>(seen);
-                while (queue.Count > 0)
-                {
-                    var cell = queue.Dequeue();
-                    foreach (var d in new[] { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right })
-                    {
-                        if (map.IsWalkable(cell + d) && seen.Add(cell + d)) queue.Enqueue(cell + d);
-                    }
-                }
+                var seen = FieldReach.Flood(map); // 보스 방 문·덩굴 다리를 연 뒤 기준 (숲의 정글 출입구는 보스 공터 안, #80)
                 foreach (var door in map.Doors)
                     Assert.IsTrue(seen.Contains(door), $"{area.name}: {door}의 출입구에 갈 수 없음");
             }

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71c0dd365e2553c48922bec3a339f174, type: 3}
+  m_Name: flute_echo_veil
+  m_EditorClassIdentifier: WordRPG::WordRPG.Monsters.SkillData
+  skillId: flute_echo_veil
+  displayName: "\uBA54\uC544\uB9AC \uC7A5\uB9C9"
+  description: "\uD53C\uB9AC \uC18C\uB9AC\uAC00 \uBA54\uC544\uB9AC \uC7A5\uB9C9\uC774
+    \uB418\uC5B4 \uBAA8\uB450\uB97C \uC9C0\uD0A8\uB2E4."
+  kind: 2
+  target: 3
+  power: 10
+  quizDirection: 1

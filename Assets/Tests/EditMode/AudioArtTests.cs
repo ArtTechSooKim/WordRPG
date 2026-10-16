@@ -64,6 +64,7 @@ namespace WordRPG.Tests
             foreach (FieldTheme theme in Enum.GetValues(typeof(FieldTheme)))
             foreach (FieldTile tile in Enum.GetValues(typeof(FieldTile)))
             {
+                if (!FieldThemes.Supports(theme, tile)) continue; // 정글 칸은 정글 그림만 (#80)
                 string path = $"Art/NinjaAdventure/Tiles/{theme}_{tile}";
                 Assert.IsNotNull(Resources.Load<Texture2D>(path), $"Resources/{path} 없음");
             }

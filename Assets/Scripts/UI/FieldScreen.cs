@@ -77,6 +77,7 @@ namespace WordRPG.UI
         private SpriteRenderer playerRenderer;
         private Tilemap tilemap;
         private readonly Dictionary<string, Tile> tileCache = new Dictionary<string, Tile>();
+        private readonly List<GameObject> props = new List<GameObject>(); // 칸보다 큰 그림 (석상·동굴, #80)
         private BattleScreen battle;
         private bool bossBattle;
 
@@ -285,9 +286,11 @@ namespace WordRPG.UI
             BuildHud();
             BuildBattle();
 
-            // 저장된 위치가 이 지역의 걸을 수 있는 칸이면 거기서, 아니면 시작 위치에서
-            var spawn = session.World.TryGetPosition(area.AreaId, out var saved) && map.IsWalkable(saved) ? saved : map.Start;
-            EnterArea(area, spawn);
+            // 저장된 위치가 이 지역의 걸을 수 있는 칸(뗏목이었으면 강 위)이면 거기서, 아니면 시작 위치에서
+            bool onRaft = session.World.Rafting;
+            bool savedHere = session.World.TryGetPosition(area.AreaId, out var saved)
+                             && (onRaft ? map.IsRaftWater(saved) : map.IsWalkable(saved));
+            EnterArea(area, savedHere ? saved : map.Start, savedHere && onRaft);
 
             if (!string.IsNullOrEmpty(statusMessage)) ShowToast(statusMessage, 3f);
             if (showTutorials && !session.Tutorials.Has(TutorialProgress.Field)) StartCoroutine(FieldGuide());
@@ -579,15 +582,7 @@ namespace WordRPG.UI
         // 지나갈 수 있게 된 칸 — [확인]할 것도 없다: 쓰러뜨린 보스 자리(사전은 쉼터 받침대로 옮겨짐, #45), 연 보스 방 문(#76)
         private bool IsClearedBossSpot(Vector2Int cell) => IsCleared(area, cell);
 
-        private bool IsCleared(FieldArea fieldArea, Vector2Int cell)
-        {
-            switch (fieldArea.Map.Get(cell))
-            {
-                case FieldTile.Boss: return session.World.IsBossDefeated(fieldArea.BossId);
-                case FieldTile.Gate: return BossGate.IsOpen(fieldArea, session);
-                default: return false;
-            }
-        }
+        private bool IsCleared(FieldArea fieldArea, Vector2Int cell) => CellState.IsPassable(fieldArea, session, cell);
 
         // 보스 방 문 (#76, 사용자가 정한 말): 열쇠가 없으면 / 단어가 모자라면 주인공 혼잣말, 다 갖췄으면 문이 열린다
         private void KnockGate()
@@ -723,7 +718,7 @@ namespace WordRPG.UI
         // 한 칸 도착. 출입구·조우로 화면이 바뀌기 시작하면 false (계속 걷지 않음)
         private bool OnStepFinished()
         {
-            session.World.SetPosition(area.AreaId, walker.Position);
+            session.World.SetPosition(area.AreaId, walker.Position, walker.Rafting);
             stepsTaken++;
             minimap.SetPlayer(walker.Position);
             RefreshNameTags();
@@ -867,6 +862,7 @@ namespace WordRPG.UI
                 {
                     case FieldTheme.Library: return Music.Library;
                     case FieldTheme.Forest: return Music.Forest;
+                    case FieldTheme.Jungle: return Music.Jungle;
                     default: return Music.Meadow;
                 }
             }
@@ -1151,13 +1147,14 @@ namespace WordRPG.UI
         }
 
         // 지역을 바꿔 그린다 (처음 시작할 때, 출입구를 지날 때)
-        private void EnterArea(FieldArea newArea, Vector2Int position)
+        // rafting: 뗏목에 탄 채로 (세이브가 강 위였을 때, #80)
+        private void EnterArea(FieldArea newArea, Vector2Int position, bool rafting = false)
         {
             area = newArea;
             var map = area.Map;
-            walker = new FieldWalker(map, position, cell => IsDoorLocked(cell) || IsPaywalled(cell), cell => IsCleared(area, cell));
+            walker = new FieldWalker(map, position, cell => IsDoorLocked(cell) || IsPaywalled(cell), cell => IsCleared(area, cell), rafting);
             encounterCounter = new EncounterCounter(area.EncounterRate, area.MinStepsBetweenEncounters);
-            session.World.SetPosition(area.AreaId, position);
+            session.World.SetPosition(area.AreaId, position, rafting);
             SetUpRoamers(position);
 
             DrawTiles(area, IsDoorLocked);
@@ -1181,18 +1178,51 @@ namespace WordRPG.UI
             {
                 var cell = new Vector2Int(x, y);
                 var kind = map.Get(cell);
-                bool done = kind == FieldTile.Chest && session.World.IsChestOpened(fieldArea.ChestId(cell))
-                            || kind == FieldTile.Boss && session.World.IsBossDefeated(fieldArea.BossId)
-                            || kind == FieldTile.Lectern && BossDictionary.IsUnlocked(fieldArea, session.World)
-                            || kind == FieldTile.Gate && BossGate.IsOpen(fieldArea, session)
-                            || kind == FieldTile.Key && BossGate.HasKey(fieldArea, session);
+                bool done = CellState.IsDone(fieldArea, session, cell);
                 Tile tile;
                 if (kind == FieldTile.Door) tile = DoorTile(fieldArea, cell, lockedDoor(cell));
+                else if (kind == FieldTile.Bridge) tile = BridgeTile(fieldArea.Theme, done, map.IsBridgeHorizontal(cell));
                 else if (FieldAutotile.IsAutotiled(kind)) tile = AutoTile(fieldArea.Theme, kind, FieldAutotile.Mask(map, cell)) ?? TileFor(kind, done, fieldArea.Theme);
                 else tile = TileFor(kind, done, fieldArea.Theme);
                 tilemap.SetTile(new Vector3Int(x, y, 0), tile);
             }
             cam.backgroundColor = PlaceholderArt.OutsideColor(fieldArea.Theme);
+            DrawProps(fieldArea);
+        }
+
+        // 칸보다 큰 그림 (#80): 유적 제단의 잠든 석상 · 섬의 동굴 입구. 바닥 칸 아래 가운데에 맞춰 타일 위에 (주인공보다 아래)
+        private void DrawProps(FieldArea fieldArea)
+        {
+            foreach (var prop in props) Destroy(prop);
+            props.Clear();
+            var map = fieldArea.Map;
+            for (int x = 0; x < map.Width; x++)
+            for (int y = 0; y < map.Height; y++)
+            {
+                var cell = new Vector2Int(x, y);
+                var sprite = FieldArt.Prop(map.Get(cell), fieldArea.Theme, CellState.IsDone(fieldArea, session, cell));
+                if (sprite == null) continue;
+                var go = new GameObject("Prop_" + map.Get(cell), typeof(SpriteRenderer));
+                go.transform.SetParent(transform, false);
+                go.transform.position = new Vector3(cell.x + 0.5f, cell.y, 0f);
+                var renderer = go.GetComponent<SpriteRenderer>();
+                renderer.sprite = sprite;
+                renderer.sortingOrder = 5;
+                props.Add(go);
+            }
+        }
+
+        public int PropCount => props.Count; // 큰 그림 수 (테스트용)
+
+        private Tile BridgeTile(FieldTheme theme, bool built, bool horizontal)
+        {
+            string key = $"{theme}_Bridge_{built}_{horizontal}";
+            if (!tileCache.TryGetValue(key, out var tile))
+            {
+                tile = MakeTile(FieldArt.ForBridge(theme, built, horizontal));
+                tileCache[key] = tile;
+            }
+            return tile;
         }
 
         private Tile TileFor(FieldTile kind, bool done, FieldTheme? theme = null)
@@ -1768,17 +1798,7 @@ namespace WordRPG.UI
         }
 
         // 미니맵에서 '끝난 곳' (연 상자, 쓰러뜨린 보스)
-        private bool IsCellDone(Vector2Int cell)
-        {
-            switch (walker.Map.Get(cell))
-            {
-                case FieldTile.Chest: return session.World.IsChestOpened(area.ChestId(cell));
-                case FieldTile.Boss: return session.World.IsBossDefeated(area.BossId);
-                case FieldTile.Gate: return BossGate.IsOpen(area, session);
-                case FieldTile.Key: return BossGate.HasKey(area, session);
-                default: return false;
-            }
-        }
+        private bool IsCellDone(Vector2Int cell) => CellState.IsDone(area, session, cell);
 
         private void OpenBag() => OpenBag(BagTab.Hero);
 

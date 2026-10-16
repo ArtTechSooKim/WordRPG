@@ -27,7 +27,7 @@
 - **엔진**: Unity 6000.3.11f1 (2D, Built-in RP) / **플랫폼**: 모바일, **세로 고정**, **아이폰 앱스토어 출시** (2026-10-03 사용자 결정, 안드로이드는 시험용 빌드만) / **개발**: 1인
 - **핵심 루프**: 탐험 → 랜덤 조우 → 전투(기술마다 단어 문제) → 보상(경험치·재료·성유물) → 레벨업·성유물 강화(+3 각성) → 새 지역·어려운 단어
 - **현재 단계**: MVP 이후 확장 — 초원(마을)·잊혀진 서고(던전)·숲(2번째 지역, 서고 보스를 물리치면 열림), 주인공 + 성유물 8개(3칸 장착),
-  적 6종 + 보스 2. 단어 = 2022 개정 교육과정 영어과 기본 어휘(교육부 고시, 저작권 없음 — GDD 11-2)에서 **지역마다 150개**(#76: 초원·서고 = 중·고 공통,
+  적 6종 + 보스 2 (+ 1.1 메아리 정글 작업 중 #80: 숲 보스 공터 위 출입구, 적 3종 + 빈칸두꺼비, 동료 아라). 단어 = 2022 개정 교육과정 영어과 기본 어휘(교육부 고시, 저작권 없음 — GDD 11-2)에서 **지역마다 150개**(#76: 초원·서고 = 중·고 공통,
   숲 = 고급에서 자주 쓰는 순 — `Tools/trim_wordbooks.py`). 남은 단어는 `Docs/단어_예비_중고공통.csv`(900)·`Docs/단어_예비_고급.csv`(850) — 새 지역은 위에서부터 150개.
   뜻은 Claude 초안 + 사용자 검수. 맵은 2026-10-03에 넓이 4배. 보스 방은 열쇠 + 그 지역 단어 40개 발견으로 열림(#76)
 
@@ -70,6 +70,12 @@
      맵을 바꿀 땐 에셋의 map 칸도 같이 고칠 것 (상자 id는 위치 기준이라 상자를 옮기면 새 상자)
    - 조우 방식은 FieldArea `encounterStyle`: Grass(풀숲 확률 조우) / Roaming(보이는 몬스터 — 마른 덤불 ','이 서식지, 발견하면 쫓아옴·부딪히면 전투,
      가까우면 [선제공격] = QTE(기회 슬로모션 → 줄어드는 원 + 이미 본 단어 한 문제), 맞히면 HP 20%. 규칙 `RoamingMonsters`·`Preemptive`, 그림 `FieldRoamerViews`·`PreemptView`, #73~75. 사막부터)
+   - 정글 맵 글자 (#80, 1.1): '>' '<' '^' 'v' 얕은 강(걸을 수 있음, 물살 방향으로 걸으면 빨라짐 — `FieldMap.StreamDirection/IsWithStream`) ·
+     'J' 나루터(여기서 깊은 강 쪽으로 가면 뗏목 — `FieldWalker.Rafting`, 뗏목이 다니는 물 = 나루터에 이어진 물 `FieldMap.IsRaftWater`, 세이브 `WorldState.Rafting`) ·
+     'Y' 레버 → 가장 가까운 'H' 덩굴 다리가 놓임(`FieldMap.BridgeOf`, 규칙 `Levers`, 세이브 pulledLevers) · 'U' 유적 돌벽 · ';' 유적 바닥 ·
+     'T' 단어 석판(세이브 solvedTablets) · 'A' 유적 제단(FieldArea `shrineCompanion` + `shrineWords` 60, 규칙 `Ruins`) · 'O' 동굴 입구(1.2).
+     정글 칸은 정글 테마에서만 (`FieldThemes.Supports` — 다른 테마에 쓰려면 거기에 더하고 그림을 만듦). 칸 상태(끝난 모습·지나갈 수 있음)는 `CellState`,
+     도달 검사(모든 상자·출입구)는 걷기 + 뗏목 `FieldReach.Flood`. 칸보다 큰 그림(석상·동굴)은 `FieldArt.Prop`(Tiles/{테마}_{종류}_prop.png)
    - 통로는 두 칸 너비 (사용자 요청 #67): 새 맵은 `python Tools/widen_maps.py --only {상수} [--apply]`로 한 칸 통로를 넓힘 (상수·에셋 같이)
 6. **네이밍**: PascalCase 클래스/메서드/프로퍼티, camelCase 필드. SO 필드는 `[SerializeField] private` + 읽기 전용 프로퍼티. 클래스명은 영문, 화면 표시명은 한국어 필드(`displayName = "펜촉이"`). 주석은 한국어
 7. **Git LFS 사용 중**: 이미지·오디오·폰트·네이티브 플러그인. 새 바이너리 타입 추가 시 `.gitattributes` 확인 (새로 클론하면 `git lfs install` 먼저)
@@ -119,13 +125,15 @@ Assets/
     Battle/             BattleEngine(기술·강도(단어 n개 연속)·상처약·도망(Flee, 보스전 canFlee=false)·연속 정답 수), Combo(콤보 단계·글자·추가 피해), BattleFormulas, BattleReward,
                         BattleSummary(한 판 결산: 새 단어·틀린 단어·기술별 피해·최대 콤보 — 결산 화면용), Preemptive(선제공격: HP 20%·이미 본 단어만)
     Field/              FieldMap(맵 글자→격자), FieldWalker(이동), StickInput(스틱 값→4방향·달리기), EncounterCounter(조우), FieldInteraction([확인] 대상·이름표 규칙), FieldAutotile(길·물가 테두리 모양),
-                        FieldArea(지역 SO: 테마·출입구 연결·보스·상자·상점·조우 방식), EncounterTable, RoamingMonsters(보이는 몬스터: 어슬렁·발견·쫓기·포기·부딪힘)
+                        FieldArea(지역 SO: 테마·출입구 연결·보스·상자·상점·조우 방식·물의 몬스터·유적 동료), EncounterTable, RoamingMonsters(보이는 몬스터: 어슬렁·발견·쫓기·포기·부딪힘),
+                        FieldReach(시작 칸에서 갈 수 있는 칸 — 걷기 + 뗏목, 문·다리를 연/닫은 기준, #80)
     Game/               GameSession(진행 상태 전체), GameManager(씬 간 유지 + 자동 저장 + 설정 + 결제 창구), GameDatabase(id→에셋), PlayerRecord,
                         Entitlements(산 상품) · IStore + UnityIapStore(애플 인앱 결제),
                         Dex(도감 규칙), Keepsakes(징표 진열장), GameSettings(음량·진동), TutorialProgress(본 튜토리얼 id, 세이브에 저장),
                         Objectives(목표 한 줄) · MenuBadges(메뉴 빨간 점) · BattleUnlocks(강도 고르기는 전투 2번 뒤),
                         BossDictionary(보스의 사전: 받침대 L, 하루 한 번 새 단어 — 읽은 날은 WorldState),
-                        BossGate(보스 방 문: 열쇠 K + 단어 40개 → G가 열림 — #76)
+                        BossGate(보스 방 문: 열쇠 K + 단어 40개 → G가 열림 — #76),
+                        Ruins(유적: 석판 T 4개 + 정글 단어 60개 → 제단 A에서 동료) · Levers(레버 Y → 덩굴 다리 H) · CellState(칸의 끝난 모습·지나갈 수 있음) — #80
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
     UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투 + 보스 결정타 연출 + 전투 결산, 단독 연습 모드도 있음),
                         DexView(도감), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기),
@@ -146,7 +154,8 @@ Assets/
     Editor/             WordRPG.Editor.asmdef — CSV 임포터, 샘플 데이터 생성기, UiAssetImporter(아이콘·도트·소리 가져오기 설정),
                         MonsterArtLinker(몬스터 그림 연결), MobileBuild(모바일 설정·아이폰 Xcode/안드로이드 빌드)
   Resources/UI/         Fonts(Jua, Noto Sans KR + OFL 라이선스), Icons(UI 아이콘 128px), Icons/Items(아이템 256px, 파일명 = itemId)
-  Resources/Art/NinjaAdventure/  Monsters(speciesId.png), Relics(relicId.png), Items(itemId.png), Player(Boy 시트), Tiles(합성 타일 + _auto 테두리 아틀라스),
+  Resources/Art/NinjaAdventure/  Monsters(speciesId.png), Relics(relicId.png), Items(itemId.png), Player(Boy 시트), Tiles(합성 타일 + _auto 테두리 아틀라스 + _prop 큰 그림),
+                                 Field(raft.png 뗏목 · ripple.png 물살 물결 — 필드 위 그림, #80),
                                  Title(title_scene.png 타이틀 배경 풍경), LICENSE.txt(CC0)
   Resources/Audio/      Music(6곡 ogg), Sfx(21개 wav) — Ninja Adventure. 징글(새 단어 발견·길 열림)은 Sound.PlayJingle(음악 잠깐 멈춤)
   Branding/             AppIcon.png (앱 아이콘 1024px, Figma 'App Icon (#28)')

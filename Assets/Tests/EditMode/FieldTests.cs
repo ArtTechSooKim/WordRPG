@@ -250,14 +250,18 @@ namespace WordRPG.Tests
                 Assert.IsNotNull(area.Words, $"{area.name}: 단어장 없음");
 
                 var map = area.Map; // 형식이 틀리면 여기서 예외 (어느 줄이 틀렸는지 메시지에 나옴)
+                for (int x = 0; x < map.Width; x++)
+                for (int y = 0; y < map.Height; y++)
+                    Assert.IsTrue(FieldThemes.Supports(area.Theme, map.Get(new Vector2Int(x, y))),
+                        $"{area.name}: {area.Theme} 테마에서 쓰지 않는 칸 {map.Get(new Vector2Int(x, y))} ({x},{y}) — FieldThemes.Supports에 더하고 그림을 만들 것");
                 Assert.AreEqual(map.Chests.Count, area.ChestContents.Count,
                     $"{area.name}: 맵의 보물상자 {map.Chests.Count}개, 내용물 {area.ChestContents.Count}개 — 개수가 같아야 함");
                 foreach (var content in area.ChestContents)
                     Assert.IsTrue(content.Item != null && content.Count > 0 || content.Gold > 0 || content.Relic != null,
                         $"{area.name}: 빈 보물상자 내용물");
 
-                // 시작 위치에서 모든 보물상자·회복의 샘에 갈 수 있어야 함
-                var reachable = Flood(map);
+                // 시작 위치에서 모든 보물상자·회복의 샘(정글은 뗏목으로 가는 모래톱까지)에 갈 수 있어야 함 — 보스 방 문·덩굴 다리는 연 뒤 기준
+                var reachable = FieldReach.Flood(map);
                 for (int x = 0; x < map.Width; x++)
                 for (int y = 0; y < map.Height; y++)
                 {
@@ -271,22 +275,5 @@ namespace WordRPG.Tests
             }
         }
 
-        private static HashSet<Vector2Int> Flood(FieldMap map)
-        {
-            var seen = new HashSet<Vector2Int> { map.Start };
-            var queue = new Queue<Vector2Int>(seen);
-            while (queue.Count > 0)
-            {
-                var cell = queue.Dequeue();
-                foreach (var d in new[] { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right })
-                {
-                    var next = cell + d;
-                    // 보스 방 문은 열 수 있는 칸 (#76) — 문을 연 뒤 기준. 열기 전 조건은 BossGateDataTests가 본다
-                    bool passable = map.IsWalkable(next) || map.Get(next) == FieldTile.Gate;
-                    if (passable && seen.Add(next)) queue.Enqueue(next);
-                }
-            }
-            return seen;
-        }
     }
 }
