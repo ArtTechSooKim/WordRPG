@@ -172,6 +172,7 @@ namespace WordRPG.UI
         public int MooredRaftsVisible => mooredRafts.FindAll(r => r != null && r.activeSelf).Count;
         public int StreamRipples => streams != null ? streams.ActiveCount : 0;
         public int ScatterCount => scatter != null ? scatter.Count : 0;
+        public int FogCount => fog != null ? fog.Count : 0; // 바닥 안개 띠 수 (#102, 테스트용)
         public float LastStepSeconds => currentStep; // 마지막 한 칸에 걸린 시간 (물살·뗏목 확인용)
         public int LeversPulled { get; private set; }
         public bool IsCameraPanning => cameraFocus.HasValue;
@@ -310,6 +311,7 @@ namespace WordRPG.UI
             PulseBadges();
             UpdateRoamers(Time.unscaledDeltaTime);
             streams.Tick(Time.deltaTime, walker.Position);
+            fog.Tick(Time.deltaTime);
             tabletView.Tick(Time.unscaledDeltaTime);
             UpdateRaft();
 
@@ -665,6 +667,7 @@ namespace WordRPG.UI
             DrawTiles(area, IsDoorLocked);
             streams.SetMap(map);
             scatter.Build(map, area.Theme);
+            fog.Build(map, area.Theme);
             RefreshMooredRafts();
             if (!inBattle) Sound.PlayMusic(AreaMusic);
             session.World.Reveal(area.AreaId, map.Width, map.Height, position);

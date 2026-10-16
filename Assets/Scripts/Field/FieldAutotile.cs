@@ -17,7 +17,7 @@ namespace WordRPG.Field
         };
 
         // 테두리를 자동으로 그리는 칸: 길, 물, 얕은 강 (#80), 벽 (#100 — 초원 덤불 덩어리가 잔디와 둥글게 갈리게. 그림이 있는 테마만)
-        // 풀숲 (#101): 서고의 바닥 안개가 열린 바닥 쪽으로만 옅어지게
+        // 풀숲 (#101·#102): 초원 풀숲의 테두리 따기 · 서고 바닥 안개 자리. 풀숲이 아닌 쪽은 모두 테두리
         public static bool IsAutotiled(FieldTile tile) => tile == FieldTile.Floor || tile == FieldTile.Water || tile == FieldTile.Stream
                                                           || tile == FieldTile.Wall || tile == FieldTile.Grass;
 
@@ -30,8 +30,8 @@ namespace WordRPG.Field
                 case FieldTile.Water:
                 case FieldTile.Stream: return neighbor == FieldTile.Water || neighbor == FieldTile.Stream || neighbor == FieldTile.Bridge;
                 case FieldTile.Wall: return neighbor == FieldTile.Wall;
-                // 안개는 책장·잉크·물건 쪽으로는 끝까지 차고, 걸어 다니는 열린 땅(길·카펫·출입구·보스 방 문) 쪽으로만 옅어진다
-                case FieldTile.Grass: return neighbor != FieldTile.Floor && neighbor != FieldTile.Lawn && neighbor != FieldTile.Door && neighbor != FieldTile.Gate;
+                // 풀숲은 풀숲끼리만 이어짐 (#102): 잔디·덤불·물·물건 쪽은 모두 풀잎 모양 테두리 — 짙은 네모 바탕이 드러나지 않게
+                case FieldTile.Grass: return neighbor == FieldTile.Grass;
                 default: return false;
             }
         }

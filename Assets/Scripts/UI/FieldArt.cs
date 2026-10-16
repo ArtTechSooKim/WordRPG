@@ -64,6 +64,24 @@ namespace WordRPG.UI
 
         private static readonly Dictionary<string, Sprite[]> ScatterCache = new Dictionary<string, Sprite[]>();
 
+        // 바닥 안개 띠 (#102): Tiles/{테마}_Fog_Wide_0… (넓은 것, 64×20) · _Fog_Small_0… (작은 것). 칸보다 커서 16px = 1칸, 가운데 기준.
+        // 없으면 빈 배열 → 안개 없음
+        public static Sprite[] Fog(FieldTheme theme, bool wide)
+        {
+            string key = $"{theme}_Fog_{(wide ? "Wide" : "Small")}";
+            if (ScatterCache.TryGetValue(key, out var cached)) return cached;
+            var list = new List<Sprite>();
+            for (int i = 0; i < 16; i++)
+            {
+                var texture = Resources.Load<Texture2D>($"{Folder}{key}_{i}");
+                if (texture == null) break;
+                var sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 16, 0, SpriteMeshType.FullRect);
+                sprite.name = $"{key}_{i}";
+                list.Add(sprite);
+            }
+            return ScatterCache[key] = list.ToArray();
+        }
+
         // 칸보다 큰 그림 (#80): 유적 제단의 잠든 석상(2×2), 동굴 입구(3×3) — Tiles/{테마}_{종류}_prop.png, 16px = 1칸.
         // 바닥 칸 위에 아래 가운데를 맞춰 따로 그린다. 끝난 칸(동료가 깨어난 제단)은 없음
         public static Sprite Prop(FieldTile tile, FieldTheme theme, bool done)

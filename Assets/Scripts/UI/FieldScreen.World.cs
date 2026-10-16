@@ -159,6 +159,7 @@ namespace WordRPG.UI
             roamerViews = new FieldRoamerViews(transform, CellCenter);
             streams = new FieldStreams(transform);
             scatter = new FieldScatter(transform);
+            fog = new FieldFog(transform);
             var raftTexture = Resources.Load<Texture2D>("Art/NinjaAdventure/Field/raft");
             if (raftTexture != null)
                 raftSprite = Sprite.Create(raftTexture, new Rect(0, 0, raftTexture.width, raftTexture.height), new Vector2(0.5f, 0.5f), 16);

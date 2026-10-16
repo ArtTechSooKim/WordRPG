@@ -26,6 +26,7 @@ namespace WordRPG.UI
         private bool tabletBusy;                // 맞힌 뒤 다음 문제로 넘어가는 중
         private FieldStreams streams;           // 얕은 강 물결
         private FieldScatter scatter;           // 흩뿌림 꾸밈 — 풀·꽃·연잎·돌 부스러기 (#86)
+        private FieldFog fog;                   // 서고 바닥 안개 띠 (#102)
         private SpriteRenderer raftRenderer;    // 타고 있는 뗏목
         private Sprite raftSprite;
         private readonly List<GameObject> mooredRafts = new List<GameObject>(); // 나루터마다 묶인 뗏목 (타는 동안은 숨김)

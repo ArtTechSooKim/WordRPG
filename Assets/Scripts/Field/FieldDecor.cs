@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace WordRPG.Field
@@ -24,6 +25,23 @@ namespace WordRPG.Field
         }
 
         // 흩뿌림: 그 칸에 그릴 그림 번호 (없으면 -1). count = 그 바닥의 그림 수
+        // 바닥 안개 띠 (#102): 몬스터 칸(풀숲)마다 한 장 — 양옆도 풀숲이면 넓은 띠, 아니면(책장·길 옆) 작은 것.
+        // 그림 번호·뒤집기·어긋남(픽셀)은 칸 위치로 정해져 다시 그려도 같음. 그림(테마별)이 있는 지역만 FieldFog가 그린다
+        public static List<FogPuff> FogPuffs(FieldMap map)
+        {
+            var list = new List<FogPuff>();
+            for (int x = 0; x < map.Width; x++)
+            for (int y = 0; y < map.Height; y++)
+            {
+                var cell = new Vector2Int(x, y);
+                if (map.Get(cell) != FieldTile.Grass) continue;
+                bool wide = map.Get(cell + Vector2Int.left) == FieldTile.Grass && map.Get(cell + Vector2Int.right) == FieldTile.Grass;
+                list.Add(new FogPuff(cell, wide, Hash(cell, 61), Hash(cell, 67) % 2 == 1,
+                    new Vector2Int(Hash(cell, 71) % 9 - 4, Hash(cell, 73) % 5 - 2)));
+            }
+            return list;
+        }
+
         // 칸 그림 변형 (#98): 같은 종류 칸(책장·나무·풀숲)이 한 그림만 되풀이되지 않게 0(기본) ~ variants 중 하나를 칸 위치로 고른다
         public static int TileVariant(Vector2Int cell, int variants) => variants <= 0 ? 0 : Hash(cell, 97) % (variants + 1);
 
@@ -65,6 +83,25 @@ namespace WordRPG.Field
                 h *= 1274126177;
                 return (h ^ (h >> 16)) & 0x7FFFFFFF;
             }
+        }
+    }
+
+    // 바닥 안개 띠 한 장의 자리 (#102). Offset = 칸 가운데에서 어긋난 픽셀(16px = 1칸)
+    public readonly struct FogPuff
+    {
+        public readonly Vector2Int Cell;
+        public readonly bool Wide;
+        public readonly int Variant;
+        public readonly bool Flip;
+        public readonly Vector2Int Offset;
+
+        public FogPuff(Vector2Int cell, bool wide, int variant, bool flip, Vector2Int offset)
+        {
+            Cell = cell;
+            Wide = wide;
+            Variant = variant;
+            Flip = flip;
+            Offset = offset;
         }
     }
 }

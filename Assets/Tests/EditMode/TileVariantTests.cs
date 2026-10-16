@@ -31,11 +31,35 @@ namespace WordRPG.Tests
         {
             Assert.AreEqual(2, FieldArt.VariantCount(FieldTile.Wall, FieldTheme.Library), "책장 3가지 = 기본 + _v1·_v2");
             Assert.AreEqual(0, FieldArt.VariantCount(FieldTile.Grass, FieldTheme.Library), "몬스터 칸은 바닥 안개 (#101)");
-            Assert.IsNotNull(FieldArt.AutoTile(FieldTile.Grass, FieldTheme.Library, 255), "안개 자동 테두리");
-            Assert.IsNull(FieldArt.AutoTile(FieldTile.Grass, FieldTheme.Meadow, 255), "다른 지역 풀숲은 그대로");
+            Assert.IsNotNull(FieldArt.AutoTile(FieldTile.Grass, FieldTheme.Library, 255), "안개 자리 (아주 옅게)");
+            Assert.IsNotNull(FieldArt.AutoTile(FieldTile.Grass, FieldTheme.Meadow, 0), "초원 풀숲 테두리 따기 (#102)");
+            Assert.IsNull(FieldArt.AutoTile(FieldTile.Grass, FieldTheme.Forest, 0), "숲 고사리는 바탕이 잔디와 같아 그대로");
             Assert.AreEqual(0, FieldArt.VariantCount(FieldTile.Floor, FieldTheme.Library));
             Assert.IsNotNull(FieldArt.ForTileVariant(FieldTile.Wall, FieldTheme.Library, 2));
             Assert.IsNotNull(FieldArt.AutoTile(FieldTile.Water, FieldTheme.Library, 0), "잉크 웅덩이 물가 테두리 (#98)");
+        }
+
+        // #102 서고 바닥 안개 띠: 풀숲 칸마다 한 장, 양옆도 풀숲이면 넓은 띠, 자리는 늘 같음. 그림은 서고에만
+        [Test]
+        public void FogPuffsSitOnGrassAndOnlyTheLibraryHasFogArt()
+        {
+            var map = FieldMap.Parse("#####\n#,,,#\n#.,P#\n#####");
+            var puffs = FieldDecor.FogPuffs(map);
+            Assert.AreEqual(4, puffs.Count, "풀숲 4칸");
+            foreach (var p in puffs)
+            {
+                Assert.AreEqual(FieldTile.Grass, map.Get(p.Cell));
+                Assert.That(p.Offset.x, Is.InRange(-4, 4));
+                Assert.That(p.Offset.y, Is.InRange(-2, 2));
+            }
+            Assert.IsTrue(puffs.Find(p => p.Cell == new Vector2Int(2, 2)).Wide, "가운데 칸은 양옆이 풀숲 → 넓은 띠");
+            Assert.IsFalse(puffs.Find(p => p.Cell == new Vector2Int(1, 2)).Wide, "책장 옆은 작은 것");
+            CollectionAssert.AreEqual(puffs.ConvertAll(p => p.Variant), FieldDecor.FogPuffs(map).ConvertAll(p => p.Variant), "다시 그려도 같은 자리");
+
+            Assert.AreEqual(4, FieldArt.Fog(FieldTheme.Library, true).Length);
+            Assert.AreEqual(3, FieldArt.Fog(FieldTheme.Library, false).Length);
+            Assert.AreEqual(16f, FieldArt.Fog(FieldTheme.Library, true)[0].pixelsPerUnit, "칸보다 큰 그림 — 16px = 1칸");
+            Assert.AreEqual(0, FieldArt.Fog(FieldTheme.Meadow, true).Length, "초원엔 안개 없음");
         }
 
         // #99: 숲은 나무·풀숲 3가지씩, 초원·숲 잔디 흩뿌림. #100: 초원은 섞지 않고 덤불 벽 자동 테두리 (벽·땅이 헷갈리지 않게)
