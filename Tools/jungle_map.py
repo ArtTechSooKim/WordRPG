@@ -6,10 +6,12 @@
 #   '.' 흙길  ':' 이끼 땅(조우 없음)  ',' 짙은 풀숲(보이는 몬스터 서식지)  '#' 정글 나무(막힘)  '~' 깊은 강·골짜기(막힘)
 #   'D' 출입구(숲에서)  'P' 시작(야영지)  'F' 샘  'S' 가게  'E' 제단  'L' 사전 받침대  'C' 상자  'B' 빈칸두꺼비(보스)
 #   'G' 보스 방 문  'K' 열쇠 받침대 (#76 규칙 그대로)
-#   새: '>' '<' '^' 'v' 얕은 강(걸을 수 있음, 그 방향으로 걸으면 빨라짐)  'J' 나루터(뗏목 — 짝지은 나루터로 강을 따라 이동, 가는 길에 조우)
+#   새: '>' '<' '^' 'v' 얕은 강(걸을 수 있음, 그 방향으로 걸으면 빨라짐)
+#       'J' 나루터: 여기서 물 쪽으로 가면 뗏목에 탐 → 깊은 강 위를 스틱으로 직접 몰고(사용자 결정), 나루터에 닿으면 내림.
+#           강 가운데 모래톱의 상자는 뗏목에 탄 채 [확인]. 강 위에도 보이는 몬스터(흉내문어)
 #       'Y' 레버  'H' 덩굴 다리(레버를 당기면 놓임, 그 전엔 막힘)  'U' 유적 돌벽(막힘)  ';' 유적 바닥(조우 없음)
 #       'T' 단어 석판  'A' 유적 제단(동료 아라)  'O' 섬의 동굴 입구(1.2 어두운 밀림 동굴 — 1.1에선 막힘)
-# 검사: 줄 길이 · P 하나 · 모든 물건이 시작에서 닿음(다리·문은 열린 것으로, 나루터는 짝끼리 이어짐) ·
+# 검사: 줄 길이 · P 하나 · 모든 물건이 시작에서 닿음(다리·문은 열린 것으로, 걷기 + 뗏목) ·
 #       문을 안 열면 보스에게 못 감 · 열쇠는 문 없이 닿음 · 한 칸 통로 경고
 import os
 import random
@@ -23,7 +25,8 @@ OUT = os.path.join(ROOT, "Builds", "maps")
 W, H = 72, 88
 WALK = set(".:,;PD<>^v")
 OBJECTS = set("FSELCBKTAOYJ")
-RAFTS = [((49, 70), (52, 44)), ((58, 44), (60, 16))]   # 나루터 짝: 서쪽 기슭 ↔ 섬, 섬 ↔ 동쪽 기슭
+DOCKS = [(49, 70), (52, 44), (58, 44), (60, 16)]          # 나루터: 서쪽 기슭(버섯 늪) · 섬 서쪽·동쪽 · 동쪽 기슭
+SANDBARS = [(53, 5), (57, 9), (52, 81), (56, 84)]        # 강 위쪽·아래쪽 모래톱 상자 (뗏목으로만, 사용자 요청)
 
 g = [["#"] * W for _ in range(H)]
 rng = random.Random(20261016)
@@ -81,7 +84,7 @@ rect(2, 2, W - 3, H - 3, ":")
 rect(50, 2, 59, H - 3, "~")                      # 깊은 강 (동쪽, 남→북) — 뗏목으로만
 ellipse(55, 44, 3, 5, ":")                       # 강 가운데 섬
 rect(3, 46, 49, 48, ">")                         # 얕은 강 (서→동, 깊은 강으로 흘러듦) — 물살 따라 걸으면 빨라짐
-places += [("깊은 강 (뗏목)", 55, 24), ("얕은 강 → 물살", 18, 45), ("섬 · 동굴 입구 (1.2)", 55, 37)]
+places += [("깊은 강 (뗏목 직접 몰기)", 55, 24), ("얕은 강 → 물살", 18, 45), ("섬 · 동굴 입구 (1.2)", 55, 37)]
 
 # ---------------------------------------------------------------- 2) 고대 유적 (북서) — 석판 4개 + 안쪽 제단
 rect(3, 3, 28, 31, "#")
@@ -189,32 +192,51 @@ g[8][14] = "A"                                                      # 유적 제
 g[6][6] = "C"; g[6][25] = "C"                                       # 유적 보물
 g[9][39] = "B"                                                      # 빈칸두꺼비
 g[41][55] = "O"                                                     # 섬의 동굴 입구 (1.2)
-for (a, b) in RAFTS:
-    for x, y in (a, b):
-        g[y][x] = "J"
+for x, y in DOCKS:
+    g[y][x] = "J"
+for x, y in SANDBARS:                                               # 강 한가운데 모래톱 위 상자 — 뗏목에서 [확인]
+    g[y][x] = "C"
 obj("K", 66, 7)                                                     # 보스 방 열쇠 — 동쪽 기슭 끝 (뗏목으로, 아라가 힌트)
 for x, y in [(33, 82), (47, 78), (64, 66), (67, 82), (45, 36), (5, 36), (35, 50), (66, 44)]:
     obj("C", x, y)
-places += [("석판", 6, 15), ("석판", 25, 15), ("제단 (아라)", 14, 5), ("열쇠", 66, 4), ("나루터", 46, 70)]
+places += [("석판", 6, 15), ("석판", 25, 15), ("제단 (아라)", 14, 5), ("열쇠", 66, 4), ("나루터", 46, 70),
+           ("강 위쪽 모래톱", 55, 12), ("강 아래쪽 모래톱", 54, 78)]
 
 
 # ---------------------------------------------------------------- 8) 검사
-def flood(start, open_gate=True, open_bridges=True):
-    walk = set(WALK) | ({"G"} if open_gate else set()) | ({"H"} if open_bridges else set())
-    seen = {start}
-    q = deque([start])
+def river_cells():
+    # 나루터에 닿는 깊은 물 덩어리 (골짜기 물은 따로라 뗏목이 못 감)
+    seeds = [(x + dx, y + dy) for x, y in DOCKS for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)) if g[y + dy][x + dx] == "~"]
+    seen, q = set(seeds), deque(seeds)
     while q:
         x, y = q.popleft()
-        nxt = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
-        for a, b in RAFTS:   # 나루터 옆에 서면 짝 나루터 옆으로
-            for here, there in ((a, b), (b, a)):
-                if abs(x - here[0]) + abs(y - here[1]) == 1:
-                    nxt += [(there[0] + dx, there[1] + dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))]
-        for n in nxt:
-            if n not in seen and 0 <= n[0] < W and 0 <= n[1] < H and g[n[1]][n[0]] in walk:
+        for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+            if n not in seen and 0 <= n[0] < W and 0 <= n[1] < H and g[n[1]][n[0]] == "~":
                 seen.add(n)
                 q.append(n)
     return seen
+
+
+def flood(start, open_gate=True, open_bridges=True):
+    # 걷기 + 뗏목: 나루터(J)에서 강으로 들어가 타고, 강에서 나루터로 들어가 내린다. 돌려주는 값 = 걸은 칸 ∪ 뗏목 칸
+    walk = set(WALK) | {"J"} | ({"G"} if open_gate else set()) | ({"H"} if open_bridges else set())
+    river = river_cells()
+    seen = {("foot", start)}
+    q = deque(seen)
+    while q:
+        mode, (x, y) = q.popleft()
+        for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+            if not (0 <= n[0] < W and 0 <= n[1] < H):
+                continue
+            c = g[n[1]][n[0]]
+            if mode == "foot":
+                nxt = ("foot", n) if c in walk else ("raft", n) if n in river and g[y][x] == "J" else None
+            else:
+                nxt = ("raft", n) if n in river else ("foot", n) if c == "J" else None
+            if nxt and nxt not in seen:
+                seen.add(nxt)
+                q.append(nxt)
+    return {cell for _, cell in seen}
 
 
 start = next((x, y) for y in range(H) for x in range(W) if g[y][x] == "P")
@@ -269,7 +291,7 @@ OBJ_COLORS = {"C": (255, 220, 40), "T": (255, 255, 255), "A": (255, 120, 200), "
               "S": (0, 160, 80), "E": (160, 60, 255), "L": (250, 250, 250), "K": (255, 170, 0), "Y": (255, 90, 0),
               "J": (140, 90, 40), "O": (20, 20, 20)}
 S = 10
-LEGEND_W = 260
+LEGEND_W = 320
 img = Image.new("RGB", (W * S + LEGEND_W, H * S), (240, 244, 236))
 d = ImageDraw.Draw(img)
 for y in range(H):
@@ -282,13 +304,8 @@ for y in range(H):
             d.rectangle([x * S, y * S, x * S + S - 1, y * S + S - 1], fill=COLORS.get(c, (255, 0, 255)))
         if c in "><^v":
             d.text((x * S + 2, y * S - 2), {">": "›", "<": "‹", "^": "ˆ", "v": "ˇ"}[c], fill=(40, 90, 150))
-for a, b in RAFTS:   # 뗏목 길 (점선)
-    (x0, y0), (x1, y1) = a, b
-    steps = max(abs(x1 - x0), abs(y1 - y0))
-    for i in range(0, steps + 1, 2):
-        px = x0 + (x1 - x0) * i / steps
-        py = y0 + (y1 - y0) * i / steps
-        d.ellipse([px * S + 3, py * S + 3, px * S + 7, py * S + 7], fill=(250, 230, 160))
+for x, y in SANDBARS:   # 모래톱 (상자 둘레)
+    d.ellipse([x * S - 6, y * S - 6, x * S + S + 5, y * S + S + 5], outline=(240, 220, 150), width=3)
 try:
     font = ImageFont.truetype(os.path.join(ROOT, "Assets", "Resources", "UI", "Fonts", "NotoSansKR-Bold.otf"), 17)
 except OSError:
@@ -296,7 +313,7 @@ except OSError:
 for name, x, y in places:
     d.text((x * S, y * S), name, font=font, fill=(0, 0, 0), anchor="mm", stroke_width=3, stroke_fill=(255, 255, 255))
 legend = [("C", "보물상자"), ("T", "단어 석판 (4)"), ("A", "유적 제단 (아라)"), ("B", "빈칸두꺼비 (보스)"), ("K", "보스 방 열쇠"),
-          ("Y", "레버"), ("J", "나루터 (뗏목)"), ("O", "동굴 입구 (1.2)"), ("F", "회복의 샘"), ("S", "가게"),
+          ("Y", "레버"), ("J", "나루터 (뗏목 타기·내리기)"), ("O", "동굴 입구 (1.2)"), ("F", "회복의 샘"), ("S", "가게"),
           ("E", "성유물 제단"), ("L", "사전 받침대")]
 lx, ly = W * S + 16, 20
 d.text((lx, ly), "메아리 정글 72×88 (초안)", font=font, fill=(0, 0, 0)); ly += 36
@@ -308,6 +325,7 @@ for c, label in [(",", "짙은 풀숲 (몬스터 서식지)"), (".", "흙길"), 
                  (";", "유적 바닥"), ("G", "보스 방 문")]:
     d.rectangle([lx, ly, lx + 14, ly + 14], fill=COLORS[c], outline=(0, 0, 0))
     d.text((lx + 22, ly - 3), label, font=font, fill=(0, 0, 0)); ly += 27
-d.text((lx, ly + 6), "점선 = 뗏목 길 (가는 길에 조우)", font=font, fill=(0, 0, 0))
+d.text((lx, ly + 6), "깊은 강 = 나루터에서 뗏목을 타고", font=font, fill=(0, 0, 0))
+d.text((lx, ly + 32), "직접 몰기 (모래톱 상자는 뗏목에서)", font=font, fill=(0, 0, 0))
 img.save(os.path.join(OUT, "JungleMap_preview.png"))
 print(os.path.join(OUT, "JungleMap_preview.png"))
