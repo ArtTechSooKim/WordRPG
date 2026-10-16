@@ -112,6 +112,41 @@ def landmark(name, x0, y0, x1, y1):
     landmarks.append((name, x0, y0, x1, y1))
 
 
+# ---------------------------------------------------------------- 문장부호 모양 (#107 사용자: 랜드마크가 이름처럼 보이게)
+def disk_cells(cx, cy, r):
+    return {(x, y) for y in range(int(cy - r) - 1, int(cy + r) + 2) for x in range(int(cx - r) - 1, int(cx + r) + 2)
+            if (x + 0.5 - cx) ** 2 + (y + 0.5 - cy) ** 2 <= r * r}
+
+
+def stroke_cells(points, r0, r1):
+    # 점들을 따라 굵기가 r0 → r1로 바뀌는 둥근 붓질
+    cells = set()
+    for i, (x, y) in enumerate(points):
+        r = r0 + (r1 - r0) * i / max(1, len(points) - 1)
+        cells |= disk_cells(x, y, r)
+    return cells
+
+
+def comma_cells(cx, cy, r, tail, flip=False):
+    # 쉼표: 둥근 머리 + 머리 오른쪽 아래에서 내려와 왼쪽으로 휘며 가늘어지는 꼬리.
+    # flip = 거꾸로(여는 따옴표 “ 한 짝 — 머리는 아래, 꼬리는 위로 올라가 오른쪽으로 휨)
+    s = -1 if flip else 1
+    tail_pts = bezier((cx + s * r * 0.45, cy + s * r * 0.55), (cx + s * r * 0.75, cy + s * (r + tail * 0.6)), (cx - s * r * 0.55, cy + s * (r + tail)), n=30)
+    return disk_cells(cx, cy, r) | stroke_cells(tail_pts, r * 0.62, r * 0.28)
+
+
+def fill(cells, c, only=None):
+    for x, y in cells:
+        if inside(x, y, 2) and (only is None or g[y][x] in only):
+            g[y][x] = c
+
+
+def landmark_cells(name, cells):
+    fill(cells, "R")
+    xs, ys = [x for x, _ in cells], [y for _, y in cells]
+    landmarks.append((name, min(xs), min(ys), max(xs), max(ys)))
+
+
 # ---------------------------------------------------------------- 1) 넓은 모래벌판
 rect(3, 3, W - 4, H - 4, ":")
 # 가장자리를 울퉁불퉁하게 (절벽·큰 언덕)
@@ -153,12 +188,12 @@ places.append(("잊힌 문자의 신전", 72, 20))
 
 # ---------------------------------------------------------------- 4) 쉼표 오아시스 (가운데 마을)
 ellipse(72, 96, 24, 17, ":")
-ellipse(72, 96, 9, 5, "~")              # 오아시스 연못
+fill(comma_cells(72.5, 92.5, 6.2, 8), "~")   # 오아시스 연못 = 쉼표 (둥근 머리 + 왼쪽 아래로 휘는 꼬리, #107)
 for x0, y0 in [(52, 83), (88, 83), (50, 106), (90, 106)]:
     landmark("모래 집", x0, y0, x0 + 3, y0 + 2)
-for x0, y0 in [(66, 88), (77, 88), (66, 103), (77, 103)]:   # 연못가 야자수 (큰 그림 한 장)
+for x0, y0 in [(63, 86), (80, 87), (78, 101), (62, 104)]:   # 연못가 야자수 (큰 그림 한 장) — 쉼표 둘레에
     landmark("야자수", x0, y0, x0 + 1, y0 + 1)
-places.append(("쉼표 오아시스", 72, 88))
+places.append(("쉼표 오아시스", 72, 84))
 
 # ---------------------------------------------------------------- 5) 큰길 (모래길, 두 칸)
 roads = [
@@ -172,12 +207,12 @@ for r in roads:
     path(r, 2, ".", only=":,")
 
 # ---------------------------------------------------------------- 6) 랜드마크
-landmark("느낌표 바위", 70, 58, 75, 68)     # 막대
-rect(70, 69, 75, 70, ":")
-landmark("느낌표 바위", 71, 71, 74, 73)     # 점 (같은 이름 — 그림 하나로 덮음)
+bar = {(x, y) for y in range(57, 69) for x in range(66, 80)
+       if abs(x + 0.5 - 73) <= 3.4 - (y - 57) * 0.19 - (0.8 if y == 57 else 0)}   # 위가 넓고 아래로 좁아지는 막대, 윗모서리는 둥글게
+landmark_cells("느낌표 바위", bar | disk_cells(73, 72.5, 2.3))                    # + 둥근 점 (같은 이름 — 그림 하나로 덮음)
 ellipse(23, 70, 18, 15, ":")
-landmark("따옴표 쌍둥이 탑", 15, 58, 19, 66)
-landmark("따옴표 쌍둥이 탑", 27, 58, 31, 66)
+landmark_cells("따옴표 쌍둥이 탑", comma_cells(16.5, 65, 3.4, 5, flip=True))    # 여는 따옴표 “ 두 짝 — 쉼표 오아시스와 다르게 거꾸로
+landmark_cells("따옴표 쌍둥이 탑", comma_cells(28.5, 65, 3.4, 5, flip=True))
 
 # ---------------------------------------------------------------- 7) 마침표 호수 (남동)
 ellipse(114, 150, 16, 12, "~")
