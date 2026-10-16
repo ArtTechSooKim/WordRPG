@@ -7,6 +7,7 @@
 - tileset(): 이어지는 바닥 타일 16장 (1회, 높이 차 transition 0.25면 4회). 참고 그림을 주면 그 그림을 그대로 베낌 → 글로만
 - bitforge(): 16px 한 장 (1회) — 품질 낮음. character(): 사람 뼈대가 기본이라 물고기가 사람 모양 → 쓰지 말 것
 - create-tiles-pro(Ninja 느낌 바닥 타일)는 8회로 부족했음 — 크레딧 필요
+- vfx(): 움직이는 효과(소용돌이·거품) 1회, 고치기도 1회 (#95). 색을 16진수로 적으면 맞춰 줌. 다른 바다 색은 코드로 색만 바꾸면 됨
 사용: python Tools/pixellab_client.py balance"""
 import base64, io, json, os, sys, time, urllib.request, urllib.error
 from PIL import Image
@@ -181,6 +182,32 @@ def rotate4(label, image, desc):
     log(label, before)
     return sheet
 
+
+def vfx(label, desc, effect_id=None, conversation=None):
+    """움직이는 효과 (lite = 1회). 고칠 땐 앞 결과의 effect_id·conversation과 '바꿀 점'을 desc로 (1회).
+    결과: out/label/{label}.png(프레임 시트) · .json(프레임 위치·시간) · .gif · meta.json(effect_id·conversation)"""
+    before = balance()
+    payload = {"description": desc, "artist": "lite", "name": label}
+    if effect_id:
+        payload.update({"effect_id": effect_id, "conversation": conversation})
+    code, j = call("POST", "/vfx", payload)
+    if code not in (200, 202):
+        print(label, code, json.dumps(j)[:300]); return None
+    job = wait_job(j["background_job_id"], label)
+    lr = job.get("last_response") or {}
+    if job.get("status") != "completed":
+        print(label, job.get("status")); return None
+    os.makedirs(os.path.join(OUT, label), exist_ok=True)
+    files = lr.get("files") or {}
+    items = files.items() if isinstance(files, dict) else [(f.get("name"), f.get("url")) for f in files]
+    for name, url in items:
+        if isinstance(url, dict): url = url.get("url")
+        with urllib.request.urlopen(url, timeout=60) as r:
+            open(os.path.join(OUT, label, os.path.basename(str(name))), "wb").write(r.read())
+    meta = {k: lr.get(k) for k in ("effect_id", "name", "message", "canvas", "frames", "fps", "loop", "conversation")}
+    json.dump(meta, open(os.path.join(OUT, label, "meta.json"), "w"), ensure_ascii=False)
+    log(label, before, f"canvas={lr.get('canvas')} frames={lr.get('frames')}")
+    return meta
 
 if __name__ == "__main__":
     if sys.argv[1:] == ["balance"]:
