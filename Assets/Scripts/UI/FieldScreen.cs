@@ -173,6 +173,7 @@ namespace WordRPG.UI
         public int StreamRipples => streams != null ? streams.ActiveCount : 0;
         public int ScatterCount => scatter != null ? scatter.Count : 0;
         public bool HasFog => fog != null && fog.IsShowing; // 바닥 안개 (#103, 테스트용)
+        public int FogRepaints => fog != null ? fog.Repaints : 0; // 안개 무늬가 흘러가 다시 칠한 횟수 (#104, 테스트용)
         public float LastStepSeconds => currentStep; // 마지막 한 칸에 걸린 시간 (물살·뗏목 확인용)
         public int LeversPulled { get; private set; }
         public bool IsCameraPanning => cameraFocus.HasValue;
@@ -311,6 +312,7 @@ namespace WordRPG.UI
             PulseBadges();
             UpdateRoamers(Time.unscaledDeltaTime);
             streams.Tick(Time.deltaTime, walker.Position);
+            fog.Tick(Time.deltaTime);
             tabletView.Tick(Time.unscaledDeltaTime);
             UpdateRaft();
 

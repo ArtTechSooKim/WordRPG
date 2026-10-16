@@ -64,6 +64,34 @@ namespace WordRPG.Tests
             Assert.IsFalse(FieldFog.StyleFor(FieldTheme.Meadow, out _, out _, out _), "초원엔 안개 없음");
         }
 
+        // #104 안개 무늬가 흘러감: 덮는 자리(가장자리)는 그대로, 짙은 곳·옅은 곳만 바뀜
+        [Test]
+        public void FogPatternDriftsButItsOutlineStays()
+        {
+            var map = FieldMap.Parse(MapText(new[] { "########", "#,,,,,.#", "#,,,,,P#", "########" }));
+            var light = new Color32(206, 218, 232, 255);
+            var shade = new Color32(150, 168, 192, 255);
+            var coverage = FogMap.Prepare(map);
+            var still = new Color32[coverage.Width * coverage.Height];
+            var moved = new Color32[still.Length];
+            FogMap.Paint(coverage, still, light, shade, 0.5f, 0f);
+            FogMap.Paint(coverage, moved, light, shade, 0.5f, 12f);
+            int changed = 0;
+            var covered = new System.Collections.Generic.HashSet<int>(coverage.Index);
+            for (int i = 0; i < still.Length; i++)
+            {
+                if (!covered.Contains(i))
+                {
+                    Assert.AreEqual(0, still[i].a); Assert.AreEqual(0, moved[i].a, "덮는 자리 밖은 흘러가도 맑음 (벽 위로 안 미끄러짐)");
+                }
+                else if (!still[i].Equals(moved[i])) changed++;
+            }
+            Assert.Greater(changed, 20, "구름 무늬는 바뀜");
+            CollectionAssert.AreEqual(FogMap.Render(map, light, shade, 0.5f), still, "흘러가기 전 = 처음 그림");
+        }
+
+        private static string MapText(string[] rows) => string.Join("\n", rows);
+
         // #99: 숲은 나무·풀숲 3가지씩, 초원·숲 잔디 흩뿌림. #100: 초원은 섞지 않고 덤불 벽 자동 테두리 (벽·땅이 헷갈리지 않게)
         [Test]
         public void ForestMixesTreesMeadowKeepsOneBushWithShadedEdges()

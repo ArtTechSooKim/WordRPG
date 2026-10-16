@@ -5,16 +5,42 @@ namespace WordRPG.Field
     // 바닥 안개 한 장 (#103, 사용자: "한 줄씩 긋지 말고 그냥 합쳐버리자"): 몬스터 칸(풀숲)을 모두 덮는 이어진 안개.
     // 안쪽은 구름 무늬로 짙기만 조금씩 다르고(맵 픽셀 좌표 기준이라 칸마다 되풀이되지 않음 — 고른 막은 유리 같다고 함),
     // 풀숲 밖(벽은 빼고)으로 fade px에 걸쳐 4단계 디더로 점점이 옅어진다. 결과 = (맵 너비×16) × (맵 높이×16) RGBA, 아래 줄부터 (16px = 1칸).
+    // 구름 무늬는 천천히 흘러간다 (#104 사용자: 살짝 움직이면 좋겠어) — 가장자리는 그대로라 안개가 벽 위로 미끄러지지 않음.
     // 막지 않는 그림일 뿐 — 조우는 그대로 풀숲 규칙
     public static class FogMap
     {
         public const int Pixels = 16;
         private static readonly int[,] Bayer = { { 0, 8, 2, 10 }, { 12, 4, 14, 6 }, { 3, 11, 1, 9 }, { 15, 7, 13, 5 } };
 
-        public static Color32[] Render(FieldMap map, Color32 light, Color32 shade, float alpha, float fade = 6f)
+        // 안개가 덮는 픽셀들 — 자리와 가장자리 옅어짐은 맵에서 한 번만 정하고(벽엔 안 번짐), 구름 무늬만 Paint가 매번 다시 칠한다 (#104 흘러가기)
+        public sealed class Coverage
+        {
+            public int Width { get; }
+            public int Height { get; }
+            public int[] Index { get; }   // Color32[] 안 위치
+            public short[] X { get; }     // 맵 픽셀 좌표
+            public short[] Y { get; }
+            public float[] Edge { get; }  // 1 = 풀숲 안, 0에 가까울수록 바깥 가장자리
+            public int Count => Index.Length;
+
+            public Coverage(int width, int height, int[] index, short[] x, short[] y, float[] edge)
+            {
+                Width = width;
+                Height = height;
+                Index = index;
+                X = x;
+                Y = y;
+                Edge = edge;
+            }
+        }
+
+        public static Coverage Prepare(FieldMap map, float fade = 6f)
         {
             int width = map.Width * Pixels, height = map.Height * Pixels;
-            var pixels = new Color32[width * height];
+            var index = new System.Collections.Generic.List<int>();
+            var xs = new System.Collections.Generic.List<short>();
+            var ys = new System.Collections.Generic.List<short>();
+            var edges = new System.Collections.Generic.List<float>();
             for (int cy = 0; cy < map.Height; cy++)
             for (int cx = 0; cx < map.Width; cx++)
             {
@@ -27,19 +53,44 @@ namespace WordRPG.Field
                     int wx = cx * Pixels + px, wy = cy * Pixels + py;
                     float d = inside ? 0f : DistanceToGrass(map, cx, cy, wx + 0.5f, wy + 0.5f);
                     if (d >= fade) continue;
-                    float n1 = Noise(wx, wy * 1.6f, 34f, 1);   // 큰 뭉게 (가로로 조금 길게)
-                    float n2 = Noise(wx, wy * 1.6f, 13f, 2);   // 잔 무늬
-                    float density = Mathf.Clamp01(0.62f + 0.38f * n1 + 0.16f * (n2 - 0.5f));
-                    float level = density * (1f - d / fade) * 4f;
-                    int steps = Mathf.FloorToInt(level);
-                    if (Bayer[wy & 3, wx & 3] / 16f < level - steps) steps++;
-                    if (steps <= 0) continue;
-                    float k = Mathf.Clamp01(1.1f - n1 * 1.3f) * 0.6f;   // 옅은 곳은 살짝 그늘색
-                    var c = Color32.Lerp(light, shade, k);
-                    c.a = (byte)Mathf.RoundToInt(255f * alpha * Mathf.Min(4, steps) / 4f);
-                    pixels[wy * width + wx] = c;
+                    index.Add(wy * width + wx);
+                    xs.Add((short)wx);
+                    ys.Add((short)wy);
+                    edges.Add(1f - d / fade);
                 }
             }
+            return new Coverage(width, height, index.ToArray(), xs.ToArray(), ys.ToArray(), edges.ToArray());
+        }
+
+        // drift = 구름 무늬가 흘러간 픽셀 수 (큰 뭉게는 오른쪽으로, 잔 무늬는 반대로 조금 — 그냥 미끄러지지 않고 모양이 바뀌며 흐름)
+        public static void Paint(Coverage coverage, Color32[] pixels, Color32 light, Color32 shade, float alpha, float drift = 0f)
+        {
+            for (int i = 0; i < coverage.Count; i++)
+            {
+                int wx = coverage.X[i], wy = coverage.Y[i];
+                float n1 = Noise(wx - drift, wy * 1.6f, 34f, 1);          // 큰 뭉게 (가로로 조금 길게)
+                float n2 = Noise(wx + drift * 0.6f, wy * 1.6f, 13f, 2);   // 잔 무늬
+                float density = Mathf.Clamp01(0.62f + 0.38f * n1 + 0.16f * (n2 - 0.5f));
+                float level = density * coverage.Edge[i] * 4f;
+                int steps = Mathf.FloorToInt(level);
+                if (Bayer[wy & 3, wx & 3] / 16f < level - steps) steps++;
+                if (steps <= 0)
+                {
+                    pixels[coverage.Index[i]] = default;
+                    continue;
+                }
+                float k = Mathf.Clamp01(1.1f - n1 * 1.3f) * 0.6f;   // 옅은 곳은 살짝 그늘색
+                var c = Color32.Lerp(light, shade, k);
+                c.a = (byte)Mathf.RoundToInt(255f * alpha * Mathf.Min(4, steps) / 4f);
+                pixels[coverage.Index[i]] = c;
+            }
+        }
+
+        public static Color32[] Render(FieldMap map, Color32 light, Color32 shade, float alpha, float fade = 6f, float drift = 0f)
+        {
+            var coverage = Prepare(map, fade);
+            var pixels = new Color32[coverage.Width * coverage.Height];
+            Paint(coverage, pixels, light, shade, alpha, drift);
             return pixels;
         }
 
