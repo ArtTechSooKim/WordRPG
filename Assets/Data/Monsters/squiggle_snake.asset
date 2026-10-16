@@ -38,3 +38,5 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: d068093b31fa6bd479a9978022d8bc1f, type: 2}
     chance: 0.2
     count: 1
+  trainingDummy: 0
+  fleeTier: 1

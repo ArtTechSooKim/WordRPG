@@ -20,6 +20,9 @@ namespace WordRPG.Battle
         [SerializeField] private float comboBonusPerStep = 0.05f;
         [Tooltip("공격 기술 강도: n번째 값 = 단어 n개를 연속으로 맞혀야 할 때의 피해 배율 (하나라도 틀리면 이번 턴 공격 실패)")]
         [SerializeField] private float[] intensityMultipliers = { 1f, 1.2f, 1.5f, 2f };
+        [Tooltip("보통 등급 몬스터에게서 도망칠 때 단어 문제가 나올 확률 (#84 사용자: 1/4 — 나머지 3/4은 바로 도망)")]
+        [Range(0f, 1f)]
+        [SerializeField] private float normalFleeQuizChance = 0.25f;
 
         private static readonly float[] DefaultIntensity = { 1f, 1.2f, 1.5f, 2f };
 
@@ -29,6 +32,7 @@ namespace WordRPG.Battle
         public float Variance => variance;
         public int ExpPerCorrectAnswer => expPerCorrectAnswer;
         public float ComboBonusPerStep => comboBonusPerStep;
+        public float NormalFleeQuizChance => normalFleeQuizChance;
 
         // 고를 수 있는 가장 높은 강도 (= 연속으로 맞혀야 할 단어 수의 최대)
         public int MaxIntensity => Multipliers.Length;
@@ -42,8 +46,10 @@ namespace WordRPG.Battle
         public BattleConfig() { }
 
         public BattleConfig(float answerTimeLimitSeconds, float criticalTimeSeconds, float criticalMultiplier,
-            float variance, int expPerCorrectAnswer, float comboBonusPerStep = 0.05f, float[] intensityMultipliers = null)
+            float variance, int expPerCorrectAnswer, float comboBonusPerStep = 0.05f, float[] intensityMultipliers = null,
+            float normalFleeQuizChance = 0.25f)
         {
+            this.normalFleeQuizChance = normalFleeQuizChance;
             if (intensityMultipliers != null) this.intensityMultipliers = intensityMultipliers;
             this.answerTimeLimitSeconds = answerTimeLimitSeconds;
             this.criticalTimeSeconds = criticalTimeSeconds;

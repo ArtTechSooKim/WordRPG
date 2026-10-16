@@ -327,6 +327,12 @@ namespace WordRPG.EditorTools
                 boss.FindPropertyRelative("rewardItem").objectReferenceValue = fillBlankDoc;
             });
 
+            // --- 도망 등급 (#84 사용자 결정): 약함 = 항상 도망 / 보통 = 1/4 확률로 단어 문제 / 강함 = 늘 단어 문제 (틀리면 차례를 놓침).
+            //     초원의 잉크 슬라임·낙서 박쥐는 약함, 숲·정글의 보통 몬스터는 보통, 던전의 까먹깨비·정글의 받침갓파(방어형)와 보스는 강함
+            SetFleeTier(FleeTier.Weak, inkSlime, scribbleBat);
+            SetFleeTier(FleeTier.Normal, spellMushroom, squiggleSnake, questionOwl, tailLizard, mimicOctopus);
+            SetFleeTier(FleeTier.Strong, forgetGoblin, batchimKappa, forgetKing, muddleRaccoon, blankFrog);
+
             // --- 출입구 연결 (맵의 D를 위→아래, 왼→오른 순): 초원 0 = 서고, 초원 1 = 숲(서고 보스를 물리치면 열림).
             //     숲 0 = 정글(숲 보스를 물리치면 열림, #80 — 보스 공터 위쪽), 숲 1 = 초원 ---
             const string meadowPath = "Assets/Data/Areas/meadow.asset", libraryPath = "Assets/Data/Areas/library.asset",
@@ -684,6 +690,18 @@ namespace WordRPG.EditorTools
                 if (source[i] != 'G' && source[i] != 'K' && source[i] != current[i]) return;
             prop.stringValue = source;
             so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // 도망 등급: 기본값(약함)일 때만 정함 (인스펙터에서 바꾼 값은 유지)
+        private static void SetFleeTier(FleeTier tier, params MonsterSpecies[] species)
+        {
+            foreach (var monster in species)
+            {
+                if (monster == null || monster.FleeTier != FleeTier.Weak || tier == FleeTier.Weak) continue;
+                var so = new SerializedObject(monster);
+                Prop(so, "fleeTier").enumValueIndex = (int)tier;
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
         }
 
         // 원본 맵에 새 칸(added 글자들)이 생겼을 때: 에셋의 맵이 그 칸만 빼고 원본과 같으면 원본으로 바꾼다 (#80 숲의 정글 출입구 D)

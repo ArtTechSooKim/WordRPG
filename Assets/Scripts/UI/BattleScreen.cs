@@ -75,8 +75,11 @@ namespace WordRPG.UI
         private Vector2 fleeButtonHome;
         private Coroutine cantFleeRoutine;
         private IReadOnlyList<BattleEvent> fleeEvents;
+        private IReadOnlyList<BattleEvent> fleeQuizEvents; // 도망 문제가 나왔을 때 (#84 강한·보통 몬스터)
+        private string quizHintPrefix;                      // 문제 안내 앞에 붙는 말 (도망 문제: '도망치려면 맞혀라! — ')
         private const string CantFleeText = "도망갈 수 없다!";
         public int FleeBlockedCount { get; private set; } // 보스전에서 [도망가기]를 누른 횟수 (테스트용)
+        public int FleeQuizzes { get; private set; }      // 도망 문제가 나온 횟수 (테스트용, #84)
         public string SkillTitle => skillTitle != null ? skillTitle.text : "";
         // 공격 기술 강도 (Figma 'Intensity Button'): ×1 단어 1개 / ×1.2 연속 2개 / ×1.5 연속 3개 / ×2 연속 4개
         private readonly List<Button> intensityButtons = new List<Button>();
@@ -326,6 +329,7 @@ namespace WordRPG.UI
             engine = new BattleEngine(session.PartyMembers, enemies, provider, battleConfig, rng,
                 session.StartBattleCombo(DateTime.UtcNow), canFlee: !bossBattle);
             fleeEvents = null;
+            fleeQuizEvents = null;
 
             foreach (var view in enemyViews) Destroy(view.Root.gameObject);
             enemyViews.Clear();
@@ -400,7 +404,15 @@ namespace WordRPG.UI
                     yield return PlayEvents(itemEvents);
                     continue;
                 }
-                var question = engine.SelectSkill(pickedSkill, pickedTarget, pickedIntensity);
+                // 도망 문제 (#84): 전투 문제 칸 그대로, 안내만 '도망치려면 맞혀라!' — 틀리면 차례를 놓침
+                bool fleeQuiz = engine.IsFleeQuiz;
+                if (fleeQuiz)
+                {
+                    HideAllPanels();
+                    yield return PlayEvents(fleeQuizEvents);
+                }
+                quizHintPrefix = fleeQuiz ? "도망치려면 맞혀라! — " : null;
+                var question = fleeQuiz ? engine.CurrentQuestion : engine.SelectSkill(pickedSkill, pickedTarget, pickedIntensity);
                 IReadOnlyList<BattleEvent> events;
                 while (true)
                 {
@@ -437,6 +449,7 @@ namespace WordRPG.UI
                         // 틀리면: 정답이 초록·내 답이 빨강으로 표시되고, 오답 카드가 '오답 노트에 추가'를 알려 준다 (따로 설명 없음)
                         string title = choice < 0 ? "시간 초과! 오답 노트에 추가" : "오답! 오답 노트에 추가";
                         if (chainLength > 1) title = (choice < 0 ? "시간 초과" : "오답") + $" — ×{Multiplier(chainLength)} 공격 실패! 오답 노트에 추가";
+                        if (fleeQuiz) title = (choice < 0 ? "시간 초과" : "오답") + " — 도망 실패! 오답 노트에 추가";
                         yield return ShowWordCard(title, question.Word, "다음", Palette.Bad);
                     }
                     if (!more) break;
@@ -444,6 +457,7 @@ namespace WordRPG.UI
                 }
 
                 // 5. 결과 연출
+                quizHintPrefix = null;
                 HideAllPanels();
                 yield return PlayEvents(events); // 콤보는 글자 아래 'n 연속 정답 · 피해 +n%'가 곧 설명
             }
@@ -471,7 +485,7 @@ namespace WordRPG.UI
                 ShowTip(TutorialProgress.CompanionTurn, $"{actor.DisplayName} 차례 — {actor.DisplayName}도 단어를 맞혀야 기술이 나가요",
                     () => (RectTransform)skillButtons[0].transform, chosen, GuideHints.Gesture.Tap); // 처음 함께 싸울 때 (#81, GDD 9-6)
 
-            while (pickedSkill == null && pickedItem == null && !TrainingEnding && !engine.IsOver)
+            while (pickedSkill == null && pickedItem == null && !TrainingEnding && !engine.IsOver && engine.Phase == BattlePhase.ChoosingSkill)
             {
                 if (intensityMode && Tip(TutorialProgress.Intensity))
                     ShowTip(TutorialProgress.Intensity, "새로 열림: 단어를 더 맞히면 더 세게!",
@@ -486,7 +500,7 @@ namespace WordRPG.UI
         {
             ShowPanel(quizPanel);
             quizPrompt.text = question.Prompt;
-            string hint = question.Direction == QuizDirection.EnglishToMeaning ? "이 단어의 뜻은?" : "알맞은 영단어는?";
+            string hint = (quizHintPrefix ?? "") + (question.Direction == QuizDirection.EnglishToMeaning ? "이 단어의 뜻은?" : "알맞은 영단어는?");
             for (int i = 0; i < choiceButtons.Count; i++)
             {
                 bool used = i < question.Choices.Count;
@@ -638,6 +652,20 @@ namespace WordRPG.UI
                     case BattleEventType.Fled:
                         Log($"{UiKit.WithJosa(e.Actor.DisplayName, "은", "는")} 무사히 도망쳤다!");
                         Sound.Play(Sfx.Flee);
+                        yield return Wait(0.6f);
+                        break;
+
+                    case BattleEventType.FleeQuiz: // 강한 몬스터 (또는 보통 몬스터의 1/4) — 도망치려면 단어를 맞혀야 함 (#84)
+                        Log(e.Target != null
+                            ? $"{UiKit.WithJosa(e.Target.DisplayName, "이", "가")} 길을 막았다! 도망치려면 단어를 맞혀라"
+                            : "도망치려면 단어를 맞혀라!");
+                        Sound.Play(Sfx.Encounter);
+                        yield return Wait(0.7f);
+                        break;
+
+                    case BattleEventType.FleeFailed:
+                        Log("도망 실패! 차례를 놓쳤다");
+                        Sound.Play(Sfx.Fail);
                         yield return Wait(0.6f);
                         break;
 
@@ -1173,6 +1201,12 @@ namespace WordRPG.UI
             if (engine.Phase == BattlePhase.Fled)
             {
                 fleeEvents = events;
+                return;
+            }
+            if (engine.IsFleeQuiz) // 강한·보통(1/4) 몬스터: 단어 문제로 (ChooseSkill이 끝나고 PlayBattle이 문제를 냄, #84)
+            {
+                fleeQuizEvents = events;
+                FleeQuizzes++;
                 return;
             }
             FleeBlockedCount++;

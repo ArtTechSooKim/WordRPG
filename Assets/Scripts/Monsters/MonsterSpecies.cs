@@ -11,6 +11,15 @@ namespace WordRPG.Monsters
         Supporter // 지원형
     }
 
+    // 도망 등급 (#84, 2026-10-16 사용자 결정): 약함 = 항상 도망 / 보통 = 3/4은 바로, 1/4은 단어 문제 / 강함 = 늘 단어 문제(틀리면 차례를 놓침).
+    // 에셋에 번호로 저장되므로 새 등급은 맨 뒤에. 칸이 없는 예전 에셋·테스트 몬스터는 약함 (진짜 몬스터는 SampleDataBuilder가 모두 정해 둠)
+    public enum FleeTier
+    {
+        Weak,
+        Normal,
+        Strong
+    }
+
     public static class MonsterRoleExtensions
     {
         public static string DisplayName(this MonsterRole role)
@@ -58,6 +67,11 @@ namespace WordRPG.Monsters
         [Tooltip("수련용 허수아비: 맞아도 HP가 줄지 않는다 (피해 숫자는 그대로). 기술을 비워 두면 공격하지 않는다")]
         [SerializeField] private bool trainingDummy;
 
+        [Header("도망 (#84)")]
+        [Tooltip("약함 = 항상 도망 / 보통 = 1/4 확률로 단어 문제 / 강함 = 늘 단어 문제 (틀리면 차례를 놓침). 보스전은 원래 도망 불가")]
+        [SerializeField] private FleeTier fleeTier = FleeTier.Weak;
+
+        public FleeTier FleeTier => fleeTier;
         public string SpeciesId => speciesId;
         public string DisplayName => displayName;
         public string Description => description;

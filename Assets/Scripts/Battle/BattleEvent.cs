@@ -19,7 +19,9 @@ namespace WordRPG.Battle
         Defeat,
         Combo,        // Actor, Amount(연속 정답 수) — 정답 직후, 기술 발동 전 (Combo.Label로 글자)
         Fled,         // Actor — 도망쳐서 전투가 끝남 (#53)
-        FleeBlocked   // Actor — 보스전이라 도망칠 수 없음 (차례는 그대로)
+        FleeBlocked,  // Actor — 보스전이라 도망칠 수 없음 (차례는 그대로)
+        FleeQuiz,     // Actor, Target(가장 강한 적) — 도망치려면 단어를 맞혀야 함 (#84). 이어서 CurrentQuestion
+        FleeFailed    // Actor — 도망 문제를 틀려 차례를 놓침 (#84)
     }
 
     // 전투 로직이 만들어내는 사건 기록. UI는 이 목록을 순서대로 연출만 한다
@@ -73,6 +75,11 @@ namespace WordRPG.Battle
         public static BattleEvent Fled(BattleUnit actor) => new BattleEvent(BattleEventType.Fled) { Actor = actor };
 
         public static BattleEvent FleeBlocked(BattleUnit actor) => new BattleEvent(BattleEventType.FleeBlocked) { Actor = actor };
+
+        public static BattleEvent FleeQuiz(BattleUnit actor, BattleUnit blocker) =>
+            new BattleEvent(BattleEventType.FleeQuiz) { Actor = actor, Target = blocker };
+
+        public static BattleEvent FleeFailed(BattleUnit actor) => new BattleEvent(BattleEventType.FleeFailed) { Actor = actor };
 
         public static BattleEvent Victory() => new BattleEvent(BattleEventType.Victory);
 

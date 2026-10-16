@@ -48,3 +48,4 @@ MonoBehaviour:
     chance: 1
     count: 2
   trainingDummy: 0
+  fleeTier: 2

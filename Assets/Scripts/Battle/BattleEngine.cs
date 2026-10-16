@@ -20,7 +20,8 @@ namespace WordRPG.Battle
     //  오답/시간 초과: 기술 실패, 단어는 오답 노트로
     //  기술 대신 상처약을 쓰면 문제 없이 회복하고 차례를 넘긴다
     //  연속으로 맞히면 콤보 (Combo): 단계마다 아군 기술 피해가 조금씩 늘고, 틀리면 0으로
-    //  기술 대신 도망칠 수 있다 (#53): 바로 끝나고 보상은 없음. 보스전(canFlee = false)에서는 막힘
+    //  기술 대신 도망칠 수 있다 (#53): 끝나면 보상은 없음. 보스전(canFlee = false)에서는 막힘.
+    //    몬스터 등급(#84): 약함 = 바로 / 보통 = 1/4 확률로 단어 문제 / 강함 = 늘 단어 문제 — 맞히면 도망, 틀리면 차례를 놓침
     //  공격 기술은 강도를 고를 수 있다 (사용자 아이디어): 단어 n개를 연속으로 맞혀야 발동하고 피해 ×1.2·×1.5·×2.
     //    하나라도 틀리면 이번 턴 공격 실패. 맞힌 단어는 하나하나 콤보에 더해지고, 크리티컬은 모두 빨리 맞혔을 때만
     // MonoBehaviour·UI 의존 없음. UI는 SelectSkill/SubmitAnswer를 호출하고 돌려받은 BattleEvent 목록을 연출한다
@@ -55,6 +56,19 @@ namespace WordRPG.Battle
         public BattleSummary Summary { get; } = new BattleSummary(); // 결산 화면용 (#41)
         public bool IsOver => Phase == BattlePhase.Victory || Phase == BattlePhase.Defeat || Phase == BattlePhase.Fled;
         public bool CanFlee { get; }
+        public bool IsFleeQuiz { get; private set; } // 지금 문제가 도망 문제인지 (#84)
+
+        // 도망 등급 = 살아 있는 적 중 가장 강한 등급
+        public FleeTier EscapeTier
+        {
+            get
+            {
+                var tier = FleeTier.Weak;
+                foreach (var enemy in enemies)
+                    if (!enemy.IsDefeated && enemy.Monster != null && enemy.Monster.Species.FleeTier > tier) tier = enemy.Monster.Species.FleeTier;
+                return tier;
+            }
+        }
 
         // startStreak: 이전 전투에서 이어지는 연속 정답 수, canFlee: 도망칠 수 있는 전투인지 (보스전은 false)
         public BattleEngine(IReadOnlyList<ICombatant> partyMembers, IReadOnlyList<MonsterInstance> enemyMonsters,
@@ -124,6 +138,7 @@ namespace WordRPG.Battle
             var mastery = quiz.SubmitAnswer(CurrentQuestion, correct);
             masteryChanges.Add(mastery);
             Summary.RecordAnswer(CurrentQuestion.Word, CurrentQuestion.IsNewWord, correct);
+            if (IsFleeQuiz) return AnswerFleeQuiz(correct, mastery, events);
             if (correct)
             {
                 CorrectAnswers++;
@@ -184,8 +199,9 @@ namespace WordRPG.Battle
             return events;
         }
 
-        // 기술 대신 도망친다 (#53): 바로 전투가 끝나고(Fled) 보상은 없다. 그때까지 쓴 상처약·받은 피해·푼 단어 기록은 그대로.
-        // 도망칠 수 없는 전투(보스)면 FleeBlocked만 돌려주고 차례는 그대로
+        // 기술 대신 도망친다 (#53): 전투가 끝나고(Fled) 보상은 없다. 그때까지 쓴 상처약·받은 피해·푼 단어 기록은 그대로.
+        // 도망칠 수 없는 전투(보스)면 FleeBlocked만 돌려주고 차례는 그대로.
+        // 몬스터 등급(#84): 강한 몬스터가 있거나 보통 몬스터에서 1/4이 걸리면 FleeQuiz → 단어 문제(AnsweringQuiz) — SubmitAnswer로 답한다
         public IReadOnlyList<BattleEvent> Flee()
         {
             RequirePhase(BattlePhase.ChoosingSkill);
@@ -195,10 +211,62 @@ namespace WordRPG.Battle
                 events.Add(BattleEvent.FleeBlocked(CurrentActor));
                 return events;
             }
+            var tier = EscapeTier;
+            bool quizNeeded = tier == FleeTier.Strong || (tier == FleeTier.Normal && rng.NextDouble() < config.NormalFleeQuizChance);
+            if (quizNeeded)
+            {
+                IsFleeQuiz = true;
+                CurrentQuestion = quiz.NextQuestion(QuizDirection.EnglishToMeaning);
+                Phase = BattlePhase.AnsweringQuiz;
+                events.Add(BattleEvent.FleeQuiz(CurrentActor, StrongestEnemy()));
+                Summary.Record(events);
+                return events;
+            }
             Phase = BattlePhase.Fled;
             events.Add(BattleEvent.Fled(CurrentActor));
             Summary.Record(events);
             return events;
+        }
+
+        // 도망 문제의 답: 맞히면 도망(Fled), 틀리면 차례를 놓침(FleeFailed → 다음 아군이나 적 차례). 콤보·정답 수는 보통 문제와 같이 센다
+        private IReadOnlyList<BattleEvent> AnswerFleeQuiz(bool correct, MasteryChange mastery, List<BattleEvent> events)
+        {
+            if (correct)
+            {
+                CorrectAnswers++;
+                Streak++;
+            }
+            else
+            {
+                WrongAnswers++;
+                Streak = 0;
+            }
+            events.Add(BattleEvent.QuizAnswered(CurrentActor, correct, mastery));
+            IsFleeQuiz = false;
+            CurrentQuestion = null;
+            if (correct)
+            {
+                Phase = BattlePhase.Fled;
+                events.Add(BattleEvent.Fled(CurrentActor));
+            }
+            else
+            {
+                events.Add(BattleEvent.FleeFailed(CurrentActor));
+                if (!CheckBattleEnd(events)) AdvanceTurn(events);
+            }
+            Summary.Record(events);
+            return events;
+        }
+
+        private BattleUnit StrongestEnemy()
+        {
+            BattleUnit best = null;
+            foreach (var enemy in enemies)
+            {
+                if (enemy.IsDefeated || enemy.Monster == null) continue;
+                if (best == null || enemy.Monster.Species.FleeTier > best.Monster.Species.FleeTier) best = enemy;
+            }
+            return best;
         }
 
         public BattleReward CalculateReward()

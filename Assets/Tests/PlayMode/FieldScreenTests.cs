@@ -4,6 +4,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using WordRPG.Field;
+using WordRPG.Battle;
 using WordRPG.Game;
 using WordRPG.Heroes;
 using WordRPG.Items;
@@ -278,6 +279,54 @@ namespace WordRPG.Tests
             Assert.AreEqual(1, session.Record.BattlesFled);
             Assert.AreEqual(0, session.Record.BattlesLost + session.Record.BattlesWon);
 
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
+        // 몬스터 등급별 도망 (#84): 강한 몬스터는 도망치려면 단어를 맞혀야 함 — 틀리면 차례를 놓치고, 다시 맞히면 도망
+        [UnityTest]
+        public IEnumerator StrongMonsterAsksAWordBeforeYouCanFlee()
+        {
+            var session = GameSession.NewGame(Hero(100, 30), 1);
+            session.World.SetPosition("test", new Vector2Int(3, 2));
+            var field = CreateField(session, Enemy(500, 1, 5).Set("fleeTier", FleeTier.Strong));
+            yield return null;
+            yield return null;
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
+            yield return WaitFor(() => field.Battle.IsRunning);
+            var root = field.Battle.transform;
+
+            for (int attempt = 0; attempt < 2; attempt++)
+            {
+                yield return WaitFor(() => ActiveButton(root, "FleeButton") != null, 5f);
+                ActiveButton(root, "FleeButton").onClick.Invoke();
+                // 처음 보는 단어면 단어 카드부터
+                float deadline = Time.realtimeSinceStartup + 5f;
+                while (Time.realtimeSinceStartup < deadline && ActiveButton(root, "Choice_0") == null)
+                {
+                    ActiveButton(root, "CardConfirmButton")?.onClick.Invoke();
+                    yield return null;
+                }
+                Assert.AreEqual(attempt + 1, field.Battle.FleeQuizzes, "강한 몬스터 → 도망 문제");
+                Assert.IsTrue(field.Battle.Engine.IsFleeQuiz);
+                StringAssert.Contains("도망치려면 맞혀라", AllText(root), "문제 안내");
+                var question = field.Battle.Engine.CurrentQuestion;
+                int pick = attempt == 0 ? (question.CorrectIndex + 1) % question.Choices.Count : question.CorrectIndex;
+                ActiveButton(root, $"Choice_{pick}").onClick.Invoke();
+                if (attempt == 0)
+                {
+                    yield return WaitFor(() => ActiveButton(root, "CardConfirmButton") != null, 3f);
+                    StringAssert.Contains("도망 실패", AllText(root), "틀리면 정답 카드에 '도망 실패'");
+                    ActiveButton(root, "CardConfirmButton").onClick.Invoke();
+                    yield return WaitFor(() => field.Battle.Engine.Phase == BattlePhase.ChoosingSkill && field.Battle.Engine.Round == 2, 5f);
+                    Assert.AreEqual(2, field.Battle.Engine.Round, "차례를 놓쳐 적이 행동하고 다음 라운드");
+                    Assert.IsFalse(field.Battle.IsResultVisible, "아직 전투 중");
+                }
+            }
+            yield return WaitFor(() => field.Battle.IsResultVisible, 5f);
+            Assert.AreEqual("도망쳤다", field.Battle.ResultTitle, "맞히면 도망");
+            FindButton(root, "ResultButton_Primary").onClick.Invoke();
+            yield return WaitFor(() => !field.IsInBattle);
             Object.Destroy(field.gameObject);
             yield return null;
         }
