@@ -378,4 +378,70 @@ namespace WordRPG.Tests
             Assert.Greater(map.FindAll(FieldTile.Decor).Count, 20, "야영지·들판·유적 꾸밈 칸");
         }
     }
+
+    // 목표 한 줄의 유적 단계 (#87): 열쇠를 찾기 전까지 석판 → 단어 → 제단, 동료를 깨우면(또는 열쇠를 먼저 찾으면) 보스 목표로
+    public class RuinsObjectiveTests
+    {
+        //  y=5  #..B....#
+        //  y=4  ##GG#####   보스 방 문
+        //  y=3  #U;A;T;U#   유적 제단 (3,3) · 석판 (5,3)
+        //  y=2  #UUU;UUU#
+        //  y=1  #P:::::K#   열쇠 (7,1)
+        private const string Map =
+            "#########\n" +
+            "#..B....#\n" +
+            "##GG#####\n" +
+            "#U;A;T;U#\n" +
+            "#UUU;UUU#\n" +
+            "#P:::::K#\n" +
+            "#########";
+
+        private static FieldArea Area()
+        {
+            var words = ScriptableObject.CreateInstance<WordDatabase>();
+            words.ReplaceWords(TestData.SampleWords());
+            var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var frog = TestData.Species("frog", new MonsterStats(40, 1, 5), new MonsterStats(0, 0, 0), bite).Set("displayName", "빈칸두꺼비");
+            var key = TestData.Item("jungle_key").Set("displayName", "정글 열쇠").Set("kind", Items.ItemKind.Key);
+            var ara = ScriptableObject.CreateInstance<CompanionData>().Set("companionId", "ara").Set("displayName", "아라")
+                .Set("basicSkill", TestData.Skill("ara_pebble", SkillKind.Damage, SkillTarget.SingleEnemy, 12));
+            return ScriptableObject.CreateInstance<FieldArea>()
+                .Set("areaId", "jungle_goal").Set("displayName", "메아리 정글").Set("theme", FieldTheme.Jungle).Set("map", Map)
+                .Set("words", words).Set("boss", new BossEncounter(frog, 5)).Set("bossKey", key).Set("bossGateWords", 4)
+                .Set("shrineCompanion", ara).Set("shrineWords", 2);
+        }
+
+        [Test]
+        public void RuinsComeFirstUntilTheKeyIsFound()
+        {
+            var area = Area();
+            var session = GameSession.NewGame(TestData.Hero(new MonsterStats(100, 10, 10)), 5);
+            session.Record.RecordBattle(true, 1, 0);
+
+            var goal = Objectives.Current(session, area);
+            Assert.AreEqual(ObjectiveKind.SolveTablets, goal.Kind, "처음엔 유적의 석판");
+            Assert.AreEqual(new Vector2Int(5, 3), goal.Cell, "안 푼 석판에 별");
+
+            Ruins.SolveTablet(area, session.World, new Vector2Int(5, 3));
+            Assert.AreEqual(ObjectiveKind.GatherEcho, Objectives.Current(session, area).Kind, "석판을 다 풀면 단어 모으기");
+
+            for (int i = 0; i < 2; i++) session.Vocabulary.Discover(area.Words.Words[i].Id, System.DateTime.UtcNow);
+            goal = Objectives.Current(session, area);
+            Assert.AreEqual(ObjectiveKind.WakeCompanion, goal.Kind);
+            Assert.AreEqual(new Vector2Int(3, 3), goal.Cell, "제단에 별");
+
+            session.AddCompanion(area.ShrineCompanion);
+            Assert.AreEqual(ObjectiveKind.FindKey, Objectives.Current(session, area).Kind, "동료를 깨우면 보스 목표(열쇠)로");
+        }
+
+        [Test]
+        public void FindingTheKeyFirstSkipsTheRuins()
+        {
+            var area = Area();
+            var session = GameSession.NewGame(TestData.Hero(new MonsterStats(100, 10, 10)), 5);
+            session.Record.RecordBattle(true, 1, 0);
+            BossGate.TakeKey(area, session);
+            Assert.AreEqual(ObjectiveKind.GatherWords, Objectives.Current(session, area).Kind, "동료는 선택 — 열쇠를 찾았으면 바로 보스 목표");
+        }
+    }
 }

@@ -2080,6 +2080,12 @@ namespace WordRPG.UI
                     return $"새 단어로 힘을 모으자 {BossGate.WordsFound(area, session)}/{area.BossGateWords}";
                 case ObjectiveKind.OpenGate:
                     return "보스 방 문을 열자";
+                case ObjectiveKind.SolveTablets:
+                    return $"유적의 석판을 채우자 {Ruins.TabletsSolved(area, session.World)}/{Ruins.Tablets(area).Count}";
+                case ObjectiveKind.GatherEcho:
+                    return $"단어를 모아 유적의 메아리를 깨우자 {BossGate.WordsFound(area, session)}/{area.ShrineWords}";
+                case ObjectiveKind.WakeCompanion:
+                    return "유적 제단에서 동료를 깨우자";
                 default:
                     var progress = Dex.GetProgress(area.Words, session.Vocabulary);
                     return $"도감 채우기 {progress.Discovered}/{progress.Total}";

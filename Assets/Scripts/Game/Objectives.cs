@@ -12,7 +12,11 @@ namespace WordRPG.Game
         FillDex,     // 갈 수 있는 보스를 다 쓰러뜨림 → 도감 채우기
         FindKey,     // 이 지역 보스 방 문이 잠겼고 열쇠가 없음 (#76) — 열쇠 자리는 별로 알려 주지 않는다 (찾는 재미)
         GatherWords, // 열쇠는 있지만 이 지역 단어를 덜 발견함 (#76)
-        OpenGate     // 문을 열 수 있음 (#76) — 문에 별
+        OpenGate,    // 문을 열 수 있음 (#76) — 문에 별
+        // 유적 (#87, 정글 — 동료는 선택이라 열쇠를 찾기 전까지만 보여 줌. 열쇠를 찾으면 위의 보스 목표로)
+        SolveTablets,  // 유적의 석판을 채우자 n/4 — 아직 안 푼 석판에 별
+        GatherEcho,    // 석판은 다 풀었고 이 지역 단어가 모자람 → 단어를 모아 메아리를 깨우자 n/60
+        WakeCompanion  // 다 갖춤 → 유적 제단에서 동료를 깨우자 — 제단에 별
     }
 
     // 지금 할 일 한 줄 (#61 '목표 한 줄'): 화면에 늘 떠 있고, 미니맵·지도에 그 칸을 별로 표시한다
@@ -67,10 +71,25 @@ namespace WordRPG.Game
             return new Objective(ObjectiveKind.FillDex);
         }
 
-        // 지금 지역 보스: 보스 방 문이 잠겼으면 문부터 (#76)
+        // 지금 지역 보스: 보스 방 문이 잠겼으면 문부터 (#76). 유적이 있는 지역은 열쇠를 찾기 전까지 유적 먼저 (#87 —
+        // 깨어난 동료가 열쇠 자리를 알려 주는 흐름, GDD 9-6). 동료는 선택이라 열쇠를 먼저 찾으면 바로 보스 목표로
         private static Objective BossObjective(GameSession session, FieldArea area)
         {
-            switch (BossGate.State(area, session))
+            var gate = BossGate.State(area, session);
+            if (gate == BossGateState.NeedKey)
+            {
+                switch (Ruins.State(area, session))
+                {
+                    case ShrineState.NeedTablets:
+                        foreach (var tablet in Ruins.Tablets(area))
+                            if (!Ruins.IsTabletSolved(area, session.World, tablet))
+                                return new Objective(ObjectiveKind.SolveTablets, null, area, tablet);
+                        break;
+                    case ShrineState.NeedWords: return new Objective(ObjectiveKind.GatherEcho, null, area);
+                    case ShrineState.Ready: return new Objective(ObjectiveKind.WakeCompanion, null, area, area.Map.Find(FieldTile.Shrine));
+                }
+            }
+            switch (gate)
             {
                 case BossGateState.NeedKey: return new Objective(ObjectiveKind.FindKey, null, area);
                 case BossGateState.NeedWords: return new Objective(ObjectiveKind.GatherWords, null, area);
