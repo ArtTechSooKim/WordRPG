@@ -132,10 +132,10 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: suicide
-    english: suicide
-    meaning: "\uC790\uC0B4"
-    partOfSpeech: n
+  - id: encounter
+    english: encounter
+    meaning: "\uB9C8\uC8FC\uCE58\uB2E4, \uB9DE\uB2E5\uB728\uB9AC\uB2E4"
+    partOfSpeech: v
     example: 
     exampleMeaning: 
   - id: relevant
@@ -242,7 +242,7 @@ MonoBehaviour:
     exampleMeaning: 
   - id: principal
     english: principal
-    meaning: "\uAD50\uC7A5, \uC8FC\uC694\uD55C \uAC83"
+    meaning: "\uAD50\uC7A5, \uC6B0\uB450\uBA38\uB9AC"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -468,10 +468,10 @@ MonoBehaviour:
     partOfSpeech: n
     example: 
     exampleMeaning: 
-  - id: virgin
-    english: virgin
-    meaning: "\uCC98\uB140\uC758, \uC190\uB300\uC9C0 \uC54A\uC740"
-    partOfSpeech: adj
+  - id: guardian
+    english: guardian
+    meaning: "\uBCF4\uD638\uC790, \uC218\uD638\uC790"
+    partOfSpeech: n
     example: 
     exampleMeaning: 
   - id: liberty
@@ -884,7 +884,7 @@ MonoBehaviour:
     exampleMeaning: 
   - id: stroke
     english: stroke
-    meaning: "\uB1CC\uC878\uC911, \uD0C0\uACA9"
+    meaning: "\uD0C0\uACA9, \uB1CC\uC878\uC911"
     partOfSpeech: n
     example: 
     exampleMeaning: 

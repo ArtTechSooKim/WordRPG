@@ -26,7 +26,7 @@ MonoBehaviour:
     exampleMeaning: 
   - id: account
     english: account
-    meaning: "\uACC4\uC88C, \uC124\uBA85"
+    meaning: "\uACC4\uC88C, \uACC4\uC815, \uC124\uBA85"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -428,7 +428,7 @@ MonoBehaviour:
     exampleMeaning: 
   - id: mass
     english: mass
-    meaning: "\uB369\uC5B4\uB9AC, \uB300\uB7C9"
+    meaning: "\uB369\uC5B4\uB9AC, \uB300\uB7C9, \uC9C8\uB7C9"
     partOfSpeech: n
     example: 
     exampleMeaning: 

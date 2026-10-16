@@ -104,7 +104,7 @@ MonoBehaviour:
     exampleMeaning: 
   - id: behalf
     english: behalf
-    meaning: "\uC774\uC775, \uB300\uC2E0\uD568"
+    meaning: "\uB300\uC2E0\uD568, \uC774\uC775"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -866,7 +866,7 @@ MonoBehaviour:
     exampleMeaning: 
   - id: update
     english: update
-    meaning: "\uCD5C\uC2E0\uC758 \uAC83\uC73C\uB85C \uD558\uB2E4, \uC5C5\uB370\uC774\uD2B8\uD558\uB2E4"
+    meaning: "\uAC31\uC2E0\uD558\uB2E4, \uC5C5\uB370\uC774\uD2B8\uD558\uB2E4"
     partOfSpeech: v
     example: 
     exampleMeaning: 
