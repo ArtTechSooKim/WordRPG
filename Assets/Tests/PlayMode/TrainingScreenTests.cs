@@ -77,11 +77,13 @@ namespace WordRPG.Tests
             StringAssert.Contains("발견한 단어 4개", field.TrainingView.InfoText);
             StringAssert.Contains("오답 노트 1개", field.TrainingView.InfoText);
 
-            // [오답 위주 암기] → 허수아비 (주인공과 같은 레벨)
+            // [오답 위주 암기] → 허수아비 (주인공과 같은 레벨). 실제 전투에서 쌓은 콤보는 수련으로 이어지지 않음 (#83)
+            session.ComboStreak = 4;
             ActiveButton(field.transform, "TrainingWrong").onClick.Invoke();
             Assert.IsFalse(field.TrainingView.IsOpen);
             yield return WaitFor(() => field.Battle.IsRunning);
             Assert.IsTrue(field.Battle.IsTraining);
+            Assert.AreEqual(0, field.Battle.Engine.Streak, "수련은 콤보 0부터");
             var dummy = field.Battle.Engine.Enemies[0];
             Assert.AreSame(scarecrow, dummy.Monster.Species);
             Assert.AreEqual(session.Hero.Level, dummy.Level);
@@ -139,6 +141,7 @@ namespace WordRPG.Tests
             Assert.IsFalse(field.Battle.IsTraining);
             Assert.AreEqual(cell, field.PlayerCell, "수련이 끝나면 그 자리");
             Assert.AreEqual(0, session.Record.BattlesWon + session.Record.BattlesLost, "수련은 전투 기록에 넣지 않음");
+            Assert.AreEqual(0, session.ComboStreak, "수련에서 쌓은 콤보는 나오면 0 (#83)");
 
             // 수련을 끝낸 뒤 일반 전투가 시작하자마자 끝나면 안 됨 (기기 버그 2026-10-09)
             bool finished = false;

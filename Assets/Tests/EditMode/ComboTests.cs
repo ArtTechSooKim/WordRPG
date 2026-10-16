@@ -151,6 +151,21 @@ namespace WordRPG.Tests
             Assert.AreEqual(0, session.StartBattleCombo(t0.AddMinutes(8).AddSeconds(1)), "끝나고 3분이 넘으면 0부터");
         }
 
+        // #83 사용자 결정: 수련에 들어갈 때·나올 때 콤보 초기화
+        [Test]
+        public void TrainingStartsAndEndsWithNoCombo()
+        {
+            var session = GameSession.NewGame(TestData.Hero(new MonsterStats(60, 14, 10)), 3);
+            var t0 = new DateTime(2026, 10, 3, 12, 0, 0, DateTimeKind.Utc);
+            session.ComboStreak = 5;
+            session.EndBattleCombo(t0);
+            session.ResetCombo();
+            Assert.AreEqual(0, session.StartBattleCombo(t0.AddSeconds(10)), "3분 안이어도 0부터");
+            session.ComboStreak = 7; // 수련에서 쌓음
+            session.ResetCombo();
+            Assert.AreEqual(0, session.StartBattleCombo(t0.AddSeconds(20)), "수련 콤보는 실제 전투로 안 이어짐");
+        }
+
         [Test]
         public void LongBattleDoesNotResetCombo()
         {

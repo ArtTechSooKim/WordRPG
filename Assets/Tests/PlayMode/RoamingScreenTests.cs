@@ -125,7 +125,7 @@ namespace WordRPG.Tests
 
             yield return HoldStick(field, Direction.Right, () => field.PauseTutorial.IsShowing || field.IsInBattle, 6f);
             Assert.IsTrue(field.PauseTutorial.IsShowing, "처음 선제공격 기회 → 화면을 멈추고 설명");
-            Assert.AreEqual("정글에 오신걸 환영합니다. 이제 적이 당신을 직접 싸우러 옵니다.", field.PauseTutorial.Message);
+            Assert.AreEqual("정글에 오신걸 환영합니다.\n이제 적이 당신을 직접 싸우러 옵니다.", field.PauseTutorial.Message, "첫 문장 뒤 줄바꿈 (#83)");
             var roamer = field.Roaming.Roamers[0];
             var held = roamer.Position;
             yield return new WaitForSecondsRealtime(0.5f);

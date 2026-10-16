@@ -65,6 +65,13 @@ namespace WordRPG.Game
         // 전투가 끝날 때: 이때부터 3분을 잰다 (전투가 길어져도 그동안은 끊기지 않음)
         public void EndBattleCombo(DateTime nowUtc) => comboIdleSinceUtc = nowUtc;
 
+        // 콤보를 0으로 (#83 사용자 결정: 수련에 들어갈 때와 나올 때 — 수련 콤보는 실제 전투로 이어지지 않음, 실제 전투 콤보도 수련으로 안 이어짐)
+        public void ResetCombo()
+        {
+            ComboStreak = 0;
+            comboIdleSinceUtc = null;
+        }
+
         public bool CanFight => !Hero.IsFainted;
 
         private GameSession(Hero hero, Inventory inventory, VocabularyProgress vocabulary, PlayerRecord record, WorldState world)

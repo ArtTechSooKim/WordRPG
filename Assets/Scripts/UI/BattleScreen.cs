@@ -263,13 +263,14 @@ namespace WordRPG.UI
             string intro = provider.Mode == TrainingMode.WrongNote
                 ? "오답 위주 수련 시작! 허수아비는 쓰러지지 않아요 — 마음껏 연습하세요"
                 : "수련 시작! 허수아비는 쓰러지지 않아요 — 마음껏 연습하세요";
+            session.ResetCombo(); // 수련 콤보는 0부터 (#83)
             StartNewBattle(new List<MonsterInstance> { new MonsterInstance(dummy, Mathf.Max(1, session.Hero.Level)) }, intro, provider);
             roundLabel.text = "수련";
             var scarecrow = engine.Enemies[0];
             viewOf[scarecrow].HpCaption = "누적 피해 0";
             Sync(scarecrow);
             yield return PlayBattle();
-            session.EndBattleCombo(DateTime.UtcNow);
+            session.ResetCombo(); // 수련에서 쌓은 콤보는 실제 전투로 이어지지 않음 (#83)
             yield return ShowTrainingResult();
             training = false;
             endTrainingRequested = false;
