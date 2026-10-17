@@ -21,11 +21,15 @@ namespace WordRPG.UI
         private DarknessMap darkness;
         private FieldMap map;
         private Func<Vector2Int, bool> isStoneLit, explored;
+        private Func<bool> allLit;
+        private Vector2Int? growing;                             // 막 밝힌 반딧돌 — 빛이 퍼져 나가는 중 (#113)
+        private float growRadius;
         private LightSource hero;
         private Vector2Int drawnStep = new Vector2Int(int.MinValue, int.MinValue);
         private float drawnRadius = -1f;
 
         public bool IsShowing => layer != null;          // 테스트용
+        public bool IsGrowing => growing.HasValue;       // 테스트용
         public int Repaints { get; private set; }        // 어둠을 다시 칠한 횟수 (테스트용)
 
         public FieldDarkness(Transform parent) => this.parent = parent;
@@ -33,13 +37,15 @@ namespace WordRPG.UI
         // 어두운 지역인지 — 지금은 동굴 테마만
         public static bool IsDark(FieldTheme theme) => theme == FieldTheme.Cave;
 
-        public void Build(FieldMap fieldMap, FieldTheme theme, Func<Vector2Int, bool> stoneLit, Func<Vector2Int, bool> exploredCell)
+        // everyStoneLit: 반딧돌을 모두 밝혔는지 (그러면 동굴 전체가 은은하게 — CaveLight.AllLitGlow)
+        public void Build(FieldMap fieldMap, FieldTheme theme, Func<Vector2Int, bool> stoneLit, Func<Vector2Int, bool> exploredCell, Func<bool> everyStoneLit = null)
         {
             Clear();
             if (!IsDark(theme)) return;
             map = fieldMap;
             isStoneLit = stoneLit;
             explored = exploredCell;
+            allLit = everyStoneLit;
             darkness = new DarknessMap(map.Width, map.Height, PixelsPerCell);
             pixels = new Color32[darkness.Width * darkness.Height];
             texture = new Texture2D(darkness.Width, darkness.Height, TextureFormat.RGBA32, false)
@@ -62,8 +68,19 @@ namespace WordRPG.UI
         public void Refresh()
         {
             if (darkness == null) return;
-            darkness.SetStatic(CaveLight.StaticLights(map, isStoneLit), explored);
+            var lights = CaveLight.StaticLights(map, cell => isStoneLit != null && isStoneLit(cell) && cell != growing);
+            if (growing.HasValue) lights.Add(new LightSource(new Vector2(growing.Value.x + 0.5f, growing.Value.y + 0.5f), growRadius));
+            darkness.SetStatic(lights, explored, allLit != null && allLit() ? CaveLight.AllLitGlow : 0f);
             Repaint();
+        }
+
+        // 막 밝힌 반딧돌: 빛이 0칸에서 6칸까지 퍼져 나간다 (Tick이 키움)
+        public void Grow(Vector2Int stone)
+        {
+            if (darkness == null) return;
+            growing = stone;
+            growRadius = 0.5f;
+            Refresh();
         }
 
         // 매 프레임: 주인공 빛이 1/4칸 넘게 움직였거나 횃불(동료)이 바뀌었을 때만 다시 칠함
@@ -71,6 +88,13 @@ namespace WordRPG.UI
         {
             if (darkness == null) return;
             hero = CaveLight.Hero(heroWorld, withCompanion);
+            if (growing.HasValue)
+            {
+                growRadius += Time.unscaledDeltaTime * CaveLight.StoneRadius / CaveLight.StoneGrowSeconds;
+                if (growRadius >= CaveLight.StoneRadius) growing = null;
+                Refresh();
+                return;
+            }
             var step = new Vector2Int(Mathf.RoundToInt(heroWorld.x / MoveStep), Mathf.RoundToInt(heroWorld.y / MoveStep));
             if (step == drawnStep && Mathf.Approximately(hero.Radius, drawnRadius)) return;
             Repaint();
@@ -98,6 +122,7 @@ namespace WordRPG.UI
             pixels = null;
             darkness = null;
             map = null;
+            growing = null;
             drawnStep = new Vector2Int(int.MinValue, int.MinValue);
         }
     }

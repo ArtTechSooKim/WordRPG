@@ -185,6 +185,7 @@ namespace WordRPG.UI
             paywall = PaywallView.Create(hudRoot);
             companionCutscene = CompanionCutscene.Create(hudRoot);
             tabletView = TabletQuizView.Create(hudRoot);
+            stoneView = GlowStoneQuizView.Create(hudRoot); // 글자 반딧돌 문제 (#113)
             pauseTutorial = PauseTutorial.Create(hudRoot);
             preemptView = PreemptView.Create(hudRoot);
             guide = GuideHints.Create(transform); // 자기 캔버스로 HUD·전투 위에 (눌림은 받지 않음)
@@ -466,6 +467,8 @@ namespace WordRPG.UI
                     return $"단어를 모아 유적의 메아리를 깨우자 {BossGate.WordsFound(area, session)}/{area.ShrineWords}";
                 case ObjectiveKind.WakeCompanion:
                     return "유적 제단에서 동료를 깨우자";
+                case ObjectiveKind.LightStones:
+                    return $"반딧돌을 찾아 불을 밝혀 보자 {GlowStones.LitCount(area, session.World)}/{GlowStones.Stones(area).Count}";
                 default:
                     var progress = Dex.GetProgress(area.Words, session.Vocabulary);
                     return $"도감 채우기 {progress.Discovered}/{progress.Total}";

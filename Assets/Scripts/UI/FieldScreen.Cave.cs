@@ -1,7 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using WordRPG.Battle;
 using WordRPG.Field;
 using WordRPG.Game;
+using WordRPG.Words;
 
 namespace WordRPG.UI
 {
@@ -12,18 +15,27 @@ namespace WordRPG.UI
         // 꺼진 반딧돌이 어둠 속에서도 아주 희미하게 깜빡이는 청록 빛 — 찾아갈 수 있게 (Figma #111). 빛 안에 들어오면 돌 그림이 보이므로 끔
         private readonly List<(Vector2Int cell, SpriteRenderer glow)> stoneGlimmers = new List<(Vector2Int, SpriteRenderer)>();
         private static readonly Color GlimmerColor = new Color(0.55f, 0.9f, 0.95f, 0f);
+        private GlowStoneQuizView stoneView;    // 글자 반딧돌 문제 (Figma '반딧돌 문제 (#111)')
+        private TabletQuiz stoneQuiz;           // 석판과 같은 규칙 — 한 문제, 영단어 → 뜻
+        private Vector2Int stoneCell;
+        private bool stoneLitNow;               // 맞혀서 밝힘 (창을 닫으면 빛이 퍼짐)
 
         public bool HasDarkness => darkness != null && darkness.IsShowing;     // 테스트용
         public int DarknessRepaints => darkness != null ? darkness.Repaints : 0;
         public float BrightnessAt(Vector2Int cell) => darkness != null ? darkness.Brightness(CellCenter(cell)) : 1f;
         public int RoamerEyesShown => roamerViews != null ? roamerViews.EyesShown : 0;
         public int StoneGlimmers => stoneGlimmers.Count;
+        public GlowStoneQuizView StoneView => stoneView;
+        public QuizQuestion StoneQuestion => stoneQuiz?.Current;
+        public bool IsStoneLightGrowing => darkness != null && darkness.IsGrowing;
+        public int RoamerBubblesShown => roamerViews != null ? roamerViews.BubblesShown : 0;           // 먹물 거품 (#113)
+        public int HiddenRoamers => roaming != null ? new List<Roamer>(roaming.Roamers).FindAll(r => r.Hidden).Count : 0;
 
         // 지역에 들어올 때 (EnterArea)
         private void BuildDarkness()
         {
             darkness.Build(area.Map, area.Theme, cell => GlowStones.IsLit(area, session.World, cell),
-                cell => session.World.IsExplored(area.AreaId, cell));
+                cell => session.World.IsExplored(area.AreaId, cell), AllStonesLit);
             BuildGlimmers();
             UpdateDarkness();
         }
@@ -73,7 +85,13 @@ namespace WordRPG.UI
         // 새 칸을 지나가 탐험 기록이 늘었을 때 — 지나간 곳이 희미하게 남게
         private void RefreshDarkness() => darkness?.Refresh();
 
-        // 글자 반딧돌 [확인] — 단어 문제로 밝히는 창은 다음 단계(#113)에서. 지금은 혼잣말만
+        private bool AllStonesLit()
+        {
+            int total = GlowStones.Stones(area).Count;
+            return total > 0 && GlowStones.LitCount(area, session.World) >= total;
+        }
+
+        // 글자 반딧돌 [확인] (#113, GDD 9-7): 이미 본 단어 한 문제 — 떠오른 영단어의 뜻 고르기. 틀려도 벌점 없이 다시 (석판과 같은 규칙)
         private void TouchGlowStone(Vector2Int cell)
         {
             if (GlowStones.IsLit(area, session.World, cell))
@@ -81,7 +99,68 @@ namespace WordRPG.UI
                 bubble.Say("반딧돌이 환하게 빛나고 있다", 2.5f);
                 return;
             }
-            bubble.Say("희미하게 깜빡이는 돌이다…\n글자가 떠오를 것 같다", 3f);
+            var books = Preemptive.QuizBooks(area.Words != null ? area.Words.Words : null,
+                TrainingBooks().ConvertAll(b => (IReadOnlyList<WordEntry>)b.Words), session.Vocabulary);
+            if (books.Count == 0)
+            {
+                bubble.Say("희미하게 깜빡이는 돌이다…\n단어를 더 만나면 글자가 떠오를 것 같다", 3.5f);
+                return;
+            }
+            if (moving) SnapPlayer();
+            stoneQuiz = new TabletQuiz(new TrainingQuizProvider(books, session.Vocabulary, battle.MasteryRules, TrainingMode.All, rng),
+                1, QuizDirection.EnglishToMeaning);
+            stoneCell = cell;
+            stoneLitNow = false;
+            stoneView.Show(stoneQuiz.Current, GlowStones.LitCount(area, session.World), GlowStones.Stones(area).Count, PickStone, CloseStone);
         }
+
+        private void PickStone(int index)
+        {
+            if (stoneQuiz == null || stoneLitNow) return;
+            var question = stoneQuiz.Current;
+            switch (stoneQuiz.Answer(index))
+            {
+                case TabletAnswer.Wrong:
+                    Sound.Play(Sfx.Wrong);
+                    stoneView.MarkWrong(index);
+                    break;
+                case TabletAnswer.Correct:
+                    Sound.Play(Sfx.Correct);
+                    stoneLitNow = true;
+                    GlowStones.Light(area, session.World, stoneCell);
+                    SaveNow(); // ×로 닫아도 밝힌 것은 남게
+                    stoneView.ShowLit(question.CorrectAnswer, GlowStones.LitCount(area, session.World), GlowStones.Stones(area).Count);
+                    break;
+            }
+        }
+
+        private void CloseStone()
+        {
+            bool lit = stoneLitNow;
+            stoneQuiz = null;
+            stoneLitNow = false;
+            stoneView.Hide();
+            interactCooldown = 0.5f;
+            if (lit) StartCoroutine(LightUpStone(stoneCell));
+        }
+
+        // 밝힌 순간: 돌이 푸른 구슬로 바뀌고 반짝 + 빛이 둘레 6칸까지 퍼져 나감. 모두 밝히면 동굴 전체가 은은하게
+        private IEnumerator LightUpStone(Vector2Int cell)
+        {
+            StonesLit++;
+            tilemap.SetTile(new Vector3Int(cell.x, cell.y, 0), TileFor(FieldTile.GlowStone, true));
+            BuildGlimmers();
+            darkness.Grow(cell);
+            StartCoroutine(FieldFx.Play(transform, CellCenter(cell), Fx.Sparkle, 1.6f, animationScale, 16, tint: new Color(0.6f, 0.92f, 1f)));
+            Sound.Play(Sfx.Evolve);
+            AfterFieldChange();
+            if (!AllStonesLit()) yield break;
+            yield return WaitUnscaled(1f);
+            Sound.PlayJingle(Sfx.DexComplete);
+            darkness.Refresh();
+            bubble.Say("반딧돌을 모두 밝혔다!\n동굴 천장의 반딧불이 깨어났다", 4f);
+        }
+
+        public int StonesLit { get; private set; } // 이번에 밝힌 반딧돌 수 (테스트용)
     }
 }

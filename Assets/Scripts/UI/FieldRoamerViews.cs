@@ -19,6 +19,8 @@ namespace WordRPG.UI
             public SpriteRenderer Mark;
             public SpriteRenderer Eyes;     // 어둠 속 빨간 눈 (#112)
             public float Blink;
+            public SpriteRenderer[] Bubbles; // 웅덩이에서 오르는 먹물 거품 (#113, 먹물도롱뇽)
+            public float BubbleTime;
             public Vector3 From, To;
             public float T = 1f, Duration = 0.1f;
             public float MarkLeft;
@@ -29,11 +31,13 @@ namespace WordRPG.UI
         private readonly Func<Vector2Int, Vector3> cellCenter;
         private readonly Dictionary<Roamer, View> views = new Dictionary<Roamer, View>();
         private Sprite exclaim;
-        private Sprite eyes;
+        private Sprite eyes, bubble;
         private const float BlinkEvery = 3.6f, BlinkSeconds = 0.13f;
 
         public int Count => views.Count;
         public int EyesShown { get; private set; } // 지금 빨간 눈만 보이는 몬스터 수 (테스트용)
+        public int BubblesShown { get; private set; } // 지금 거품이 오르는 웅덩이 수 (테스트용)
+        public bool IsBodyVisible(Roamer roamer) => views.TryGetValue(roamer, out var view) && view.Body.enabled; // 테스트용
 
         public FieldRoamerViews(Transform parent, Func<Vector2Int, Vector3> cellCenter)
         {
@@ -97,12 +101,18 @@ namespace WordRPG.UI
             }
         }
 
-        // 실제 시간으로: 이동 보간 · 살짝 통통 · "!" 사라지기
+        // 실제 시간으로: 이동 보간 · 살짝 통통 · "!" 사라지기 · 웅덩이에 숨은 몬스터는 몸을 숨기고 거품
         public void Tick(float dt)
         {
+            int bubbling = 0;
             foreach (var pair in views)
             {
                 var view = pair.Value;
+                bool hidden = pair.Key.Hidden;
+                if (view.Body.enabled == hidden) view.Body.enabled = !hidden;
+                bool surfacing = pair.Key.State == RoamerState.Surfacing;
+                if (surfacing) bubbling++;
+                AnimateBubbles(view, surfacing, dt);
                 if (view.T < 1f)
                 {
                     view.T = Mathf.Min(1f, view.T + dt / Mathf.Max(0.01f, view.Duration));
@@ -116,6 +126,7 @@ namespace WordRPG.UI
                     if (view.MarkLeft <= 0f) view.Mark.gameObject.SetActive(false);
                 }
             }
+            BubblesShown = bubbling;
         }
 
         private View Create(Roamer roamer)
@@ -149,8 +160,19 @@ namespace WordRPG.UI
             eyesRenderer.sortingOrder = 15; // 어둠(14) 바로 위
             eyesRenderer.gameObject.SetActive(false);
 
-            var view = new View { Root = root, Body = body, Mark = mark, Eyes = eyesRenderer, From = root.position, To = root.position, Phase = roamer.Id,
-                                  Blink = roamer.Id * 1.37f % BlinkEvery };
+            var bubbles = new SpriteRenderer[3];
+            for (int i = 0; i < bubbles.Length; i++)
+            {
+                bubbles[i] = new GameObject($"Bubble_{i}", typeof(SpriteRenderer)).GetComponent<SpriteRenderer>();
+                bubbles[i].transform.SetParent(root, false);
+                bubbles[i].sprite = BubbleSprite();
+                bubbles[i].sortingOrder = 8; // 물 위, 주인공 아래
+                bubbles[i].gameObject.SetActive(false);
+            }
+
+            var view = new View { Root = root, Body = body, Mark = mark, Eyes = eyesRenderer, Bubbles = bubbles, From = root.position, To = root.position,
+                                  Phase = roamer.Id, Blink = roamer.Id * 1.37f % BlinkEvery };
+            body.enabled = !roamer.Hidden;
             Face(view, roamer.Facing);
             views[roamer] = view;
             return view;
@@ -162,14 +184,38 @@ namespace WordRPG.UI
             else if (facing == Direction.Right) view.Body.flipX = false;
         }
 
-        // 동굴 어둠 (#112): inDark(몬스터 자리)가 참이면 몸은 어둠에 가려지고 빨간 눈 두 개만 (가끔 깜빡). null이면 눈을 모두 끔
+        // 거품 고리 3개가 차례로 오르며 커졌다 사라짐 (웅덩이 색과 어울리게 옅은 남보라 — #95 사용자: 효과는 은은하게)
+        private static void AnimateBubbles(View view, bool on, float dt)
+        {
+            if (!on)
+            {
+                if (view.Bubbles[0].gameObject.activeSelf)
+                    foreach (var b in view.Bubbles) b.gameObject.SetActive(false);
+                view.BubbleTime = 0f;
+                return;
+            }
+            view.BubbleTime += dt;
+            for (int i = 0; i < view.Bubbles.Length; i++)
+            {
+                var b = view.Bubbles[i];
+                if (!b.gameObject.activeSelf) b.gameObject.SetActive(true);
+                float t = (view.BubbleTime * 1.6f + i / 3f) % 1f;
+                b.transform.localPosition = new Vector3((i - 1) * 0.22f + Mathf.Sin(t * 6f + i) * 0.03f, -0.2f + t * 0.45f, 0f);
+                b.transform.localScale = Vector3.one * (0.5f + t * 0.6f);
+                b.color = new Color(0.78f, 0.7f, 0.95f, (1f - t) * 0.9f);
+            }
+        }
+
+        // 동굴 어둠 (#112): inDark(몬스터 자리)가 참이면 몸은 어둠에 가려지고 빨간 눈 두 개만 (가끔 깜빡). null이면 눈을 모두 끔.
+        // 웅덩이에 숨은 몬스터는 눈도 안 보임
         public void UpdateEyes(Func<Vector3, bool> inDark, float dt)
         {
             if (inDark == null && EyesShown == 0) return;
             int shown = 0;
-            foreach (var view in views.Values)
+            foreach (var pair in views)
             {
-                bool show = inDark != null && inDark(view.Root.position);
+                var view = pair.Value;
+                bool show = inDark != null && !pair.Key.Hidden && inDark(view.Root.position);
                 if (show)
                 {
                     view.Blink = (view.Blink + dt) % BlinkEvery;
@@ -179,6 +225,25 @@ namespace WordRPG.UI
                 if (view.Eyes.gameObject.activeSelf != show) view.Eyes.gameObject.SetActive(show);
             }
             EyesShown = shown;
+        }
+
+        // 거품 고리 하나 (6×6픽셀 동그라미 테두리 + 위쪽 반짝 한 점)
+        private Sprite BubbleSprite()
+        {
+            if (bubble != null) return bubble;
+            var texture = new Texture2D(6, 6, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point, name = "ink_bubble" };
+            var pixels = new Color32[36];
+            for (int y = 0; y < 6; y++)
+            for (int x = 0; x < 6; x++)
+            {
+                float d = Mathf.Sqrt((x - 2.5f) * (x - 2.5f) + (y - 2.5f) * (y - 2.5f));
+                pixels[y * 6 + x] = d > 1.6f && d < 2.9f ? new Color32(255, 255, 255, 255) : new Color32(0, 0, 0, 0);
+            }
+            pixels[4 * 6 + 2] = new Color32(255, 255, 255, 255);
+            texture.SetPixels32(pixels);
+            texture.Apply(false);
+            bubble = Sprite.Create(texture, new Rect(0, 0, 6, 6), new Vector2(0.5f, 0.5f), 16, 0, SpriteMeshType.FullRect);
+            return bubble;
         }
 
         // 빨간 눈 두 개 (6×2픽셀 + 옅은 번짐, 16px = 1칸)

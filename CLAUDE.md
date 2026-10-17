@@ -72,7 +72,9 @@
      맵을 바꿀 땐 에셋의 map 칸도 같이 고칠 것 (상자 id는 위치 기준이라 상자를 옮기면 새 상자)
    - 조우 방식은 FieldArea `encounterStyle`: Grass(풀숲 확률 조우) / Roaming(보이는 몬스터 — 마른 덤불 ','이 서식지, 발견하면 쫓아옴·부딪히면 전투,
      가까우면 [선제공격] = QTE(기회 슬로모션 → 줄어드는 원 + 이미 본 단어 한 문제), 맞히면 HP 20%. 규칙 `RoamingMonsters`·`Preemptive`, 그림 `FieldRoamerViews`·`PreemptView`, #73~75. 정글부터 — 1.1).
-     FieldArea `waterEncounters`가 있으면 뗏목이 다니는 강에도 물에 사는 몬스터(`Roamer.Aquatic`, 정글의 흉내문어 #81). 첫 선제공격 기회엔 `PauseTutorial` 설명(#79)
+     FieldArea `waterEncounters`가 있으면 뗏목이 다니는 강에도 물에 사는 몬스터(`Roamer.Aquatic`, 정글의 흉내문어 #81). 첫 선제공격 기회엔 `PauseTutorial` 설명(#79).
+     나루터가 없는 맵(동굴)이면 waterEncounters = 웅덩이에 숨는 몬스터(`Roamer.Lurker`, 먹물도롱뇽 #113): 이어진 물 덩어리마다 1~2마리 숨어 있다가(안 보임)
+     2칸 안에 오면 거품(Surfacing 0.8초) → 옆 땅으로 튀어나와 쫓음 → 놓치면 웅덩이로 돌아가 다시 숨음 (RoamingRules Lurk*)
    - 정글 맵 글자 (#80, 1.1): '>' '<' '^' 'v' 얕은 강(걸을 수 있음, 물살 방향으로 걸으면 빨라짐 — `FieldMap.StreamDirection/IsWithStream`) ·
      'J' 나루터(여기서 깊은 강 쪽으로 가면 뗏목 — `FieldWalker.Rafting`, 뗏목이 다니는 물 = 나루터에 이어진 물 `FieldMap.IsRaftWater`, 세이브 `WorldState.Rafting`) ·
      'Y' 레버 → 가장 가까운 'H' 덩굴 다리가 놓임(`FieldMap.BridgeOf`, 규칙 `Levers`, 세이브 pulledLevers) · 'U' 유적 돌벽 · ';' 유적 바닥 ·
@@ -85,6 +87,8 @@
      동굴 칸 = 기본 칸 + 레버·덩굴 다리·꾸밈·반딧돌 (`FieldThemes.Supports`). 빛 규칙 `CaveLight`·`DarknessMap`(순수): 주인공 3.5칸 + 동료 횃불 1칸 · 밝힌 반딧돌 6칸 ·
      쉼터 물건(샘·가게·제단·사전) 4칸 · 출입구 2.5칸 · 지나간 곳 Memory. 그리기 `FieldDarkness`(칸마다 2×2픽셀 한 장, 주인공 빛이 1/4칸 움직일 때만 다시 칠함, 알파 1 —
      Linear라 0.97만 돼도 바닥이 비침). 빛 밖 몬스터는 빨간 눈만 (`FieldRoamerViews.UpdateEyes` — 사용자: 적의 눈은 모두 빨간색), 꺼진 반딧돌은 희미하게 깜빡(`FieldScreen.Cave`).
+     반딧돌 [확인] = `GlowStoneQuizView`(Figma #111) + `TabletQuiz(provider, 1, EnglishToMeaning)` — 석판과 같은 규칙(틀려도 벌점 없음), 밝히면 빛이 퍼지고(`FieldDarkness.Grow`)
+     모두 밝히면 동굴 전체가 은은하게(`CaveLight.AllLitGlow`). 목표 한 줄은 열쇠를 찾기 전까지 `ObjectiveKind.LightStones` (별 없음)
      그림 = import_ninja_art.py `build_cave` (Cave_Wall_auto = 바위 윗면 + 밝은 테 + 절벽면), 시안 = Tools/cave_mockup.py
    - 통로는 두 칸 너비 (사용자 요청 #67): 새 맵은 `python Tools/widen_maps.py --only {상수} [--apply]`로 한 칸 통로를 넓힘 (상수·에셋 같이)
 6. **네이밍**: PascalCase 클래스/메서드/프로퍼티, camelCase 필드. SO 필드는 `[SerializeField] private` + 읽기 전용 프로퍼티. 클래스명은 영문, 화면 표시명은 한국어 필드(`displayName = "펜촉이"`). 주석은 한국어
@@ -168,7 +172,8 @@ Assets/
                         TitleScreen(타이틀), Haptics(진동), UnitView, VirtualStick(가상 스틱 — 누른 자리에 생김, 끝까지 밀면 달리기),
                         GuideHints(튜토리얼: 화면을 막지 않는 한 줄 알약 + 손끝 끌기·톡톡·화살표, 해 보면 끝 — #61),
                         PauseTutorial(예외로 화면을 멈추는 단계 설명 — 정글 첫 선제공격 기회 #79, 강조할 버튼만 막 위로),
-                        TabletQuizView(단어 석판 문제 창 — #81) · FieldStreams(얕은 강 물결선 — #81) · FieldDarkness(동굴 어둠 한 장 — #112),
+                        TabletQuizView(단어 석판 문제 창 — #81) · FieldStreams(얕은 강 물결선 — #81) · FieldDarkness(동굴 어둠 한 장 — #112) ·
+                        GlowStoneQuizView(글자 반딧돌 문제 창 — #113),
                         PaywallView(정식판 안내: 구매·구매 복원·나중에), CompanionViews(가방 > 동료 탭 CompanionPage · 동료 조우 연출 CompanionCutscene — #77),
                         FieldFollower(필드에서 주인공 자취를 한 칸 뒤 따라오는 동료 그림 — 보이기만 함, 칸 영향 없음 #78) · CharacterSheet(주인공과 같은 배치의 캐릭터 시트 자르기), FieldRoamerViews(필드 위 보이는 몬스터 그림·'!') · PreemptView([선제공격] QTE: 집중선·줄어드는 원·2×2 선택지·결과 도장 + TargetLock 조준 괄호),
                         UiRing(두께가 일정한 원 테두리 — 코드로 만들 땐 CanvasRenderer를 먼저 붙임),

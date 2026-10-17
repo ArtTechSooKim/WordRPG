@@ -37,6 +37,8 @@ namespace WordRPG.Field
         public const float Memory = 0.08f;     // 지나간 곳의 밝기 (처음 가는 곳은 0 = 캄캄). Linear 색공간이라 작아도 꽤 보임
         public const float Falloff = 1.6f;     // 빛 가장자리가 옅어지는 폭 (칸)
         public const float EyesBelow = 0.3f;   // 이보다 어두운 곳의 몬스터는 눈 두 개만 보인다
+        public const float AllLitGlow = 0.35f; // 반딧돌을 모두 밝히면 천장의 반딧불이 깨어나 동굴 전체가 이만큼 은은하게 (#113)
+        public const float StoneGrowSeconds = 0.9f; // 밝힌 순간 빛이 퍼져 나가는 시간
 
         public static float HeroLightRadius(bool withCompanion) => HeroRadius + (withCompanion ? TorchBonus : 0f);
 
@@ -91,11 +93,13 @@ namespace WordRPG.Field
 
         private Vector2 PixelCenter(int px, int py) => new Vector2((px + 0.5f) / PixelsPerCell, (py + 0.5f) / PixelsPerCell);
 
-        public void SetStatic(IEnumerable<LightSource> lights, Func<Vector2Int, bool> explored)
+        // ambient: 맵 전체에 깔리는 밝기 (반딧돌을 모두 밝혔을 때 CaveLight.AllLitGlow)
+        public void SetStatic(IEnumerable<LightSource> lights, Func<Vector2Int, bool> explored, float ambient = 0f)
         {
             for (int py = 0; py < Height; py++)
             for (int px = 0; px < Width; px++)
-                staticLight[py * Width + px] = explored != null && explored(new Vector2Int(px / PixelsPerCell, py / PixelsPerCell)) ? CaveLight.Memory : 0f;
+                staticLight[py * Width + px] = Mathf.Max(ambient,
+                    explored != null && explored(new Vector2Int(px / PixelsPerCell, py / PixelsPerCell)) ? CaveLight.Memory : 0f);
             if (lights == null) return;
             foreach (var light in lights)
                 ForEachPixelIn(light, (index, value) => { if (value > staticLight[index]) staticLight[index] = value; });

@@ -160,7 +160,8 @@ namespace WordRPG.UI
                                    || (paywall != null && paywall.IsOpen) || (preemptView != null && preemptView.IsOpen)
                                    || (companionCutscene != null && companionCutscene.IsPlaying)
                                    || (pauseTutorial != null && pauseTutorial.IsShowing)
-                                   || (tabletView != null && tabletView.IsOpen);
+                                   || (tabletView != null && tabletView.IsOpen)
+                                   || (stoneView != null && stoneView.IsOpen);
         public PauseTutorial PauseTutorial => pauseTutorial;
         public bool IsPreemptRangeVisible => preemptRange != null && preemptRange.gameObject.activeSelf;
         public CompanionCutscene CompanionCutscene => companionCutscene;
@@ -315,6 +316,7 @@ namespace WordRPG.UI
             fog.Tick(Time.deltaTime);
             UpdateDarkness();
             tabletView.Tick(Time.unscaledDeltaTime);
+            stoneView.Tick(Time.unscaledDeltaTime);
             UpdateRaft();
 
             if (inBattle || transitioning || IsPanelOpen)
@@ -490,6 +492,11 @@ namespace WordRPG.UI
             if (tabletView.IsOpen)
             {
                 if (!tabletBusy) CloseTablet();
+                return;
+            }
+            if (stoneView.IsOpen)
+            {
+                CloseStone();
                 return;
             }
             if (quitDialog.IsOpen) quitDialog.Hide();

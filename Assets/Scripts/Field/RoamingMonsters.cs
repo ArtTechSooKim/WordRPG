@@ -18,7 +18,10 @@ namespace WordRPG.Field
         Noticing,  // 주인공을 발견 — "!" 뜨고 잠깐 멈춤
         Chasing,   // 쫓아옴
         Returning, // 놓쳐서 집으로 돌아감
-        Stunned    // 도망친 직후 잠깐 멈춤
+        Stunned,   // 도망친 직후 잠깐 멈춤
+        // 웅덩이에 숨는 몬스터 (#113, 1.2 동굴의 먹물도롱뇽 — 보관했던 잉크 몬스터 아이디어)
+        Lurking,   // 웅덩이 속에 숨어 있음 (보이지 않음)
+        Surfacing  // 주인공이 가까이 옴 → 거품이 보글보글 (곧 튀어나옴)
     }
 
     public enum RoamerEventKind
@@ -27,7 +30,9 @@ namespace WordRPG.Field
         Moved,
         Noticed,
         GaveUp,
-        Caught // 주인공에게 부딪힘 → 전투
+        Caught,   // 주인공에게 부딪힘 → 전투
+        Surfaced, // 웅덩이에 거품이 올라옴 (#113)
+        Dived     // 웅덩이로 돌아가 다시 숨음 (#113)
     }
 
     public readonly struct RoamerEvent
@@ -64,6 +69,13 @@ namespace WordRPG.Field
         public int WaterCellsPerRoamer = 140;  // 물에 사는 몬스터 (#80 흉내문어): 뗏목이 다니는 물 칸 수 ÷ 이 값
         public int MaxWaterRoamers = 8;
         public int ActiveRadius = 26;          // 이보다 먼 어슬렁 몬스터는 쉰다 (계산 아끼기)
+        // 웅덩이에 숨는 몬스터 (#113): 나루터가 없는 맵의 물(먹물 웅덩이)이 숨는 곳. 가까이(2칸) 오면 거품 → 튀어나와 땅 위에서 쫓아옴
+        public int LurkRadius = 2;
+        public float SurfaceSeconds = 0.8f;    // 거품 경고 (GDD 9-7)
+        public int LurkCellsPerRoamer = 30;    // 웅덩이(이어진 물) 칸 수 ÷ 이 값 = 그 웅덩이의 마릿수 (1~MaxLurkersPerPool)
+        public int MaxLurkersPerPool = 2;
+        public int MaxLurkers = 8;
+        public int LurkSpawnMinDistance = 5;   // 바로 옆 웅덩이에서 생겨나 곧장 튀어나오지 않게
     }
 
     // 필드에 보이는 몬스터 하나 = 적 한 무리 (그림은 맨 앞 몬스터)
@@ -77,22 +89,27 @@ namespace WordRPG.Field
         public List<MonsterInstance> Group { get; }
         public MonsterInstance Leader => Group[0];
         public bool Aquatic { get; } // 물에 사는 몬스터 — 뗏목이 다니는 깊은 강만 다닌다 (#80)
+        public bool Lurker { get; }  // 웅덩이에 숨는 몬스터 — 집(Home)이 웅덩이 칸, 튀어나오면 땅 위를 걷는다 (#113)
+        public bool Hidden => State == RoamerState.Lurking || State == RoamerState.Surfacing; // 웅덩이 속이라 몸이 안 보임
         internal float Timer;
 
-        public Roamer(int id, Vector2Int home, List<MonsterInstance> group, bool aquatic = false)
+        public Roamer(int id, Vector2Int home, List<MonsterInstance> group, bool aquatic = false, bool lurker = false)
         {
             if (group == null || group.Count == 0) throw new ArgumentException("무리가 비었습니다", nameof(group));
             Id = id;
             Home = home;
             Position = home;
             Group = group;
-            Aquatic = aquatic;
+            Aquatic = aquatic && !lurker;
+            Lurker = lurker;
+            if (lurker) State = RoamerState.Lurking;
         }
     }
 
     // 보이는 몬스터 조우 규칙 (순수 C#, 시간은 Tick(dt), 랜덤은 주입 — GDD 9-5).
     // 서식지 = 마른 덤불(',', FieldTile.Grass) 칸. 몬스터는 길·모래·덤불·얕은 강만 걷고 출입구·물건 칸에는 서지 않는다.
-    // 물에 사는 몬스터(#80, 정글의 흉내문어)는 뗏목이 다니는 깊은 강(FieldMap.IsRaftWater)이 서식지이자 다니는 곳
+    // 물에 사는 몬스터(#80, 정글의 흉내문어)는 뗏목이 다니는 깊은 강(FieldMap.IsRaftWater)이 서식지이자 다니는 곳.
+    // 나루터가 없는 맵(1.2 동굴)이면 물의 몬스터는 웅덩이에 숨는 몬스터(#113, 먹물도롱뇽) — 이어진 물 덩어리마다 숨어 있다가 가까이 오면 튀어나옴
     public class RoamingMonsters
     {
         private static readonly Direction[] Directions = { Direction.Up, Direction.Down, Direction.Left, Direction.Right };
@@ -105,6 +122,9 @@ namespace WordRPG.Field
         private readonly List<Vector2Int> waterHabitat = new List<Vector2Int>();
         private readonly List<Roamer> roamers = new List<Roamer>();
         private readonly List<(float seconds, bool aquatic)> respawns = new List<(float, bool)>();
+        private readonly List<List<Vector2Int>> pools = new List<List<Vector2Int>>(); // 웅덩이마다 숨을 수 있는 칸 (땅에 닿은 물, #113)
+        private readonly List<int> poolSizes = new List<int>();
+        private readonly List<float> lurkerRespawns = new List<float>();
         private readonly List<RoamerEvent> tickEvents = new List<RoamerEvent>();
         private int nextId;
 
@@ -112,7 +132,8 @@ namespace WordRPG.Field
         public IReadOnlyList<Roamer> Roamers => roamers;
         public IReadOnlyList<Vector2Int> Habitat => habitat;
         public IReadOnlyList<Vector2Int> WaterHabitat => waterHabitat;
-        public int PendingRespawns => respawns.Count;
+        public int PendingRespawns => respawns.Count + lurkerRespawns.Count;
+        public int PoolCount => pools.Count;
 
         // 1이면 보통, 작으면 느려짐 ([선제공격] 문제를 푸는 동안)
         public float SlowFactor { get; set; } = 1f;
@@ -121,6 +142,19 @@ namespace WordRPG.Field
 
         public int WaterTargetCount => waterHabitat.Count == 0 ? 0
             : Mathf.Clamp(waterHabitat.Count / Mathf.Max(1, Rules.WaterCellsPerRoamer), 1, Rules.MaxWaterRoamers);
+
+        // 웅덩이에 숨는 몬스터 수 (#113): 웅덩이마다 크기에 따라 1~2마리, 모두 합쳐 MaxLurkers까지
+        public int LurkerTargetCount
+        {
+            get
+            {
+                int total = 0;
+                for (int i = 0; i < pools.Count; i++) total += PoolTarget(i);
+                return Mathf.Min(total, Rules.MaxLurkers);
+            }
+        }
+
+        private int PoolTarget(int pool) => Mathf.Clamp(poolSizes[pool] / Mathf.Max(1, Rules.LurkCellsPerRoamer), 1, Rules.MaxLurkersPerPool);
 
         // rollWaterGroup: 물에 사는 몬스터 무리 (없으면 물엔 몬스터 없음 — FieldArea.WaterEncounters)
         public RoamingMonsters(FieldMap map, Func<System.Random, List<MonsterInstance>> rollGroup, System.Random rng, RoamingRules rules = null,
@@ -138,7 +172,44 @@ namespace WordRPG.Field
             {
                 waterHabitat.AddRange(map.RaftWaterCells());
                 waterHabitat.Sort((a, b) => a.y != b.y ? a.y.CompareTo(b.y) : a.x.CompareTo(b.x)); // 랜덤 결과가 매번 같게
+                if (waterHabitat.Count == 0) FindPools(); // 뗏목이 없는 물 = 숨는 웅덩이 (#113)
             }
+        }
+
+        // 이어진 물 덩어리(3칸 이상)마다, 땅(몬스터가 설 수 있는 칸)에 닿은 물 칸 = 숨을 자리
+        private void FindPools()
+        {
+            var seen = new HashSet<Vector2Int>();
+            for (int y = 0; y < map.Height; y++)
+            for (int x = 0; x < map.Width; x++)
+            {
+                var start = new Vector2Int(x, y);
+                if (map.Get(start) != FieldTile.Water || !seen.Add(start)) continue;
+                var group = new List<Vector2Int> { start };
+                var queue = new Queue<Vector2Int>(group);
+                while (queue.Count > 0)
+                {
+                    var cell = queue.Dequeue();
+                    foreach (var direction in Directions)
+                    {
+                        var next = cell + direction.ToOffset();
+                        if (map.Get(next) != FieldTile.Water || !seen.Add(next)) continue;
+                        group.Add(next);
+                        queue.Enqueue(next);
+                    }
+                }
+                var spots = group.FindAll(cell => Array.Exists(Directions, d => IsLand(cell + d.ToOffset())));
+                if (group.Count < 3 || spots.Count == 0) continue;
+                spots.Sort((a, b) => a.y != b.y ? a.y.CompareTo(b.y) : a.x.CompareTo(b.x));
+                pools.Add(spots);
+                poolSizes.Add(group.Count);
+            }
+        }
+
+        private bool IsLand(Vector2Int cell)
+        {
+            var tile = map.Get(cell);
+            return tile == FieldTile.Floor || tile == FieldTile.Lawn || tile == FieldTile.Grass || tile == FieldTile.Stream;
         }
 
         // 지역에 들어올 때: 정해진 마릿수만큼 주인공에게서 먼 서식지에
@@ -148,12 +219,18 @@ namespace WordRPG.Field
             foreach (bool aquatic in new[] { false, true })
             {
                 int target = aquatic ? WaterTargetCount : TargetCount;
-                while (roamers.FindAll(r => r.Aquatic == aquatic).Count < target)
+                while (roamers.FindAll(r => r.Aquatic == aquatic && !r.Lurker).Count < target)
                 {
                     var roamer = TrySpawn(player, aquatic);
                     if (roamer == null) break;
                     events.Add(new RoamerEvent(RoamerEventKind.Spawned, roamer, roamer.Position));
                 }
+            }
+            while (roamers.FindAll(r => r.Lurker).Count < LurkerTargetCount)
+            {
+                var lurker = TrySpawnLurker(player);
+                if (lurker == null) break;
+                events.Add(new RoamerEvent(RoamerEventKind.Spawned, lurker, lurker.Position));
             }
             return events;
         }
@@ -183,7 +260,9 @@ namespace WordRPG.Field
         // 전투에서 이김 → 사라지고 얼마 뒤 다른 곳에서 새로 나타남
         public void Defeat(Roamer roamer)
         {
-            if (roamers.Remove(roamer)) respawns.Add((Rules.RespawnSeconds, roamer.Aquatic));
+            if (!roamers.Remove(roamer)) return;
+            if (roamer.Lurker) lurkerRespawns.Add(Rules.RespawnSeconds);
+            else respawns.Add((Rules.RespawnSeconds, roamer.Aquatic));
         }
 
         // 도망침 → 잠깐 멈춤 (그동안 거리를 벌림)
@@ -208,6 +287,15 @@ namespace WordRPG.Field
                 respawns.RemoveAt(i);
                 events.Add(new RoamerEvent(RoamerEventKind.Spawned, roamer, roamer.Position));
             }
+            for (int i = lurkerRespawns.Count - 1; i >= 0; i--)
+            {
+                lurkerRespawns[i] -= dt;
+                if (lurkerRespawns[i] > 0f) continue;
+                var lurker = TrySpawnLurker(player);
+                if (lurker == null) continue;
+                lurkerRespawns.RemoveAt(i);
+                events.Add(new RoamerEvent(RoamerEventKind.Spawned, lurker, lurker.Position));
+            }
 
             float step = dt * SlowFactor;
             foreach (var roamer in roamers.ToArray())
@@ -219,6 +307,17 @@ namespace WordRPG.Field
                 roamer.Timer -= step;
                 switch (roamer.State)
                 {
+                    case RoamerState.Lurking:
+                        if (d2 <= Rules.LurkRadius * Rules.LurkRadius + 1) // 2칸 안 (대각선 한 칸 어긋남까지)
+                        {
+                            roamer.State = RoamerState.Surfacing;
+                            roamer.Timer = Rules.SurfaceSeconds;
+                            events.Add(new RoamerEvent(RoamerEventKind.Surfaced, roamer, roamer.Position));
+                        }
+                        break;
+                    case RoamerState.Surfacing:
+                        if (roamer.Timer <= 0f) Emerge(roamer, player, d2, events);
+                        break;
                     case RoamerState.Stunned:
                         if (roamer.Timer <= 0f) StartReturning(roamer);
                         break;
@@ -289,8 +388,75 @@ namespace WordRPG.Field
             Move(roamer, target, events);
         }
 
+        // 거품 뒤 튀어나옴 (#113): 웅덩이 옆 땅 중 주인공에게 가장 가까운 칸으로 → "!" 뒤 쫓아옴.
+        // 주인공이 바로 옆이면 부딪힘(전투), 그새 멀어졌으면 다시 숨음, 옆 땅이 다 막혔으면 조금 뒤 다시
+        private void Emerge(Roamer roamer, Vector2Int player, int d2, List<RoamerEvent> events)
+        {
+            if (d2 > Rules.DetectRadius * Rules.DetectRadius)
+            {
+                roamer.State = RoamerState.Lurking;
+                events.Add(new RoamerEvent(RoamerEventKind.Dived, roamer, roamer.Position));
+                return;
+            }
+            Vector2Int? best = null;
+            int bestDistance = int.MaxValue;
+            foreach (var direction in Directions)
+            {
+                var cell = roamer.Position + direction.ToOffset();
+                if (cell == player)
+                {
+                    roamer.Facing = direction;
+                    events.Add(new RoamerEvent(RoamerEventKind.Caught, roamer, roamer.Position));
+                    return;
+                }
+                if (!CanStand(cell, false)) continue;
+                int d = Distance2(cell, player);
+                if (d < bestDistance)
+                {
+                    best = cell;
+                    bestDistance = d;
+                }
+            }
+            if (!best.HasValue)
+            {
+                roamer.Timer = 0.2f;
+                return;
+            }
+            roamer.Facing = Toward(roamer.Position, best.Value);
+            Move(roamer, best.Value, events);
+            roamer.State = RoamerState.Noticing;
+            roamer.Timer = Rules.NoticeSeconds;
+            roamer.Facing = Toward(roamer.Position, player);
+            events.Add(new RoamerEvent(RoamerEventKind.Noticed, roamer, roamer.Position));
+        }
+
+        // 놓친 웅덩이 몬스터: 집(웅덩이 칸) 옆까지 걸어가 뛰어들어 다시 숨음. 길이 막혔으면 그 자리에서 바로 웅덩이로
+        private void ReturnToPool(Roamer roamer, Vector2Int player, List<RoamerEvent> events)
+        {
+            roamer.Timer = Rules.WanderStepSeconds * 0.5f;
+            var next = (roamer.Position - roamer.Home).sqrMagnitude <= 1 ? roamer.Home
+                : NextStepToward(roamer.Position, roamer.Home, Rules.GiveUpRadius + Rules.LeashRadius + 10, false);
+            if (next.HasValue && next.Value == player) return;
+            if (!next.HasValue || next.Value == roamer.Home)
+            {
+                var from = roamer.Position;
+                roamer.Position = roamer.Home;
+                roamer.State = RoamerState.Lurking;
+                events.Add(new RoamerEvent(RoamerEventKind.Moved, roamer, from));
+                events.Add(new RoamerEvent(RoamerEventKind.Dived, roamer, from));
+                return;
+            }
+            roamer.Facing = Toward(roamer.Position, next.Value);
+            Move(roamer, next.Value, events);
+        }
+
         private void ReturnHome(Roamer roamer, Vector2Int player, List<RoamerEvent> events)
         {
+            if (roamer.Lurker)
+            {
+                ReturnToPool(roamer, player, events);
+                return;
+            }
             roamer.Timer = Rules.WanderStepSeconds * 0.5f;
             if (Distance2(roamer.Position, roamer.Home) <= (Rules.LeashRadius / 2) * (Rules.LeashRadius / 2))
             {
@@ -360,6 +526,29 @@ namespace WordRPG.Field
                         return step;
                     }
                     queue.Enqueue(next);
+                }
+            }
+            return null;
+        }
+
+        // 웅덩이에 숨는 몬스터 하나 (#113): 마릿수가 모자란 웅덩이의 숨을 자리 중 주인공에게서 조금 떨어진 곳
+        private Roamer TrySpawnLurker(Vector2Int player)
+        {
+            if (rollWaterGroup == null) return null;
+            int near = Rules.LurkSpawnMinDistance * Rules.LurkSpawnMinDistance;
+            for (int i = 0; i < pools.Count; i++)
+            {
+                int inPool = roamers.FindAll(r => r.Lurker && pools[i].Contains(r.Home)).Count;
+                if (inPool >= PoolTarget(i)) continue;
+                var spots = pools[i];
+                for (int attempt = 0; attempt < 40; attempt++)
+                {
+                    var cell = spots[rng.Next(spots.Count)];
+                    if (Distance2(cell, player) < near || At(cell) != null) continue;
+                    if (roamers.Exists(r => r.Lurker && Distance2(r.Home, cell) < 9)) continue;
+                    var lurker = new Roamer(nextId++, cell, rollWaterGroup(rng), false, true);
+                    roamers.Add(lurker);
+                    return lurker;
                 }
             }
             return null;

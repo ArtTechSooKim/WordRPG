@@ -84,6 +84,13 @@ namespace WordRPG.UI
                 foreach (var e in events)
                 {
                     if (e.Kind == RoamerEventKind.Noticed) Sound.Play(Sfx.Click);
+                    // 웅덩이 몬스터 (#113): 튀어나올 때·뛰어들 때 먹물이 튐
+                    if (e.Roamer.Lurker && (e.Kind == RoamerEventKind.Dived || (e.Kind == RoamerEventKind.Moved && walker.Map.Get(e.From) == FieldTile.Water)))
+                    {
+                        StartCoroutine(FieldFx.Play(transform, CellCenter(e.Kind == RoamerEventKind.Dived ? e.Roamer.Home : e.From), Fx.Smoke, 1f,
+                            animationScale, 13, tint: new Color(0.42f, 0.34f, 0.62f)));
+                        Sound.Play(Sfx.Flee);
+                    }
                     if (e.Kind == RoamerEventKind.Caught && !quiz)
                     {
                         StartRoamerBattle(e.Roamer, null);
