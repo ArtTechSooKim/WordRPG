@@ -30,7 +30,9 @@ namespace WordRPG.Field
         Tablet,   // 단어 석판 'T' (막힘): [확인] → 빈칸 단어 문제
         Shrine,   // 유적 제단 'A' (막힘): 석판을 다 풀고 단어를 모으면 동료(아라)가 깨어남
         Cave,     // 동굴 입구 'O' (막힘): 1.2 어두운 밀림 동굴로 이어질 자리 — 지금은 무너진 바위로 막힘
-        Decor     // 꾸밈 'Q' (#86, 막힘): 둘레를 보고 상자·통나무·그루터기·바위·이끼 기둥·석상 중 하나 (FieldDecor.Variant)
+        Decor,    // 꾸밈 'Q' (#86, 막힘): 둘레를 보고 상자·통나무·그루터기·바위·이끼 기둥·석상 중 하나 (FieldDecor.Variant)
+        // ---- 1.2 어두운 밀림 동굴 (#112, GDD 9-7)
+        GlowStone // 글자 반딧돌 'I' (막힘): [확인] → 단어 한 문제로 밝히면 둘레가 영영 밝아짐 (GlowStones, 빛 = CaveLight)
     }
 
     // 지역 분위기에 따라 같은 칸도 다르게 그린다 (초원: 나무·풀숲·물 / 서고: 책장·흩어진 책장·잉크 웅덩이 / 숲: 짙은 덤불·고사리·늪)
@@ -40,14 +42,25 @@ namespace WordRPG.Field
         Meadow,
         Library,
         Forest,
-        Jungle    // 1.1 메아리 정글 (#80)
+        Jungle,   // 1.1 메아리 정글 (#80)
+        Cave      // 1.2 어두운 밀림 동굴 (#112) — 어두운 지역 (FieldDarkness)
     }
 
     public static class FieldThemes
     {
-        // 그 테마의 맵에 쓸 수 있는 칸 — 정글 칸(얕은 강·나루터·레버·덩굴 다리·유적·석판·제단·동굴)은 정글에서만 (#80).
+        // 그 테마의 맵에 쓸 수 있는 칸 — 정글 칸(얕은 강·나루터·레버·덩굴 다리·유적·석판·제단·동굴 입구)은 정글에서만 (#80),
+        // 동굴(#112)은 글자 반딧돌 + 정글의 레버·덩굴 다리·꾸밈.
         // 그림(Tiles/{테마}_{종류}.png)도 이 표대로 있어야 함 (AudioArtTests). 다른 테마에서 쓰려면 여기에 더하고 그림을 만든다
-        public static bool Supports(FieldTheme theme, FieldTile tile) => tile < FieldTile.Stream || theme == FieldTheme.Jungle;
+        public static bool Supports(FieldTheme theme, FieldTile tile)
+        {
+            if (tile < FieldTile.Stream) return true;
+            switch (theme)
+            {
+                case FieldTheme.Jungle: return tile != FieldTile.GlowStone;
+                case FieldTheme.Cave: return tile == FieldTile.Lever || tile == FieldTile.Bridge || tile == FieldTile.Decor || tile == FieldTile.GlowStone;
+                default: return false;
+            }
+        }
     }
 
     public enum Direction
@@ -78,6 +91,7 @@ namespace WordRPG.Field
     //   'D' 출입구 (밟으면 다른 지역으로)
     //   정글 (#80): '>' '<' '^' 'v' 얕은 강(물살 방향)   'J' 나루터   'Y' 레버   'H' 덩굴 다리   'U' 유적 돌벽   ';' 유적 바닥
     //               'T' 단어 석판   'A' 유적 제단   'O' 동굴 입구   'Q' 꾸밈(#86, 막힘)
+    //   동굴 (#112): 'I' 글자 반딧돌 (정글의 'Y' 레버 · 'H' 덩굴 다리 · 'Q' 꾸밈도 씀)
     // 좌표: x는 오른쪽, y는 위쪽 (맨 아래 줄이 y=0) — Unity 월드 좌표와 같은 방향
     public class FieldMap
     {
@@ -162,6 +176,7 @@ namespace WordRPG.Field
                         case 'A': tiles[x, y] = FieldTile.Shrine; break;
                         case 'O': tiles[x, y] = FieldTile.Cave; break;
                         case 'Q': tiles[x, y] = FieldTile.Decor; break;
+                        case 'I': tiles[x, y] = FieldTile.GlowStone; break;
                         case 'D':
                             tiles[x, y] = FieldTile.Door;
                             doors.Add(new Vector2Int(x, y));
@@ -203,7 +218,8 @@ namespace WordRPG.Field
         public static bool IsInteractive(FieldTile tile) =>
             tile == FieldTile.Chest || tile == FieldTile.Fountain || tile == FieldTile.Altar || tile == FieldTile.Shop
             || tile == FieldTile.Boss || tile == FieldTile.Lectern || tile == FieldTile.Gate || tile == FieldTile.Key
-            || tile == FieldTile.Lever || tile == FieldTile.Tablet || tile == FieldTile.Shrine || tile == FieldTile.Cave;
+            || tile == FieldTile.Lever || tile == FieldTile.Tablet || tile == FieldTile.Shrine || tile == FieldTile.Cave
+            || tile == FieldTile.GlowStone;
 
         // 얕은 강의 물살 방향 (얕은 강이 아니면 null)
         public Direction? StreamDirection(Vector2Int p) => streams.TryGetValue(p, out var d) ? d : (Direction?)null;

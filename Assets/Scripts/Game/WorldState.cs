@@ -25,6 +25,8 @@ namespace WordRPG.Game
         [SerializeField] private bool rafting;
         [SerializeField] private List<string> pulledLevers = new List<string>();
         [SerializeField] private List<string> solvedTablets = new List<string>();
+        // 1.2 동굴 (#112, 예전 세이브엔 없음 → 빈 목록): 밝힌 글자 반딧돌 (id = "지역:x,y")
+        [SerializeField] private List<string> litStones = new List<string>();
 
         public string AreaId => hasPosition ? areaId : null;
         public IReadOnlyList<string> OpenedChests => openedChests;
@@ -109,6 +111,14 @@ namespace WordRPG.Game
         {
             if (solvedTablets == null) solvedTablets = new List<string>();
             if (!solvedTablets.Contains(tabletId)) solvedTablets.Add(tabletId);
+        }
+
+        public bool IsStoneLit(string stoneId) => litStones != null && litStones.Contains(stoneId);
+
+        public void MarkStoneLit(string stoneId)
+        {
+            if (litStones == null) litStones = new List<string>();
+            if (!litStones.Contains(stoneId)) litStones.Add(stoneId);
         }
 
         // 그 지역 사전을 마지막으로 읽은 날 ("yyyy-MM-dd", 없으면 null)

@@ -313,6 +313,7 @@ namespace WordRPG.UI
             UpdateRoamers(Time.unscaledDeltaTime);
             streams.Tick(Time.deltaTime, walker.Position);
             fog.Tick(Time.deltaTime);
+            UpdateDarkness();
             tabletView.Tick(Time.unscaledDeltaTime);
             UpdateRaft();
 
@@ -542,6 +543,7 @@ namespace WordRPG.UI
                 case FieldTile.Cave:
                     bubble.Say("무너진 바위와 판자로 막혀 있다…\n언젠가 들어갈 수 있을 것 같다", 3.5f);
                     break;
+                case FieldTile.GlowStone: TouchGlowStone(cell); break;
             }
         }
 
@@ -557,7 +559,11 @@ namespace WordRPG.UI
             stepsTaken++;
             minimap.SetPlayer(walker.Position);
             RefreshNameTags();
-            if (session.World.Reveal(area.AreaId, walker.Map.Width, walker.Map.Height, walker.Position) > 0) minimap.Redraw();
+            if (session.World.Reveal(area.AreaId, walker.Map.Width, walker.Map.Height, walker.Position) > 0)
+            {
+                minimap.Redraw();
+                RefreshDarkness();
+            }
             MaybeSayGrassLine();
             var tile = walker.Map.Get(walker.Position);
             if (tile == FieldTile.Dock && showTutorials && !session.Tutorials.Has(TutorialProgress.Raft) && !bubble.IsVisible)
@@ -672,6 +678,7 @@ namespace WordRPG.UI
             RefreshMooredRafts();
             if (!inBattle) Sound.PlayMusic(AreaMusic);
             session.World.Reveal(area.AreaId, map.Width, map.Height, position);
+            BuildDarkness();
             minimap.SetArea(map, area.Theme, IsCellDone, cell => session.World.IsExplored(area.AreaId, cell));
             nameTags.SetArea(area, IsDoorLocked);
             RefreshNameTags();

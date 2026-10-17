@@ -202,6 +202,7 @@ namespace WordRPG.Field
         // 레버·석판도 같은 방식 (#80) — 위치를 옮기면 새 레버·석판
         public string LeverId(Vector2Int position) => ChestId(position);
         public string TabletId(Vector2Int position) => ChestId(position);
+        public string StoneId(Vector2Int position) => ChestId(position); // 글자 반딧돌 (#112)
 
         public AreaExit GetExit(Vector2Int position)
         {
@@ -226,6 +227,7 @@ namespace WordRPG.Field
                 case FieldTile.Shrine: return "유적 제단";
                 case FieldTile.Cave: return "동굴 입구";
                 case FieldTile.Dock: return "나루터";
+                case FieldTile.GlowStone: return "글자 반딧돌";
                 case FieldTile.Door:
                     var exit = GetExit(position);
                     return exit != null && exit.Target != null ? exit.Target.DisplayName : null;

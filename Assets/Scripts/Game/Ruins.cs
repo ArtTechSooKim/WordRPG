@@ -76,7 +76,7 @@ namespace WordRPG.Game
     public static class CellState
     {
         // 끝난 모습으로 그릴 칸: 연 상자 · 쓰러뜨린 보스 자리 · 사전이 놓인 받침대 · 연 보스 방 문 · 가져간 열쇠 ·
-        // 당긴 레버 · 놓인 덩굴 다리 · 푼 석판 · 동료가 깨어난 제단
+        // 당긴 레버 · 놓인 덩굴 다리 · 푼 석판 · 동료가 깨어난 제단 · 밝힌 글자 반딧돌 (#112)
         public static bool IsDone(FieldArea area, GameSession session, Vector2Int cell)
         {
             var world = session.World;
@@ -91,6 +91,7 @@ namespace WordRPG.Game
                 case FieldTile.Bridge: return Levers.IsBridgeBuilt(area, world, cell);
                 case FieldTile.Tablet: return Ruins.IsTabletSolved(area, world, cell);
                 case FieldTile.Shrine: return Ruins.IsAwakened(area, session);
+                case FieldTile.GlowStone: return GlowStones.IsLit(area, world, cell);
                 default: return false;
             }
         }

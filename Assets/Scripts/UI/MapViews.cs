@@ -24,12 +24,15 @@ namespace WordRPG.UI
         public static readonly Color32 Shrine = new Color32(255, 128, 200, 255); // 유적 제단 (동료)
         public static readonly Color32 Cave = new Color32(28, 26, 30, 255);      // 동굴 입구 (1.2)
         public static readonly Color32 Dock = new Color32(176, 112, 56, 255);    // 나루터
+        public static readonly Color32 GlowStone = new Color32(120, 220, 255, 255); // 글자 반딧돌 (#112) — 밝히면 더 환하게
+        public static readonly Color32 GlowStoneLit = new Color32(214, 248, 255, 255);
         public static readonly Color32 Fog = new Color32(20, 22, 34, 255); // 아직 안 가 본 칸
 
         // done: 연 상자·쓰러뜨린 보스 → 바닥색으로
         public static Color32 ColorOf(FieldTile tile, FieldTheme theme, bool done)
         {
             if (theme == FieldTheme.Jungle) return JungleColorOf(tile, done);
+            if (theme == FieldTheme.Cave) return CaveColorOf(tile, done);
             bool library = theme == FieldTheme.Library;
             bool forest = theme == FieldTheme.Forest;
             var floor = library ? new Color32(74, 63, 69, 255) : forest ? new Color32(150, 100, 64, 255) : new Color32(205, 140, 100, 255); // 초원 길 = 흙길
@@ -87,10 +90,38 @@ namespace WordRPG.UI
             }
         }
 
+        // 동굴 (#112): 짙은 청회색 바위벽, 회갈 바위 바닥, 다져진 길은 더 짙게, 빛이끼는 청록, 먹물은 남보라
+        private static Color32 CaveColorOf(FieldTile tile, bool done)
+        {
+            var floor = new Color32(104, 84, 68, 255);
+            var ink = new Color32(64, 50, 104, 255);
+            switch (tile)
+            {
+                case FieldTile.Wall: return new Color32(44, 47, 58, 255);
+                case FieldTile.Lawn: return new Color32(140, 116, 100, 255);
+                case FieldTile.Grass: return new Color32(72, 134, 116, 255);
+                case FieldTile.Water: return ink;
+                case FieldTile.Bridge: return done ? new Color32(160, 116, 60, 255) : ink; // 놓이기 전엔 먹물 개울로
+                case FieldTile.Lever: return Lever;
+                case FieldTile.GlowStone: return done ? GlowStoneLit : GlowStone;
+                case FieldTile.Decor: return new Color32(70, 66, 64, 255);
+                case FieldTile.Chest: return done ? floor : Chest;
+                case FieldTile.Boss: return done ? floor : Boss;
+                case FieldTile.Fountain: return Fountain;
+                case FieldTile.Altar: return Altar;
+                case FieldTile.Shop: return Shop;
+                case FieldTile.Door: return Door;
+                case FieldTile.Lectern: return Lectern;
+                case FieldTile.Gate: return done ? floor : Gate;
+                case FieldTile.Key: return done ? Lectern : Key;
+                default: return floor;
+            }
+        }
+
         // 미니맵에서 '끝난' 모습이 따로 있는 칸 (연 상자·쓰러뜨린 보스·연 문·가져간 열쇠·놓인 다리·푼 석판·깨어난 제단)
         public static bool HasDoneLook(FieldTile tile) =>
             tile == FieldTile.Chest || tile == FieldTile.Boss || tile == FieldTile.Gate || tile == FieldTile.Key
-            || tile == FieldTile.Bridge || tile == FieldTile.Tablet || tile == FieldTile.Shrine;
+            || tile == FieldTile.Bridge || tile == FieldTile.Tablet || tile == FieldTile.Shrine || tile == FieldTile.GlowStone;
 
         // explored: 가 본 칸인지 (null = 전부 보임). 안 가 본 칸은 안개색 — 그 안의 상자·보스도 숨는다
         public static Texture2D Build(FieldMap map, FieldTheme theme, Func<Vector2Int, bool> done, Texture2D reuse = null,

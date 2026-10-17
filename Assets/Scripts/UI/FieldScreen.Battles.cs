@@ -150,7 +150,11 @@ namespace WordRPG.UI
             walker.WarpTo(walker.Map.Start);
             walker.Face(Direction.Down);
             SnapPlayer();
-            if (session.World.Reveal(area.AreaId, walker.Map.Width, walker.Map.Height, walker.Position) > 0) minimap.Redraw();
+            if (session.World.Reveal(area.AreaId, walker.Map.Width, walker.Map.Height, walker.Position) > 0)
+            {
+                minimap.Redraw();
+                RefreshDarkness();
+            }
             RefreshNameTags();
             session.World.SetPosition(area.AreaId, walker.Position);
             SaveNow();

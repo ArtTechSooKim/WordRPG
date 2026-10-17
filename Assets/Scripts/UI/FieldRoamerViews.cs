@@ -17,6 +17,8 @@ namespace WordRPG.UI
             public Transform Root;
             public SpriteRenderer Body;
             public SpriteRenderer Mark;
+            public SpriteRenderer Eyes;     // 어둠 속 빨간 눈 (#112)
+            public float Blink;
             public Vector3 From, To;
             public float T = 1f, Duration = 0.1f;
             public float MarkLeft;
@@ -27,8 +29,11 @@ namespace WordRPG.UI
         private readonly Func<Vector2Int, Vector3> cellCenter;
         private readonly Dictionary<Roamer, View> views = new Dictionary<Roamer, View>();
         private Sprite exclaim;
+        private Sprite eyes;
+        private const float BlinkEvery = 3.6f, BlinkSeconds = 0.13f;
 
         public int Count => views.Count;
+        public int EyesShown { get; private set; } // 지금 빨간 눈만 보이는 몬스터 수 (테스트용)
 
         public FieldRoamerViews(Transform parent, Func<Vector2Int, Vector3> cellCenter)
         {
@@ -134,10 +139,18 @@ namespace WordRPG.UI
             mark.transform.SetParent(root, false);
             mark.transform.localPosition = new Vector3(0f, 0.55f, 0f);
             mark.sprite = ExclaimSprite();
-            mark.sortingOrder = 12;
+            mark.sortingOrder = 16; // 동굴 어둠(14) 위 — 어둠 속에서도 '!'는 보이게 (#112)
             mark.gameObject.SetActive(false);
 
-            var view = new View { Root = root, Body = body, Mark = mark, From = root.position, To = root.position, Phase = roamer.Id };
+            var eyesRenderer = new GameObject("Eyes", typeof(SpriteRenderer)).GetComponent<SpriteRenderer>();
+            eyesRenderer.transform.SetParent(root, false);
+            eyesRenderer.transform.localPosition = new Vector3(0f, 0.08f, 0f);
+            eyesRenderer.sprite = EyesSprite();
+            eyesRenderer.sortingOrder = 15; // 어둠(14) 바로 위
+            eyesRenderer.gameObject.SetActive(false);
+
+            var view = new View { Root = root, Body = body, Mark = mark, Eyes = eyesRenderer, From = root.position, To = root.position, Phase = roamer.Id,
+                                  Blink = roamer.Id * 1.37f % BlinkEvery };
             Face(view, roamer.Facing);
             views[roamer] = view;
             return view;
@@ -147,6 +160,47 @@ namespace WordRPG.UI
         {
             if (facing == Direction.Left) view.Body.flipX = true;
             else if (facing == Direction.Right) view.Body.flipX = false;
+        }
+
+        // 동굴 어둠 (#112): inDark(몬스터 자리)가 참이면 몸은 어둠에 가려지고 빨간 눈 두 개만 (가끔 깜빡). null이면 눈을 모두 끔
+        public void UpdateEyes(Func<Vector3, bool> inDark, float dt)
+        {
+            if (inDark == null && EyesShown == 0) return;
+            int shown = 0;
+            foreach (var view in views.Values)
+            {
+                bool show = inDark != null && inDark(view.Root.position);
+                if (show)
+                {
+                    view.Blink = (view.Blink + dt) % BlinkEvery;
+                    show = view.Blink > BlinkSeconds;
+                    shown++;
+                }
+                if (view.Eyes.gameObject.activeSelf != show) view.Eyes.gameObject.SetActive(show);
+            }
+            EyesShown = shown;
+        }
+
+        // 빨간 눈 두 개 (6×2픽셀 + 옅은 번짐, 16px = 1칸)
+        private Sprite EyesSprite()
+        {
+            if (eyes != null) return eyes;
+            var texture = new Texture2D(8, 4, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point, name = "roamer_eyes" };
+            var clear = new Color32(0, 0, 0, 0);
+            var pixels = new Color32[8 * 4];
+            for (int i = 0; i < pixels.Length; i++) pixels[i] = clear;
+            foreach (int x0 in new[] { 1, 5 })
+            {
+                for (int y = 1; y <= 2; y++)
+                for (int x = x0; x <= x0 + 1; x++)
+                    pixels[y * 8 + x] = new Color32(255, 64, 52, 255);
+                pixels[3 * 8 + x0] = new Color32(255, 64, 52, 70);     // 위로 옅은 번짐
+                pixels[0 * 8 + x0 + 1] = new Color32(255, 64, 52, 70);
+            }
+            texture.SetPixels32(pixels);
+            texture.Apply(false);
+            eyes = Sprite.Create(texture, new Rect(0, 0, 8, 4), new Vector2(0.5f, 0.5f), 16, 0, SpriteMeshType.FullRect);
+            return eyes;
         }
 
         // 사전 말풍선과 같은 팩 그림 (Ui/bubble_exclaim, 아래 가운데 기준)

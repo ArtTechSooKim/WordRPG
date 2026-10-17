@@ -206,7 +206,7 @@ lm = lightmap(lights, explored)
 dark = darken(scene, lm)
 # 어둠 속 몬스터 눈 두 개 (빛 밖) — 엉킴거미 하나, 깜빡유령 하나
 dd = ImageDraw.Draw(dark)
-for ex, ey, col in [(33.3, 28.6, (255, 90, 70)), (24.6, 45.2, (190, 230, 255))]:
+for ex, ey, col in [(33.3, 28.6, (255, 90, 70)), (24.6, 45.2, (255, 90, 70))]:
     px_, py_ = int(ex * 16), int(ey * 16)
     for k in (0, 5):
         dd.rectangle([px_ + k, py_, px_ + k + 1, py_ + 1], fill=col)
@@ -270,7 +270,7 @@ gd.ellipse([sx - 4, sy - 4, sx + 4, sy + 4], fill=(150, 230, 240, 110))
 out_a.alpha_composite(glow.filter(ImageFilter.GaussianBlur(2)))
 oa = ImageDraw.Draw(out_a)
 oa.rectangle([sx - 1, sy - 3, sx, sy - 2], fill=(190, 240, 250))
-for ex, ey, col in [(27.6, 27.4, (255, 90, 70)), (24.3, 31.4, (190, 230, 255))]:
+for ex, ey, col in [(27.6, 27.4, (255, 90, 70)), (24.3, 31.4, (255, 90, 70))]:
     px_, py_ = int(ex * 16), int(ey * 16)
     for k in (0, 5):
         oa.rectangle([px_ + k, py_, px_ + k + 1, py_ + 1], fill=col)

@@ -81,6 +81,11 @@
      도달 검사(모든 상자·출입구)는 걷기 + 뗏목 `FieldReach.Flood`. 칸보다 큰 그림(석상·동굴)은 `FieldArt.Prop`(Tiles/{테마}_{종류}_prop.png).
      'Q' 꾸밈(#86, 막힘): 종류는 둘레로 정함 `FieldDecor.Variant` (그림 Tiles/{테마}_Decor_{종류}.png, 1×2는 _prop), 막지 않는 흩뿌림은 `FieldScatter`(Tiles/{테마}_Scatter_{바닥}_n.png).
      정글 맵 원본 = Tools/jungle_map.py (마지막에 widen_maps.widen을 나무만 걷게 해서 한 칸 통로를 넓힘) → Builds/maps/JungleMap.txt를 상수·에셋에 옮김
+   - 동굴 (#112, 1.2 — GDD 9-7): 테마 `FieldTheme.Cave` = 어두운 지역 (`FieldDarkness.IsDark`). 맵 글자 'I' = 글자 반딧돌(규칙 `GlowStones`, 세이브 `WorldState.litStones`),
+     동굴 칸 = 기본 칸 + 레버·덩굴 다리·꾸밈·반딧돌 (`FieldThemes.Supports`). 빛 규칙 `CaveLight`·`DarknessMap`(순수): 주인공 3.5칸 + 동료 횃불 1칸 · 밝힌 반딧돌 6칸 ·
+     쉼터 물건(샘·가게·제단·사전) 4칸 · 출입구 2.5칸 · 지나간 곳 Memory. 그리기 `FieldDarkness`(칸마다 2×2픽셀 한 장, 주인공 빛이 1/4칸 움직일 때만 다시 칠함, 알파 1 —
+     Linear라 0.97만 돼도 바닥이 비침). 빛 밖 몬스터는 빨간 눈만 (`FieldRoamerViews.UpdateEyes` — 사용자: 적의 눈은 모두 빨간색), 꺼진 반딧돌은 희미하게 깜빡(`FieldScreen.Cave`).
+     그림 = import_ninja_art.py `build_cave` (Cave_Wall_auto = 바위 윗면 + 밝은 테 + 절벽면), 시안 = Tools/cave_mockup.py
    - 통로는 두 칸 너비 (사용자 요청 #67): 새 맵은 `python Tools/widen_maps.py --only {상수} [--apply]`로 한 칸 통로를 넓힘 (상수·에셋 같이)
 6. **네이밍**: PascalCase 클래스/메서드/프로퍼티, camelCase 필드. SO 필드는 `[SerializeField] private` + 읽기 전용 프로퍼티. 클래스명은 영문, 화면 표시명은 한국어 필드(`displayName = "펜촉이"`). 주석은 한국어
 7. **Git LFS 사용 중**: 이미지·오디오·폰트·네이티브 플러그인. 새 바이너리 타입 추가 시 `.gitattributes` 확인 (새로 클론하면 `git lfs install` 먼저)
@@ -140,7 +145,7 @@ Assets/
                         BattleSummary(한 판 결산: 새 단어·틀린 단어·기술별 피해·최대 콤보 — 결산 화면용), Preemptive(선제공격: HP 20%·이미 본 단어만)
     Field/              FieldMap(맵 글자→격자), FieldWalker(이동), StickInput(스틱 값→4방향·달리기), EncounterCounter(조우), FieldInteraction([확인] 대상·이름표 규칙), FieldAutotile(길·물가 테두리 모양),
                         FieldArea(지역 SO: 테마·출입구 연결·보스·상자·상점·조우 방식·물의 몬스터·유적 동료), EncounterTable, RoamingMonsters(보이는 몬스터: 어슬렁·발견·쫓기·포기·부딪힘),
-                        FieldReach(시작 칸에서 갈 수 있는 칸 — 걷기 + 뗏목, 문·다리를 연/닫은 기준, #80)
+                        FieldReach(시작 칸에서 갈 수 있는 칸 — 걷기 + 뗏목, 문·다리를 연/닫은 기준, #80), CaveLight(동굴 빛 규칙 + DarknessMap — #112)
     Game/               GameSession(진행 상태 전체), GameManager(씬 간 유지 + 자동 저장 + 설정 + 결제 창구), GameDatabase(id→에셋), PlayerRecord,
                         Entitlements(산 상품) · IStore + UnityIapStore(애플 인앱 결제),
                         Dex(도감 규칙), Keepsakes(징표 진열장), GameSettings(음량·진동), TutorialProgress(본 튜토리얼 id, 세이브에 저장),
@@ -148,11 +153,11 @@ Assets/
                         BossDictionary(보스의 사전: 받침대 L, 하루 한 번 새 단어 — 읽은 날은 WorldState),
                         BossGate(보스 방 문: 열쇠 K + 단어 40개 → G가 열림 — #76),
                         Ruins(유적: 석판 T 4개 + 정글 단어 60개 → 제단 A에서 동료) · Levers(레버 Y → 덩굴 다리 H) · CellState(칸의 끝난 모습·지나갈 수 있음) — #80,
-                        TabletQuiz(석판 3문제: 틀리면 벌점 없이 다시, 숙련도는 처음 답만 — #81)
+                        TabletQuiz(석판 3문제: 틀리면 벌점 없이 다시, 숙련도는 처음 답만 — #81), GlowStones(글자 반딧돌: 밝힘·밝힌 수 — #112)
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
     UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투 + 보스 결정타 연출 + 전투 결산, 단독 연습 모드도 있음)
                         — 둘 다 partial로 나눔 (#93): FieldScreen.cs(상태·이동·입력) + .Places([확인] 장소)·.Jungle(정글 기믹)·.Battles(조우·전투 뒤·수련)·
-                        .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout.
+                        .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴)·.Cave(동굴 어둠·반딧돌 #112) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout.
                         새 기능은 맞는 파일에, 기능 묶음이 커지면 새 partial 파일로,
                         DexView(도감), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기),
                         InventoryView(소지품: 주인공·성유물·아이템·징표) + HeroViews(HeroInfoPage·RelicPage·RelicSlotsRow·SkillRowView),
@@ -163,7 +168,7 @@ Assets/
                         TitleScreen(타이틀), Haptics(진동), UnitView, VirtualStick(가상 스틱 — 누른 자리에 생김, 끝까지 밀면 달리기),
                         GuideHints(튜토리얼: 화면을 막지 않는 한 줄 알약 + 손끝 끌기·톡톡·화살표, 해 보면 끝 — #61),
                         PauseTutorial(예외로 화면을 멈추는 단계 설명 — 정글 첫 선제공격 기회 #79, 강조할 버튼만 막 위로),
-                        TabletQuizView(단어 석판 문제 창 — #81) · FieldStreams(얕은 강 물결선 — #81),
+                        TabletQuizView(단어 석판 문제 창 — #81) · FieldStreams(얕은 강 물결선 — #81) · FieldDarkness(동굴 어둠 한 장 — #112),
                         PaywallView(정식판 안내: 구매·구매 복원·나중에), CompanionViews(가방 > 동료 탭 CompanionPage · 동료 조우 연출 CompanionCutscene — #77),
                         FieldFollower(필드에서 주인공 자취를 한 칸 뒤 따라오는 동료 그림 — 보이기만 함, 칸 영향 없음 #78) · CharacterSheet(주인공과 같은 배치의 캐릭터 시트 자르기), FieldRoamerViews(필드 위 보이는 몬스터 그림·'!') · PreemptView([선제공격] QTE: 집중선·줄어드는 원·2×2 선택지·결과 도장 + TargetLock 조준 괄호),
                         UiRing(두께가 일정한 원 테두리 — 코드로 만들 땐 CanvasRenderer를 먼저 붙임),

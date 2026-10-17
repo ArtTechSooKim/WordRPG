@@ -13,12 +13,13 @@ namespace WordRPG.UI
         private static readonly Dictionary<string, Sprite> Cache = new Dictionary<string, Sprite>();
 
         // done: 연 보물상자, 쓰러뜨린 보스 자리(빈자리), 사전이 놓인 받침대, 연 보스 방 문(길), 열쇠를 가져간 빈 받침대,
-        //       당긴 레버, 놓인 덩굴 다리, 푼 석판, 깨어난 유적 제단(빈 받침) (#80)
+        //       당긴 레버, 놓인 덩굴 다리, 푼 석판, 깨어난 유적 제단(빈 받침) (#80), 밝힌 글자 반딧돌 (#112)
         public static Sprite ForTile(FieldTile tile, FieldTheme theme, bool done)
         {
             bool hasDone = done && (tile == FieldTile.Chest || tile == FieldTile.Boss || tile == FieldTile.Lectern
                                     || tile == FieldTile.Gate || tile == FieldTile.Key || tile == FieldTile.Lever
-                                    || tile == FieldTile.Bridge || tile == FieldTile.Tablet || tile == FieldTile.Shrine);
+                                    || tile == FieldTile.Bridge || tile == FieldTile.Tablet || tile == FieldTile.Shrine
+                                    || tile == FieldTile.GlowStone);
             return Load($"{theme}_{tile}{(hasDone ? "_done" : "")}") ?? PlaceholderArt.ForTile(tile, theme, done);
         }
 
@@ -159,6 +160,15 @@ namespace WordRPG.UI
                         case FieldTile.RuinFloor:
                         case FieldTile.Bridge: return Rgb(0xDDE0CC);
                         default: return Rgb(0xD9B79A);
+                    }
+                case FieldTheme.Cave: // 동굴 (#112): 회갈 바위 바닥 · 다져진 길 · 청록 빛이끼
+                    switch (tile)
+                    {
+                        case FieldTile.Grass: return Rgb(0xBFE3D4);
+                        case FieldTile.Lawn:
+                        case FieldTile.Boss: return Rgb(0xD9CCC0);
+                        case FieldTile.Bridge: return Rgb(0xDDC7A8);
+                        default: return Rgb(0xC9B39E);
                     }
                 default:
                     switch (tile)

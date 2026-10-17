@@ -796,6 +796,7 @@ def build_tiles(pack):
     themes["Forest"]["Door_Jungle"] = over(shade_top(tint(dirt, (0.8, 0.95, 0.8)), 10, 0.4), pack.tile("TilesetFloorDetail.png", 7, 2))
 
     build_jungle(pack, themes, autos, template, lectern, key_stand, keyhole, big_chest, gem, stall, brambles, pond, gold_key)
+    build_cave(pack, themes, autos, template, lectern, key_stand, keyhole, big_chest, gem, stall, pond, gold_key)
 
     # 초원·숲 다듬기 (#99, 사용자: 나무가 한 그림만 되풀이·빈 잔디가 밋밋): 나무·풀숲 3가지씩 섞기(_v1·_v2 — 게임이 칸 위치로 고름)
     # + 잔디에 작은 흩뿌림(초원 = 클로버·풀 포기·작은 꽃, 숲 = 낙엽·잔가지·돌멩이·짙은 풀). 흰 데이지·해바라기처럼 튀는 것은 뺌 (은은하게 #95)
@@ -1016,6 +1017,171 @@ def build_jungle(pack, themes, autos, template, lectern, key_stand, keyhole, big
     os.makedirs(field, exist_ok=True)
     save_if_changed(log_raft(planks), os.path.join(field, "raft.png"))
     save_if_changed(flow_streaks(), os.path.join(field, "ripple.png"))
+
+
+# ------------------------------------------------------------------ 1.2 어두운 밀림 동굴 (#112, GDD 9-7)
+# 시안(#111, Tools/cave_mockup.py)과 같은 조각: 회갈 바위 바닥(조우 없음) · 짙은 다져진 길(자동 테두리) · 은은한 청록 빛이끼(몬스터 서식지) ·
+# 짙은 청회색 바위벽(바닥 쪽 밝은 테 + 아래가 바닥이면 절벽면 — 사용자 #100 벽·땅 구분) · 남보라 먹물(둥근 물가) · 받침 구슬 글자 반딧돌(꺼짐 회녹색 / 밝힘 푸른 빛) ·
+# 출구 사다리(섬으로 올라감) · 말줄임덩굴(GiantBamboo). 어둠은 게임이 위에 얹는다 (FieldDarkness)
+CAVE_TINT = (0.8, 0.79, 0.8)
+CAVE_ROCK, CAVE_ROCK_LIGHT, CAVE_ROCK_DARK = (40, 43, 53), (52, 56, 68), (31, 33, 41)
+CAVE_RIM, CAVE_RIM_INNER = (96, 104, 120), (66, 72, 86)
+
+
+def cave_floor(t):
+    return tint(t, CAVE_TINT)
+
+
+def recolor(t, dark, light):
+    """밝기만 남기고 두 색 사이로 다시 칠한다 (절벽면 청회색 등)"""
+    out = t.copy()
+    px = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            r, g, b, a = px[x, y]
+            k = (r + g + b) / 765
+            px[x, y] = tuple(int(dark[i] + (light[i] - dark[i]) * k) for i in range(3)) + (a,)
+    return out
+
+
+def cave_rock_top(seed):
+    import random
+    rr = random.Random(seed)
+    t = Image.new("RGBA", (16, 16), CAVE_ROCK + (255,))
+    px = t.load()
+    for _ in range(14):
+        x, y = rr.randrange(16), rr.randrange(16)
+        px[x, y] = (CAVE_ROCK_LIGHT if rr.random() < 0.6 else CAVE_ROCK_DARK) + (255,)
+    return t
+
+
+def cave_wall_atlas(face):
+    """바위벽 256칸 (FieldAutotile 마스크 — 벽끼리 이어짐): 아래가 바닥이면 절벽면, 아니면 바위 윗면 + 바닥에 닿은 쪽(위·왼·오른)에 밝은 테 2px,
+    안쪽 모서리(두 변은 벽인데 대각선이 바닥)엔 밝은 점"""
+    out = Image.new("RGBA", (256, 256))
+    for mask in range(256):
+        m = auto_normalize(mask)
+        if not m & AUTO_S:
+            t = face.copy()
+            px = t.load()
+            if not m & AUTO_N:                       # 한 줄짜리 벽: 절벽면 위에도 테
+                for x in range(16):
+                    px[x, 0], px[x, 1] = CAVE_RIM + (255,), CAVE_RIM_INNER + (255,)
+        else:
+            t = cave_rock_top(mask % 5)
+            px = t.load()
+            for side, (bit, outer, inner) in enumerate(((AUTO_N, lambda i: (i, 0), lambda i: (i, 1)),
+                                                        (AUTO_W, lambda i: (0, i), lambda i: (1, i)),
+                                                        (AUTO_E, lambda i: (15, i), lambda i: (14, i)))):
+                if not m & bit:
+                    for i in range(16):
+                        px[inner(i)] = CAVE_RIM_INNER + (255,)
+                for i in range(16):
+                    if not m & bit:
+                        px[outer(i)] = CAVE_RIM + (255,)
+            for corner, a, b, (cx, cy) in ((AUTO_NE, AUTO_N, AUTO_E, (14, 0)), (AUTO_NW, AUTO_N, AUTO_W, (0, 0)),
+                                           (AUTO_SE, AUTO_S, AUTO_E, (14, 14)), (AUTO_SW, AUTO_S, AUTO_W, (0, 14))):
+                if m & a and m & b and not mask & corner:
+                    for dx in (0, 1):
+                        for dy in (0, 1):
+                            px[cx + dx, cy + dy] = CAVE_RIM_INNER + (255,)
+        out.alpha_composite(t, ((mask % 16) * 16, (mask // 16) * 16))
+    return out
+
+
+def cave_exit(path):
+    """출구 (섬으로 올라가는 길): 다져진 길이 아래쪽(바깥)으로 갈수록 따뜻한 빛으로 밝아진다"""
+    out = path.copy()
+    px = out.load()
+    for y in range(16):
+        k = 0.15 + 0.55 * (y / 15)
+        for x in range(16):
+            r, g, b, a = px[x, y]
+            px[x, y] = (int(r + (236 - r) * k), int(g + (222 - g) * k), int(b + (186 - b) * k), a)
+    return out
+
+
+def cave_moss(lawn, seed):
+    """빛이끼 덤불 (몬스터 서식지): 바위 바닥을 아주 살짝 청록으로 + 청록 이끼 포기 4개 (칸 전체를 칠하지 않음 — 네모로 보이지 않게)"""
+    import random
+    rr = random.Random(100 + seed)
+    t = Image.blend(lawn, tint(lawn, (0.8, 1.02, 0.98)), 0.7)
+    px = t.load()
+    for _ in range(4):
+        cx, cy = rr.randrange(2, 14), rr.randrange(3, 15)
+        for dx, dy, col in ((0, 0, (150, 225, 196)), (-1, 0, (78, 168, 146)), (1, 0, (78, 168, 146)), (0, -1, (96, 190, 164)),
+                            (-1, 1, (52, 120, 108)), (1, 1, (52, 120, 108)), (0, 1, (60, 140, 124))):
+            if 0 <= cx + dx < 16 and 0 <= cy + dy < 16:
+                px[cx + dx, cy + dy] = col + (255,)
+    return t
+
+
+def build_cave(pack, themes, autos, template, lectern, key_stand, keyhole, big_chest, gem, stall, pond, gold_key):
+    lawn = cave_floor(pack.tile("TilesetFloor.png", 15, 19))                 # 회갈 바위 바닥 (조우 없음)
+    path = cave_floor(pack.tile("TilesetFloor.png", 12, 15))                 # 다져진 길 가운데 조각
+    face = recolor(pack.tile("TilesetRelief.png", 5, 1), (30, 34, 42), (112, 122, 136))  # 절벽면 (청회색 세로 줄무늬)
+    water = ink(pack.tile("TilesetWater.png", 11, 2))                        # 먹물
+    planks = pack.tile("TilesetWater.png", 1, 13)
+    lever = pack.tile("TilesetElement.png", 6, 4)
+    orb_off, orb_on = pack.tile("TilesetDungeon.png", 3, 2), pack.tile("TilesetDungeon.png", 4, 2)
+    boulder = recolor(pack.tile("TilesetReliefDetail.png", 4, 0), (40, 42, 50), (130, 130, 140))
+    bamboo = pack.frame("Actor/Boss/GiantBamboo/Idle.png", 0, 62)
+    bamboo = bamboo.crop(bamboo.getbbox())
+    cave_key = tint(gold_key, (0.72, 0.95, 1.12))                            # 푸른빛 열쇠
+    nature = lambda c, r: pack.tile("TilesetNature.png", c, r)
+
+    lit = over(lawn, orb_on)
+    glow = lit.load()                                                        # 밝힌 반딧돌: 받침 둘레 바닥에 옅은 푸른 빛
+    for y in range(16):
+        for x in range(16):
+            r, g, b, a = glow[x, y]
+            d = ((x - 7.5) ** 2 + (y - 7) ** 2) ** 0.5
+            k = max(0.0, 1 - d / 9) * 0.35
+            glow[x, y] = (min(255, int(r + (150 - r) * k)), min(255, int(g + (230 - g) * k)), min(255, int(b + (245 - b) * k)), a)
+    themes["Cave"] = {
+        "Floor": path,
+        "Lawn": lawn,
+        "Grass": cave_moss(lawn, 0),
+        "Grass_v1": cave_moss(lawn, 1),
+        "Grass_v2": cave_moss(lawn, 2),
+        "Wall": cave_rock_top(0),                                            # 자동 테두리(Cave_Wall_auto)가 없을 때만
+        "Water": water,
+        "Door": cave_exit(path),                                             # 바깥 빛이 드는 길 = 섬으로 올라가는 출구
+        "Door_locked": over(lawn, boulder),                                  # 무너진 바위
+        "Fountain": pond_on(lawn, pond),
+        "Chest": over(lawn, big_chest[0]),
+        "Chest_done": over(lawn, big_chest[1]),
+        "Altar": over(lawn, gem),
+        "Shop": over(lawn, stall),
+        "Boss": over(lawn, bamboo, scale=3),
+        "Boss_done": lawn.copy(),
+        "Lectern": lectern(lawn, False),
+        "Lectern_done": lectern(lawn, True),
+        "Gate": tint(keyhole[0], (0.72, 0.84, 1.0)),                         # 푸른빛 열쇠 구멍 블록
+        "Gate_done": path,
+        "Key": key_stand(lawn, cave_key),
+        "Key_done": lectern(lawn, False),
+        "Lever": over(lawn, lever),
+        "Lever_done": over(lawn, tint(mirror(lever), (1.15, 1.1, 0.8))),
+        "Bridge": over(water, faded(planks, 0.38)),                          # 놓이기 전: 먹물 위 희미한 다리 윤곽
+        "Bridge_done": vine_rails(planks, True),
+        "Bridge_h": over(water, faded(planks.rotate(90), 0.38)),
+        "Bridge_h_done": vine_rails(planks.rotate(90), False),
+        "GlowStone": over(lawn, orb_off),                                    # 꺼진 반딧돌 (어둠 속에서 희미하게 깜빡 — 게임)
+        "GlowStone_done": lit,                                               # 밝힌 반딧돌
+        # 꾸밈 'Q' (FieldDecor.Variant): 쉼터 = 광부 상자·통·통나무 / 굴 = 푸른 수정·보석 박힌 바위·돌덩이 (이름은 정글과 같은 칸 종류)
+        "Decor": over(lawn, nature(17, 17)),
+        "Decor_Crate": over(lawn, pack.tile("TilesetElement.png", 0, 0)),
+        "Decor_Barrel": over(lawn, pack.tile("TilesetElement.png", 1, 0)),
+        "Decor_Log": over(lawn, nature(5, 15)),
+        "Decor_Stump": over(lawn, nature(1, 14)),
+        "Decor_Rock": over(lawn, nature(17, 17)),
+    }
+    for i, (c, r) in enumerate(((15, 18), (16, 18), (17, 18), (19, 17))):   # 흩뿌림: 바위 바닥의 자갈 (은은하게)
+        themes["Cave"][f"Scatter_Lawn_{i}"] = tint(nature(c, r), (0.75, 0.75, 0.8))
+    autos["Cave_Floor_auto"] = auto_atlas(pack, template, "TilesetFloor.png", 11, 14, cave_floor)
+    autos["Cave_Water_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6, lambda t: library_ink_rim(t, lawn))
+    autos["Cave_Wall_auto"] = cave_wall_atlas(face)
 
 
 def keep_green(t):

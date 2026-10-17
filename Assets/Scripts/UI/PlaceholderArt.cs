@@ -32,6 +32,7 @@ namespace WordRPG.UI
                 case FieldTheme.Library: return new Color(0.12f, 0.08f, 0.06f);
                 case FieldTheme.Forest: return new Color(0.05f, 0.14f, 0.08f);
                 case FieldTheme.Jungle: return new Color(0.03f, 0.12f, 0.07f);
+                case FieldTheme.Cave: return new Color(0.02f, 0.02f, 0.04f); // 동굴 (#112) — 맵 밖은 캄캄
                 default: return OutsideMap;
             }
         }
@@ -74,6 +75,8 @@ namespace WordRPG.UI
                 case FieldTile.Shrine: return opened ? Make(t + "shrine_done", Layer(Pedestal, RuinFloor)) : Make(t + "shrine", Layer(ShrinePixel, RuinFloor));
                 case FieldTile.Cave: return Make(t + "cave", (x, y) => DoorPixel(x, y, false, false));
                 case FieldTile.Decor: return Make(t + "decor", Layer(ChestOpen, ground)); // 꾸밈 (#86) — 갈색 상자 모양
+                case FieldTile.GlowStone: // 글자 반딧돌 (#112) — 꺼지면 빈 받침, 밝히면 샘처럼 푸른 빛
+                    return opened ? Make(t + "glowstone_lit", Layer(Fountain, ground)) : Make(t + "glowstone", Layer(Pedestal, ground));
                 default: return Make(t + "floor", ground);
             }
         }
