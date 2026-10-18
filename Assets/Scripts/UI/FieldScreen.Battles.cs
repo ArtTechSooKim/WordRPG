@@ -50,6 +50,7 @@ namespace WordRPG.UI
                     case FieldTheme.Library: return Music.Library;
                     case FieldTheme.Forest: return Music.Forest;
                     case FieldTheme.Jungle: return Music.Jungle;
+                    case FieldTheme.Cave: return Music.Cave;
                     default: return Music.Meadow;
                 }
             }

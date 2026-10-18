@@ -40,7 +40,7 @@ namespace WordRPG.Tests
         {
             foreach (var tile in new[] { FieldTile.GlowStone, FieldTile.Lever, FieldTile.Bridge, FieldTile.Decor, FieldTile.Chest, FieldTile.Water })
                 Assert.IsTrue(FieldThemes.Supports(FieldTheme.Cave, tile), $"동굴: {tile}");
-            foreach (var tile in new[] { FieldTile.Stream, FieldTile.Dock, FieldTile.Tablet, FieldTile.Shrine, FieldTile.Cave, FieldTile.RuinFloor })
+            foreach (var tile in new[] { FieldTile.Stream, FieldTile.Dock, FieldTile.Tablet, FieldTile.Shrine, FieldTile.RuinFloor })
                 Assert.IsFalse(FieldThemes.Supports(FieldTheme.Cave, tile), $"동굴엔 정글 칸 {tile} 없음");
             Assert.IsFalse(FieldThemes.Supports(FieldTheme.Jungle, FieldTile.GlowStone), "반딧돌은 동굴에서만");
             Assert.IsFalse(FieldThemes.Supports(FieldTheme.Meadow, FieldTile.GlowStone));
@@ -69,6 +69,32 @@ namespace WordRPG.Tests
             Assert.IsFalse(old.IsStoneLit(area.StoneId(stone)));
             old.MarkStoneLit("cave:1,3");
             Assert.IsTrue(old.IsStoneLit("cave:1,3"));
+        }
+
+        // 모두 밝힌 보상 (#115): 반딧돌을 다 밝혀야 성유물(반딧돌 등잔), 한 번만
+        [Test]
+        public void LightingEveryStoneGivesTheGlowStoneRelicOnce()
+        {
+            var lamp = TestData.Relic("relic_glow_lamp", TestData.Skill("lamp_flash", Monsters.SkillKind.Damage, Monsters.SkillTarget.AllEnemies, 26),
+                new Monsters.MonsterStats(0, 9, 0));
+            var twoStones = Map.Replace("#P:::YHH:#", "#P:::YHHI#");
+            var area = ScriptableObject.CreateInstance<FieldArea>().Set("areaId", "cave").Set("map", twoStones)
+                .Set("theme", FieldTheme.Cave).Set("glowStoneRelic", lamp);
+            var session = GameSession.NewGame(TestData.Hero(new Monsters.MonsterStats(50, 10, 10)), 5);
+
+            GlowStones.Light(area, session.World, new Vector2Int(1, 3));
+            Assert.IsFalse(GlowStones.AllLit(area, session.World));
+            Assert.IsNull(GlowStones.ClaimAllLitReward(area, session), "하나 남음 — 아직 보상 없음");
+            Assert.IsFalse(session.Hero.Owns(lamp));
+
+            GlowStones.Light(area, session.World, new Vector2Int(8, 1));
+            Assert.IsTrue(GlowStones.AllLit(area, session.World));
+            var relic = GlowStones.ClaimAllLitReward(area, session);
+            Assert.AreSame(lamp, relic?.Data, "다 밝히면 반딧돌 등잔");
+            Assert.IsTrue(session.Hero.Owns(lamp));
+            Assert.IsNull(GlowStones.ClaimAllLitReward(area, session), "두 번은 안 줌");
+
+            Assert.IsNull(GlowStones.ClaimAllLitReward(Area(), session), "보상이 없는 지역");
         }
 
         [Test]

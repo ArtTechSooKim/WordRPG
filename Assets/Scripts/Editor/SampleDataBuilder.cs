@@ -328,22 +328,111 @@ namespace WordRPG.EditorTools
                 boss.FindPropertyRelative("rewardItem").objectReferenceValue = fillBlankDoc;
             });
 
+            // --- 1.2 어두운 밀림 동굴 (#115, GDD 9-7): 정글 강 가운데 섬 밑(정식판, 입장 조건 없음 — 사용자). 어둠 · 글자 반딧돌 8개 · 먹물도롱뇽 ---
+            //     숫자는 BalanceSimulationTests(동굴 전투·보스)로 맞춤 — 정글 보스를 이긴 주인공 Lv17~19 + 아라 기준
+            var glowMoss = Item("glow_moss", "빛이끼", "동굴 벽에서 은은하게 빛나는 이끼. 동굴의 성유물을 강화한다.", new Color(0.4f, 0.85f, 0.8f));
+            var caveKeepsake = Item("keepsake_cave", "반딧불 책갈피",
+                "어두운 밀림 동굴 도감을 완성한 증표. 반딧불 한 마리가 깃들어 은은하게 빛난다.", new Color(1f, 0.9f, 0.4f), ItemKind.Keepsake);
+            var caveKey = Item("cave_key", "동굴 열쇠", "어두운 밀림 동굴 깊은 곳, 말줄임덩굴의 방 문을 여는 푸른 수정빛 열쇠.",
+                new Color(0.6f, 0.8f, 1f), ItemKind.Key);
+            var glowFlash = Skill("lamp_glow_flash", "반딧빛 번쩍", "등잔의 반딧빛이 번쩍 터져 적 전체를 눈부시게 때린다.", SkillKind.Damage, SkillTarget.AllEnemies, 26, QuizDirection.MeaningToEnglish);
+            var fireflySwarm = Skill("lamp_firefly_swarm", "반딧불 떼", "깨어난 반딧불이 떼 지어 적 전체를 휘감는다.", SkillKind.Damage, SkillTarget.AllEnemies, 38, QuizDirection.MeaningToEnglish);
+            var fullStop = Skill("seed_full_stop", "마침표 찍기", "또박또박 마침표를 찍듯 모두에게 단단한 보호막을 친다.", SkillKind.Guard, SkillTarget.AllAllies, 14, QuizDirection.MeaningToEnglish);
+            var periodGrove = Skill("seed_period_grove", "마침표 울타리", "씨앗에서 자란 덩굴 울타리가 모두를 겹겹이 지킨다.", SkillKind.Guard, SkillTarget.AllAllies, 22, QuizDirection.MeaningToEnglish);
+            var glowLamp = Relic("relic_glow_lamp", "반딧돌 등잔", "동굴의 반딧돌을 모두 밝히자 천장의 반딧불이 내려와 깃든 등잔. 빛으로 적 전체를 공격한다.", MonsterRole.Attacker,
+                new Color(0.45f, 0.85f, 1f), glowFlash, fireflySwarm, new MonsterStats(0, 9, 0), new MonsterStats(0, 3, 0), glowMoss);
+            var periodSeed = Relic("relic_period_seed", "마침표 씨앗", "말줄임덩굴이 삼켰던 문장의 끝이 뭉친 씨앗. 끝맺은 문장처럼 단단하다.", MonsterRole.Defender,
+                new Color(0.4f, 0.35f, 0.5f), fullStop, periodGrove, new MonsterStats(24, 0, 7), new MonsterStats(7, 0, 2), glowMoss);
+            var finishSentence = Skill("doc_finish_sentence", "문장 끝맺기", "말줄임표로 끝난 문장을 끝까지 맺어 적 전체를 공격한다.", SkillKind.Damage, SkillTarget.AllEnemies, 30, QuizDirection.MeaningToEnglish);
+            var finishSentenceDoc = Item("skilldoc_finish_sentence", "기술문서: 문장 끝맺기", "읽으면 기술 '문장 끝맺기'를 배운다. 배워도 사라지지 않아 언제든 다시 배울 수 있다.",
+                new Color(0.75f, 0.7f, 0.9f), ItemKind.SkillDocument, taughtSkill: finishSentence);
+
+            var blinkBrush = Skill("ghost_blink_brush", "깜빡 스침", "스르륵 스쳐 지나가며 방금 외운 단어를 깜빡 잊게 한다.", SkillKind.Damage, SkillTarget.SingleEnemy, 20, QuizDirection.EnglishToMeaning);
+            var chew = Skill("larva_chew", "곱씹기", "단어를 곱씹듯 물고 늘어진다.", SkillKind.Damage, SkillTarget.SingleEnemy, 20, QuizDirection.EnglishToMeaning);
+            var silkSpray = Skill("larva_silk_spray", "실 뿜기", "끈끈한 실을 뿜어 모두를 휘감는다.", SkillKind.Damage, SkillTarget.AllEnemies, 14, QuizDirection.EnglishToMeaning);
+            var tangleWeb = Skill("spider_tangle_web", "엉킴 거미줄", "철자를 엉키게 하는 거미줄을 흩뿌린다.", SkillKind.Damage, SkillTarget.AllEnemies, 16, QuizDirection.EnglishToMeaning);
+            var spellBite = Skill("spider_spell_bite", "철자 깨물기", "단어의 철자 하나를 콱 깨물어 떼어 간다.", SkillKind.Damage, SkillTarget.SingleEnemy, 24, QuizDirection.EnglishToMeaning);
+            var inkSpit = Skill("newt_ink_spit", "먹물 뱉기", "웅덩이에서 머금은 먹물을 힘껏 뱉는다.", SkillKind.Damage, SkillTarget.SingleEnemy, 22, QuizDirection.EnglishToMeaning);
+            var vineSlam = Skill("vine_slam", "덩굴 후려치기", "굵은 덩굴로 힘껏 후려친다.", SkillKind.Damage, SkillTarget.SingleEnemy, 44, QuizDirection.EnglishToMeaning);
+            var ellipsisSpore = Skill("vine_ellipsis_spore", "말줄임 포자", "포자를 흩뿌려 하려던 말이 '…'로 끊기게 한다.", SkillKind.Damage, SkillTarget.AllEnemies, 28, QuizDirection.EnglishToMeaning);
+            var swallowSentence = Skill("vine_swallow_sentence", "문장 삼키기", "문장의 끝을 꿀꺽 삼켜 HP를 회복한다.", SkillKind.Heal, SkillTarget.Self, 10, QuizDirection.EnglishToMeaning);
+            var blinkGhost = Monster("blink_ghost", "깜빡유령", "방금 외운 단어를 깜빡 잊게 만드는 유령. 빛 밖에서 깜빡깜빡 나타났다 사라진다.", MonsterRole.Attacker,
+                new Color(0.8f, 0.85f, 0.95f), new MonsterStats(24, 14, 8), new MonsterStats(5, 3, 2), new[] { blinkBrush },
+                enemyExp: 15, enemyGold: 14, drops: new[] { new ItemDrop(glowMoss, 0.35f), new ItemDrop(sparkleDust, 0.2f) });
+            var chewLarva = Monster("chew_larva", "곱씹애벌레", "단어를 곱씹고 또 곱씹다 꿀꺽 삼켜 버리는 애벌레. 빛이끼 덤불에 산다.", MonsterRole.Defender,
+                new Color(0.75f, 0.8f, 0.45f), new MonsterStats(34, 12, 13), new MonsterStats(7, 2, 3), new[] { chew, silkSpray },
+                enemyExp: 17, enemyGold: 16, drops: new[] { new ItemDrop(glowMoss, 0.35f), new ItemDrop(hardCover, 0.25f) });
+            var tangleSpider = Monster("tangle_spider", "엉킴거미", "철자를 거미줄로 엉키게 하는 거미. 거미 굴 천장에 매달려 지나가는 사람을 노린다.", MonsterRole.Attacker,
+                new Color(0.8f, 0.3f, 0.3f), new MonsterStats(32, 16, 10), new MonsterStats(6, 3, 2), new[] { tangleWeb, spellBite },
+                enemyExp: 19, enemyGold: 18, drops: new[] { new ItemDrop(glowMoss, 0.4f), new ItemDrop(shinyInk, 0.25f) });
+            var inkNewt = Monster("ink_newt", "먹물도롱뇽", "먹물 웅덩이에 숨어 있다가 튀어나오는 도롱뇽. 지나간 자리마다 먹물 방울이 떨어진다.", MonsterRole.Attacker,
+                new Color(0.4f, 0.3f, 0.7f), new MonsterStats(30, 15, 9), new MonsterStats(6, 3, 2), new[] { inkSpit },
+                enemyExp: 17, enemyGold: 16, drops: new[] { new ItemDrop(glowMoss, 0.3f), new ItemDrop(shinyInk, 0.3f) });
+            var ellipsisVine = Monster("boss_ellipsis_vine", "말줄임덩굴", "문장의 끝을 삼켜 '…'만 남기는 거대한 덩굴. 덩굴로 반딧돌을 덮어 동굴을 캄캄하게 만들었다.", MonsterRole.Attacker,
+                new Color(0.35f, 0.6f, 0.35f), new MonsterStats(66, 32, 13), new MonsterStats(6, 5, 1), new[] { vineSlam, ellipsisSpore, swallowSentence },
+                enemyExp: 90, enemyGold: 120,
+                drops: new[] { new ItemDrop(glowMoss, 1f, 3), new ItemDrop(vineFiber, 1f, 2), new ItemDrop(shinyInk, 1f, 2), new ItemDrop(hardCover, 1f, 2), new ItemDrop(sparkleDust, 1f, 2) });
+            var caveEncounters = Encounters("cave_field", 1, 2,
+                new EncounterTable.Entry(blinkGhost, 15, 17, 10),
+                new EncounterTable.Entry(chewLarva, 15, 18, 8),
+                new EncounterTable.Entry(tangleSpider, 16, 18, 6));
+            var inkPoolEncounters = Encounters("cave_water", 1, 2,
+                new EncounterTable.Entry(inkNewt, 16, 18, 10));
+
+            ConfigureRegion("Assets/Data/Words/tier4_cave.asset", "cave", "어두운 밀림 동굴", caveKeepsake, 900, 5);
+            const string cavePath = "Assets/Data/Areas/cave.asset";
+            // 보물상자 10개 (맵의 C를 위→아래, 왼→오른 순). 성유물은 반딧돌을 모두 밝힌 보상(반딧돌 등잔)과 보스(마침표 씨앗)
+            Area("cave", "어두운 밀림 동굴", CaveMap, caveEncounters,
+                AssetDatabase.LoadAssetAtPath<WordDatabase>("Assets/Data/Words/tier4_cave.asset"),
+                new ChestContent(null, 0, 250),           // 옛 광부 쉼터 (숨은 방)
+                new ChestContent(glowMoss, 3),            // 수정 굴 (열쇠 옆)
+                new ChestContent(largePotion, 2),         // 숨은 틈
+                new ChestContent(glowMoss, 2),            // 버섯 굴
+                new ChestContent(potion, 3),              // 대동굴 서쪽
+                new ChestContent(sparkleDust, 3, 80),     // 거미 굴 깊은 곳
+                new ChestContent(glowMoss, 2),            // 거미 굴
+                new ChestContent(hardCover, 3),           // 개울가 굴 (레버 옆)
+                new ChestContent(potion, 2),              // 반딧불 쉼터
+                new ChestContent(shinyInk, 3, 200));      // 무너진 갱도 (숨은 방)
+            var caveShop = ShopAsset("cave_shop", "반딧불 쉼터 가게",
+                new ShopEntry(potion, 30), new ShopEntry(largePotion, 90));
+            AssignShopIfEmpty(cavePath, caveShop);
+            SetFullVersionArea(cavePath); // 정식판에 포함 (추가 결제 없음)
+            SetDictionary(cavePath, "동굴의 사전");
+            SetBossGate(cavePath, caveKey, 40);
+            ConfigureAreaIfNew(cavePath, so =>
+            {
+                Prop(so, "theme").enumValueIndex = (int)FieldTheme.Cave;
+                Prop(so, "encounterStyle").enumValueIndex = (int)EncounterStyle.Roaming;
+                Prop(so, "waterEncounters").objectReferenceValue = inkPoolEncounters; // 나루터가 없어 웅덩이에 숨는 몬스터 (#113)
+                Prop(so, "glowStoneRelic").objectReferenceValue = glowLamp;
+                var boss = Prop(so, "boss");
+                boss.FindPropertyRelative("species").objectReferenceValue = ellipsisVine;
+                boss.FindPropertyRelative("level").intValue = 20;
+                boss.FindPropertyRelative("rewardRelic").objectReferenceValue = periodSeed;
+                boss.FindPropertyRelative("rewardItem").objectReferenceValue = finishSentenceDoc;
+            });
+
             // --- 도망 등급 (#84 사용자 결정): 약함 = 항상 도망 / 보통 = 1/4 확률로 단어 문제 / 강함 = 늘 단어 문제 (틀리면 차례를 놓침).
-            //     초원의 잉크 슬라임·낙서 박쥐는 약함, 숲·정글의 보통 몬스터는 보통, 던전의 까먹깨비·정글의 받침갓파(방어형)와 보스는 강함
-            SetFleeTier(FleeTier.Weak, inkSlime, scribbleBat);
-            SetFleeTier(FleeTier.Normal, spellMushroom, squiggleSnake, questionOwl, tailLizard, mimicOctopus);
-            SetFleeTier(FleeTier.Strong, forgetGoblin, batchimKappa, forgetKing, muddleRaccoon, blankFrog);
+            //     초원의 잉크 슬라임·낙서 박쥐·동굴의 깜빡유령은 약함, 숲·정글·동굴의 보통 몬스터는 보통,
+            //     던전의 까먹깨비·정글의 받침갓파(방어형)·동굴의 엉킴거미와 보스는 강함
+            SetFleeTier(FleeTier.Weak, inkSlime, scribbleBat, blinkGhost);
+            SetFleeTier(FleeTier.Normal, spellMushroom, squiggleSnake, questionOwl, tailLizard, mimicOctopus, chewLarva, inkNewt);
+            SetFleeTier(FleeTier.Strong, forgetGoblin, batchimKappa, forgetKing, muddleRaccoon, blankFrog, tangleSpider, ellipsisVine);
 
             // --- 출입구 연결 (맵의 D를 위→아래, 왼→오른 순): 초원 0 = 서고, 초원 1 = 숲(서고 보스를 물리치면 열림).
-            //     숲 0 = 정글(숲 보스를 물리치면 열림, #80 — 보스 공터 위쪽), 숲 1 = 초원 ---
+            //     숲 0 = 정글(숲 보스를 물리치면 열림, #80 — 보스 공터 위쪽), 숲 1 = 초원.
+            //     정글 0 = 동굴(강 가운데 섬의 'O', 1.2 — 처음부터 열림, #115), 정글 1 = 숲 ---
             const string meadowPath = "Assets/Data/Areas/meadow.asset", libraryPath = "Assets/Data/Areas/library.asset",
                 forestPath = "Assets/Data/Areas/forest.asset";
             UpgradeMapIf(forestPath, ForestMap, "D"); // 숲 보스 공터 위쪽에 정글 출입구가 생김 (#80)
             SetExitDoorIf(meadowPath, 1, 0, 1);         // 그래서 숲의 초원 출입구는 0번 → 1번
+            SetExitDoorIf(forestPath, 0, 0, 1);         // 정글의 'O'(위쪽)가 출입구가 되어 정글의 숲 출입구는 0번 → 1번 (#115)
             SetExitsIfMismatch(meadowPath, (libraryPath, 0, null), (forestPath, 1, libraryPath));
             SetExitsIfMismatch(libraryPath, (meadowPath, 0, null));
-            SetExitsIfMismatch(forestPath, (junglePath, 0, forestPath), (meadowPath, 1, null));
-            SetExitsIfMismatch(junglePath, (forestPath, 0, null));
+            SetExitsIfMismatch(forestPath, (junglePath, 1, forestPath), (meadowPath, 1, null));
+            SetExitsIfMismatch(junglePath, (cavePath, 0, null), (forestPath, 0, null));
+            SetExitsIfMismatch(cavePath, (junglePath, 0, null));
 
             AssetDatabase.SaveAssets();
             GameDatabaseBuilder.Refresh();
@@ -644,6 +733,74 @@ namespace WordRPG.EditorTools
                 "##:::::::::::::::::::::::::~~:::::::::::::::::::::~~~~~~~~~~:::#::#:::##\n" +
                 "########################################################################\n" +
                 "########################################################################\n";
+
+        // 1.2 어두운 밀림 동굴 (#115, GDD 9-7) 50×62 — 원본은 python Tools/cave_map.py (Builds/maps/CaveMap.txt를 여기로 옮김).
+        // . 다져진 길  : 바위 바닥  , 빛이끼 덤불(보이는 몬스터 서식지)  # 바위벽  ~ 먹물 웅덩이·개울(먹물도롱뇽이 숨음)  I 글자 반딧돌
+        // Y 레버  H 덩굴 다리  Q 꾸밈  G 보스 방 문  K 열쇠  D 출입구(정글 섬으로)
+        // 아래 출입구 → 반딧불 쉼터(F·S·E·L) → 대동굴 → 서쪽 고리(버섯 굴·먹물 호수·개울가 굴 레버) · 동쪽 고리(거미 굴·수정 굴 열쇠) → 맨 위 보스 방
+        public const string CaveMap =
+                "##################################################\n" +
+                "##################################################\n" +
+                "##################################################\n" +
+                "########################:::#######################\n" +
+                "####################:::::::::#####################\n" +
+                "###################:::::::::::::##################\n" +
+                "######:::::::#####:::::::::::::::#################\n" +
+                "#####::::C::::####::::::::::::::::################\n" +
+                "#####:::::::::####:::::::B::::::::################\n" +
+                "######:::::::#####:::::::::::::::#####:::::::#####\n" +
+                "#######:::::#######::::::::::::::###C::::::K::####\n" +
+                "########:::########::::::::::::#####:::::::::::###\n" +
+                "#########::#########::::::::::######:::::::::::###\n" +
+                "########:::#############:::##########:I:::::::####\n" +
+                "########::##############:::##########::::::::#####\n" +
+                "########::#::###########:::###########:::::::#####\n" +
+                "#######:::::::##########GGG#############::::######\n" +
+                "####::::::::::##########...########:#####:::######\n" +
+                "####::::I::::::#########...#######::######:::#####\n" +
+                "###::::::::::::#########...#####:::C::####:::#####\n" +
+                "###:::::::,:,Q:#########...####::::::######:::####\n" +
+                "##::C::,:::,,::#######::...::##::::::#######::####\n" +
+                "####,,,,,:::,,,######I:::.::::###:::########:::###\n" +
+                "####,,:,:::::,#######::::.::::###::#########:::###\n" +
+                "#######:::Q:::#######::::.:::###:::#########,,,###\n" +
+                "######::::::::#########::.:#####::##########,,####\n" +
+                "######:::##::::#####,,,,:.:::##::,#########::,####\n" +
+                "#####:::####:,:##:,,,,,,..::::::,,,:#####:::,:####\n" +
+                "#####:Q:#####,::#:,,Q,,:..::::,:,,,::###:::,,::###\n" +
+                "#####:::######,::~~::,,:..::::Q,,:,:::#::Q,,::::##\n" +
+                "#####:::#######,:~~~~:::.I::::,,,,:::::::,,:::::##\n" +
+                "######:::######,:::::::..:::::,:::::::::::,,::I::#\n" +
+                "######:::######::::::::..:::::::::Q::::::,,,:::###\n" +
+                "######:Q:######:,C:::::..::::Q:::::::###::,,,,,###\n" +
+                "######:::::::###::,:,:::..:::::::::::####:,,,,,###\n" +
+                "####:::::::::,,#,,:,:::::..:::~~~:::#####C:,,,####\n" +
+                "####:::::::::,,,,:#,:Q:::..:::~~~::########,:,####\n" +
+                "####,,:::::~,:,Q:###::::::.:::::~###########:::###\n" +
+                "####I,:::~~~~~:::###::::::..::::############:::###\n" +
+                "####,,,,:~~~~~::::####::::..:###############:::###\n" +
+                "####,,,:~~~~~~~:::######::..###############:::####\n" +
+                "####:,::~~~~~~~:::#####::...###############:::####\n" +
+                "####,Q::~~~~~~~:Q:####::...############:,::::#####\n" +
+                "####:,:::~~~~~::::###:....############,,,,::::####\n" +
+                "####:::::~~~~~:::####...:#############,,,,:,:::###\n" +
+                "#####::::::~~~::#####..:##############C,,:::,I:###\n" +
+                "#####::Q::::~~::#####..::############,:,~~::,,,,##\n" +
+                "#####:::::::~~#######..:::###########::~~~::,,::##\n" +
+                "####:::::::::~~#######..:::##########:::~:::,,,:##\n" +
+                "####:::##::::~~~####::..:::::#:#######::.:Q:,,,###\n" +
+                "####::::::####~~###::::..::::::#######:..::::#####\n" +
+                "####:::Q:::::#~~##:::::...::::S:::###::.:#########\n" +
+                "###:::::::::::~~##::F:::..::::::::###:..:#########\n" +
+                "###:::::::::::HH:::::::::.:::::::::::..:::########\n" +
+                "###:::::::::::HH::#::::::.:::::.....:..#:::::#####\n" +
+                "###C:I:,,::::#~~###::::::.:::::::....##:::::::::##\n" +
+                "####:::,,,Y::#~~###::E:::P:::L::#######:::::::::##\n" +
+                "#####,,,,,::##~~##::C::::.:::##########:::::::C::#\n" +
+                "#####,:,:,::##~~#####:##...#############:::::::###\n" +
+                "########################...##############::::::###\n" +
+                "########################...#######################\n" +
+                "#########################D########################\n";
 
         // 새로 만든 지역에만 추가 설정 (보스가 아직 없을 때 = 처음 만들 때). 인스펙터에서 바꾼 값은 유지
         // 정식판을 사야 들어가는 지역 표시 (이미 켜져 있으면 그대로)

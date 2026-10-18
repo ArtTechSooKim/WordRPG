@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba224dac5864d74daef27257bbcd2da, type: 3}
+  m_Name: cave_shop
+  m_EditorClassIdentifier: WordRPG::WordRPG.Items.ShopData
+  displayName: "\uBC18\uB527\uBD88 \uC27C\uD130 \uAC00\uAC8C"
+  entries:
+  - item: {fileID: 11400000, guid: 56596be176cf57541a9ab3caafeb386a, type: 2}
+    price: 30
+  - item: {fileID: 11400000, guid: 03136cba480d605499404eebbaaac6f5, type: 2}
+    price: 90

@@ -44,7 +44,11 @@ namespace WordRPG.Tests
             Assert.AreEqual(FieldTile.Lever, map.Get(new Vector2Int(1, 2)));
             Assert.AreEqual(FieldTile.Stream, map.Get(new Vector2Int(3, 2)));
             Assert.AreEqual(FieldTile.Dock, map.Get(new Vector2Int(8, 2)));
-            Assert.AreEqual(FieldTile.Cave, map.Get(new Vector2Int(7, 0)));
+            // 동굴 입구 'O' (#115): 1.2부터 출입구 — 'D'와 같고 그림만 큰 동굴
+            Assert.AreEqual(FieldTile.Door, map.Get(new Vector2Int(7, 0)));
+            Assert.IsTrue(map.IsCaveMouth(new Vector2Int(7, 0)));
+            Assert.AreEqual(0, map.DoorIndex(new Vector2Int(7, 0)), "출입구 번호에 들어감");
+            Assert.IsFalse(FieldMap.Parse("#P#\n#D#").IsCaveMouth(new Vector2Int(1, 0)), "'D'는 그냥 출입구");
 
             Assert.AreEqual(Direction.Right, map.StreamDirection(new Vector2Int(3, 2)));
             Assert.AreEqual(Direction.Down, map.StreamDirection(new Vector2Int(6, 2)));
@@ -52,9 +56,9 @@ namespace WordRPG.Tests
 
             foreach (var walkable in new[] { FieldTile.Stream, FieldTile.Dock, FieldTile.RuinFloor })
                 Assert.IsTrue(FieldMap.IsWalkable(walkable), $"{walkable}은 걸을 수 있음");
-            foreach (var blocked in new[] { FieldTile.RuinWall, FieldTile.Bridge, FieldTile.Lever, FieldTile.Tablet, FieldTile.Shrine, FieldTile.Cave })
+            foreach (var blocked in new[] { FieldTile.RuinWall, FieldTile.Bridge, FieldTile.Lever, FieldTile.Tablet, FieldTile.Shrine })
                 Assert.IsFalse(FieldMap.IsWalkable(blocked), $"{blocked}은 막힘");
-            foreach (var usable in new[] { FieldTile.Lever, FieldTile.Tablet, FieldTile.Shrine, FieldTile.Cave })
+            foreach (var usable in new[] { FieldTile.Lever, FieldTile.Tablet, FieldTile.Shrine })
                 Assert.IsTrue(FieldMap.IsInteractive(usable), $"{usable}은 [확인]으로 씀");
         }
 

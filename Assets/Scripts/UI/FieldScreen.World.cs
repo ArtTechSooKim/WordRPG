@@ -53,8 +53,8 @@ namespace WordRPG.UI
             for (int y = 0; y < map.Height; y++)
             {
                 var cell = new Vector2Int(x, y);
-                var sprite = map.Get(cell) == FieldTile.Decor
-                    ? FieldArt.DecorProp(fieldArea.Theme, FieldDecor.Variant(map, cell))
+                var sprite = map.Get(cell) == FieldTile.Decor ? FieldArt.DecorProp(fieldArea.Theme, FieldDecor.Variant(map, cell))
+                    : map.IsCaveMouth(cell) ? FieldArt.CaveMouthProp(fieldArea.Theme)
                     : FieldArt.Prop(map.Get(cell), fieldArea.Theme, CellState.IsDone(fieldArea, session, cell));
                 if (sprite == null) continue;
                 var go = new GameObject("Prop_" + map.Get(cell), typeof(SpriteRenderer));

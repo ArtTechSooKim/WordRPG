@@ -47,6 +47,7 @@ namespace WordRPG.Game
         public PlayerRecord Record { get; }
         public WorldState World { get; }
         public TutorialProgress Tutorials { get; private set; } = new TutorialProgress(); // 이미 본 안내 (#36)
+        public UpdateNotices Notices { get; private set; } = new UpdateNotices();       // 이미 본 업데이트 안내 (#115)
         public IReadOnlyList<string> LoadWarnings => loadWarnings;
 
         // 연속 정답 수 (전투 콤보). 전투가 끝나도 이어지지만 세이브에는 넣지 않는다 — 게임을 다시 켜면 0부터
@@ -83,11 +84,14 @@ namespace WordRPG.Game
             World = world;
         }
 
-        // level을 안 주면 HeroData의 시작 레벨. 시작 성유물을 가지고(앞에서부터 끼운 채로) 시작한다
+        // level을 안 주면 HeroData의 시작 레벨. 시작 성유물을 가지고(앞에서부터 끼운 채로) 시작한다.
+        // 업데이트 안내는 모두 본 것으로 (#115 — 새로 시작한 사람은 업데이트한 사람이 아님)
         public static GameSession NewGame(HeroData heroData, int? level = null)
         {
-            return new GameSession(CreateHero(heroData, level ?? heroData.StartLevel), new Inventory(), new VocabularyProgress(),
+            var session = new GameSession(CreateHero(heroData, level ?? heroData.StartLevel), new Inventory(), new VocabularyProgress(),
                 new PlayerRecord(), new WorldState());
+            session.Notices.MarkAll();
+            return session;
         }
 
         // 샘·패배 뒤 회복: 주인공과 동료 모두
@@ -220,7 +224,7 @@ namespace WordRPG.Game
                 savedCompanions.Add(new CompanionSaveData(companion.Data.CompanionId, companion.Level, companion.Exp, companion.CurrentHp));
             return new SaveData(nowUtc, new HeroSaveData(Hero.Level, Hero.Exp, Hero.CurrentHp), relics,
                     Inventory, Vocabulary, Record, World).WithSkillSlots(skills).WithTutorials(Tutorials.Seen)
-                .WithCompanions(savedCompanions, PartyCompanion?.Data.CompanionId);
+                .WithNotices(Notices.Seen).WithCompanions(savedCompanions, PartyCompanion?.Data.CompanionId);
         }
 
         // 세이브에 있는 성유물을 찾을 수 없으면(삭제·id 변경) 빼고 경고를 남긴다. 성유물이 하나도 없으면 시작 성유물로 채운다.
@@ -276,6 +280,7 @@ namespace WordRPG.Game
 
             var session = new GameSession(hero, data.Inventory, data.Vocabulary, data.Record, data.World);
             session.Tutorials = new TutorialProgress(data.Tutorials);
+            session.Notices = new UpdateNotices(data.Notices);
             RestoreCompanions(session, data, database, warnings);
             session.loadWarnings.AddRange(warnings);
             return session;

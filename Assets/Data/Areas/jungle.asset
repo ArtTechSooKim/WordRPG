@@ -261,6 +261,9 @@ MonoBehaviour:
     gold: 200
     relic: {fileID: 0}
   exits:
+  - target: {fileID: 11400000, guid: 3eaceaca8882957449f036b992066ba9, type: 2}
+    targetDoorIndex: 0
+    openedByBossOf: {fileID: 0}
   - target: {fileID: 11400000, guid: a3e19a296f3df11468a130c5e27e87f5, type: 2}
     targetDoorIndex: 0
     openedByBossOf: {fileID: 0}
@@ -273,5 +276,6 @@ MonoBehaviour:
   bossGateWords: 40
   shrineCompanion: {fileID: 11400000, guid: 52ba6ccb4d7a2cf44b9de8c5f1a97d8f, type: 2}
   shrineWords: 60
+  glowStoneRelic: {fileID: 0}
   requiresFullVersion: 1
   dictionaryName: "\uC815\uAE00\uC758 \uC0AC\uC804"

@@ -4,6 +4,7 @@ using UnityEngine;
 using WordRPG.Battle;
 using WordRPG.Field;
 using WordRPG.Game;
+using WordRPG.Heroes;
 using WordRPG.Words;
 
 namespace WordRPG.UI
@@ -19,6 +20,7 @@ namespace WordRPG.UI
         private TabletQuiz stoneQuiz;           // 석판과 같은 규칙 — 한 문제, 영단어 → 뜻
         private Vector2Int stoneCell;
         private bool stoneLitNow;               // 맞혀서 밝힘 (창을 닫으면 빛이 퍼짐)
+        private OwnedRelic stoneRelic;          // 이번에 반딧돌을 모두 밝혀 얻은 성유물 (#115 반딧돌 등잔) — 빛이 다 퍼진 뒤 알림
 
         public bool HasDarkness => darkness != null && darkness.IsShowing;     // 테스트용
         public int DarknessRepaints => darkness != null ? darkness.Repaints : 0;
@@ -85,11 +87,7 @@ namespace WordRPG.UI
         // 새 칸을 지나가 탐험 기록이 늘었을 때 — 지나간 곳이 희미하게 남게
         private void RefreshDarkness() => darkness?.Refresh();
 
-        private bool AllStonesLit()
-        {
-            int total = GlowStones.Stones(area).Count;
-            return total > 0 && GlowStones.LitCount(area, session.World) >= total;
-        }
+        private bool AllStonesLit() => GlowStones.AllLit(area, session.World);
 
         // 글자 반딧돌 [확인] (#113, GDD 9-7): 이미 본 단어 한 문제 — 떠오른 영단어의 뜻 고르기. 틀려도 벌점 없이 다시 (석판과 같은 규칙)
         private void TouchGlowStone(Vector2Int cell)
@@ -128,7 +126,8 @@ namespace WordRPG.UI
                     Sound.Play(Sfx.Correct);
                     stoneLitNow = true;
                     GlowStones.Light(area, session.World, stoneCell);
-                    SaveNow(); // ×로 닫아도 밝힌 것은 남게
+                    stoneRelic = GlowStones.ClaimAllLitReward(area, session);
+                    SaveNow(); // ×로 닫아도 밝힌 것(·얻은 성유물)은 남게
                     stoneView.ShowLit(question.CorrectAnswer, GlowStones.LitCount(area, session.World), GlowStones.Stones(area).Count);
                     break;
             }
@@ -159,6 +158,14 @@ namespace WordRPG.UI
             Sound.PlayJingle(Sfx.DexComplete);
             darkness.Refresh();
             bubble.Say("반딧돌을 모두 밝혔다!\n동굴 천장의 반딧불이 깨어났다", 4f);
+            if (stoneRelic == null) yield break;
+            // 모두 밝힌 보상 (#115): 반딧불이 깨어난 뒤 성유물 (상자에서 얻을 때와 같은 알림)
+            var relic = stoneRelic;
+            stoneRelic = null;
+            yield return WaitUnscaled(1.6f);
+            Sound.Play(Sfx.Evolve);
+            ShowToast($"성유물 '{relic.Data.DisplayName}'을(를) 손에 넣었다!\n" + RelicHint(relic), 3.5f);
+            RefreshHud();
         }
 
         public int StonesLit { get; private set; } // 이번에 밝힌 반딧돌 수 (테스트용)

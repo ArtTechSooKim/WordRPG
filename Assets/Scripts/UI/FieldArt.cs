@@ -66,13 +66,16 @@ namespace WordRPG.UI
         private static readonly Dictionary<string, Sprite[]> ScatterCache = new Dictionary<string, Sprite[]>();
 
 
-        // 칸보다 큰 그림 (#80): 유적 제단의 잠든 석상(2×2), 동굴 입구(3×3) — Tiles/{테마}_{종류}_prop.png, 16px = 1칸.
+        // 칸보다 큰 그림 (#80): 유적 제단의 잠든 석상(2×2) — Tiles/{테마}_{종류}_prop.png, 16px = 1칸.
         // 바닥 칸 위에 아래 가운데를 맞춰 따로 그린다. 끝난 칸(동료가 깨어난 제단)은 없음
         public static Sprite Prop(FieldTile tile, FieldTheme theme, bool done)
         {
-            if (done || (tile != FieldTile.Shrine && tile != FieldTile.Cave)) return null;
+            if (done || tile != FieldTile.Shrine) return null;
             return LoadProp($"{theme}_{tile}_prop");
         }
+
+        // 동굴 입구 'O' 출입구 (#115)의 큰 그림(3×3): Tiles/{테마}_Door_Cave_prop.png
+        public static Sprite CaveMouthProp(FieldTheme theme) => LoadProp($"{theme}_Door_Cave_prop");
 
         // 큰 그림: 16px = 1칸, 아래 가운데 기준 (칸 아래쪽에 맞춰 위로 그림)
         private static Sprite LoadProp(string key)

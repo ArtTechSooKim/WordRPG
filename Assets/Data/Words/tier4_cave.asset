@@ -1,0 +1,921 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b72d5cf44eaeb8458f8605263c9da22, type: 3}
+  m_Name: tier4_cave
+  m_EditorClassIdentifier: WordRPG::WordRPG.Words.WordDatabase
+  tier: 4
+  regionId: cave
+  regionName: "\uC5B4\uB450\uC6B4 \uBC00\uB9BC \uB3D9\uAD74"
+  completionKeepsake: {fileID: 11400000, guid: 528fd9a2b4a378f4eaf4f4d0509121e2, type: 2}
+  completionGold: 900
+  storyOrder: 5
+  words:
+  - id: mutual
+    english: mutual
+    meaning: "\uC0C1\uD638\uC758, \uC11C\uB85C\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: oral
+    english: oral
+    meaning: "\uAD6C\uB450\uC758, \uC785\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: pursue
+    english: pursue
+    meaning: "\uCD94\uAD6C\uD558\uB2E4, \uB4A4\uCAD3\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: scope
+    english: scope
+    meaning: "\uBC94\uC704, \uC601\uC5ED"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: spectrum
+    english: spectrum
+    meaning: "\uC2A4\uD399\uD2B8\uB7FC, \uBC94\uC704"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: terror
+    english: terror
+    meaning: "\uACF5\uD3EC, \uD14C\uB7EC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: venture
+    english: venture
+    meaning: "\uBAA8\uD5D8, \uBCA4\uCC98 \uC0AC\uC5C5"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: screw
+    english: screw
+    meaning: "\uB098\uC0AC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: trigger
+    english: trigger
+    meaning: "\uCD09\uBC1C\uD558\uB2E4, \uC720\uBC1C\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: copyright
+    english: copyright
+    meaning: "\uC800\uC791\uAD8C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: democrat
+    english: democrat
+    meaning: "\uBBFC\uC8FC\uC8FC\uC758\uC790"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: deposit
+    english: deposit
+    meaning: "\uC608\uAE08, \uBCF4\uC99D\uAE08"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: diverse
+    english: diverse
+    meaning: "\uB2E4\uC591\uD55C, \uC5EC\uB7EC \uAC00\uC9C0\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: divine
+    english: divine
+    meaning: "\uC2E0\uC758, \uC2E0\uC131\uD55C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: export
+    english: export
+    meaning: "\uC218\uCD9C\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: neutral
+    english: neutral
+    meaning: "\uC911\uB9BD\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: noble
+    english: noble
+    meaning: "\uACE0\uADC0\uD55C, \uADC0\uC871\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: pat
+    english: pat
+    meaning: "\uC4F0\uB2E4\uB4EC\uB2E4, \uD1A0\uB2E5\uC774\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: sacred
+    english: sacred
+    meaning: "\uC131\uC2A4\uB7EC\uC6B4, \uC2E0\uC131\uC2DC\uB418\uB294"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: toxic
+    english: toxic
+    meaning: "\uC720\uB3C5\uD55C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: tunnel
+    english: tunnel
+    meaning: "\uD130\uB110"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: warrant
+    english: warrant
+    meaning: "\uC601\uC7A5, \uBCF4\uC99D"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: asset
+    english: asset
+    meaning: "\uC790\uC0B0, \uC7AC\uC0B0"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: burden
+    english: burden
+    meaning: "\uC9D0, \uBD80\uB2F4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: chef
+    english: chef
+    meaning: "\uC694\uB9AC\uC0AC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: palm
+    english: palm
+    meaning: "\uC190\uBC14\uB2E5, \uC57C\uC790\uB098\uBB34"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: strict
+    english: strict
+    meaning: "\uC5C4\uACA9\uD55C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: substance
+    english: substance
+    meaning: "\uBB3C\uC9C8, \uC2E4\uCCB4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: biology
+    english: biology
+    meaning: "\uC0DD\uBB3C\uD559"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: cruise
+    english: cruise
+    meaning: "\uC720\uB78C\uC120 \uC5EC\uD589"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: custody
+    english: custody
+    meaning: "\uC591\uC721\uAD8C, \uAD6C\uAE08"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: delete
+    english: delete
+    meaning: "\uC0AD\uC81C\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: generate
+    english: generate
+    meaning: "\uBC1C\uC0DD\uC2DC\uD0A4\uB2E4, \uB9CC\uB4E4\uC5B4 \uB0B4\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: legitimate
+    english: legitimate
+    meaning: "\uC815\uB2F9\uD55C, \uD569\uBC95\uC801\uC778"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: nasty
+    english: nasty
+    meaning: "\uB054\uCC0D\uD55C, \uBABB\uB41C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: permit
+    english: permit
+    meaning: "\uD5C8\uB77D\uD558\uB2E4, \uD5C8\uAC00\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: portrait
+    english: portrait
+    meaning: "\uCD08\uC0C1\uD654"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: advocate
+    english: advocate
+    meaning: "\uC9C0\uC9C0\uD558\uB2E4, \uC639\uD638\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: clinic
+    english: clinic
+    meaning: "\uC9C4\uB8CC\uC18C, \uBCD1\uC6D0"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: excess
+    english: excess
+    meaning: "\uCD08\uACFC, \uACFC\uC789"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: highlight
+    english: highlight
+    meaning: "\uAC15\uC870\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: identical
+    english: identical
+    meaning: "\uB3D9\uC77C\uD55C, \uB611\uAC19\uC740"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: imperial
+    english: imperial
+    meaning: "\uC81C\uAD6D\uC758, \uD669\uC81C\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: skip
+    english: skip
+    meaning: "\uAC74\uB108\uB6F0\uB2E4, \uAC70\uB974\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: cave
+    english: cave
+    meaning: "\uB3D9\uAD74"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: chronic
+    english: chronic
+    meaning: "\uB9CC\uC131\uC801\uC778"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: dose
+    english: dose
+    meaning: "\uBCF5\uC6A9\uB7C9, \uD22C\uC5EC\uB7C9"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: flesh
+    english: flesh
+    meaning: "\uC0B4, \uC721\uCCB4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: flip
+    english: flip
+    meaning: "\uB4A4\uC9D1\uB2E4, \uD719 \uB118\uAE30\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: generous
+    english: generous
+    meaning: "\uAD00\uB300\uD55C, \uB108\uADF8\uB7EC\uC6B4"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: implement
+    english: implement
+    meaning: "\uC2DC\uD589\uD558\uB2E4, \uC2E4\uD589\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: loyal
+    english: loyal
+    meaning: "\uCDA9\uC131\uC2A4\uB7EC\uC6B4"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: patch
+    english: patch
+    meaning: "\uD5DD\uAC8A \uC870\uAC01, \uBD80\uBD84"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: privilege
+    english: privilege
+    meaning: "\uD2B9\uAD8C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: bulk
+    english: bulk
+    meaning: "\uB300\uBD80\uBD84, \uBD80\uD53C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: corn
+    english: corn
+    meaning: "\uC625\uC218\uC218"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: destiny
+    english: destiny
+    meaning: "\uC6B4\uBA85"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: emphasis
+    english: emphasis
+    meaning: "\uAC15\uC870"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: insight
+    english: insight
+    meaning: "\uD1B5\uCC30\uB825"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: nightmare
+    english: nightmare
+    meaning: "\uC545\uBABD"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: preserve
+    english: preserve
+    meaning: "\uBCF4\uC874\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: acknowledge
+    english: acknowledge
+    meaning: "\uC778\uC815\uD558\uB2E4, (\uBC1B\uC558\uC74C\uC744) \uC54C\uB9AC\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: bias
+    english: bias
+    meaning: "\uD3B8\uACAC, \uD3B8\uD5A5"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: cancel
+    english: cancel
+    meaning: "\uCDE8\uC18C\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: chill
+    english: chill
+    meaning: "\uB0C9\uAE30, \uC624\uD55C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: collapse
+    english: collapse
+    meaning: "\uBB34\uB108\uC9C0\uB2E4, \uBD95\uAD34\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: compound
+    english: compound
+    meaning: "\uD654\uD569\uBB3C, \uD63C\uD569\uBB3C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: costume
+    english: costume
+    meaning: "\uC758\uC0C1, \uBCF5\uC7A5"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: grain
+    english: grain
+    meaning: "\uACE1\uBB3C, \uB09F\uC54C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: lap
+    english: lap
+    meaning: "\uBB34\uB98E, (\uACBD\uC8FC\uC758) \uD55C \uBC14\uD034"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: metropolitan
+    english: metropolitan
+    meaning: "\uB300\uB3C4\uC2DC\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: patent
+    english: patent
+    meaning: "\uD2B9\uD5C8"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: restore
+    english: restore
+    meaning: "\uD68C\uBCF5\uC2DC\uD0A4\uB2E4, \uBCF5\uC6D0\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: rival
+    english: rival
+    meaning: "\uACBD\uC7C1\uC790, \uB77C\uC774\uBC8C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: soap
+    english: soap
+    meaning: "\uBE44\uB204"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: suite
+    english: suite
+    meaning: "\uC2A4\uC704\uD2B8\uB8F8, \uD55C \uBC8C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: verse
+    english: verse
+    meaning: "\uC6B4\uBB38, \uC2DC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: contrary
+    english: contrary
+    meaning: "\uBC18\uB300\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: crush
+    english: crush
+    meaning: "\uC73C\uC2A4\uB7EC\uB728\uB9AC\uB2E4, \uC9D3\uBC1F\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: decrease
+    english: decrease
+    meaning: "\uAC10\uC18C\uD558\uB2E4, \uC904\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: diabetes
+    english: diabetes
+    meaning: "\uB2F9\uB1E8\uBCD1"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: lease
+    english: lease
+    meaning: "\uC784\uB300\uCC28 \uACC4\uC57D"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: resolve
+    english: resolve
+    meaning: "\uD574\uACB0\uD558\uB2E4, \uACB0\uC2EC\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: scandal
+    english: scandal
+    meaning: "\uCD94\uBB38, \uC2A4\uCE94\uB4E4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: substitute
+    english: substitute
+    meaning: "\uB300\uCCB4\uBB3C, \uB300\uB9AC\uC778"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: treasure
+    english: treasure
+    meaning: "\uBCF4\uBB3C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: counsel
+    english: counsel
+    meaning: "\uC0C1\uB2F4\uD558\uB2E4, \uC870\uC5B8\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: embrace
+    english: embrace
+    meaning: "\uAEF4\uC548\uB2E4, \uBC1B\uC544\uB4E4\uC774\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: exhibit
+    english: exhibit
+    meaning: "\uC804\uC2DC\uD558\uB2E4, \uBCF4\uC774\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: hammer
+    english: hammer
+    meaning: "\uB9DD\uCE58"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: retain
+    english: retain
+    meaning: "\uC720\uC9C0\uD558\uB2E4, \uBCF4\uC720\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: yield
+    english: yield
+    meaning: "\uC0B0\uCD9C\uD558\uB2E4, \uC591\uBCF4\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: barrier
+    english: barrier
+    meaning: "\uC7A5\uBCBD, \uC7A5\uC560\uBB3C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: cattle
+    english: cattle
+    meaning: "\uC18C, \uAC00\uCD95"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: compromise
+    english: compromise
+    meaning: "\uD0C0\uD611"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: crop
+    english: crop
+    meaning: "\uB18D\uC791\uBB3C, \uC218\uD655\uB7C9"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: eliminate
+    english: eliminate
+    meaning: "\uC81C\uAC70\uD558\uB2E4, \uC5C6\uC560\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: harbor
+    english: harbor
+    meaning: "\uD56D\uAD6C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: strain
+    english: strain
+    meaning: "\uBD80\uB2F4, \uAE34\uC7A5"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: swift
+    english: swift
+    meaning: "\uC2E0\uC18D\uD55C, \uBE60\uB978"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: tackle
+    english: tackle
+    meaning: "(\uBB38\uC81C\uB97C) \uB2E4\uB8E8\uB2E4, \uD0DC\uD074\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: torture
+    english: torture
+    meaning: "\uACE0\uBB38, \uACE0\uD1B5"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: vertical
+    english: vertical
+    meaning: "\uC218\uC9C1\uC758, \uC138\uB85C\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: abstract
+    english: abstract
+    meaning: "\uCD94\uC0C1\uC801\uC778"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: beam
+    english: beam
+    meaning: "\uAD11\uC120, \uB4E4\uBCF4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: corrupt
+    english: corrupt
+    meaning: "\uBD80\uD328\uD55C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: curve
+    english: curve
+    meaning: "\uACE1\uC120, \uCEE4\uBE0C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: harsh
+    english: harsh
+    meaning: "\uAC00\uD639\uD55C, \uAC70\uCE5C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: immune
+    english: immune
+    meaning: "\uBA74\uC5ED\uC758, \uBA74\uC81C\uB41C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: install
+    english: install
+    meaning: "\uC124\uCE58\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: lecture
+    english: lecture
+    meaning: "\uAC15\uC758, \uAC15\uC5F0"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: missile
+    english: missile
+    meaning: "\uBBF8\uC0AC\uC77C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: organ
+    english: organ
+    meaning: "\uC7A5\uAE30, \uC624\uB974\uAC04"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: peer
+    english: peer
+    meaning: "\uB610\uB798, \uB3D9\uB8CC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: rod
+    english: rod
+    meaning: "\uB9C9\uB300, \uB09A\uC2EF\uB300"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: sweat
+    english: sweat
+    meaning: "\uB540"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: acquire
+    english: acquire
+    meaning: "\uC5BB\uB2E4, \uD68D\uB4DD\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: alike
+    english: alike
+    meaning: "\uBE44\uC2B7\uD55C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: arrow
+    english: arrow
+    meaning: "\uD654\uC0B4, \uD654\uC0B4\uD45C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: boundary
+    english: boundary
+    meaning: "\uACBD\uACC4, \uD55C\uACC4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: companion
+    english: companion
+    meaning: "\uB3D9\uBC18\uC790, \uB3D9\uB8CC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: embassy
+    english: embassy
+    meaning: "\uB300\uC0AC\uAD00"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: flexible
+    english: flexible
+    meaning: "\uC720\uC5F0\uD55C, \uC735\uD1B5\uC131 \uC788\uB294"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: keen
+    english: keen
+    meaning: "\uC5F4\uB9DD\uD558\uB294, \uC608\uB9AC\uD55C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: mere
+    english: mere
+    meaning: "\uB2E8\uC21C\uD55C, ~\uC5D0 \uBD88\uACFC\uD55C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: miracle
+    english: miracle
+    meaning: "\uAE30\uC801"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: owe
+    english: owe
+    meaning: "\uBE5A\uC9C0\uB2E4, \uC2E0\uC138\uB97C \uC9C0\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: phenomenon
+    english: phenomenon
+    meaning: "\uD604\uC0C1"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: precise
+    english: precise
+    meaning: "\uC815\uD655\uD55C, \uC815\uBC00\uD55C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: prospect
+    english: prospect
+    meaning: "\uC804\uB9DD, \uAC00\uB2A5\uC131"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: retreat
+    english: retreat
+    meaning: "\uD6C4\uD1F4\uD558\uB2E4, \uBB3C\uB7EC\uAC00\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: colony
+    english: colony
+    meaning: "\uC2DD\uBBFC\uC9C0, \uAD70\uC9D1"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: curriculum
+    english: curriculum
+    meaning: "\uAD50\uC721 \uACFC\uC815"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: heal
+    english: heal
+    meaning: "\uCE58\uC720\uD558\uB2E4, \uB0AB\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: resume
+    english: resume
+    meaning: "\uC7AC\uAC1C\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: tribe
+    english: tribe
+    meaning: "\uBD80\uC871, \uC885\uC871"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: alternate
+    english: alternate
+    meaning: "\uBC88\uAC08\uC544 \uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: athlete
+    english: athlete
+    meaning: "\uC6B4\uB3D9\uC120\uC218"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: convert
+    english: convert
+    meaning: "\uC804\uD658\uD558\uB2E4, \uAC1C\uC870\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: grip
+    english: grip
+    meaning: "\uAF49 \uC7A1\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: harmony
+    english: harmony
+    meaning: "\uC870\uD654"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: mild
+    english: mild
+    meaning: "\uC628\uD654\uD55C, \uC21C\uD55C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: minimal
+    english: minimal
+    meaning: "\uCD5C\uC18C\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+  - id: proportion
+    english: proportion
+    meaning: "\uBE44\uC728, \uBD80\uBD84"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: rage
+    english: rage
+    meaning: "\uBD84\uB178, \uACA9\uB178"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: urge
+    english: urge
+    meaning: "\uCD09\uAD6C\uD558\uB2E4, \uC7AC\uCD09\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: ally
+    english: ally
+    meaning: "\uB3D9\uB9F9\uAD6D, \uD611\uB825\uC790"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+  - id: import
+    english: import
+    meaning: "\uC218\uC785\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: pose
+    english: pose
+    meaning: "\uC790\uC138\uB97C \uCDE8\uD558\uB2E4, (\uBB38\uC81C\uB97C) \uC81C\uAE30\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+  - id: publish
+    english: publish
+    meaning: "\uCD9C\uD310\uD558\uB2E4, \uBC1C\uD45C\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 

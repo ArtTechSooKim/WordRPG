@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a1fd635b15c21104eac5e74f7cab0005
+guid: 7056632fcd3902e45864a19e480ba54c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6982783881061579552
-    second: Jungle_Cave_prop_0
+      213: -901954899280393002
+    second: keepsake_cave_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -110,19 +110,6 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
     buildTarget: iOS
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -139,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Jungle_Cave_prop_0
+      name: keepsake_cave_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 7
-        width: 48
-        height: 41
+        y: 0
+        width: 14
+        height: 14
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 02bbff581f4d7e060800000000000000
-      internalID: 6982783881061579552
+      spriteID: 6dc08f04ccc9b73f0800000000000000
+      internalID: -901954899280393002
       vertices: []
       indices: 
       edges: []

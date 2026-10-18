@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e0461c5501ea214aa7df5f405021104, type: 3}
+  m_Name: cave_water
+  m_EditorClassIdentifier: WordRPG::WordRPG.Field.EncounterTable
+  entries:
+  - species: {fileID: 11400000, guid: 687abc908a4a50140b52ce8d0c1691af, type: 2}
+    minLevel: 16
+    maxLevel: 18
+    weight: 10
+  minGroupSize: 1
+  maxGroupSize: 2

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71c0dd365e2553c48922bec3a339f174, type: 3}
+  m_Name: larva_chew
+  m_EditorClassIdentifier: WordRPG::WordRPG.Monsters.SkillData
+  skillId: larva_chew
+  displayName: "\uACF1\uC539\uAE30"
+  description: "\uB2E8\uC5B4\uB97C \uACF1\uC539\uB4EF \uBB3C\uACE0 \uB298\uC5B4\uC9C4\uB2E4."
+  kind: 0
+  target: 0
+  power: 20
+  quizDirection: 0

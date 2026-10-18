@@ -138,7 +138,7 @@ MonoBehaviour:
     relic: {fileID: 0}
   exits:
   - target: {fileID: 11400000, guid: 768fa7c9e98d0ef48bcfa114628de9e5, type: 2}
-    targetDoorIndex: 0
+    targetDoorIndex: 1
     openedByBossOf: {fileID: 11400000}
   - target: {fileID: 11400000, guid: a2d06106feb91f048ad3b3d9f1f26ff0, type: 2}
     targetDoorIndex: 1
@@ -152,5 +152,6 @@ MonoBehaviour:
   bossGateWords: 40
   shrineCompanion: {fileID: 0}
   shrineWords: 60
+  glowStoneRelic: {fileID: 0}
   requiresFullVersion: 1
   dictionaryName: "\uC232\uC758 \uC0AC\uC804"

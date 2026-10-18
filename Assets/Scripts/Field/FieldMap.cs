@@ -29,7 +29,7 @@ namespace WordRPG.Field
         RuinFloor,// 유적 바닥 ';': 걸을 수 있고 조우 없음 (보이는 몬스터도 들어오지 않음)
         Tablet,   // 단어 석판 'T' (막힘): [확인] → 빈칸 단어 문제
         Shrine,   // 유적 제단 'A' (막힘): 석판을 다 풀고 단어를 모으면 동료(아라)가 깨어남
-        Cave,     // 동굴 입구 'O' (막힘): 1.2 어두운 밀림 동굴로 이어질 자리 — 지금은 무너진 바위로 막힘
+        // (동굴 입구 'O'는 1.2부터 출입구 Door — 그림만 큰 동굴 입구, FieldMap.IsCaveMouth #115)
         Decor,    // 꾸밈 'Q' (#86, 막힘): 둘레를 보고 상자·통나무·그루터기·바위·이끼 기둥·석상 중 하나 (FieldDecor.Variant)
         // ---- 1.2 어두운 밀림 동굴 (#112, GDD 9-7)
         GlowStone // 글자 반딧돌 'I' (막힘): [확인] → 단어 한 문제로 밝히면 둘레가 영영 밝아짐 (GlowStones, 빛 = CaveLight)
@@ -48,7 +48,7 @@ namespace WordRPG.Field
 
     public static class FieldThemes
     {
-        // 그 테마의 맵에 쓸 수 있는 칸 — 정글 칸(얕은 강·나루터·레버·덩굴 다리·유적·석판·제단·동굴 입구)은 정글에서만 (#80),
+        // 그 테마의 맵에 쓸 수 있는 칸 — 정글 칸(얕은 강·나루터·레버·덩굴 다리·유적·석판·제단)은 정글에서만 (#80),
         // 동굴(#112)은 글자 반딧돌 + 정글의 레버·덩굴 다리·꾸밈.
         // 그림(Tiles/{테마}_{종류}.png)도 이 표대로 있어야 함 (AudioArtTests). 다른 테마에서 쓰려면 여기에 더하고 그림을 만든다
         public static bool Supports(FieldTheme theme, FieldTile tile)
@@ -90,7 +90,7 @@ namespace WordRPG.Field
     //   옆에서 [확인]으로 쓰는 칸: 'F' 회복의 샘   'C' 보물상자   'E' 성유물 제단   'S' 상점   'B' 보스   'L' 사전 받침대   'G' 보스 방 문   'K' 열쇠
     //   'D' 출입구 (밟으면 다른 지역으로)
     //   정글 (#80): '>' '<' '^' 'v' 얕은 강(물살 방향)   'J' 나루터   'Y' 레버   'H' 덩굴 다리   'U' 유적 돌벽   ';' 유적 바닥
-    //               'T' 단어 석판   'A' 유적 제단   'O' 동굴 입구   'Q' 꾸밈(#86, 막힘)
+    //               'T' 단어 석판   'A' 유적 제단   'O' 동굴 입구(1.2부터 출입구 — 'D'와 같고 그림만 큰 동굴, #115)   'Q' 꾸밈(#86, 막힘)
     //   동굴 (#112): 'I' 글자 반딧돌 (정글의 'Y' 레버 · 'H' 덩굴 다리 · 'Q' 꾸밈도 씀)
     // 좌표: x는 오른쪽, y는 위쪽 (맨 아래 줄이 y=0) — Unity 월드 좌표와 같은 방향
     public class FieldMap
@@ -99,7 +99,8 @@ namespace WordRPG.Field
         private readonly List<Vector2Int> chests; // 위→아래, 왼→오른 순 (보물상자 내용물 배정 순서)
         private readonly List<Vector2Int> doors;  // 같은 순서 (출입구 연결 배정 순서)
         private readonly Dictionary<Vector2Int, Direction> streams; // 얕은 강 칸의 물살 방향
-        private HashSet<Vector2Int> raftWater;    // 나루터에서 뗏목으로 갈 수 있는 깊은 물 (처음 물을 때 계산)
+        private readonly HashSet<Vector2Int> caveMouths;            // 'O' 출입구 (그림만 큰 동굴 입구)
+        private HashSet<Vector2Int> raftWater;   // 나루터에서 뗏목으로 갈 수 있는 깊은 물 (처음 물을 때 계산)
         private List<List<Vector2Int>> bridges;   // 이어진 덩굴 다리 칸 덩어리들
 
         public int Width { get; }
@@ -110,12 +111,13 @@ namespace WordRPG.Field
         public Vector2Int? BossPosition { get; }
 
         private FieldMap(FieldTile[,] tiles, Vector2Int start, List<Vector2Int> chests, List<Vector2Int> doors,
-            Vector2Int? boss, Dictionary<Vector2Int, Direction> streams)
+            Vector2Int? boss, Dictionary<Vector2Int, Direction> streams, HashSet<Vector2Int> caveMouths)
         {
             this.tiles = tiles;
             this.chests = chests;
             this.doors = doors;
             this.streams = streams;
+            this.caveMouths = caveMouths;
             BossPosition = boss;
             Width = tiles.GetLength(0);
             Height = tiles.GetLength(1);
@@ -138,6 +140,7 @@ namespace WordRPG.Field
             var chests = new List<Vector2Int>();
             var doors = new List<Vector2Int>();
             var streams = new Dictionary<Vector2Int, Direction>();
+            var caveMouths = new HashSet<Vector2Int>();
             Vector2Int? start = null;
             Vector2Int? boss = null;
 
@@ -174,12 +177,13 @@ namespace WordRPG.Field
                         case ';': tiles[x, y] = FieldTile.RuinFloor; break;
                         case 'T': tiles[x, y] = FieldTile.Tablet; break;
                         case 'A': tiles[x, y] = FieldTile.Shrine; break;
-                        case 'O': tiles[x, y] = FieldTile.Cave; break;
                         case 'Q': tiles[x, y] = FieldTile.Decor; break;
                         case 'I': tiles[x, y] = FieldTile.GlowStone; break;
+                        case 'O':
                         case 'D':
                             tiles[x, y] = FieldTile.Door;
                             doors.Add(new Vector2Int(x, y));
+                            if (c == 'O') caveMouths.Add(new Vector2Int(x, y));
                             break;
                         case 'B':
                             if (boss.HasValue) throw new FormatException("보스 'B'는 지역마다 하나만 둘 수 있습니다");
@@ -202,7 +206,7 @@ namespace WordRPG.Field
             }
 
             if (!start.HasValue) throw new FormatException("시작 위치 'P'가 없습니다");
-            return new FieldMap(tiles, start.Value, chests, doors, boss, streams);
+            return new FieldMap(tiles, start.Value, chests, doors, boss, streams, caveMouths);
         }
 
         public bool InBounds(Vector2Int p) => p.x >= 0 && p.y >= 0 && p.x < Width && p.y < Height;
@@ -218,8 +222,10 @@ namespace WordRPG.Field
         public static bool IsInteractive(FieldTile tile) =>
             tile == FieldTile.Chest || tile == FieldTile.Fountain || tile == FieldTile.Altar || tile == FieldTile.Shop
             || tile == FieldTile.Boss || tile == FieldTile.Lectern || tile == FieldTile.Gate || tile == FieldTile.Key
-            || tile == FieldTile.Lever || tile == FieldTile.Tablet || tile == FieldTile.Shrine || tile == FieldTile.Cave
-            || tile == FieldTile.GlowStone;
+            || tile == FieldTile.Lever || tile == FieldTile.Tablet || tile == FieldTile.Shrine || tile == FieldTile.GlowStone;
+
+        // 'O'로 적은 출입구인지 (#115): 하는 일은 'D'와 같고 그림만 큰 동굴 입구 (FieldArt.CaveMouthProp)
+        public bool IsCaveMouth(Vector2Int p) => caveMouths.Contains(p);
 
         // 얕은 강의 물살 방향 (얕은 강이 아니면 null)
         public Direction? StreamDirection(Vector2Int p) => streams.TryGetValue(p, out var d) ? d : (Direction?)null;

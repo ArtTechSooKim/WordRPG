@@ -28,7 +28,7 @@
 - **핵심 루프**: 탐험 → 랜덤 조우 → 전투(기술마다 단어 문제) → 보상(경험치·재료·성유물) → 레벨업·성유물 강화(+3 각성) → 새 지역·어려운 단어
 - **현재 단계**: MVP 이후 확장 — 초원(마을)·잊혀진 서고(던전)·숲(2번째 지역, 서고 보스를 물리치면 열림), 주인공 + 성유물 8개(3칸 장착),
   적 6종 + 보스 2 (+ 1.1 메아리 정글 완성 — 출시 대기, 가지 release-1.1: 숲 보스 공터 위 출입구, 적 3종 + 빈칸두꺼비, 동료 아라)
-  (+ 1.2 어두운 밀림 동굴 작업 중 — 정글 섬 밑, 설계 GDD 9-7, 맵 초안 Tools/cave_map.py). 단어 = 2022 개정 교육과정 영어과 기본 어휘(교육부 고시, 저작권 없음 — GDD 11-2)에서 **지역마다 150개**(#76: 초원·서고 = 중·고 공통,
+  (+ 1.2 어두운 밀림 동굴 완성 — main, 1.1 출시 뒤 TestFlight: 정글 강 가운데 섬의 'O' 출입구(입장 조건 없음), 적 4종 + 말줄임덩굴, 설계 GDD 9-7). 단어 = 2022 개정 교육과정 영어과 기본 어휘(교육부 고시, 저작권 없음 — GDD 11-2)에서 **지역마다 150개**(#76: 초원·서고 = 중·고 공통,
   숲 = 고급에서 자주 쓰는 순 — `Tools/trim_wordbooks.py`). 남은 단어는 `Docs/단어_예비_중고공통.csv`(900)·`Docs/단어_예비_고급.csv`(850) — 새 지역은 위에서부터 150개.
   뜻은 Claude 초안 + 사용자 검수. 맵은 2026-10-03에 넓이 4배. 보스 방은 열쇠 + 그 지역 단어 40개 발견으로 열림(#76)
 
@@ -42,7 +42,7 @@
 4. **시간·랜덤은 주입**: 로직에서 `DateTime.UtcNow`, `UnityEngine.Random` 직접 사용 금지 → `DateTime nowUtc` / `System.Random` 파라미터로 받기 (테스트 결정성)
 5. **저장 데이터는 id 문자열로 참조**: wordId, itemId, relicId, areaId. 에셋 이름이 바뀌어도 세이브가 깨지지 않게 (세이브 v2: 주인공 + 성유물, v1 몬스터 파티는 불러올 때 변환)
    - 아이템·성유물·몬스터·지역을 새로 만들면 `WordRPG > Data > Refresh Game Database` 실행 (안 하면 세이브에서 불러올 수 없음, DataIntegrityTests가 잡음)
-   - 성유물은 시작·보물상자(ChestContent.relic)·보스(BossEncounter.rewardRelic) 중 하나에서 얻을 수 있어야 하고, 강화 재료는 적 드롭·상자에서 얻을 수 있어야 함.
+   - 성유물은 시작·보물상자(ChestContent.relic)·보스(BossEncounter.rewardRelic)·반딧돌 보상(FieldArea.glowStoneRelic) 중 하나에서 얻을 수 있어야 하고, 강화 재료는 적 드롭·상자에서 얻을 수 있어야 함.
      상점은 회복 아이템(상처약)만 판다 — 사용자 결정 (TownDataTests가 검사)
    - 기술문서(ItemKind.SkillDocument)는 taughtSkill이 있어야 하고 상자·보스(BossEncounter.rewardItem)에서 얻을 수 있어야 함 (SkillDocumentDataTests).
      전투 기술 = 기본 기술(고정) + 기술 칸 3개(성유물 기술·기술문서 기술), 세이브에는 칸 순서를 키 문자열로 저장
@@ -53,10 +53,12 @@
      전투는 `GameSession.PartyMembers`(주인공 → 동료 차례), 경험치는 둘 다(`BattleRewardCalculator.ApplyTo`), 이긴 뒤 쓰러진 동료는 HP 1(`AfterBattle`),
      샘·패배 회복(`RestoreHero`)은 동료도. 얻기 = `FieldScreen.MeetCompanion`(조우 연출) — 동료를 새로 만들면 Refresh Game Database (CompanionDataTests)
    - 세션을 쓰기 시작하는 화면(필드·전투)은 `MarkPlaying()`을 불러야 저장된다 (타이틀에서 시작 전엔 저장 안 함)
+   - 업데이트 안내 (#115): `UpdateNotices`(세이브 칸 notices) — 예전 세이브로 켠 사람(= 업데이트한 사람)만 타이틀에서 한 번 (`TitleScreen.ShowUpdateNotice`,
+     `ConfirmDialog.ShowNotice` [확인] 하나). 새 게임은 모두 본 것으로 시작, 튜토리얼과 따로. 다음 업데이트 안내는 `UpdateNotices.All` 맨 뒤에 새 id로
    - 설정(`GameSettings`: 음량·진동)은 세이브가 아니라 PlayerPrefs. `GameManager.Settings` / `SaveSettings()`
    - **수익화** (GDD 9-3): 산 상품(`Entitlements`, 정식판 id `com.arttechsoo.wordrpg.full` — 바꾸지 말 것)도 세이브가 아니라 PlayerPrefs.
      결제는 `IStore`(실제 `UnityIapStore` = Unity IAP 5, 테스트는 가짜 — `GameManager.StoreOverride`/`FieldScreen.Configure`).
-     정식판이 필요한 지역은 FieldArea `requiresFullVersion` (지금은 숲) → 입구에서 `PaywallView`, 어디서든 설정 > 정식판(보기·구매 복원).
+     정식판이 필요한 지역은 FieldArea `requiresFullVersion` (숲·정글·동굴) → 입구에서 `PaywallView`, 어디서든 설정 > 정식판(보기·구매 복원).
      앱 버전(PlayerSettings.bundleVersion)은 앱스토어 버전과 같아야 함 (지금 main = **1.2 개발 중**(동굴, #110). **1.1 출시·고침은 가지 `release-1.1`**에서 빌드하고
      고친 것은 main에도 합침 — main에서 1.1을 빌드하지 말 것. 1.0 심사 코드는 태그 v1.0-build3, 1.0을 고쳐 다시 내야 하면 그 태그에서 가지를 땀). 지원·개인정보 웹 페이지 = `gh-pages` 브랜치 (작업메모)
    - 새 지역(단어장)은 regionId·regionName·징표 아이템(종류 Keepsake)·골드·storyOrder(이야기 순서 = 징표 진열장 순서, 다음 번호)를 지정해야 함 (RegionDataTests가 검사)
@@ -68,7 +70,7 @@
      열쇠 + 그 지역 단어 40개 발견 → [확인]으로 열림 (규칙 `BossGate`, 세이브 `WorldState.openedGates`). 열쇠는 문 밖, 보스는 문 안에서만 닿아야 함 (BossGateDataTests)
    - 맵 글자 ':' = 잔디(걸을 수 있고 조우 없음). 출입구 연결(AreaExit)의 openedByBossOf = 그 지역 보스를 물리쳐야 열림 →
      보스를 이기면 FieldScreen이 카메라로 그 출입구를 보여 주는 연출(GateCutscene). 잠긴 길은 진짜 보스가 열어야 함 (GateDataTests)
-   - 맵 원본은 SampleDataBuilder의 MeadowMap·LibraryMap·ForestMap 상수. 이미 있는 에셋은 Create Sample Data가 덮어쓰지 않으므로
+   - 맵 원본은 SampleDataBuilder의 MeadowMap·LibraryMap·ForestMap·JungleMap·CaveMap 상수. 이미 있는 에셋은 Create Sample Data가 덮어쓰지 않으므로
      맵을 바꿀 땐 에셋의 map 칸도 같이 고칠 것 (상자 id는 위치 기준이라 상자를 옮기면 새 상자)
    - 조우 방식은 FieldArea `encounterStyle`: Grass(풀숲 확률 조우) / Roaming(보이는 몬스터 — 마른 덤불 ','이 서식지, 발견하면 쫓아옴·부딪히면 전투,
      가까우면 [선제공격] = QTE(기회 슬로모션 → 줄어드는 원 + 이미 본 단어 한 문제), 맞히면 HP 20%. 규칙 `RoamingMonsters`·`Preemptive`, 그림 `FieldRoamerViews`·`PreemptView`, #73~75. 정글부터 — 1.1).
@@ -78,7 +80,8 @@
    - 정글 맵 글자 (#80, 1.1): '>' '<' '^' 'v' 얕은 강(걸을 수 있음, 물살 방향으로 걸으면 빨라짐 — `FieldMap.StreamDirection/IsWithStream`) ·
      'J' 나루터(여기서 깊은 강 쪽으로 가면 뗏목 — `FieldWalker.Rafting`, 뗏목이 다니는 물 = 나루터에 이어진 물 `FieldMap.IsRaftWater`, 세이브 `WorldState.Rafting`) ·
      'Y' 레버 → 가장 가까운 'H' 덩굴 다리가 놓임(`FieldMap.BridgeOf`, 규칙 `Levers`, 세이브 pulledLevers) · 'U' 유적 돌벽 · ';' 유적 바닥 ·
-     'T' 단어 석판(세이브 solvedTablets) · 'A' 유적 제단(FieldArea `shrineCompanion` + `shrineWords` 60, 규칙 `Ruins`) · 'O' 동굴 입구(1.2).
+     'T' 단어 석판(세이브 solvedTablets) · 'A' 유적 제단(FieldArea `shrineCompanion` + `shrineWords` 60, 규칙 `Ruins`) ·
+     'O' 동굴 입구 = 출입구(#115 — 'D'와 같이 Door·출입구 번호에 들어가고 그림만 3×3 동굴 `FieldMap.IsCaveMouth` · `FieldArt.CaveMouthProp`).
      정글 칸은 정글 테마에서만 (`FieldThemes.Supports` — 다른 테마에 쓰려면 거기에 더하고 그림을 만듦). 칸 상태(끝난 모습·지나갈 수 있음)는 `CellState`,
      도달 검사(모든 상자·출입구)는 걷기 + 뗏목 `FieldReach.Flood`. 칸보다 큰 그림(석상·동굴)은 `FieldArt.Prop`(Tiles/{테마}_{종류}_prop.png).
      'Q' 꾸밈(#86, 막힘): 종류는 둘레로 정함 `FieldDecor.Variant` (그림 Tiles/{테마}_Decor_{종류}.png, 1×2는 _prop), 막지 않는 흩뿌림은 `FieldScatter`(Tiles/{테마}_Scatter_{바닥}_n.png).
@@ -88,7 +91,8 @@
      쉼터 물건(샘·가게·제단·사전) 4칸 · 출입구 2.5칸 · 지나간 곳 Memory. 그리기 `FieldDarkness`(칸마다 2×2픽셀 한 장, 주인공 빛이 1/4칸 움직일 때만 다시 칠함, 알파 1 —
      Linear라 0.97만 돼도 바닥이 비침). 빛 밖 몬스터는 빨간 눈만 (`FieldRoamerViews.UpdateEyes` — 사용자: 적의 눈은 모두 빨간색), 꺼진 반딧돌은 희미하게 깜빡(`FieldScreen.Cave`).
      반딧돌 [확인] = `GlowStoneQuizView`(Figma #111) + `TabletQuiz(provider, 1, EnglishToMeaning)` — 석판과 같은 규칙(틀려도 벌점 없음), 밝히면 빛이 퍼지고(`FieldDarkness.Grow`)
-     모두 밝히면 동굴 전체가 은은하게(`CaveLight.AllLitGlow`). 목표 한 줄은 열쇠를 찾기 전까지 `ObjectiveKind.LightStones` (별 없음)
+     모두 밝히면 동굴 전체가 은은하게(`CaveLight.AllLitGlow`) + FieldArea `glowStoneRelic`(동굴 = 반딧돌 등잔, `GlowStones.ClaimAllLitReward`).
+     목표 한 줄은 열쇠를 찾기 전까지 `ObjectiveKind.LightStones` (별 없음). 동굴 지역 = cave.asset (#115, 정글 출입구 0번 ↔ 동굴 출입구 0번)
      그림 = import_ninja_art.py `build_cave` (Cave_Wall_auto = 바위 윗면 + 밝은 테 + 절벽면), 시안 = Tools/cave_mockup.py
    - 통로는 두 칸 너비 (사용자 요청 #67): 새 맵은 `python Tools/widen_maps.py --only {상수} [--apply]`로 한 칸 통로를 넓힘 (상수·에셋 같이)
 6. **네이밍**: PascalCase 클래스/메서드/프로퍼티, camelCase 필드. SO 필드는 `[SerializeField] private` + 읽기 전용 프로퍼티. 클래스명은 영문, 화면 표시명은 한국어 필드(`displayName = "펜촉이"`). 주석은 한국어
@@ -157,7 +161,8 @@ Assets/
                         BossDictionary(보스의 사전: 받침대 L, 하루 한 번 새 단어 — 읽은 날은 WorldState),
                         BossGate(보스 방 문: 열쇠 K + 단어 40개 → G가 열림 — #76),
                         Ruins(유적: 석판 T 4개 + 정글 단어 60개 → 제단 A에서 동료) · Levers(레버 Y → 덩굴 다리 H) · CellState(칸의 끝난 모습·지나갈 수 있음) — #80,
-                        TabletQuiz(석판 3문제: 틀리면 벌점 없이 다시, 숙련도는 처음 답만 — #81), GlowStones(글자 반딧돌: 밝힘·밝힌 수 — #112)
+                        TabletQuiz(석판 3문제: 틀리면 벌점 없이 다시, 숙련도는 처음 답만 — #81), GlowStones(글자 반딧돌: 밝힘·밝힌 수·모두 밝힌 보상 — #112·#115),
+                        UpdateNotices(업데이트 안내: 업데이트한 사람만 타이틀에서 한 번 — #115)
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
     UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투 + 보스 결정타 연출 + 전투 결산, 단독 연습 모드도 있음)
                         — 둘 다 partial로 나눔 (#93): FieldScreen.cs(상태·이동·입력) + .Places([확인] 장소)·.Jungle(정글 기믹)·.Battles(조우·전투 뒤·수련)·
@@ -165,7 +170,7 @@ Assets/
                         새 기능은 맞는 파일에, 기능 묶음이 커지면 새 partial 파일로,
                         DexView(도감), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기),
                         InventoryView(소지품: 주인공·성유물·아이템·징표) + HeroViews(HeroInfoPage·RelicPage·RelicSlotsRow·SkillRowView),
-                        SettingsView(설정) + ConfirmDialog(확인 창), SwitchView, GateCutscene(보스가 연 길을 보여 주는 연출),
+                        SettingsView(설정) + ConfirmDialog(확인 창 · ShowNotice = [확인] 하나), SwitchView, GateCutscene(보스가 연 길을 보여 주는 연출),
                         TrainingView(수련 창: 전체적 암기·오답 위주 암기 → BattleScreen.BeginTraining, 허수아비),
                         SpeechBubble(주인공 머리 위 말풍선 — 팩 DialogInfo·Emote: 점점점·느낌표 풍선, 글자 풍선. 사전 읽기·혼잣말),
                         FieldNameTags(오브젝트 이름표),

@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35710cec1d88f164fb5d9f37dda09273, type: 3}
+  m_Name: relic_glow_lamp
+  m_EditorClassIdentifier: WordRPG::WordRPG.Heroes.RelicData
+  relicId: relic_glow_lamp
+  displayName: "\uBC18\uB527\uB3CC \uB4F1\uC794"
+  description: "\uB3D9\uAD74\uC758 \uBC18\uB527\uB3CC\uC744 \uBAA8\uB450 \uBC1D\uD788\uC790
+    \uCC9C\uC7A5\uC758 \uBC18\uB527\uBD88\uC774 \uB0B4\uB824\uC640 \uAE43\uB4E0 \uB4F1\uC794.
+    \uBE5B\uC73C\uB85C \uC801 \uC804\uCCB4\uB97C \uACF5\uACA9\uD55C\uB2E4."
+  role: 0
+  icon: {fileID: 0}
+  placeholderColor: {r: 0.45, g: 0.85, b: 1, a: 1}
+  skill: {fileID: 11400000, guid: 3050bb7c7f9806c4284cb3fdcd9c6612, type: 2}
+  awakenedSkill: {fileID: 11400000, guid: 6693d9d7c1f2fed429ff4dd208dbb236, type: 2}
+  awakenLevel: 3
+  baseBonus:
+    maxHp: 0
+    attack: 9
+    defense: 0
+  bonusPerLevel:
+    maxHp: 0
+    attack: 3
+    defense: 0
+  upgradeItem: {fileID: 11400000, guid: 1e3af499576bc6040a52fac76ed9d294, type: 2}
+  upgradeCosts:
+  - itemCount: 1
+    gold: 30
+  - itemCount: 2
+    gold: 60
+  - itemCount: 2
+    gold: 90
+  - itemCount: 3
+    gold: 120
+  - itemCount: 3
+    gold: 150

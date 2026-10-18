@@ -35,6 +35,20 @@ MONSTERS = {
     "batchim_kappa": ("Actor/Monsters/KappaRed/SpriteSheet.png", 16),    # 받침갓파
     "mimic_octopus": ("Actor/Monsters/GreenOctopus/SpriteSheet.png", 16),  # 흉내문어 (강·뗏목 길)
     "boss_blank_frog": ("Actor/Boss/GiantFrog/Idle40x40.png", 40),       # 빈칸두꺼비
+    # 1.2 어두운 밀림 동굴 (#115, GDD 9-7 — 이름·그림 사용자 확정). 먹물도롱뇽은 파란 도롱뇽을 먹물색으로 (MONSTER_TINTS)
+    "blink_ghost": ("Actor/Monsters/Spirit/SpriteSheet.png", 16),        # 깜빡유령
+    "chew_larva": ("Actor/Monsters/Larva2/Larva2.png", 16),              # 곱씹애벌레
+    "tangle_spider": ("Actor/Monsters/SpiderRed/SpriteSheet.png", 16),   # 엉킴거미
+    "ink_newt": ("Actor/Monsters/AxolotBlue/SpriteSheet.png", 16),       # 먹물도롱뇽 (먹물 웅덩이에 숨었다 튀어나옴)
+    "boss_ellipsis_vine": ("Actor/Boss/GiantBamboo/Idle.png", 62),       # 말줄임덩굴
+}
+# 같은 그림을 다른 색으로 (채널별 곱) — 먹물도롱뇽 = 서고 잉크 웅덩이 같은 남보라
+MONSTER_TINTS = {
+    "ink_newt": (0.62, 0.48, 0.92),
+}
+# 지울 줄 (맨 위 = 0): 떠 있는 유령 발밑의 그림자 줄은 전투 카드에서 빨간 줄로만 보여서 지운다
+MONSTER_CLEAR_ROWS = {
+    "blink_ghost": (15,),
 }
 
 PLAYER = "Actor/Characters/Boy/SpriteSheet.png"
@@ -53,6 +67,15 @@ RELICS = {
     "relic_flute": ("Items/Object/PanFlute.png", None),                   # 메아리 피리 (유적 상자)
     "relic_gourd": ("Items/Object/Gourd.png", None),                      # 정글 조롱박 (강 위쪽 모래톱 상자)
     "relic_letter_gem": ("Items/Resource/GemGreen.png", None),            # 글자 구슬 (빈칸두꺼비 보상)
+    # 1.2 어두운 밀림 동굴 (#115)
+    "relic_period_seed": ("Items/Food/SeedBig3.png", None),               # 마침표 씨앗 (말줄임덩굴 보상) — 어둡게 (RELIC_TINTS)
+}
+RELIC_TINTS = {
+    "relic_period_seed": (0.45, 0.4, 0.55),
+}
+# 타일 시트의 한 칸을 그대로: relicId → (시트, 열, 행)
+RELIC_TILES = {
+    "relic_glow_lamp": ("TilesetDungeon.png", 4, 2),  # 반딧돌 등잔 (동굴 반딧돌을 모두 밝힌 보상) = 밝힌 반딧돌의 받침 구슬
 }
 
 # itemId: 그림 경로 (도트 아이템)
@@ -73,10 +96,17 @@ ITEMS = {
     "keepsake_jungle": "Items/Resource/Grass.png",         # 메아리 풀잎 책갈피 (정글 도감 완성 징표)
     "vine_fiber": "Items/Resource/Branch.png",             # 덩굴 섬유 (정글 성유물 강화 재료)
     "skilldoc_fill_blank": "Items/Scroll/ScrollEmpty.png", # 기술문서: 빈칸 채우기 (빈칸두꺼비) — 빈 두루마리
+    # 1.2 어두운 밀림 동굴 (#115)
+    "glow_moss": "Items/Resource/Grass.png",               # 빛이끼 (동굴 성유물 강화 재료) — 청록으로 물들임
+    "cave_key": "Items/Treasure/SilverKey.png",            # 동굴 열쇠 — 푸른 수정빛으로 물들임
+    "keepsake_cave": "Items/Resource/GemYellow.png",       # 반딧불 책갈피 (동굴 도감 완성 징표)
+    "skilldoc_finish_sentence": "Items/Scroll/Scroll.png", # 기술문서: 문장 끝맺기 (말줄임덩굴)
 }
 # 같은 그림을 다른 색으로 (채널별 곱)
 ITEM_TINTS = {
     "jungle_key": (0.75, 1.0, 0.62),
+    "glow_moss": (0.55, 1.0, 1.6),
+    "cave_key": (0.78, 0.92, 1.12),
 }
 # 직접 손본 도트 아이템 (#96): 처음 넣은 매끈한 256px 아이콘(초원 재료 3개 + 초원 징표)이 다른 도트 아이템과 그림체가 달라
 # 팩 그림을 고쳐 쓰거나(색 바꾸기·반짝임) 팩과 같은 색·외곽선으로 그림. 함수는 아래 build_item_* (copy_relics_and_items에서 저장)
@@ -106,6 +136,7 @@ MUSIC = {
     "boss": "Audio/Musics/28 - Tension.ogg",
     "forest": "Audio/Musics/11 - Clearing.ogg",
     "jungle": "Audio/Musics/30 - Ruins.ogg",  # 1.1 메아리 정글 (#80) — 고대 유적이 있는 정글
+    "cave": "Audio/Musics/2 - The Cave.ogg",  # 1.2 어두운 밀림 동굴 (#115)
 }
 SFX = {
     "click": "Audio/Sounds/Menu/Move2.wav",  # 가벼운 찰칵 (0.04초)
@@ -288,9 +319,13 @@ def copy_audio(pack):
 TILESETS = "Backgrounds/Tilesets/"
 
 
-def crop_front(src, size, dst):
+def crop_front(src, size, dst, mul=None, clear_rows=()):
     sheet = Image.open(src).convert("RGBA")
-    sheet.crop((0, 0, size, size)).save(dst)
+    front = sheet.crop((0, 0, size, size))
+    for y in clear_rows:
+        for x in range(size):
+            front.putpixel((x, y), (0, 0, 0, 0))
+    save_if_changed(tint(front, mul) if mul else front, dst)
 
 
 # ------------------------------------------------------------------ 필드 타일
@@ -638,8 +673,13 @@ def copy_relics_and_items(pack):
         dst = os.path.join(OUT, "Relics", relic_id + ".png")
         if size:
             crop_front(os.path.join(pack, rel), size, dst)
+        elif relic_id in RELIC_TINTS:
+            save_if_changed(tint(Image.open(os.path.join(pack, rel)).convert("RGBA"), RELIC_TINTS[relic_id]), dst)
         else:
             shutil.copyfile(os.path.join(pack, rel), dst)
+    art = Pack(pack)
+    for relic_id, (sheet, col, row) in RELIC_TILES.items():
+        save_if_changed(art.tile(sheet, col, row), os.path.join(OUT, "Relics", relic_id + ".png"))
     for item_id, rel in ITEMS.items():
         dst = os.path.join(OUT, "Items", item_id + ".png")
         if item_id in ITEM_TINTS:
@@ -648,7 +688,7 @@ def copy_relics_and_items(pack):
             shutil.copyfile(os.path.join(pack, rel), dst)
     for item_id in ITEM_BUILDERS:
         save_if_changed(globals()["build_item_" + item_id](pack), os.path.join(OUT, "Items", item_id + ".png"))
-    print("relics", len(RELICS), "+ items", len(ITEMS) + len(ITEM_BUILDERS), "->", OUT)
+    print("relics", len(RELICS) + len(RELIC_TILES), "+ items", len(ITEMS) + len(ITEM_BUILDERS), "->", OUT)
 
 
 def save_if_changed(img, path):
@@ -975,10 +1015,10 @@ def build_jungle(pack, themes, autos, template, lectern, key_stand, keyhole, big
         "Tablet_done": over(ruin_floor, tint(stele, (1.3, 1.12, 0.55))),     # 빈칸을 채워 금빛
         "Shrine": lectern(ruin_floor, False),                                # 받침 (위에 석상 그림 Shrine_prop)
         "Shrine_done": lectern(ruin_floor, False),                           # 깨어나 빈 받침
-        "Cave": moss.copy(),                                                 # 바닥 (위에 동굴 그림 Cave_prop)
+        "Door_Cave": moss.copy(),                                            # 동굴로 가는 출입구 'O'(#115)의 바닥 (위에 동굴 그림 Door_Cave_prop)
         # 큰 그림 (FieldArt.Prop — 16px = 1칸이라 칸보다 크게, 아래 가운데를 칸에 맞춰 그 위에 그림)
         "Shrine_prop": statue,                                               # 이끼 낀 앉은 석상 2×2 (잠든 아라)
-        "Cave_prop": cave,                                                   # 판자로 막은 동굴 3×3 (1.2)
+        "Door_Cave_prop": cave,                                              # 간판을 단 동굴 입구 3×3 (1.2 동굴로)
     }
     # 꾸밈 'Q' (#86, 막힘): 둘레를 보고 종류를 고름 (FieldDecor.Variant) — 야영지 = 나무 상자·통·통나무 / 들판 = 그루터기·통나무·바위 /
     # 유적 = 이끼 기둥·부서진 석상(1×2 큰 그림) · 돌무더기 · 이끼 바위. 바닥은 이끼 땅(유적은 유적 바닥)
@@ -1250,7 +1290,8 @@ def main():
     os.makedirs(os.path.join(OUT, "Player"), exist_ok=True)
 
     for species_id, (rel, size) in MONSTERS.items():
-        crop_front(os.path.join(pack, rel), size, os.path.join(OUT, "Monsters", species_id + ".png"))
+        crop_front(os.path.join(pack, rel), size, os.path.join(OUT, "Monsters", species_id + ".png"), MONSTER_TINTS.get(species_id),
+                   MONSTER_CLEAR_ROWS.get(species_id, ()))
         print("monster", species_id, "<-", rel)
     build_scarecrow(pack)
     build_bubbles(pack)

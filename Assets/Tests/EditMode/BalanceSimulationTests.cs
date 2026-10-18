@@ -141,6 +141,32 @@ namespace WordRPG.Tests
             Assert.Less(alone, 0.8f, $"숲 직후 레벨 혼자·정답률 60%면 쉽지 않아야 — {alone:P0}");
         }
 
+        // 1.2 어두운 밀림 동굴 (#115): 정글 보스를 이긴 주인공(Lv17, 글자 구슬·지팡이·조롱박) + 아라 — 일반 전투는 대부분 이기고,
+        // 보스 말줄임덩굴 Lv20은 레벨을 좀 올리면 이길 만해야 (정글과 같은 기준)
+        private static Hero CaveHero(int level) => MakeHero(level, ("relic_letter_gem", 1), ("relic_wand", 2), ("relic_gourd", 1));
+
+        [Test]
+        public void CaveFieldBattlesAreWinnableRightAfterTheJungle()
+        {
+            foreach (var group in new[] { new[] { ("blink_ghost", 16), ("blink_ghost", 16) }, new[] { ("chew_larva", 17) },
+                         new[] { ("tangle_spider", 17) }, new[] { ("tangle_spider", 16), ("blink_ghost", 15) }, new[] { ("ink_newt", 17), ("ink_newt", 17) } })
+            {
+                var (win, _, _) = Many(() => CaveHero(17), Ara, group, 0.75);
+                Assert.Greater(win, 0.85f, $"정답률 75%로 {string.Join(",", group)} — 이긴 비율 {win:P0}");
+            }
+        }
+
+        [Test]
+        public void CaveBossIsAChallengeButBeatable()
+        {
+            var boss = new[] { ("boss_ellipsis_vine", 20) };
+            var (withAra, _, rounds) = Many(() => CaveHero(19), Ara, boss, 0.8);
+            var (alone, _, _) = Many(() => CaveHero(17), null, boss, 0.6);
+            Assert.Greater(withAra, 0.8f, $"레벨 19 + 아라, 정답률 80%면 이길 만해야 — {withAra:P0}");
+            Assert.Less(rounds, 15f, $"보스전이 너무 길지 않게 — 평균 {rounds:0.0}라운드");
+            Assert.Less(alone, 0.8f, $"정글 직후 레벨 혼자·정답률 60%면 쉽지 않아야 — {alone:P0}");
+        }
+
         // 레벨 차이 경험치 (#88): 몬스터보다 높을수록 한 레벨에 25%씩 줄고 5%에서 멈춤
         [Test]
         public void ExpFallsOffWhenOverLeveled()
@@ -212,11 +238,21 @@ namespace WordRPG.Tests
                     Row($"정글 Lv{lv}+아라 vs 빈칸두꺼비 Lv17", () => JungleHero(lv), Ara, new[] { ("boss_blank_frog", 17) }, acc);
                     Row($"정글 Lv{lv} 혼자 vs 빈칸두꺼비 Lv17", () => JungleHero(lv), null, new[] { ("boss_blank_frog", 17) }, acc);
                 }
+                foreach (int lv in new[] { 17, 19, 21 })
+                {
+                    Row($"동굴 Lv{lv}+아라 vs 깜빡유령 Lv16 ×2", () => CaveHero(lv), Ara, new[] { ("blink_ghost", 16), ("blink_ghost", 16) }, acc);
+                    Row($"동굴 Lv{lv}+아라 vs 곱씹애벌레 Lv17", () => CaveHero(lv), Ara, new[] { ("chew_larva", 17) }, acc);
+                    Row($"동굴 Lv{lv}+아라 vs 엉킴거미 Lv17", () => CaveHero(lv), Ara, new[] { ("tangle_spider", 17) }, acc);
+                    Row($"동굴 Lv{lv}+아라 vs 먹물도롱뇽 Lv17 ×2", () => CaveHero(lv), Ara, new[] { ("ink_newt", 17), ("ink_newt", 17) }, acc);
+                    Row($"동굴 Lv{lv}+아라 vs 말줄임덩굴 Lv20", () => CaveHero(lv), Ara, new[] { ("boss_ellipsis_vine", 20) }, acc);
+                    Row($"동굴 Lv{lv} 혼자 vs 말줄임덩굴 Lv20", () => CaveHero(lv), null, new[] { ("boss_ellipsis_vine", 20) }, acc);
+                }
             }
             // 게임 전체 레벨 흐름: 지역마다 전투 N번(평균 적 레벨·기본 경험치·마릿수·정답 4개) → 보스 앞 주인공 레벨
             var areas = new (string name, int battles, int enemyLevel, int baseExp, double group, int boss)[]
             {
                 ("초원", 15, 2, 7, 1.5, 0), ("잊혀진 서고", 20, 4, 9, 2.0, 7), ("숲", 25, 9, 11, 2.0, 12), ("메아리 정글", 25, 14, 15, 1.5, 17),
+                ("어두운 밀림 동굴", 30, 17, 17, 1.5, 20),
             };
             foreach (var (falloff, floor) in new[] { (0f, 1f), (0.15f, 0.1f), (0.25f, 0.05f), (0.3f, 0.05f) })
             {

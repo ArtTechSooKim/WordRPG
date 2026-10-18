@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ec416e140bfc414b93cb9aa6306ba85, type: 3}
+  m_Name: chew_larva
+  m_EditorClassIdentifier: WordRPG::WordRPG.Monsters.MonsterSpecies
+  speciesId: chew_larva
+  displayName: "\uACF1\uC539\uC560\uBC8C\uB808"
+  description: "\uB2E8\uC5B4\uB97C \uACF1\uC539\uACE0 \uB610 \uACF1\uC539\uB2E4 \uAFC0\uAEBD
+    \uC0BC\uCF1C \uBC84\uB9AC\uB294 \uC560\uBC8C\uB808. \uBE5B\uC774\uB07C \uB364\uBD88\uC5D0
+    \uC0B0\uB2E4."
+  role: 1
+  sprite: {fileID: 21300000, guid: 8584b05f48d777a408c68a088e91846c, type: 3}
+  placeholderColor: {r: 0.75, g: 0.8, b: 0.45, a: 1}
+  baseStats:
+    maxHp: 34
+    attack: 12
+    defense: 13
+  growthPerLevel:
+    maxHp: 7
+    attack: 2
+    defense: 3
+  skills:
+  - {fileID: 11400000, guid: ab712d5b3a58f7748aa1e491f916824e, type: 2}
+  - {fileID: 11400000, guid: 11b1b1d5db31bd247801ff8e9f3aeeba, type: 2}
+  expReward: 17
+  goldReward: 16
+  drops:
+  - item: {fileID: 11400000, guid: 1e3af499576bc6040a52fac76ed9d294, type: 2}
+    chance: 0.35
+    count: 1
+  - item: {fileID: 11400000, guid: 4ef0a20b2f82e9c4c8ea2a134a013bf4, type: 2}
+    chance: 0.25
+    count: 1
+  trainingDummy: 0
+  fleeTier: 1

@@ -141,11 +141,13 @@ namespace WordRPG.Tests
                     if (chest.Relic != null) findableRelics.Add(chest.Relic);
                 }
                 if (area.Boss != null && area.Boss.RewardRelic != null) findableRelics.Add(area.Boss.RewardRelic);
+                // 글자 반딧돌을 모두 밝힌 보상 (#115) — 반딧돌이 있는 맵에서만
+                if (area.GlowStoneRelic != null && area.Map.FindAll(FieldTile.GlowStone).Count > 0) findableRelics.Add(area.GlowStoneRelic);
             }
 
             foreach (var relic in relics)
             {
-                Assert.IsTrue(findableRelics.Contains(relic), $"{relic.name}: 시작·보물상자·보스 어디에서도 얻을 수 없음");
+                Assert.IsTrue(findableRelics.Contains(relic), $"{relic.name}: 시작·보물상자·보스·반딧돌 어디에서도 얻을 수 없음");
                 Assert.IsTrue(obtainableItems.Contains(relic.UpgradeItem),
                     $"{relic.name}의 강화 재료 {relic.UpgradeItem.name}을(를) 얻을 방법이 없음 (적 드롭·보물상자)");
             }

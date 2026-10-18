@@ -73,7 +73,6 @@ namespace WordRPG.UI
                 case FieldTile.RuinFloor: return Make(t + "ruin_floor", RuinFloor);
                 case FieldTile.Tablet: return opened ? Make(t + "tablet_done", Layer(TabletPixel(true), RuinFloor)) : Make(t + "tablet", Layer(TabletPixel(false), RuinFloor));
                 case FieldTile.Shrine: return opened ? Make(t + "shrine_done", Layer(Pedestal, RuinFloor)) : Make(t + "shrine", Layer(ShrinePixel, RuinFloor));
-                case FieldTile.Cave: return Make(t + "cave", (x, y) => DoorPixel(x, y, false, false));
                 case FieldTile.Decor: return Make(t + "decor", Layer(ChestOpen, ground)); // 꾸밈 (#86) — 갈색 상자 모양
                 case FieldTile.GlowStone: // 글자 반딧돌 (#112) — 꺼지면 빈 받침, 밝히면 샘처럼 푸른 빛
                     return opened ? Make(t + "glowstone_lit", Layer(Fountain, ground)) : Make(t + "glowstone", Layer(Pedestal, ground));

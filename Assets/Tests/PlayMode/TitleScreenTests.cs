@@ -217,6 +217,49 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // 업데이트 안내 (#115): 예전 세이브(본 안내 칸이 없음 = 업데이트한 사람)로 켜면 타이틀에 한 번 — 사용자가 정한 문구, [확인] 하나.
+        // 띄우는 순간 본 것으로 저장돼 다음에 켜면 안 뜸. 새 게임으로 시작한 사람에겐 안 뜸 (다른 테스트의 세이브가 그 경우)
+        [UnityTest]
+        public IEnumerator UpdateNoticeShowsOnceForAnOlderSave()
+        {
+            var system = new WordRPG.Save.SaveSystem(dir);
+            var old = GameSession.NewGame(hero).ToSaveData(System.DateTime.UtcNow).WithNotices(new string[0]);
+            system.Save(old);
+
+            var manager = StartManager();
+            bool? started = null;
+            var title = MakeTitle(newGame => started = newGame);
+            yield return null;
+            yield return null;
+            var root = title.transform;
+            var dialog = root.Find("TitleCanvas/SafeArea/ConfirmDialog");
+            Assert.IsTrue(title.IsDialogOpen, "업데이트 안내 창");
+            StringAssert.Contains("업데이트 해주셔서 감사합니다", AllText(dialog));
+            StringAssert.Contains("동굴 지역이 열렸습니다!", AllText(dialog));
+            StringAssert.Contains("숲 지역에서 확인해보세요!", AllText(dialog));
+            Assert.IsFalse(FindButton(dialog, "DialogCancelButton").gameObject.activeSelf, "버튼은 [확인] 하나");
+            CollectionAssert.Contains(system.Load().Data.Notices, UpdateNotices.Cave.Id, "띄우는 순간 본 것으로 저장");
+
+            FindButton(root, "TapToStart").onClick.Invoke();
+            Assert.IsNull(started, "안내 창이 떠 있는 동안은 시작하지 않음");
+            FindButton(dialog, "DialogConfirmButton").onClick.Invoke();
+            Assert.IsFalse(title.IsDialogOpen);
+            FindButton(root, "TapToStart").onClick.Invoke();
+            Assert.AreEqual(false, started, "닫으면 이어하기");
+            Object.Destroy(title.gameObject);
+            yield return null;
+
+            // 다시 켜면 안 뜸
+            Object.DestroyImmediate(manager.gameObject);
+            StartManager();
+            var again = MakeTitle(_ => { });
+            yield return null;
+            yield return null;
+            Assert.IsFalse(again.IsDialogOpen, "한 번 본 안내는 다시 안 뜸");
+            Object.Destroy(again.gameObject);
+            yield return null;
+        }
+
         // 튜토리얼 다시 보기 (타이틀 설정): 본 안내를 지우고 바로 시작
         [UnityTest]
         public IEnumerator ReplayTutorialFromTitleClearsAndStarts()

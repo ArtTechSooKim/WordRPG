@@ -45,6 +45,19 @@ namespace WordRPG.UI
             Build();
             Refresh();
             Sound.PlayMusic(Music.Title);
+            ShowUpdateNotice();
+        }
+
+        // 업데이트 안내 (#115, Figma '타이틀 — 업데이트 안내 (#115)'): 예전 세이브로 처음 켰을 때(= 업데이트한 사람) 한 번.
+        // 띄우는 순간 본 것으로 저장 — 창을 닫지 않고 앱을 꺼도 다시 뜨지 않게. 안 본 안내가 여럿이면 닫을 때 다음 것
+        private void ShowUpdateNotice()
+        {
+            if (!manager.HasSave || manager.SaveBlocked) return;
+            var notice = manager.Session.Notices.NextUnseen();
+            if (notice == null) return;
+            manager.Session.Notices.Mark(notice.Id);
+            manager.Save();
+            dialog.ShowNotice(notice.Title, notice.Message, closed: ShowUpdateNotice);
         }
 
         // 뒤로가기: 설정·확인 창을 닫고, 아무것도 없으면 '게임을 끝낼까요?'

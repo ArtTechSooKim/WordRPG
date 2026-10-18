@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ec416e140bfc414b93cb9aa6306ba85, type: 3}
+  m_Name: ink_newt
+  m_EditorClassIdentifier: WordRPG::WordRPG.Monsters.MonsterSpecies
+  speciesId: ink_newt
+  displayName: "\uBA39\uBB3C\uB3C4\uB871\uB1FD"
+  description: "\uBA39\uBB3C \uC6C5\uB369\uC774\uC5D0 \uC228\uC5B4 \uC788\uB2E4\uAC00
+    \uD280\uC5B4\uB098\uC624\uB294 \uB3C4\uB871\uB1FD. \uC9C0\uB098\uAC04 \uC790\uB9AC\uB9C8\uB2E4
+    \uBA39\uBB3C \uBC29\uC6B8\uC774 \uB5A8\uC5B4\uC9C4\uB2E4."
+  role: 0
+  sprite: {fileID: 21300000, guid: 8bc0bc6a28eca22428d082902e60181e, type: 3}
+  placeholderColor: {r: 0.4, g: 0.3, b: 0.7, a: 1}
+  baseStats:
+    maxHp: 30
+    attack: 15
+    defense: 9
+  growthPerLevel:
+    maxHp: 6
+    attack: 3
+    defense: 2
+  skills:
+  - {fileID: 11400000, guid: e6e51b90d3bcc5d44b4bf1393545c180, type: 2}
+  expReward: 17
+  goldReward: 16
+  drops:
+  - item: {fileID: 11400000, guid: 1e3af499576bc6040a52fac76ed9d294, type: 2}
+    chance: 0.3
+    count: 1
+  - item: {fileID: 11400000, guid: d068093b31fa6bd479a9978022d8bc1f, type: 2}
+    chance: 0.3
+    count: 1
+  trainingDummy: 0
+  fleeTier: 1

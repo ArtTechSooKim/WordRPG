@@ -101,5 +101,65 @@ namespace WordRPG.Tests
             Assert.AreEqual("jungle", goal.Destination.AreaId);
             Assert.AreEqual(forest.Map.Doors[0], goal.Cell, "숲 보스 공터 위 출입구에 별");
         }
+
+        // 1.1 세이브 → 1.2 (#115): 1.1 세이브엔 본 업데이트 안내(notices)·밝힌 반딧돌(litStones) 칸이 없다.
+        // 1.2에서 정글 강 가운데 섬의 'O'가 동굴로 가는 출입구가 되어(위쪽이라 0번) 정글 야영지 출입구는 0번 → 1번
+        private static string As11Save(GameSession session)
+        {
+            string json = JsonUtility.ToJson(session.ToSaveData(Now));
+            foreach (var key in new[] { "notices", "litStones" })
+            {
+                Assert.IsTrue(json.Contains($"\"{key}\""), $"{key} 칸이 세이브에 있어야 지울 수 있음");
+                json = Regex.Replace(json, $",\"{key}\":(\\[[^\\]]*\\]|\"[^\"]*\"|true|false|-?\\d+)", "");
+            }
+            return json;
+        }
+
+        [Test]
+        public void JungleSaveFrom11KeepsItsDoorsAndOpensTheCave()
+        {
+            var db = Database();
+            var jungle = db.FindArea("jungle");
+            var forest = db.FindArea("forest");
+            var cave = db.FindArea("cave");
+
+            Assert.AreEqual(2, jungle.Map.Doors.Count, "정글 출입구 = 섬의 동굴 입구 + 야영지");
+            var caveMouth = jungle.Map.Doors[0];
+            var campDoor = jungle.Map.Doors[1];
+            Assert.IsTrue(jungle.Map.IsCaveMouth(caveMouth));
+            Assert.IsFalse(jungle.Map.IsCaveMouth(campDoor));
+            Assert.AreSame(forest, jungle.GetExit(campDoor).Target, "야영지 출입구는 그대로 숲으로");
+            Assert.AreEqual(campDoor, jungle.Map.Doors[forest.Exits[0].TargetDoorIndex], "숲에서 정글로 가면 1.1과 같은 야영지 출입구에 도착");
+            Assert.AreSame(cave, jungle.GetExit(caveMouth).Target);
+            Assert.AreEqual(caveMouth, jungle.Map.Doors[cave.Exits[0].TargetDoorIndex], "동굴에서 나오면 섬의 동굴 입구");
+
+            // 정글 야영지에 있던 1.1 세이브 (정글 보스는 아직) — 동굴은 입장 조건 없음 (사용자)
+            var session = GameSession.NewGame(HeroData(), 14);
+            session.World.SetPosition("jungle", jungle.Map.Start);
+            var loaded = Load(As11Save(session));
+            Assert.IsEmpty(loaded.LoadWarnings, string.Join(" / ", loaded.LoadWarnings));
+            Assert.IsTrue(loaded.World.TryGetPosition("jungle", out var position));
+            Assert.AreEqual(jungle.Map.Start, position);
+            Assert.IsTrue(loaded.World.IsExitOpen(jungle.GetExit(caveMouth)), "정글 보스를 이기기 전에도 동굴이 열려 있음");
+            Assert.AreEqual(0, GlowStones.LitCount(cave, loaded.World), "밝힌 반딧돌 없음");
+            Assert.AreSame(UpdateNotices.Cave, loaded.Notices.NextUnseen(), "업데이트한 사람 → 타이틀에 동굴 안내");
+        }
+
+        // 업데이트 안내 (#115): 새로 시작한 사람에겐 안 뜨고, 본 기록은 세이브에 남으며 [튜토리얼 다시 보기]와 따로
+        [Test]
+        public void UpdateNoticesAreForUpdatersOnlyAndSurviveSaving()
+        {
+            var fresh = GameSession.NewGame(HeroData());
+            Assert.IsNull(fresh.Notices.NextUnseen(), "새 게임은 안내를 모두 본 것으로");
+            Assert.IsNull(Load(JsonUtility.ToJson(fresh.ToSaveData(Now))).Notices.NextUnseen(), "저장했다 불러와도");
+
+            var updater = Load(As11Save(GameSession.NewGame(HeroData())));
+            Assert.AreEqual("업데이트 해주셔서 감사합니다", updater.Notices.NextUnseen().Title, "문구는 사용자가 정한 그대로");
+            Assert.AreEqual("동굴 지역이 열렸습니다!\n숲 지역에서 확인해보세요!", UpdateNotices.Cave.Message);
+            updater.Notices.Mark(UpdateNotices.Cave.Id);
+            updater.Tutorials.Clear();
+            Assert.IsNull(updater.Notices.NextUnseen(), "튜토리얼 다시 보기로 안내가 다시 뜨지 않음");
+            Assert.IsNull(Load(JsonUtility.ToJson(updater.ToSaveData(Now))).Notices.NextUnseen(), "본 기록은 세이브에");
+        }
     }
 }

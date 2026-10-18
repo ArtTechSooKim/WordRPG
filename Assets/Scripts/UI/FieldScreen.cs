@@ -547,9 +547,6 @@ namespace WordRPG.UI
                 case FieldTile.Lever: PullLever(cell); break;
                 case FieldTile.Tablet: ReadTablet(cell); break;
                 case FieldTile.Shrine: TouchShrine(cell); break;
-                case FieldTile.Cave:
-                    bubble.Say("무너진 바위와 판자로 막혀 있다…\n언젠가 들어갈 수 있을 것 같다", 3.5f);
-                    break;
                 case FieldTile.GlowStone: TouchGlowStone(cell); break;
             }
         }

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e0461c5501ea214aa7df5f405021104, type: 3}
+  m_Name: cave_field
+  m_EditorClassIdentifier: WordRPG::WordRPG.Field.EncounterTable
+  entries:
+  - species: {fileID: 11400000, guid: ca88c1ce713cced48858d08f6a572307, type: 2}
+    minLevel: 15
+    maxLevel: 17
+    weight: 10
+  - species: {fileID: 11400000, guid: 83a6d0e5c8852b040a19dc54085cc217, type: 2}
+    minLevel: 15
+    maxLevel: 18
+    weight: 8
+  - species: {fileID: 11400000, guid: 055dfe320031a2645ac4433f0f5e1217, type: 2}
+    minLevel: 16
+    maxLevel: 18
+    weight: 6
+  minGroupSize: 1
+  maxGroupSize: 2

@@ -108,7 +108,7 @@ namespace WordRPG.Field
         [SerializeField] private string displayName; // 예: "초원"
         [SerializeField] private FieldTheme theme = FieldTheme.Meadow;
 
-        [Tooltip(". 길  : 잔디(조우 없음)  , 풀숲(조우)  # 나무  ~ 물  P 시작 위치  D 출입구  /  옆에서 [확인]으로 사용: F 회복의 샘  C 보물상자  E 성유물 제단  S 상점  B 보스  L 사전  G 보스 방 문  K 열쇠 받침대  /  정글: > < ^ v 얕은 강  J 나루터  Y 레버  H 덩굴 다리  U 유적 벽  ; 유적 바닥  T 석판  A 유적 제단  O 동굴 입구")]
+        [Tooltip(". 길  : 잔디(조우 없음)  , 풀숲(조우)  # 나무  ~ 물  P 시작 위치  D 출입구  /  옆에서 [확인]으로 사용: F 회복의 샘  C 보물상자  E 성유물 제단  S 상점  B 보스  L 사전  G 보스 방 문  K 열쇠 받침대  /  정글: > < ^ v 얕은 강  J 나루터  Y 레버  H 덩굴 다리  U 유적 벽  ; 유적 바닥  T 석판  A 유적 제단  O 동굴 입구(출입구 D와 같음, 그림만 동굴)  Q 꾸밈  /  동굴: I 글자 반딧돌")]
         [TextArea(12, 40)]
         [SerializeField] private string map;
 
@@ -150,6 +150,10 @@ namespace WordRPG.Field
         [Tooltip("동료가 깨어나려면 이 지역 단어장에서 발견해야 하는 단어 수 (사용자 결정 60)")]
         [SerializeField] private int shrineWords = 60;
 
+        [Header("글자 반딧돌 — 맵의 I (#112, 동굴)")]
+        [Tooltip("이 지역의 글자 반딧돌 'I'를 모두 밝히면 주는 성유물 (#115, 동굴의 반딧돌 등잔). 비우면 보상 없음")]
+        [SerializeField] private RelicData glowStoneRelic;
+
         [Header("정식판")]
         [Tooltip("정식판(인앱 결제)을 사야 들어갈 수 있는 지역 — 입구에서 정식판 안내가 뜬다 (#40, 숲부터)")]
         [SerializeField] private bool requiresFullVersion;
@@ -181,6 +185,7 @@ namespace WordRPG.Field
         public int BossGateWords => bossGateWords;
         public CompanionData ShrineCompanion => shrineCompanion;
         public int ShrineWords => shrineWords;
+        public RelicData GlowStoneRelic => glowStoneRelic;
 
         // 맵 텍스트가 바뀌면 다시 해석 (인스펙터에서 고치면서 플레이할 수 있게)
         public FieldMap Map
@@ -225,7 +230,6 @@ namespace WordRPG.Field
                 case FieldTile.Lever: return "레버";
                 case FieldTile.Tablet: return "단어 석판";
                 case FieldTile.Shrine: return "유적 제단";
-                case FieldTile.Cave: return "동굴 입구";
                 case FieldTile.Dock: return "나루터";
                 case FieldTile.GlowStone: return "글자 반딧돌";
                 case FieldTile.Door:

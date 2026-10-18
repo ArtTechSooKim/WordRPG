@@ -51,7 +51,7 @@ namespace WordRPG.Tests
         //  y=5  #U;;A;;TU#   유적 제단 (4,5) · 단어 석판 (7,5)
         //  y=4  #U;;;;;;U#
         //  y=3  #UUU;;UUU#   유적 입구 (4,3)(5,3)
-        //  y=2  #::::::O:#   동굴 입구 (7,2)
+        //  y=2  #::::::O:#   동굴 입구 (7,2) — 출입구 (연결 없음, 그림만)
         //  y=1  #P:::::::#   시작 (1,1)
         private const string RuinsMap =
             "##########\n" +
@@ -161,16 +161,9 @@ namespace WordRPG.Tests
             var session = Session(area, 2);
             var field = Field(area, session);
             yield return null;
-            Assert.AreEqual(2, field.PropCount, "잠든 석상 + 동굴 입구 (칸보다 큰 그림)");
+            Assert.AreEqual(2, field.PropCount, "잠든 석상 + 동굴 입구 (칸보다 큰 그림 — 'O'는 1.2부터 출입구, #115)");
 
-            // 동굴 입구 (1.2)
-            yield return HoldStick(field, Direction.Right, () => field.PlayerCell.x >= 7);
-            yield return FaceStick(field, Direction.Up);
-            yield return PressConfirm(field);
-            StringAssert.Contains("막혀 있다", field.Bubble.Text);
-
-            yield return HoldStick(field, Direction.Left, () => field.PlayerCell.x <= 4);
-            yield return HoldStick(field, Direction.Up, () => field.PlayerCell.y >= 4);
+            yield return WalkToTabletRoom(field);
             yield return FaceStick(field, Direction.Up);
             Assert.AreEqual(new Vector2Int(4, 4), field.PlayerCell);
             yield return new WaitForSecondsRealtime(0.4f);

@@ -22,7 +22,6 @@ namespace WordRPG.UI
         public static readonly Color32 Lever = new Color32(255, 140, 40, 255);   // 레버 (#80) — 멀리서도 눈에 띄게
         public static readonly Color32 Tablet = new Color32(240, 240, 232, 255); // 단어 석판
         public static readonly Color32 Shrine = new Color32(255, 128, 200, 255); // 유적 제단 (동료)
-        public static readonly Color32 Cave = new Color32(28, 26, 30, 255);      // 동굴 입구 (1.2)
         public static readonly Color32 Dock = new Color32(176, 112, 56, 255);    // 나루터
         public static readonly Color32 GlowStone = new Color32(120, 220, 255, 255); // 글자 반딧돌 (#112) — 밝히면 더 환하게
         public static readonly Color32 GlowStoneLit = new Color32(214, 248, 255, 255);
@@ -75,7 +74,6 @@ namespace WordRPG.UI
                 case FieldTile.Lever: return Lever;
                 case FieldTile.Tablet: return done ? ruinFloor : Tablet;
                 case FieldTile.Shrine: return done ? ruinFloor : Shrine;
-                case FieldTile.Cave: return Cave;
                 case FieldTile.Decor: return new Color32(92, 74, 50, 255); // 꾸밈 (#86) — 막힌 칸, 은은한 갈색
                 case FieldTile.Chest: return done ? floor : Chest;
                 case FieldTile.Boss: return done ? floor : Boss;

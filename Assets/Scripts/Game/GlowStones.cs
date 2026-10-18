@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using WordRPG.Field;
+using WordRPG.Heroes;
 
 namespace WordRPG.Game
 {
@@ -28,5 +29,16 @@ namespace WordRPG.Game
                 if (IsLit(area, world, stone)) lit++;
             return lit;
         }
+
+        public static bool AllLit(FieldArea area, WorldState world)
+        {
+            int total = Stones(area).Count;
+            return total > 0 && LitCount(area, world) >= total;
+        }
+
+        // 모두 밝힌 보상 (#115): 그 지역 반딧돌을 다 밝혔으면 그 지역의 반딧돌 성유물(동굴 = 반딧돌 등잔)을 준다.
+        // 이번에 새로 얻었으면 그 성유물, 아직 덜 밝혔거나 보상이 없거나 이미 가졌으면 null
+        public static OwnedRelic ClaimAllLitReward(FieldArea area, GameSession session) =>
+            area.GlowStoneRelic != null && AllLit(area, session.World) ? session.GrantRelic(area.GlowStoneRelic) : null;
     }
 }

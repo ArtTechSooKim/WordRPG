@@ -125,6 +125,8 @@ namespace WordRPG.Save
         // 얻은 동료와 파티에 넣은 동료 id (#77, 1.1 — 예전 세이브엔 없음 → 동료 없이 시작). 빈 문자열 = 동료가 쉬는 중
         [SerializeField] private List<CompanionSaveData> companions = new List<CompanionSaveData>();
         [SerializeField] private string partyCompanionId = "";
+        // 이미 본 업데이트 안내 id (#115, UpdateNotices). 예전 세이브엔 없음 → 업데이트한 사람이라 안내를 한 번 보여 준다
+        [SerializeField] private List<string> notices = new List<string>();
 
         public int Version => version;
         public DateTime SavedAtUtc => new DateTime(savedAtTicks, DateTimeKind.Utc);
@@ -140,12 +142,19 @@ namespace WordRPG.Save
         public IReadOnlyList<string> Tutorials => tutorials ?? (IReadOnlyList<string>)new List<string>();
         public IReadOnlyList<CompanionSaveData> Companions => companions ?? (IReadOnlyList<CompanionSaveData>)new List<CompanionSaveData>();
         public string PartyCompanionId => partyCompanionId ?? "";
+        public IReadOnlyList<string> Notices => notices ?? (IReadOnlyList<string>)new List<string>();
 
         public SaveData() { }
 
         public SaveData WithTutorials(IEnumerable<string> ids)
         {
             tutorials = new List<string>(ids);
+            return this;
+        }
+
+        public SaveData WithNotices(IEnumerable<string> ids)
+        {
+            notices = new List<string>(ids);
             return this;
         }
 
