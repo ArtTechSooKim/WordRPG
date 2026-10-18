@@ -124,3 +124,8 @@ AuthKey_*
 /license_certificate_*.pdf
 /_소리후보_*/
 /_캡처/
+
+# Python 실행 때 저절로 생기는 임시 파일 · Claude Code 개인 권한 설정 (#114)
+__pycache__/
+*.pyc
+.claude/settings.local.json
