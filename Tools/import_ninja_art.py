@@ -961,7 +961,7 @@ def build_jungle(pack, themes, autos, template, lectern, key_stand, keyhole, big
         "Key_done": lectern(moss, False),
         # 정글 칸
         "Stream": stream,
-        "Dock": over(water, planks.rotate(90)),                              # 물가에 놓인 가로 판자
+        "Dock": jungle_dock_atlas(water, planks)[1],                         # 나루터 한 칸 (네 변 모두 물 — 말뚝 넷). 여러 칸 부두는 Jungle_Dock_auto
         "Lever": over(moss, lever),
         "Lever_done": over(moss, tint(mirror(lever), (1.15, 1.1, 0.8))),     # 반대쪽으로 넘어간 막대
         "Bridge": over(water, faded(planks, 0.38)),                          # 놓이기 전: 희미한 다리 윤곽
@@ -1010,6 +1010,7 @@ def build_jungle(pack, themes, autos, template, lectern, key_stand, keyhole, big
     autos["Jungle_Floor_auto"] = auto_atlas(pack, template, "TilesetFloor.png", 11, 7, jungle_mud)
     autos["Jungle_Water_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6, jungle_water)
     autos["Jungle_Stream_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6, jungle_stream)
+    autos["Jungle_Dock_auto"] = jungle_dock_atlas(water, planks)[0]          # 2×2 나무 부두: 물 쪽만 말뚝 (#121)
 
     # 필드 위 그림 (#80·#81): 뗏목 · 물살 줄 — Field/raft.png, Field/ripple.png
     field = os.path.join(OUT, "Field")
@@ -1028,6 +1029,49 @@ def keep_green(t):
             if b > g or (b > r and g - b < 30):
                 px[x, y] = (0, 0, 0, 0)
     return out
+
+
+def jungle_dock_atlas(water, planks):
+    """나루터 부두 (#121 사용자: 나루터인 것을 알 수 있도록 타일을 더 쓰자): 2×2 나무 부두의 자동 테두리 256칸.
+    마스크에서 이어진 쪽(나루터·뭍)은 판자가 그대로 이어지고, 안 이어진 쪽(물)은 판자 끝에 그늘 한 줄 + 물이 1px 비치고
+    그 변 양 끝에 말뚝(어두운 테두리 + 밝은 윗면). 판자 결은 예전 나루터와 같은 가로 판자"""
+    deck = planks.rotate(90).convert("RGBA")
+    colors = sorted({px for px in deck.getdata() if px[3] > 0}, key=lambda c: c[0] + c[1] + c[2])
+    shade = colors[0]                                         # 판자 끝 그늘 = 판자에서 가장 어두운 색
+    outline, post, top = (34, 22, 14, 255), (92, 58, 32, 255), (156, 108, 62, 255)
+
+    def cell(mask):
+        out = water.convert("RGBA").copy()
+        o, d = out.load(), deck.load()
+        n, e, s, w = not mask & AUTO_N, not mask & AUTO_E, not mask & AUTO_S, not mask & AUTO_W
+        x0, x1 = (1 if w else 0), (14 if e else 15)
+        y0, y1 = (1 if n else 0), (14 if s else 15)
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                edge = (n and y == y0) or (s and y == y1) or (w and x == x0) or (e and x == x1)
+                o[x, y] = shade if edge else d[x, y]
+
+        def peg(px, py):  # 3×3 말뚝: 테두리 + 가운데 + 왼위 밝은 점
+            for dy in range(3):
+                for dx in range(3):
+                    o[px + dx, py + dy] = outline if dx in (0, 2) or dy in (0, 2) else post
+            o[px + 1, py] = top
+            o[px, py + 1] = outline
+
+        if n:
+            peg(1, 0); peg(12, 0)
+        if s:
+            peg(1, 13); peg(12, 13)
+        if w:
+            peg(0, 1); peg(0, 12)
+        if e:
+            peg(13, 1); peg(13, 12)
+        return out
+
+    atlas = Image.new("RGBA", (256, 256))
+    for mask in range(256):
+        atlas.paste(cell(auto_normalize(mask)), ((mask % 16) * 16, (mask // 16) * 16))
+    return atlas, cell(0)
 
 
 def log_raft(planks):

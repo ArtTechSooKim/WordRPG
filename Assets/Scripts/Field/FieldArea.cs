@@ -225,7 +225,7 @@ namespace WordRPG.Field
                 case FieldTile.Tablet: return "단어 석판";
                 case FieldTile.Shrine: return "유적 제단";
                 case FieldTile.Cave: return "동굴 입구";
-                case FieldTile.Dock: return "나루터";
+                case FieldTile.Dock: return Map.DockGroup(position)[0] == position ? "나루터" : null; // 2×2 부두는 맨 위 왼쪽 칸에만 (#121)
                 case FieldTile.Door:
                     var exit = GetExit(position);
                     return exit != null && exit.Target != null ? exit.Target.DisplayName : null;
