@@ -23,6 +23,8 @@ namespace WordRPG.UI
         {
             var map = fieldArea.Map;
             tilemap.ClearAllTiles();
+            foreach (var glow in exitGlows) Destroy(glow);
+            exitGlows.Clear();
             for (int x = 0; x < map.Width; x++)
             for (int y = 0; y < map.Height; y++)
             {
@@ -128,11 +130,18 @@ namespace WordRPG.UI
             return tile;
         }
 
-        // 출입구 그림: 잠김 / 도착 지역 테마 전용(예: 초원의 숲길 입구) / 기본
+        // 출입구 그림: 잠김 / 지역 사이 길(초원↔숲↔정글, #120) = 옆 길과 이어진 바닥 + 바깥에서 비치는 빛 /
+        // 도착 지역 테마 전용 / 기본
         private Tile DoorTile(FieldArea fieldArea, Vector2Int cell, bool locked)
         {
             var exit = fieldArea.GetExit(cell);
             FieldTheme? target = exit != null && exit.Target != null ? exit.Target.Theme : (FieldTheme?)null;
+            if (!locked && FieldArt.ExitGlow(fieldArea.Theme, target) is Color glow
+                && AutoTile(fieldArea.Theme, FieldTile.Floor, FieldAutotile.DoorFloorMask(fieldArea.Map, cell)) is Tile floor)
+            {
+                AddExitGlow(cell, FieldAutotile.Outward(fieldArea.Map, cell), glow);
+                return floor;
+            }
             string key = $"{fieldArea.Theme}_Door_{target}_{locked}";
             if (!tileCache.TryGetValue(key, out var tile))
             {
@@ -140,6 +149,23 @@ namespace WordRPG.UI
                 tileCache[key] = tile;
             }
             return tile;
+        }
+
+        private readonly List<GameObject> exitGlows = new List<GameObject>(); // 지역 사이 길 출입구의 빛 (#120)
+        public int ExitGlowCount => exitGlows.Count; // 테스트용
+
+        // 출입구 칸 가운데에 빛 한 장 — 바깥(outward) 쪽이 가장 밝게 돌려 놓음. 타일 위, 큰 그림·주인공 아래
+        private void AddExitGlow(Vector2Int cell, Vector2Int outward, Color color)
+        {
+            var go = new GameObject("ExitGlow", typeof(SpriteRenderer));
+            go.transform.SetParent(transform, false);
+            go.transform.position = CellCenter(cell);
+            go.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(outward.y, outward.x) * Mathf.Rad2Deg);
+            var renderer = go.GetComponent<SpriteRenderer>();
+            renderer.sprite = FieldArt.ExitGlowSprite();
+            renderer.color = color;
+            renderer.sortingOrder = 4;
+            exitGlows.Add(go);
         }
 
         private void CreateWorldObjects()

@@ -8,6 +8,7 @@ namespace WordRPG.UI
     // 전투 > 사건 연출 (#119): BattleEngine이 돌려준 사건 목록을 순서대로 화면에 보여 준다.
     // 사건 종류마다 Show… 함수 하나 — 로그·소리·효과·떠오르는 숫자·HP 갱신을 하고 기다릴 시간(초)을 돌려준다.
     // 기다림은 PlayEvents가 사건마다 한 번 (보스 결정타·보스 쓰러짐만 따로). 승리·패배·도망 불가는 연출 없음 (결과 화면·도망 버튼이 맡음).
+    // 1.1 고침(#120)은 가지 release-1.1의 PlayEvents에 먼저 들어가고 여기로 옮김 — 두 곳의 연출이 같아야 함
     // 연출 순서·빠짐·기다리는 횟수는 PlayMode BattleEventPlaybackTests가 못 박음 — 연출을 바꾸면 그 기대 순서도 같이 고칠 것
     public partial class BattleScreen
     {
@@ -54,6 +55,7 @@ namespace WordRPG.UI
                 case BattleEventType.ItemUsed: return ShowItemUsed(e);
                 case BattleEventType.Defeated: return ShowDefeated(e);
                 case BattleEventType.RoundStarted: return ShowRoundStarted(e);
+                case BattleEventType.Charging: return ShowCharging(e);
                 default: return 0f; // Victory · Defeat · FleeBlocked
             }
         }
@@ -197,13 +199,22 @@ namespace WordRPG.UI
             PlayFx(e.Target, Fx.Smoke, 2.5f, 1.4f);
         }
 
-        // 보호막은 새 라운드에 사라짐 (화면 숫자도). 수련은 라운드 대신 '수련'
+        // 아군 보호막은 전투 내내 남음 (#120) — 화면도 실제 값 그대로. 수련은 라운드 대신 '수련'
         private float ShowRoundStarted(BattleEvent e)
         {
             roundLabel.text = training ? "수련" : $"라운드 {e.Round}";
-            foreach (var unit in engine.Party) shown[unit] = (shown[unit].hp, 0);
             SyncAll();
             return 0.2f;
+        }
+
+        // 힘을 모으는 기술 (#120): 이번 차례는 힘만 모으고 다음 차례에 큰 한 방 — 보호막으로 대비할 틈
+        private float ShowCharging(BattleEvent e)
+        {
+            Log($"{UiKit.WithJosa(e.Actor.DisplayName, "이", "가")} 힘을 모으고 있다");
+            Float(e.Actor, "힘을 모은다!", Palette.Gold, 48);
+            Sound.Play(Sfx.EvolveLight);
+            PlayFx(e.Actor, Fx.Sparkle, 1.5f, 1.3f);
+            return 0.9f;
         }
     }
 }

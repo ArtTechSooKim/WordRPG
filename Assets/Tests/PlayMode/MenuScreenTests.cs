@@ -179,6 +179,41 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // 성유물이 11개면 (1.1) 칸이 두 줄 6칸씩 — 이름이 아랫줄 칸에 가려지지 않고 11번째 칸도 보임 (#120 사용자 캡처)
+        [UnityTest]
+        public IEnumerator RelicGridShowsElevenRelicsWithoutCoveringNames()
+        {
+            var relics = new List<RelicData> { quill, book, lantern };
+            for (int i = 3; i < 11; i++)
+                relics.Add(TestData.Relic($"relic_extra_{i}", TestData.Skill($"extra_{i}", SkillKind.Damage, SkillTarget.SingleEnemy, 5),
+                    new MonsterStats(0, 1, 0), cover).Set("displayName", $"긴 이름 성유물 {i}"));
+            database.ReplaceContents(new MonsterSpecies[0], new[] { ink, cover, keepsake, potion }, new[] { area }, relics.ToArray());
+            foreach (var relic in relics.GetRange(1, 4)) session.GrantRelic(relic); // 5개 가짐, 6개는 ???
+            var field = MakeField();
+            yield return null;
+            yield return null;
+            var bag = field.transform.Find("FieldHud/SafeArea/InventoryView");
+            FindButton(field.transform.Find("FieldHud/SafeArea"), "BagButton").onClick.Invoke();
+            FindButton(bag, "TabRelics").onClick.Invoke();
+            yield return null;
+            Canvas.ForceUpdateCanvases();
+
+            var grid = bag.Find("RelicPage/Grid");
+            for (int i = 0; i < 11; i++)
+                Assert.IsTrue(grid.Find($"RelicCell_{i}").gameObject.activeSelf, $"{i + 1}번째 칸이 보여야 함");
+            StringAssert.Contains("모은 성유물  5 / 11", AllText(bag.Find("RelicPage")));
+
+            // 윗줄(0~5) 이름의 아래 끝이 아랫줄(6~10) 칸 그림의 위 끝보다 위에 있어야 함
+            float Bottom(RectTransform rt) { var c = new Vector3[4]; rt.GetWorldCorners(c); return c[0].y; }
+            float Top(RectTransform rt) { var c = new Vector3[4]; rt.GetWorldCorners(c); return c[1].y; }
+            float lowestName = float.MaxValue, highestBelow = float.MinValue;
+            for (int i = 0; i < 6; i++) lowestName = Mathf.Min(lowestName, Bottom((RectTransform)grid.Find($"RelicCell_{i}/Name")));
+            for (int i = 6; i < 11; i++) highestBelow = Mathf.Max(highestBelow, Top((RectTransform)grid.Find($"RelicCell_{i}/Back")));
+            Assert.GreaterOrEqual(lowestName, highestBelow, "윗줄 이름이 아랫줄 칸에 가려짐");
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
         // 가방 > 주인공: 레벨·경험치·능력치(성유물 보너스)·기술(기본 + 성유물). 성유물 탭: 모은 것·??? · 장착/빼기
         [UnityTest]
         public IEnumerator BagHeroAndRelicTabs()

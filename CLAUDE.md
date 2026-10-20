@@ -125,7 +125,9 @@
       라이선스 증명서는 .gitignore — 공개 저장소에 올리면 재배포라 안 됨. 저장소엔 팩 소리가 대신 있음 (지금: newword, 작업메모 #66)
     - 전투: 효과 `BattleFx`(Fx 열거형 = Art/NinjaAdventure/Fx/{소문자}.png 정사각 프레임 시트), 배경은 지역 타일(`BattleScreen.SetBackdrop`).
       필드에서 같은 효과를 월드에 그리려면 `FieldFx.Play`(1 = 한 칸 크기, tint로 색 입히기) — 다시 일어남(Heal·Sparkle),
-      달리기 먼지(Dust = 회색조 그림 × 바닥 색 `FieldArt.DustColor` — 새 바닥 타일을 만들면 색도 정할 것)
+      달리기 먼지(Dust = 회색조 그림 × 바닥 색 `FieldArt.DustColor` — 새 바닥 타일을 만들면 색도 정할 것).
+      지역 사이 길의 출입구(초원↔숲↔정글, #120) = 옆 길과 이어진 바닥(`FieldAutotile.DoorFloorMask`, 맵 밖으로도 이어짐) + 맵 끝에서 비치는 빛
+      (`FieldArt.ExitGlow` 색 — 새 지역 길을 잇으면 거기에 더함). 서고 입구·동굴처럼 원래 그림을 쓰는 출입구는 null
     - Linear 색공간이라 반투명 검정은 알파를 높게(0.7~0.8) 잡아야 눈에 보이는 만큼 어두워진다
 13. **맵은 글자 데이터로만**: 미니맵·지도(`MapViews.cs`)가 FieldMap에서 자동으로 그려진다. 탐험 안개는 `WorldState.Reveal/IsExplored`
     (지역별 비트 기록 `ExploredArea`, 세이브에 포함). **맵 글자 표 `FieldTiles`** (#116): 칸 종류마다 한 줄 — 글자·걷기·몬스터가 걷는 땅·[확인]·이름표(기본 글자)·
@@ -166,7 +168,8 @@ Assets/
                         CompanionData SO + Companion(동료 #77: 레벨·경험치·HP, 기본 기술 + 레벨에 배우는 기술, 성유물 없음 — 파티 = 주인공 + 동료 1명)
     Items/              ItemData SO(재료·상처약·징표·기술문서), Inventory, ShopData SO + Shop(구매 규칙)
     Battle/             BattleEngine(기술·강도(단어 n개 연속)·상처약·도망(Flee, 보스전 canFlee=false — 몬스터 등급 MonsterSpecies.fleeTier: 약함 바로·보통 1/4·강함 늘 단어 문제 #84)·연속 정답 수,
-                        적 회복은 HP 절반 아래·한 전투 두 번까지 #88), 경험치는 레벨 차이 비율 BattleConfig.ExpFactor(25%씩·최소 5% #88) —
+                        적 회복은 HP 절반 아래·한 전투 두 번까지 #88, 아군 보호막은 다 깎일 때까지 전투 내내 #120,
+                        힘 모으기 = SkillData.chargeTurns → 고른 차례엔 BattleEvent.Charging만, 다음 차례에 발동 #120 — 까먹대왕 기억상실), 경험치는 레벨 차이 비율 BattleConfig.ExpFactor(25%씩·최소 5% #88) —
                         숫자를 바꾸면 EditMode BalanceSimulationTests(정글 전투·보스) 확인, 표는 [Explicit] BalanceReport, Combo(콤보 단계·글자·추가 피해), BattleFormulas, BattleReward,
                         BattleSummary(한 판 결산: 새 단어·틀린 단어·기술별 피해·최대 콤보 — 결산 화면용), Preemptive(선제공격: HP 20%·이미 본 단어만)
     Field/              FieldMap(맵 글자→격자), FieldTiles(맵 글자 표 — 칸 종류마다 글자·성질·이름표·테마, #116), FieldWalker(이동), StickInput(스틱 값→4방향·달리기), EncounterCounter(조우), FieldInteraction([확인] 대상·이름표 규칙), FieldAutotile(길·물가 테두리 모양),

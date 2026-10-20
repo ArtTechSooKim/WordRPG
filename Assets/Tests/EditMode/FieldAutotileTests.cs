@@ -75,5 +75,47 @@ namespace WordRPG.Tests
             }
             Assert.IsNull(FieldArt.AutoTile(FieldTile.Floor, FieldTheme.Library, 0), "서고는 돌바닥 한 칸 그림");
         }
+
+        // 지역 사이 길의 출입구 (#120 사용자: 숲·초원 입구가 옆 칸과 따로 놀았음): 바닥은 옆 길과 이어지고 맵 밖으로도 이어짐, 빛은 바깥 쪽에서
+        [Test]
+        public void ExitDoorFloorJoinsThePathAndRunsOffTheMap()
+        {
+            //   y=2  ####
+            //   y=1  P..D   ← 오른쪽 끝 출입구: 왼쪽 길 + 맵 밖(오른쪽)과 이어짐, 위·아래 덤불과는 안 이어짐
+            //   y=0  ##:#
+            var map = FieldMap.Parse("####\nP..D\n##:#");
+            var door = new Vector2Int(3, 1);
+            Assert.AreEqual(FieldAutotile.E | FieldAutotile.W, FieldAutotile.DoorFloorMask(map, door));
+            Assert.AreEqual(Vector2Int.right, FieldAutotile.Outward(map, door), "빛은 맵 밖 쪽에서");
+
+            //   한가운데 출입구(맵 끝이 아님): 걸어 들어오는 쪽의 반대가 바깥
+            var inner = FieldMap.Parse("###\n#D#\n#P#");
+            Assert.AreEqual(Vector2Int.up, FieldAutotile.Outward(inner, new Vector2Int(1, 1)));
+        }
+
+        [Test]
+        public void OnlyRoadsBetweenOverlandRegionsGlow()
+        {
+            Assert.IsTrue(FieldArt.ExitGlow(FieldTheme.Meadow, FieldTheme.Forest).HasValue, "초원 → 숲");
+            Assert.IsTrue(FieldArt.ExitGlow(FieldTheme.Forest, FieldTheme.Meadow).HasValue, "숲 → 초원");
+            Assert.IsTrue(FieldArt.ExitGlow(FieldTheme.Forest, FieldTheme.Jungle).HasValue, "숲 → 정글");
+            Assert.IsTrue(FieldArt.ExitGlow(FieldTheme.Jungle, FieldTheme.Forest).HasValue, "정글 → 숲");
+            Assert.IsFalse(FieldArt.ExitGlow(FieldTheme.Meadow, FieldTheme.Library).HasValue, "서고 입구는 원래 그림(동굴 입구)");
+            Assert.IsFalse(FieldArt.ExitGlow(FieldTheme.Library, FieldTheme.Meadow).HasValue, "서고 안 출입구도 원래 그림");
+            Assert.IsFalse(FieldArt.ExitGlow(FieldTheme.Meadow, null).HasValue);
+            Assert.IsNotNull(FieldArt.ExitGlowSprite());
+        }
+
+        // 가방 > 성유물 칸 (#120 사용자: 이름이 자물쇠에 가려짐): 늘 두 줄 안에 — 10개까지 5칸씩, 넘으면 한 줄 칸을 늘림
+        [Test]
+        public void RelicGridAlwaysFitsInTwoRows()
+        {
+            Assert.AreEqual(5, RelicPage.ColumnsFor(3));
+            Assert.AreEqual(5, RelicPage.ColumnsFor(10));
+            Assert.AreEqual(6, RelicPage.ColumnsFor(11), "1.1: 성유물 11개");
+            Assert.AreEqual(7, RelicPage.ColumnsFor(13), "1.2: 성유물 13개");
+            foreach (int count in new[] { 3, 8, 10, 11, 12, 13, 14, 16 })
+                Assert.LessOrEqual((count + RelicPage.ColumnsFor(count) - 1) / RelicPage.ColumnsFor(count), 2, $"{count}개");
+        }
     }
 }

@@ -153,8 +153,9 @@ namespace WordRPG.Tests
             Assert.AreEqual(BattlePhase.ChoosingSkill, battle.Phase);
         }
 
+        // 보호막은 다 깎일 때까지 그 전투 내내 남는다 (#120 사용자 결정 — 예전엔 새 라운드에 사라졌음)
         [Test]
-        public void GuardAbsorbsEnemyDamageAndExpiresNextRound()
+        public void GuardAbsorbsEnemyDamageAndLastsUntilUsedUp()
         {
             var battle = Start(new[] { Hero() }, new[] { Slime() });
 
@@ -167,7 +168,14 @@ namespace WordRPG.Tests
             Assert.AreEqual(0, enemyHit.Amount);
             Assert.AreEqual(5, enemyHit.Absorbed);
             Assert.AreEqual(30, battle.Party[0].Hp);
-            Assert.AreEqual(0, battle.Party[0].Shield, "새 라운드에 보호막 소멸");
+            Assert.AreEqual(10, battle.Party[0].Shield, "새 라운드에도 남은 보호막 그대로");
+
+            // 다음 라운드: 공격만 해도 남은 보호막이 또 막아 줌 → 5씩 깎여 0이 되면 그때부터 HP
+            battle.SelectSkill(battle.Party[0].Skills[0], battle.Enemies[0]);
+            var second = battle.SubmitAnswer(Wrong, Normal).Single(e => e.Type == BattleEventType.Damage && e.Target.IsPlayerSide);
+            Assert.AreEqual(5, second.Absorbed);
+            Assert.AreEqual(30, battle.Party[0].Hp);
+            Assert.AreEqual(5, battle.Party[0].Shield);
         }
 
         [Test]

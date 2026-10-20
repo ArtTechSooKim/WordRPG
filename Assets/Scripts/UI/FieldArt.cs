@@ -105,6 +105,53 @@ namespace WordRPG.UI
             return ForTile(FieldTile.Door, theme, false);
         }
 
+        // 지역 사이 길의 출입구 빛 (#120 사용자: "빛나는 건 좋은데 바로 옆 타일과 어느 정도 연결되게") — 초원↔숲↔정글.
+        // 색은 도착 지역 느낌. null = 지역 사이 길이 아님 (서고 입구·동굴처럼 원래 그림을 쓰는 출입구)
+        public static Color? ExitGlow(FieldTheme theme, FieldTheme? target)
+        {
+            if (!target.HasValue || target.Value == theme) return null;
+            bool overland = theme == FieldTheme.Meadow || theme == FieldTheme.Forest || theme == FieldTheme.Jungle;
+            if (!overland) return null;
+            switch (target.Value)
+            {
+                case FieldTheme.Meadow: return new Color(1f, 0.93f, 0.66f, 0.75f);  // 햇살 (예전 숲의 밝은 모래빛)
+                case FieldTheme.Forest: return new Color(0.82f, 0.95f, 0.58f, 0.7f); // 숲 그늘 사이 연두 햇빛
+                case FieldTheme.Jungle: return new Color(0.72f, 0.96f, 0.82f, 0.7f); // 정글 물빛 민트
+                default: return null;
+            }
+        }
+
+        private static Sprite exitGlow;
+
+        // 출입구 빛 한 장 (흰색 — 색·불투명도는 SpriteRenderer.color). 가로 24px = 칸 안 16px(안쪽은 거의 투명 → 맵 끝에서 가장 밝게)
+        // + 맵 밖 8px(밝음 → 0). 세로는 위·아래 4px만 옅게. 도트 느낌이 나게 밝기를 5단계로 끊음.
+        // 피벗 = 칸 가운데, 오른쪽이 바깥 → FieldScreen이 바깥 방향으로 돌려 놓는다
+        public static Sprite ExitGlowSprite()
+        {
+            if (exitGlow != null) return exitGlow;
+            const int w = 24, h = 16;
+            var texture = new Texture2D(w, h, TextureFormat.RGBA32, false)
+            {
+                filterMode = FilterMode.Point,
+                wrapMode = TextureWrapMode.Clamp,
+                name = "exit_glow"
+            };
+            var pixels = new Color32[w * h];
+            for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++)
+            {
+                float along = x < 16 ? Mathf.Pow((x + 0.5f) / 16f, 1.6f) : 1f - (x - 16 + 0.5f) / 8f;
+                float edge = Mathf.Clamp01(Mathf.Min(y + 0.5f, h - y - 0.5f) / 4f);
+                float a = Mathf.Round(Mathf.Clamp01(along) * edge * 5f) / 5f;
+                pixels[y * w + x] = new Color32(255, 255, 255, (byte)(a * 255));
+            }
+            texture.SetPixels32(pixels);
+            texture.Apply();
+            exitGlow = Sprite.Create(texture, new Rect(0, 0, w, h), new Vector2(8f / w, 0.5f), 16, 0, SpriteMeshType.FullRect);
+            exitGlow.name = "exit_glow";
+            return exitGlow;
+        }
+
         // 자동 테두리 조각 (Tiles/{테마}_{종류}_auto.png: 16×16칸, 칸 번호 = FieldAutotile 마스크). 아틀라스가 없으면 null
         public static Sprite AutoTile(FieldTile tile, FieldTheme theme, int mask)
         {

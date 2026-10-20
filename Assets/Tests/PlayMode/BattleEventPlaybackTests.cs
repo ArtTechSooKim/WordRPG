@@ -215,6 +215,20 @@ namespace WordRPG.Tests
                 End());
         }
 
+        // 힘 모으기 (#120): "○○이 힘을 모으고 있다" — 금색 글자 · 반짝임 · 조금 길게 기다림 (기다림은 한 번)
+        [UnityTest]
+        public IEnumerator ChargingShowsTheWindUp()
+        {
+            yield return Begin("까먹대왕", boss: true);
+            var amnesia = TestData.Skill("amnesia", SkillKind.Damage, SkillTarget.SingleEnemy, 230).Set("displayName", "기억상실").Set("chargeTurns", 1);
+            yield return Play(BattleEvent.Charging(enemy, amnesia));
+
+            AssertCues(
+                "로그 까먹대왕이 힘을 모으고 있다", $"숫자 까먹대왕 힘을 모은다! {Gold} 48", "소리 EvolveLight", "효과 Sparkle 까먹대왕 느리게1.5 크기1.3", "기다림 0.9",
+                End());
+            Assert.AreEqual(1, Yields(BattleEvent.Charging(enemy, amnesia)));
+        }
+
         // 보스전에서 아군이 보스를 쓰러뜨리는 마지막 한 방만 결정타 (앞의 타격은 보통), 보스는 천천히 쓰러짐
         [UnityTest]
         public IEnumerator BossFinisherIsOnlyTheLastHitThatWinsTheFight()

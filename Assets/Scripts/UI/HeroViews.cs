@@ -310,8 +310,8 @@ namespace WordRPG.UI
     // 소지품 > 성유물 탭 (Figma '소지품 — 성유물'): 끼운 3칸 + 모은 성유물(못 찾은 것은 ???) + 고른 성유물 상세 · [장착하기]/[빼기]
     public class RelicPage
     {
-        public const int Columns = 5;
-        private const int MaxCells = 10;
+        public const int Columns = 5;   // 한 줄 기본 칸 수 (10개까지 두 줄)
+        private const int MaxCells = 16; // 성유물이 늘어도 두 줄 안에 (한 줄 최대 8칸) — #120 1.1에서 11개가 되자 칸이 모자랐음
 
         private class Cell
         {
@@ -521,19 +521,25 @@ namespace WordRPG.UI
             ShowDetail(owned);
         }
 
-        // 칸을 5개씩 한 줄로 (10개까지 두 줄)
+        // 칸은 늘 두 줄 안에: 10개까지 5칸씩, 더 많으면 한 줄 칸 수를 늘림 (11~12개 → 6칸, 13~14개 → 7칸).
+        // #120: 1.1에서 성유물이 11개가 되자 세 줄로 나뉘며 줄 높이가 작아져 이름이 아랫줄 자물쇠에 가려졌고, 11번째 칸은 아예 없었음
+        public static int ColumnsFor(int count) => Mathf.Max(Columns, Mathf.CeilToInt(count / 2f));
+
         private void LayoutCells()
         {
-            int rows = Mathf.Max(1, Mathf.CeilToInt(catalog.Count / (float)Columns));
+            int columns = ColumnsFor(catalog.Count);
+            int rows = Mathf.Max(1, Mathf.CeilToInt(catalog.Count / (float)columns));
             float h = 1f / rows;
+            // 그림 크기는 한 줄 높이에 맞춤: 그림 + 6 + 이름 34 + 여유 4가 한 줄 안에 (화면 비율이 달라도 이름이 아랫줄에 가려지지 않게)
+            float size = Mathf.Min(rows > 1 ? 80f : 112f, grid.rect.height / rows - 6f - 34f - 4f);
+            size = Mathf.Max(24f, size);
             for (int i = 0; i < cells.Count; i++)
             {
-                int col = i % Columns, row = i / Columns;
+                int col = i % columns, row = i / columns;
                 var rt = (RectTransform)cells[i].Root.transform;
-                rt.anchorMin = new Vector2(col / (float)Columns, 1f - (row + 1) * h);
-                rt.anchorMax = new Vector2((col + 1) / (float)Columns, 1f - row * h);
+                rt.anchorMin = new Vector2(col / (float)columns, 1f - (row + 1) * h);
+                rt.anchorMax = new Vector2((col + 1) / (float)columns, 1f - row * h);
                 rt.offsetMin = rt.offsetMax = Vector2.zero;
-                float size = rows > 1 ? 80 : 112;
                 cells[i].Back.rectTransform.sizeDelta = new Vector2(size, size);
                 cells[i].Name.rectTransform.anchoredPosition = new Vector2(0, -size - 6);
             }

@@ -63,6 +63,10 @@ namespace WordRPG.EditorTools
             var scratch = Skill("bat_scratch", "낙서 할퀴기", "삐뚤빼뚤한 발톱으로 할퀸다.", SkillKind.Damage, SkillTarget.SingleEnemy, 16, QuizDirection.EnglishToMeaning);
             var forgetFog = Skill("goblin_forget_fog", "망각의 안개", "기억을 흐리는 안개로 주인공을 공격한다.", SkillKind.Damage, SkillTarget.AllEnemies, 10, QuizDirection.EnglishToMeaning);
             var memoryDrain = Skill("boss_memory_drain", "기억 흡수", "빼앗은 기억으로 자신의 HP를 회복한다.", SkillKind.Heal, SkillTarget.Self, 8, QuizDirection.EnglishToMeaning);
+            // 까먹대왕 전용 (#120 사용자: 한 방 40 이상 · 힘을 모았다가 기억상실 100 — 까먹깨비 기술과 따로)
+            var kingBonk = Skill("boss_forget_bonk", "깜빡 대방망이", "까먹대왕의 커다란 방망이질. 맞으면 머리가 새하얗게 된다.", SkillKind.Damage, SkillTarget.SingleEnemy, 100, QuizDirection.EnglishToMeaning);
+            var amnesia = Skill("boss_amnesia", "기억상실", "힘을 잔뜩 모았다가 내리치는 한 방. 맞으면 기억이 하얗게 날아간다.", SkillKind.Damage, SkillTarget.SingleEnemy, 230, QuizDirection.EnglishToMeaning,
+                chargeTurns: 1);
             var blankBonk = Skill("goblin_blank_bonk", "깜빡 방망이", "머리를 하얗게 만드는 방망이질.", SkillKind.Damage, SkillTarget.SingleEnemy, 18, QuizDirection.EnglishToMeaning);
             var spore = Skill("mushroom_spell_spore", "철자 포자", "철자를 뒤섞는 포자를 흩뿌린다.", SkillKind.Damage, SkillTarget.AllEnemies, 12, QuizDirection.EnglishToMeaning);
             var squeeze = Skill("snake_squiggle_squeeze", "꼬부랑 조이기", "꼬부랑 글씨처럼 몸을 비틀어 조인다.", SkillKind.Damage, SkillTarget.SingleEnemy, 20, QuizDirection.EnglishToMeaning);
@@ -117,7 +121,7 @@ namespace WordRPG.EditorTools
 
             // --- 보스: 잊혀진 서고 꼭대기의 까먹대왕. 강화 재료 3종 + 성유물 '기억의 성배' ---
             var forgetKing = Monster("boss_forget_king", "까먹대왕", "까먹깨비들의 우두머리. 서고의 기억을 몽땅 먹어 치우고 있다.", MonsterRole.Attacker,
-                new Color(0.15f, 0.6f, 0.55f), new MonsterStats(50, 14, 12), new MonsterStats(8, 3, 2), new[] { forgetFog, blankBonk, memoryDrain },
+                new Color(0.15f, 0.6f, 0.55f), new MonsterStats(100, 14, 12), new MonsterStats(16, 3, 2), new[] { kingBonk, memoryDrain, amnesia }, // HP 2배 (#120)
                 enemyExp: 25, enemyGold: 30,
                 drops: new[] { new ItemDrop(shinyInk, 1f), new ItemDrop(hardCover, 1f), new ItemDrop(sparkleDust, 1f) });
 
@@ -1034,7 +1038,7 @@ namespace WordRPG.EditorTools
         }
 
         private static SkillData Skill(string id, string name, string description, SkillKind kind, SkillTarget target,
-            int power, QuizDirection direction)
+            int power, QuizDirection direction, int chargeTurns = 0)
         {
             return CreateIfMissing<SkillData>($"{Root}/Skills/{id}.asset", so =>
             {
@@ -1045,6 +1049,7 @@ namespace WordRPG.EditorTools
                 Prop(so, "target").enumValueIndex = (int)target;
                 Prop(so, "power").intValue = power;
                 Prop(so, "quizDirection").enumValueIndex = (int)direction;
+                Prop(so, "chargeTurns").intValue = chargeTurns;
             });
         }
 
