@@ -22,6 +22,7 @@ namespace WordRPG.UI
         // 글자가 크게 찍히듯 줄어들며 나타났다가 잠깐 머문 뒤 위로 떠오르며 사라진다. 단계가 오를수록 크고 효과음이 높다
         private IEnumerator ComboRoutine(int streak)
         {
+            Cue($"콤보 글자 {streak}");
             int step = Combo.Step(streak);
             if (step <= 0) yield break;
             var color = ComboColors[step - 1];
@@ -81,6 +82,7 @@ namespace WordRPG.UI
 
         private void Float(BattleUnit unit, string text, Color color, int size)
         {
+            Cue($"숫자 {unit?.DisplayName} {text} #{ColorUtility.ToHtmlStringRGB(color)} {size}");
             if (!viewOf.TryGetValue(unit, out var view)) return;
             StartCoroutine(FloatRoutine(view.Root, text, color, size));
         }
@@ -150,6 +152,7 @@ namespace WordRPG.UI
         // slow: 효과를 몇 배 느리게 (보스 결정타), scale: 크기 배율
         private void PlayFx(BattleUnit unit, Fx fx, float slow = 1f, float scale = 1f)
         {
+            Cue($"효과 {fx} {unit?.DisplayName}" + (slow != 1f || scale != 1f ? $" 느리게{CueNumber(slow)} 크기{CueNumber(scale)}" : ""));
             if (unit == null || !viewOf.TryGetValue(unit, out var view)) return;
             float size = (unit.IsPlayerSide ? 200f : 300f) * scale;
             StartCoroutine(BattleFx.Play(view.Root, fx, size, animationScale * slow));
@@ -176,6 +179,7 @@ namespace WordRPG.UI
         // 하얀 번쩍임 → 느린 화면(가장자리 어둡게, 보스 카드가 커지며 흔들림, 느린 큰 타격 효과, 낮은 소리) → '결정타!' 도장
         private IEnumerator BossFinisher(BattleEvent e)
         {
+            Cue($"결정타 {e.Target.DisplayName}");
             var d = shown[e.Target];
             shown[e.Target] = (Mathf.Max(0, d.hp - e.Amount), Mathf.Max(0, d.shield - e.Absorbed));
             FinishersPlayed++;
@@ -239,6 +243,7 @@ namespace WordRPG.UI
         // 화면을 어둡게(느린 화면 동안) / 다시 밝게
         private IEnumerator FadeShade(float to, float seconds)
         {
+            Cue($"어둡게 {CueNumber(to)} {CueNumber(seconds)}");
             finisherShade.gameObject.SetActive(true);
             float from = finisherShade.color.a, duration = seconds * animationScale;
             for (float t = 0f; t < duration; t += Time.unscaledDeltaTime)

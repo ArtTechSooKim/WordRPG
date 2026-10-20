@@ -59,8 +59,12 @@ namespace WordRPG.UI
             if (clip != null) music.Play();
         }
 
+        // 소리 기록 (#119, 테스트용): 효과음을 낼 때마다 (효과음, 음높이 — 1 = 기본). 평소엔 null
+        public static System.Action<Sfx, float> Recorder;
+
         public static void Play(Sfx effect)
         {
+            Recorder?.Invoke(effect, 1f);
             if (!Application.isPlaying || !Ensure()) return;
             var clip = LoadSfx(effect);
             if (clip != null) effects.PlayOneShot(clip, SfxVolume);
@@ -69,6 +73,7 @@ namespace WordRPG.UI
         // 음높이를 바꿔 재생 (콤보 단계가 오를수록 높게)
         public static void Play(Sfx effect, float pitch)
         {
+            Recorder?.Invoke(effect, pitch);
             if (!Application.isPlaying || !Ensure()) return;
             var clip = LoadSfx(effect);
             if (clip == null) return;

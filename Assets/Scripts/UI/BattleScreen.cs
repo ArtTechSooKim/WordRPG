@@ -130,6 +130,14 @@ namespace WordRPG.UI
         private int enemyAreaIndex = -1; // 결정타 동안 적 칸을 어두운 막 위로 올렸다가 되돌릴 자리
         public int FinishersPlayed { get; private set; } // 보스 결정타 연출 횟수 (테스트용)
 
+        // 연출 기록 (#119, 테스트용): 연출 한 단계(로그·떠오르는 숫자·효과·기다림·HP 갱신·콤보 글자·결정타·어둡게)마다 한 줄씩 받는다.
+        // 소리는 Sound.Recorder. 평소엔 null이라 아무 일도 하지 않음
+        public Action<string> CueRecorder { get; set; }
+        private void Cue(string cue) => CueRecorder?.Invoke(cue);
+
+        // 사건 목록 연출만 따로 재생 (#119, 테스트용) — 전투 로직이 돌려준 BattleEvent 목록을 화면에 그대로 연출
+        public IEnumerator PlayEventsForTest(IReadOnlyList<BattleEvent> events) => PlayEvents(events);
+
         // --- 입력 대기용 ---
         private SkillData pickedSkill;
         private ItemData pickedItem;
@@ -639,152 +647,7 @@ namespace WordRPG.UI
             cardStamp.rectTransform.localScale = Vector3.one;
         }
 
-        private IEnumerator PlayEvents(IReadOnlyList<BattleEvent> events)
-        {
-            foreach (var e in events)
-            {
-                switch (e.Type)
-                {
-                    case BattleEventType.Combo:
-                        comboStep = Combo.Step(e.Amount);
-                        StartCoroutine(ComboRoutine(e.Amount));
-                        yield return Wait(0.45f);
-                        break;
-
-                    case BattleEventType.Fled:
-                        Log($"{UiKit.WithJosa(e.Actor.DisplayName, "은", "는")} 무사히 도망쳤다!");
-                        Sound.Play(Sfx.Flee);
-                        yield return Wait(0.6f);
-                        break;
-
-                    case BattleEventType.FleeQuiz: // 강한 몬스터 (또는 보통 몬스터의 1/4) — 도망치려면 단어를 맞혀야 함 (#84)
-                        Log(e.Target != null
-                            ? $"{UiKit.WithJosa(e.Target.DisplayName, "이", "가")} 길을 막았다! 도망치려면 단어를 맞혀라"
-                            : "도망치려면 단어를 맞혀라!");
-                        Sound.Play(Sfx.Encounter);
-                        yield return Wait(0.7f);
-                        break;
-
-                    case BattleEventType.FleeFailed:
-                        Log("도망 실패! 차례를 놓쳤다");
-                        Sound.Play(Sfx.Fail);
-                        yield return Wait(0.6f);
-                        break;
-
-                    case BattleEventType.QuizAnswered:
-                        comboStep = 0;
-                        Log((e.Correct ? "정답! " : "오답… ") + MasteryText(e.Mastery));
-                        yield return Wait(0.5f);
-                        break;
-
-                    case BattleEventType.SkillUsed:
-                        bool charged = e.Multiplier > 1.001f;
-                        Log($"{e.Actor.DisplayName}의 {e.Skill.DisplayName}" + (charged ? $" ×{FormatMultiplier(e.Multiplier)}!" : "!"));
-                        if (charged)
-                        {
-                            Float(e.Actor, $"×{FormatMultiplier(e.Multiplier)}!", Palette.Gold, 56);
-                            Sound.Play(Sfx.Critical);
-                        }
-                        yield return Wait(charged ? 0.7f : 0.5f);
-                        break;
-
-                    case BattleEventType.SkillFailed:
-                        Log($"{e.Actor.DisplayName}의 {e.Skill.DisplayName} 실패…");
-                        Float(e.Actor, "실패", Palette.TextDim, 44);
-                        Sound.Play(Sfx.Fail);
-                        PlayFx(e.Actor, Fx.Smoke);
-                        yield return Wait(0.7f);
-                        break;
-
-                    case BattleEventType.Damage:
-                        if (IsBossFinisher(events, e))
-                        {
-                            yield return BossFinisher(e);
-                            break;
-                        }
-                        var d = shown[e.Target];
-                        bool dummyHit = e.Target.Monster != null && e.Target.Monster.Species.IsTrainingDummy;
-                        shown[e.Target] = (dummyHit ? d.hp : Mathf.Max(0, d.hp - e.Amount), Mathf.Max(0, d.shield - e.Absorbed));
-                        if (dummyHit)
-                        {
-                            trainingDamage += e.Amount;
-                            viewOf[e.Target].HpCaption = $"누적 피해 {trainingDamage}";
-                        }
-                        Sync(e.Target);
-                        string dmgText = e.Amount > 0 ? $"-{e.Amount}" : "막음!";
-                        Sound.Play(e.Amount <= 0 ? Sfx.Shield : e.IsCritical ? Sfx.Critical : Sfx.Hit);
-                        PlayFx(e.Target, e.Amount <= 0 ? Fx.Shield : e.IsCritical ? Fx.Explosion : e.Target.IsPlayerSide ? Fx.Claw : Fx.Slash);
-                        // 콤보 중인 아군 공격은 숫자가 단계만큼 더 크게
-                        int boost = e.Actor != null && e.Actor.IsPlayerSide ? comboStep * 5 : 0;
-                        Float(e.Target, e.IsCritical ? $"크리티컬! {dmgText}" : dmgText,
-                            e.Amount > 0 ? Palette.Bad : Palette.Info, (e.IsCritical ? 58 : 48) + boost);
-                        Log(e.Absorbed > 0
-                            ? $"{e.Target.DisplayName} 피해 {e.Amount} (보호막이 {e.Absorbed} 흡수)"
-                            : $"{e.Target.DisplayName} 피해 {e.Amount}" + (e.IsCritical ? " — 크리티컬!" : ""));
-                        yield return Wait(0.6f);
-                        break;
-
-                    case BattleEventType.Heal:
-                        var h = shown[e.Target];
-                        shown[e.Target] = (h.hp + e.Amount, h.shield);
-                        Sync(e.Target);
-                        Float(e.Target, $"+{e.Amount}", Palette.Good, 48);
-                        Sound.Play(Sfx.Heal);
-                        PlayFx(e.Target, Fx.Heal);
-                        Log($"{e.Target.DisplayName} HP +{e.Amount}" + (e.IsCritical ? " — 크리티컬!" : ""));
-                        yield return Wait(0.6f);
-                        break;
-
-                    case BattleEventType.Shield:
-                        var s = shown[e.Target];
-                        shown[e.Target] = (s.hp, s.shield + e.Amount);
-                        Sync(e.Target);
-                        Float(e.Target, $"보호막 +{e.Amount}", Palette.Info, 40);
-                        Sound.Play(Sfx.Shield);
-                        PlayFx(e.Target, Fx.Shield);
-                        Log($"{e.Target.DisplayName} 보호막 +{e.Amount}");
-                        yield return Wait(0.6f);
-                        break;
-
-                    case BattleEventType.ItemUsed:
-                        var it = shown[e.Target];
-                        shown[e.Target] = (it.hp + e.Amount, it.shield);
-                        Sync(e.Target);
-                        Float(e.Target, $"+{e.Amount}", Palette.Good, 48);
-                        Sound.Play(Sfx.Heal);
-                        PlayFx(e.Target, Fx.Heal);
-                        Log($"{UiKit.WithJosa(e.Item.DisplayName, "을", "를")} 썼다! HP +{e.Amount}");
-                        yield return Wait(0.6f);
-                        break;
-
-                    case BattleEventType.Defeated:
-                        Log($"{e.Target.DisplayName} 쓰러졌다!");
-                        if (bossBattle && !e.Target.IsPlayerSide && Has(events, BattleEventType.Victory))
-                        {
-                            // 보스는 느린 화면 그대로 천천히 쓰러진다
-                            Sound.Play(Sfx.Faint, 0.7f);
-                            PlayFx(e.Target, Fx.Smoke, 2.5f, 1.4f);
-                            yield return FadeShade(0f, 0.6f);
-                            yield return Wait(0.4f);
-                            break;
-                        }
-                        Sound.Play(Sfx.Faint);
-                        PlayFx(e.Target, Fx.Smoke);
-                        yield return Wait(0.5f);
-                        break;
-
-                    case BattleEventType.RoundStarted:
-                        roundLabel.text = training ? "수련" : $"라운드 {e.Round}";
-                        foreach (var unit in engine.Party) shown[unit] = (shown[unit].hp, 0);
-                        SyncAll();
-                        yield return Wait(0.2f);
-                        break;
-                }
-            }
-
-            RefreshVocabLabel();
-            SyncAll();
-        }
+        // 사건 목록 연출(PlayEvents)은 BattleScreen.Events.cs (#119)
 
         // ------------------------------------------------------------------ 화면 갱신 도우미
 
@@ -795,7 +658,11 @@ namespace WordRPG.UI
             foreach (var unit in engine.Enemies) shown[unit] = (unit.Hp, unit.Shield);
         }
 
-        private void Sync(BattleUnit unit) => viewOf[unit].Sync(shown[unit].hp, shown[unit].shield);
+        private void Sync(BattleUnit unit)
+        {
+            Cue($"HP {unit.DisplayName} {shown[unit].hp}/{shown[unit].shield}");
+            viewOf[unit].Sync(shown[unit].hp, shown[unit].shield);
+        }
 
         private void SyncAll()
         {
@@ -803,6 +670,12 @@ namespace WordRPG.UI
             foreach (var unit in engine.Enemies) shown[unit] = (unit.Hp, unit.Shield);
             foreach (var pair in viewOf) pair.Value.Sync(shown[pair.Key].hp, shown[pair.Key].shield);
             UpdateFrames();
+            if (CueRecorder != null)
+            {
+                var all = new List<string>();
+                foreach (var pair in viewOf) all.Add($"{pair.Key.DisplayName} {shown[pair.Key].hp}/{shown[pair.Key].shield}");
+                Cue($"HP 전체 {string.Join(", ", all)} [{roundLabel.text}]");
+            }
         }
 
         private void RefreshVocabLabel() => vocabLabel.text = $"발견한 단어 {LearnedCount()}/{words.Words.Count}";
@@ -820,10 +693,13 @@ namespace WordRPG.UI
 
         private void Log(string line)
         {
+            Cue($"로그 {line}");
             logLines.Add(line);
             if (logLines.Count > 3) logLines.RemoveAt(0);
             logLabel.text = string.Join("\n", logLines);
         }
+
+        private static string CueNumber(float value) => value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
 
         private static string MasteryText(MasteryChange change)
         {
@@ -834,6 +710,7 @@ namespace WordRPG.UI
 
         private IEnumerator Wait(float seconds)
         {
+            Cue($"기다림 {CueNumber(seconds)}");
             yield return new WaitForSecondsRealtime(seconds * animationScale);
         }
 

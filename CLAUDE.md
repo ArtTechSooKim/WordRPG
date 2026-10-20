@@ -150,7 +150,8 @@
 - **세이브·id·버전**: 테스트 통과로 끝내지 않음 — 출시된 id(wordId·itemId·relicId·areaId·companionId·상품 id)가 그대로인지 git diff로 보고,
   SaveData 필드 의미를 바꾸면 version + 변환 + 예전 세이브 불러오기 테스트 (#89 방식)
 - **결제**: 가짜 상점 테스트만으로 안전하다고 보지 않음 → 결제 코드를 바꾸면 보고서 [사용자가 직접 해야 할 일]에 TestFlight 결제·구매 복원 확인을 넣음
-- **화면·연출**: 테스트는 결과만 봄 → 바꾸기 전·후 캡처를 `_캡처/`에 남겨 비교 (사용자 확인). 전투 연출(BattleScreen.PlayEvents)은 나누기 전에 연출 순서 테스트부터
+- **화면·연출**: 테스트는 결과만 봄 → 바꾸기 전·후 캡처를 `_캡처/`에 남겨 비교 (사용자 확인). 전투 사건 연출은 PlayMode `BattleEventPlaybackTests`가 순서·빠짐·기다리는 횟수를 못 박음 (#119 —
+  연출을 일부러 바꾸면 그 기대 순서도 같이 고치고 무엇이 왜 바뀌는지 보고. 기록 = `BattleScreen.CueRecorder`·`Sound.Recorder`, 테스트용·평소엔 null)
 - **빌드·출시 설정** (번들 ID·앱 버전·release-1.1 가지·ProjectSettings·워크플로): 사용자 확인 후
 
 ## 폴더 구조
@@ -183,7 +184,7 @@ Assets/
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
     UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투 + 보스 결정타 연출 + 전투 결산, 단독 연습 모드도 있음)
                         — 둘 다 partial로 나눔 (#93): FieldScreen.cs(상태·이동·입력) + .Places([확인] 장소)·.Jungle(정글 기믹)·.Battles(조우·전투 뒤·수련)·
-                        .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴)·.Cave(동굴 어둠·반딧돌 #112) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout.
+                        .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴)·.Cave(동굴 어둠·반딧돌 #112) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout·.Events(사건 연출: 사건 종류마다 Show… 함수 — #119).
                         새 기능은 맞는 파일에, 기능 묶음이 커지면 새 partial 파일로,
                         DexView(도감), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기),
                         InventoryView(소지품: 주인공·성유물·아이템·징표) + HeroViews(HeroInfoPage·RelicPage·RelicSlotsRow·SkillRowView),
