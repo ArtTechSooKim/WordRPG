@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace WordRPG.Field
@@ -244,6 +245,68 @@ namespace WordRPG.Field
                 }
             }
             return best ?? (IReadOnlyList<Vector2Int>)Array.Empty<Vector2Int>();
+        }
+
+        // 이어진 나루터 칸 덩어리 (#121 2×2 부두) — 그 칸이 든 덩어리 (나루터가 아니면 빈 목록)
+        public List<Vector2Int> DockGroup(Vector2Int cell)
+        {
+            var group = new List<Vector2Int>();
+            if (Get(cell) != FieldTile.Dock) return group;
+            var seen = new HashSet<Vector2Int> { cell };
+            var queue = new Queue<Vector2Int>(seen);
+            while (queue.Count > 0)
+            {
+                var c = queue.Dequeue();
+                group.Add(c);
+                foreach (var step in Steps)
+                    if (Get(c + step) == FieldTile.Dock && seen.Add(c + step)) queue.Enqueue(c + step);
+            }
+            group.Sort((a, b) => a.y != b.y ? b.y.CompareTo(a.y) : a.x.CompareTo(b.x)); // 위→아래, 왼→오른
+            return group;
+        }
+
+        // 나루터 덩어리마다 뗏목을 묶어 둘 물 칸 (#121): 부두가 뭍(섬)에 붙은 쪽의 반대 = 강 쪽 끝에 (부두 위에 얹혀 보이지 않게),
+        // 그쪽에 뗏목 물이 없으면 앞이 가장 넓게 트인 칸. 묶인 뗏목은 보이기만 함 — 타는 것은 어느 나루터 칸에서든 물 쪽으로
+        public List<(Vector2Int water, Vector2Int step)> MooringSpots()
+        {
+            var spots = new List<(Vector2Int, Vector2Int)>();
+            var done = new HashSet<Vector2Int>();
+            foreach (var dock in FindAll(FieldTile.Dock))
+            {
+                if (done.Contains(dock)) continue;
+                var group = DockGroup(dock);
+                done.UnionWith(group);
+                Vector2Int landSide = Steps[0];
+                int most = -1;
+                foreach (var step in Steps)
+                {
+                    int contacts = group.Count(c => Get(c + step) != FieldTile.Dock && IsWalkable(c + step));
+                    if (contacts > most)
+                    {
+                        most = contacts;
+                        landSide = step;
+                    }
+                }
+                Vector2Int? best = null, bestStep = null;
+                int bestScore = -1;
+                foreach (var cell in group)
+                foreach (var step in Steps)
+                {
+                    var water = cell + step;
+                    if (!IsRaftWater(water)) continue;
+                    int open = 0;
+                    while (open < 8 && IsRaftWater(water + step * (open + 1))) open++;
+                    int score = (step == -landSide ? 100 : 0) + open;
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                        best = water;
+                        bestStep = step;
+                    }
+                }
+                if (best.HasValue) spots.Add((best.Value, bestStep.Value));
+            }
+            return spots;
         }
 
         // 덩굴 다리를 가로(왼↔오른)로 건너는지: 다리 줄의 왼쪽·오른쪽 끝 너머가 물이 아니면 가로 (그림 방향)

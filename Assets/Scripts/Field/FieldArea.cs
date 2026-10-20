@@ -227,6 +227,7 @@ namespace WordRPG.Field
                 case FieldTile.Lectern: if (HasDictionary) return dictionaryName; break;
                 case FieldTile.Gate: if (!IsMiddleOfGate(position)) return null; break; // 여러 칸짜리 문은 가운데 칸에만
                 case FieldTile.Key: if (bossKey != null) return bossKey.DisplayName; break;
+                case FieldTile.Dock: if (Map.DockGroup(position)[0] != position) return null; break; // 2×2 부두는 맨 위 왼쪽 칸에만 (#121)
                 case FieldTile.Door:
                     var exit = GetExit(position);
                     return exit != null && exit.Target != null ? exit.Target.DisplayName : null;

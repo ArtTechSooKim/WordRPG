@@ -241,30 +241,27 @@ namespace WordRPG.UI
             raftRenderer.flipX = facing == Direction.Left || facing == Direction.Down;
         }
 
-        // 나루터마다 묶인 뗏목 (어느 나루터에서든 탈 수 있음 — 타는 동안은 숨김)
+        // 나루터(2×2 부두)마다 묶인 뗏목 하나 (어느 나루터에서든 탈 수 있음 — 타는 동안은 숨김).
+        // 자리는 부두 앞 넓은 물 (#121 사용자: 섬 나루터의 뗏목이 뭍과 섬을 잇는 다리처럼 보였음)
         private void RefreshMooredRafts()
         {
             foreach (var moored in mooredRafts) if (moored != null) Destroy(moored);
             mooredRafts.Clear();
             if (raftSprite == null) return;
-            var map = walker.Map;
-            foreach (var dock in map.FindAll(FieldTile.Dock))
+            foreach (var (water, step) in walker.Map.MooringSpots())
             {
-                foreach (var step in new[] { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down })
-                {
-                    if (!map.IsRaftWater(dock + step)) continue;
-                    var go = new GameObject("MooredRaft", typeof(SpriteRenderer));
-                    go.transform.SetParent(transform, false);
-                    go.transform.position = CellCenter(dock + step) + new Vector3(0f, -0.2f, 0f);
-                    go.transform.localEulerAngles = new Vector3(0f, 0f, step.x == 0 ? 90f : 0f);
-                    var renderer = go.GetComponent<SpriteRenderer>();
-                    renderer.sprite = raftSprite;
-                    renderer.sortingOrder = 2;
-                    go.SetActive(!walker.Rafting);
-                    mooredRafts.Add(go);
-                    break;
-                }
+                var go = new GameObject("MooredRaft", typeof(SpriteRenderer));
+                go.transform.SetParent(transform, false);
+                go.transform.position = CellCenter(water) + new Vector3(0f, -0.2f, 0f);
+                go.transform.localEulerAngles = new Vector3(0f, 0f, step.x == 0 ? 90f : 0f);
+                var renderer = go.GetComponent<SpriteRenderer>();
+                renderer.sprite = raftSprite;
+                renderer.sortingOrder = 2;
+                go.SetActive(!walker.Rafting);
+                mooredRafts.Add(go);
             }
         }
+
+        public int MooredRaftCount => mooredRafts.Count; // 테스트용
     }
 }
