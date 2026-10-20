@@ -102,6 +102,46 @@ namespace WordRPG.Tests
             Object.Destroy(screen.gameObject);
         }
 
+        // 힘 모으기 (#120 사용자): "까먹대왕이 힘을 모으고 있다" → 다음 차례 "까먹대왕의 기억상실!" (그 사이 한 차례는 피해 없음)
+        [UnityTest]
+        public IEnumerator ChargingBossAnnouncesThenStrikesNextTurn()
+        {
+            var strike = TestData.Skill("strike", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var hero = Hero(new MonsterStats(999, 10, 10), strike);
+            var amnesia = TestData.Skill("amnesia", SkillKind.Damage, SkillTarget.SingleEnemy, 20).Set("displayName", "기억상실").Set("chargeTurns", 1);
+            var boss = TestData.Species("boss", new MonsterStats(999, 10, 10), new MonsterStats(0, 0, 0), amnesia).Set("displayName", "까먹대왕");
+            var screen = CreateScreen(hero, boss);
+            yield return null;
+            yield return null;
+
+            var root = screen.transform;
+            int chargedAt = -1, struckAt = -1, hpWhenCharged = -1;
+            for (int frame = 0; frame < 4000 && struckAt < 0; frame++)
+            {
+                string text = AllText(root);
+                if (chargedAt < 0 && text.Contains("까먹대왕이 힘을 모으고 있다"))
+                {
+                    chargedAt = frame;
+                    hpWhenCharged = screen.Engine.Party[0].Hp;
+                }
+                if (text.Contains("까먹대왕의 기억상실!")) struckAt = frame;
+
+                var engine = screen.Engine;
+                var confirm = ActiveButton(root, "CardConfirmButton");
+                if (confirm != null) confirm.onClick.Invoke();
+                else if (engine.Phase == BattlePhase.AnsweringQuiz && engine.CurrentQuestion != null)
+                    ActiveButton(root, $"Choice_{(engine.CurrentQuestion.CorrectIndex + 1) % engine.CurrentQuestion.Choices.Count}")?.onClick.Invoke();
+                else if (engine.Phase == BattlePhase.ChoosingSkill)
+                    (ActiveButton(root, "Intensity_0") ?? ActiveButton(root, "SkillButton_0"))?.onClick.Invoke();
+                yield return null;
+            }
+
+            Assert.GreaterOrEqual(chargedAt, 0, "힘을 모으는 글이 떠야 함");
+            Assert.Greater(struckAt, chargedAt, "다음 차례에 기억상실");
+            Assert.AreEqual(999, hpWhenCharged, "힘을 모은 차례엔 피해 없음");
+            Object.Destroy(screen.gameObject);
+        }
+
         // 실기기 점검표 (#48): 문제 도중 전화·알림·홈 화면으로 앱이 가려지면 시간이 멈춤
         [UnityTest]
         public IEnumerator QuizTimerStopsWhileTheAppIsHidden()

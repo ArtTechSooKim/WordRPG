@@ -31,6 +31,8 @@ namespace WordRPG.Battle
         private readonly List<BattleUnit> enemies = new List<BattleUnit>();
         private readonly List<MasteryChange> masteryChanges = new List<MasteryChange>();
         private readonly Dictionary<BattleUnit, int> enemyHeals = new Dictionary<BattleUnit, int>(); // 적마다 이번 전투에서 회복한 횟수 (#88)
+        private readonly Dictionary<BattleUnit, (SkillData skill, int turnsLeft)> charging =
+            new Dictionary<BattleUnit, (SkillData, int)>(); // 힘을 모으는 적 → 모으는 기술 · 남은 차례 (#120)
         private readonly IQuizProvider quiz;
         private readonly BattleConfig config;
         private readonly Random rng;
@@ -291,9 +293,8 @@ namespace WordRPG.Battle
             RunEnemyPhase(events);
             if (CheckBattleEnd(events)) return;
 
-            // 보호막은 건 쪽의 다음 행동 차례가 오면 사라진다
+            // 아군 보호막은 다 깎일 때까지 그 전투 내내 남는다 (#120 사용자: 한 번 쓰고 사라지면 쓸 이유가 적음 — 큰 한 방에 대비해 미리 쳐 둠)
             Round++;
-            foreach (var unit in party) unit.ClearShield();
             events.Add(BattleEvent.RoundStarted(Round));
             CurrentActor = FirstAlive(party);
             Phase = BattlePhase.ChoosingSkill;
@@ -308,7 +309,27 @@ namespace WordRPG.Battle
                 if (enemy.IsDefeated || enemy.Skills.Count == 0) continue;
                 if (FirstAlive(party) == null) return;
 
+                // 힘을 모으던 기술 (#120): 다 모았으면 이번 차례에 발동 (대상은 지금 고름)
+                if (charging.TryGetValue(enemy, out var held))
+                {
+                    if (held.turnsLeft > 1)
+                    {
+                        charging[enemy] = (held.skill, held.turnsLeft - 1);
+                        events.Add(BattleEvent.Charging(enemy, held.skill));
+                        continue;
+                    }
+                    charging.Remove(enemy);
+                    ExecuteSkill(enemy, held.skill, ChooseEnemyTarget(enemy, held.skill), false, events);
+                    continue;
+                }
+
                 var skill = ChooseEnemySkill(enemy);
+                if (skill.ChargeTurns > 0)
+                {
+                    charging[enemy] = (skill, skill.ChargeTurns);
+                    events.Add(BattleEvent.Charging(enemy, skill));
+                    continue;
+                }
                 if (skill.Kind == SkillKind.Heal) enemyHeals[enemy] = HealsUsed(enemy) + 1;
                 ExecuteSkill(enemy, skill, ChooseEnemyTarget(enemy, skill), false, events);
             }
@@ -324,6 +345,9 @@ namespace WordRPG.Battle
             if (choices.Count == 0) choices.AddRange(enemy.Skills); // 회복 기술뿐인 적
             return choices[rng.Next(choices.Count)];
         }
+
+        // 힘을 모으고 있는 적인지 (#120) — 다음 차례에 큰 기술이 나감
+        public bool IsCharging(BattleUnit enemy) => enemy != null && charging.ContainsKey(enemy);
 
         private int HealsUsed(BattleUnit enemy) => enemyHeals.TryGetValue(enemy, out int used) ? used : 0;
 

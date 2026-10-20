@@ -50,6 +50,30 @@ namespace WordRPG.Field
             return Normalize(mask);
         }
 
+        // 출입구 칸의 바닥 (#120): 길처럼 이웃 길과 이어지고, 맵 밖 쪽은 길이 바깥까지 이어진 것으로 (지역 밖으로 나가는 길)
+        public static int DoorFloorMask(FieldMap map, Vector2Int cell)
+        {
+            int mask = 0;
+            for (int i = 0; i < Offsets.Length; i++)
+            {
+                var next = cell + Offsets[i];
+                if (!map.InBounds(next) || Connects(FieldTile.Floor, map.Get(next))) mask |= 1 << i;
+            }
+            return Normalize(mask);
+        }
+
+        // 출입구가 바깥으로 열린 쪽 (#120 빛이 비쳐 드는 쪽): 맵 밖과 맞닿은 변 → 없으면 걸을 수 있는 이웃의 반대쪽 → 그것도 없으면 오른쪽
+        public static Vector2Int Outward(FieldMap map, Vector2Int cell)
+        {
+            foreach (var side in Sides)
+                if (!map.InBounds(cell + side)) return side;
+            foreach (var side in Sides)
+                if (map.InBounds(cell + side) && FieldMap.IsWalkable(map.Get(cell + side))) return -side;
+            return Vector2Int.right;
+        }
+
+        private static readonly Vector2Int[] Sides = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down };
+
         public static int Normalize(int mask)
         {
             if ((mask & N) == 0 || (mask & E) == 0) mask &= ~NE;

@@ -773,9 +773,16 @@ namespace WordRPG.UI
                         yield return Wait(0.5f);
                         break;
 
-                    case BattleEventType.RoundStarted:
+                    case BattleEventType.Charging: // 힘을 모으는 기술 (#120): 이번 차례는 힘만 모으고 다음 차례에 큰 한 방 — 보호막으로 대비할 틈
+                        Log($"{UiKit.WithJosa(e.Actor.DisplayName, "이", "가")} 힘을 모으고 있다");
+                        Float(e.Actor, "힘을 모은다!", Palette.Gold, 48);
+                        Sound.Play(Sfx.EvolveLight);
+                        PlayFx(e.Actor, Fx.Sparkle, 1.5f, 1.3f);
+                        yield return Wait(0.9f);
+                        break;
+
+                    case BattleEventType.RoundStarted: // 아군 보호막은 전투 내내 남음 (#120) — 화면도 실제 값 그대로
                         roundLabel.text = training ? "수련" : $"라운드 {e.Round}";
-                        foreach (var unit in engine.Party) shown[unit] = (shown[unit].hp, 0);
                         SyncAll();
                         yield return Wait(0.2f);
                         break;

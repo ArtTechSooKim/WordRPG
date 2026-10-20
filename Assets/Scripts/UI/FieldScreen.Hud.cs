@@ -40,7 +40,6 @@ namespace WordRPG.UI
 
             // 오브젝트 이름표는 맨 아래 층 (상단 바·패드·창이 그 위를 덮는다)
             nameTags = FieldNameTags.Create(hudRoot);
-            bubble = SpeechBubble.Create(hudRoot); // 이름표 위, 상단 바·메뉴·창 아래
 
             // 상단: 지역 이름 · 도감 진행 · 골드
             var top = UiKit.Panel("TopBar", hudRoot, Palette.Scrim, 0, 0.94f, 1, 1);
@@ -166,6 +165,10 @@ namespace WordRPG.UI
             preemptRange = UiRing.Create("PreemptRange", markLayer, Palette.Gold, 5f, 100f, 28);
             preemptRange.gameObject.SetActive(false);
             BuildPreemptPrompt(UiKit.Rect("PreemptPrompt", hudRoot, 0.19f, 0.3f, 0.19f, 0.3f));
+
+            // 주인공 말풍선: 상단 바·미니맵·목표 한 줄·메뉴·스틱 위, 조우 번쩍임·창 아래
+            // (#120 사용자: "새로운 단어로 힘을 모아야해"가 목표 한 줄·가방 버튼에 가려졌음 — 예전엔 이름표 바로 위였음)
+            bubble = SpeechBubble.Create(hudRoot);
 
             // 조우 연출용 번쩍임
             flash = UiKit.Panel("EncounterFlash", hudRoot, Color.clear);

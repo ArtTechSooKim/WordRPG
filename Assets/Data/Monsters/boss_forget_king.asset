@@ -20,17 +20,17 @@ MonoBehaviour:
   sprite: {fileID: 21300000, guid: ae05ce99b8afdd04ebf4acc476acbf90, type: 3}
   placeholderColor: {r: 0.15, g: 0.6, b: 0.55, a: 1}
   baseStats:
-    maxHp: 50
+    maxHp: 100
     attack: 14
     defense: 12
   growthPerLevel:
-    maxHp: 8
+    maxHp: 16
     attack: 3
     defense: 2
   skills:
-  - {fileID: 11400000, guid: c644652d41a6995438e8245b66821e74, type: 2}
-  - {fileID: 11400000, guid: 670ad0cfd8c625745b6664b21ad56436, type: 2}
+  - {fileID: 11400000, guid: 8c7a2777a5b5470c957ba80b844f3c93, type: 2}
   - {fileID: 11400000, guid: d959ca86eeb682240a0450da7c8514ce, type: 2}
+  - {fileID: 11400000, guid: cf054c5798524f1a9df7372d93080960, type: 2}
   expReward: 25
   goldReward: 30
   drops:
