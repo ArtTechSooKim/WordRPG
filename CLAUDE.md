@@ -82,12 +82,12 @@
      'Y' 레버 → 가장 가까운 'H' 덩굴 다리가 놓임(`FieldMap.BridgeOf`, 규칙 `Levers`, 세이브 pulledLevers) · 'U' 유적 돌벽 · ';' 유적 바닥 ·
      'T' 단어 석판(세이브 solvedTablets) · 'A' 유적 제단(FieldArea `shrineCompanion` + `shrineWords` 60, 규칙 `Ruins`) ·
      'O' 동굴 입구 = 출입구(#115 — 'D'와 같이 Door·출입구 번호에 들어가고 그림만 3×3 동굴 `FieldMap.IsCaveMouth` · `FieldArt.CaveMouthProp`).
-     정글 칸은 정글 테마에서만 (`FieldThemes.Supports` — 다른 테마에 쓰려면 거기에 더하고 그림을 만듦). 칸 상태(끝난 모습·지나갈 수 있음)는 `CellState`,
+     정글 칸은 정글 테마에서만 (`FieldTiles` 표의 테마 칸 = `FieldThemes.Supports` — 다른 테마에 쓰려면 거기에 더하고 그림을 만듦). 칸 상태(끝난 모습·지나갈 수 있음)는 `CellState`,
      도달 검사(모든 상자·출입구)는 걷기 + 뗏목 `FieldReach.Flood`. 칸보다 큰 그림(석상·동굴)은 `FieldArt.Prop`(Tiles/{테마}_{종류}_prop.png).
      'Q' 꾸밈(#86, 막힘): 종류는 둘레로 정함 `FieldDecor.Variant` (그림 Tiles/{테마}_Decor_{종류}.png, 1×2는 _prop), 막지 않는 흩뿌림은 `FieldScatter`(Tiles/{테마}_Scatter_{바닥}_n.png).
      정글 맵 원본 = Tools/jungle_map.py (마지막에 widen_maps.widen을 나무만 걷게 해서 한 칸 통로를 넓힘) → Builds/maps/JungleMap.txt를 상수·에셋에 옮김
    - 동굴 (#112, 1.2 — GDD 9-7): 테마 `FieldTheme.Cave` = 어두운 지역 (`FieldDarkness.IsDark`). 맵 글자 'I' = 글자 반딧돌(규칙 `GlowStones`, 세이브 `WorldState.litStones`),
-     동굴 칸 = 기본 칸 + 레버·덩굴 다리·꾸밈·반딧돌 (`FieldThemes.Supports`). 빛 규칙 `CaveLight`·`DarknessMap`(순수): 주인공 3.5칸 + 동료 횃불 1칸 · 밝힌 반딧돌 6칸 ·
+     동굴 칸 = 기본 칸 + 레버·덩굴 다리·꾸밈·반딧돌 (`FieldTiles` 표). 빛 규칙 `CaveLight`·`DarknessMap`(순수): 주인공 3.5칸 + 동료 횃불 1칸 · 밝힌 반딧돌 6칸 ·
      쉼터 물건(샘·가게·제단·사전) 4칸 · 출입구 2.5칸 · 지나간 곳 Memory. 그리기 `FieldDarkness`(칸마다 2×2픽셀 한 장, 주인공 빛이 1/4칸 움직일 때만 다시 칠함, 알파 1 —
      Linear라 0.97만 돼도 바닥이 비침). 빛 밖 몬스터는 빨간 눈만 (`FieldRoamerViews.UpdateEyes` — 사용자: 적의 눈은 모두 빨간색), 꺼진 반딧돌은 희미하게 깜빡(`FieldScreen.Cave`).
      반딧돌 [확인] = `GlowStoneQuizView`(Figma #111) + `TabletQuiz(provider, 1, EnglishToMeaning)` — 석판과 같은 규칙(틀려도 벌점 없음), 밝히면 빛이 퍼지고(`FieldDarkness.Grow`)
@@ -128,8 +128,10 @@
       달리기 먼지(Dust = 회색조 그림 × 바닥 색 `FieldArt.DustColor` — 새 바닥 타일을 만들면 색도 정할 것)
     - Linear 색공간이라 반투명 검정은 알파를 높게(0.7~0.8) 잡아야 눈에 보이는 만큼 어두워진다
 13. **맵은 글자 데이터로만**: 미니맵·지도(`MapViews.cs`)가 FieldMap에서 자동으로 그려진다. 탐험 안개는 `WorldState.Reveal/IsExplored`
-    (지역별 비트 기록 `ExploredArea`, 세이브에 포함). 새 맵 글자(타일 종류)를 추가하면
-    `MinimapArt.ColorOf`·`FieldArt`·`PlaceholderArt`에도 추가 (MinimapTests·AudioArtTests가 빠진 것을 잡음).
+    (지역별 비트 기록 `ExploredArea`, 세이브에 포함). **맵 글자 표 `FieldTiles`** (#116): 칸 종류마다 한 줄 — 글자·걷기·몬스터가 걷는 땅·[확인]·이름표(기본 글자)·
+    끝난 모습·끝나면 열림·쉼터 물건·쓰는 테마. 게임 규칙은 이 표만 보고, 화면 모습은 UI 쪽 표가 칸 종류로 찾는다 (미니맵 색 = `MinimapArt` 테마별 표, 먼지 색 = `FieldArt.DustColor` 표).
+    새 칸 종류 = `FieldTile` 맨 뒤 + 표 한 줄 + 그림 Tiles/{테마}_{종류}.png + 미니맵 색 + `PlaceholderArt` 한 줄
+    (+ [확인]이면 `FieldScreen` Interact, 끝난 모습이면 `CellState.IsDone`). 빠진 것은 FieldTilesTests·AudioArtTests가 잡음.
     길·물은 이웃 모양으로 테두리 조각을 고른다 (FieldAutotile → FieldArt.AutoTile, 그림 = Tiles/{테마}_{Floor|Water}_auto.png 256칸).
     벽·풀숲도 그림이 있는 테마만: 초원 덤불 Meadow_Wall_auto(짙은 덤불 + 그늘 바탕, #100) · 초원 풀숲 Meadow_Grass_auto(풀숲이 아닌 쪽은 풀잎 모양 테두리, #102) ·
     서고 바닥 안개 = 몬스터 칸은 돌 + 위에 이어진 안개 한 장 `FieldFog`(그림은 규칙 `FogMap`이 맵에서 바로 — 구름 무늬, 벽엔 안 번짐, 쓰는 테마 = FieldFog.StyleFor #103).
@@ -151,7 +153,7 @@ Assets/
                         적 회복은 HP 절반 아래·한 전투 두 번까지 #88), 경험치는 레벨 차이 비율 BattleConfig.ExpFactor(25%씩·최소 5% #88) —
                         숫자를 바꾸면 EditMode BalanceSimulationTests(정글 전투·보스) 확인, 표는 [Explicit] BalanceReport, Combo(콤보 단계·글자·추가 피해), BattleFormulas, BattleReward,
                         BattleSummary(한 판 결산: 새 단어·틀린 단어·기술별 피해·최대 콤보 — 결산 화면용), Preemptive(선제공격: HP 20%·이미 본 단어만)
-    Field/              FieldMap(맵 글자→격자), FieldWalker(이동), StickInput(스틱 값→4방향·달리기), EncounterCounter(조우), FieldInteraction([확인] 대상·이름표 규칙), FieldAutotile(길·물가 테두리 모양),
+    Field/              FieldMap(맵 글자→격자), FieldTiles(맵 글자 표 — 칸 종류마다 글자·성질·이름표·테마, #116), FieldWalker(이동), StickInput(스틱 값→4방향·달리기), EncounterCounter(조우), FieldInteraction([확인] 대상·이름표 규칙), FieldAutotile(길·물가 테두리 모양),
                         FieldArea(지역 SO: 테마·출입구 연결·보스·상자·상점·조우 방식·물의 몬스터·유적 동료), EncounterTable, RoamingMonsters(보이는 몬스터: 어슬렁·발견·쫓기·포기·부딪힘),
                         FieldReach(시작 칸에서 갈 수 있는 칸 — 걷기 + 뗏목, 문·다리를 연/닫은 기준, #80), CaveLight(동굴 빛 규칙 + DarknessMap — #112)
     Game/               GameSession(진행 상태 전체), GameManager(씬 간 유지 + 자동 저장 + 설정 + 결제 창구), GameDatabase(id→에셋), PlayerRecord,

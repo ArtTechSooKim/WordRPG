@@ -206,11 +206,7 @@ namespace WordRPG.Field
             }
         }
 
-        private bool IsLand(Vector2Int cell)
-        {
-            var tile = map.Get(cell);
-            return tile == FieldTile.Floor || tile == FieldTile.Lawn || tile == FieldTile.Grass || tile == FieldTile.Stream;
-        }
+        private bool IsLand(Vector2Int cell) => FieldTiles.Of(map.Get(cell)).RoamerWalkable; // 길·잔디·덤불·얕은 강
 
         // 지역에 들어올 때: 정해진 마릿수만큼 주인공에게서 먼 서식지에
         public List<RoamerEvent> Populate(Vector2Int player)
@@ -494,10 +490,9 @@ namespace WordRPG.Field
             {
                 if (!map.IsRaftWater(cell)) return false;
             }
-            else
+            else if (!IsLand(cell))
             {
-                var tile = map.Get(cell);
-                if (tile != FieldTile.Floor && tile != FieldTile.Lawn && tile != FieldTile.Grass && tile != FieldTile.Stream) return false;
+                return false;
             }
             return At(cell) == null;
         }

@@ -50,17 +50,8 @@ namespace WordRPG.Field
     {
         // 그 테마의 맵에 쓸 수 있는 칸 — 정글 칸(얕은 강·나루터·레버·덩굴 다리·유적·석판·제단)은 정글에서만 (#80),
         // 동굴(#112)은 글자 반딧돌 + 정글의 레버·덩굴 다리·꾸밈.
-        // 그림(Tiles/{테마}_{종류}.png)도 이 표대로 있어야 함 (AudioArtTests). 다른 테마에서 쓰려면 여기에 더하고 그림을 만든다
-        public static bool Supports(FieldTheme theme, FieldTile tile)
-        {
-            if (tile < FieldTile.Stream) return true;
-            switch (theme)
-            {
-                case FieldTheme.Jungle: return tile != FieldTile.GlowStone;
-                case FieldTheme.Cave: return tile == FieldTile.Lever || tile == FieldTile.Bridge || tile == FieldTile.Decor || tile == FieldTile.GlowStone;
-                default: return false;
-            }
-        }
+        // 그림(Tiles/{테마}_{종류}.png)도 이대로 있어야 함 (AudioArtTests). 다른 테마에서 쓰려면 FieldTiles 표의 테마 칸에 더하고 그림을 만든다
+        public static bool Supports(FieldTheme theme, FieldTile tile) => FieldTiles.Of(tile).SupportsTheme(theme);
     }
 
     public enum Direction
@@ -85,7 +76,7 @@ namespace WordRPG.Field
         }
     }
 
-    // 맵 텍스트 → 격자.
+    // 맵 텍스트 → 격자. 글자 → 칸 종류는 FieldTiles 표 (#116)
     //   '.' 길   ':' 잔디(조우 없음)   ',' 풀숲(조우)   '#' 나무(막힘)   '~' 물(막힘)   'P' 시작 위치(길)
     //   옆에서 [확인]으로 쓰는 칸: 'F' 회복의 샘   'C' 보물상자   'E' 성유물 제단   'S' 상점   'B' 보스   'L' 사전 받침대   'G' 보스 방 문   'K' 열쇠
     //   'D' 출입구 (밟으면 다른 지역으로)
@@ -153,54 +144,29 @@ namespace WordRPG.Field
                 for (int x = 0; x < width; x++)
                 {
                     char c = rows[r][x];
-                    switch (c)
+                    if (!FieldTiles.TryParse(c, out var tile))
+                        throw new FormatException($"맵 {r + 1}번째 줄 {x + 1}번째 칸: 알 수 없는 글자 '{c}'");
+                    var cell = new Vector2Int(x, y);
+                    tiles[x, y] = tile;
+
+                    // 칸 종류만으로 끝나지 않는 글자: 위치 목록(상자·출입구 순서)·하나뿐인 칸·물살 방향
+                    switch (tile)
                     {
-                        case '.': tiles[x, y] = FieldTile.Floor; break;
-                        case ':': tiles[x, y] = FieldTile.Lawn; break;
-                        case ',': tiles[x, y] = FieldTile.Grass; break;
-                        case '#': tiles[x, y] = FieldTile.Wall; break;
-                        case '~': tiles[x, y] = FieldTile.Water; break;
-                        case 'F': tiles[x, y] = FieldTile.Fountain; break;
-                        case 'E': tiles[x, y] = FieldTile.Altar; break;
-                        case 'S': tiles[x, y] = FieldTile.Shop; break;
-                        case 'L': tiles[x, y] = FieldTile.Lectern; break;
-                        case 'G': tiles[x, y] = FieldTile.Gate; break;
-                        case 'K': tiles[x, y] = FieldTile.Key; break;
-                        case '>': case '<': case '^': case 'v':
-                            tiles[x, y] = FieldTile.Stream;
-                            streams[new Vector2Int(x, y)] = c == '>' ? Direction.Right : c == '<' ? Direction.Left : c == '^' ? Direction.Up : Direction.Down;
+                        case FieldTile.Chest: chests.Add(cell); break;
+                        case FieldTile.Door:
+                            doors.Add(cell);
+                            if (c == FieldTiles.CaveMouthSymbol) caveMouths.Add(cell);
                             break;
-                        case 'J': tiles[x, y] = FieldTile.Dock; break;
-                        case 'Y': tiles[x, y] = FieldTile.Lever; break;
-                        case 'H': tiles[x, y] = FieldTile.Bridge; break;
-                        case 'U': tiles[x, y] = FieldTile.RuinWall; break;
-                        case ';': tiles[x, y] = FieldTile.RuinFloor; break;
-                        case 'T': tiles[x, y] = FieldTile.Tablet; break;
-                        case 'A': tiles[x, y] = FieldTile.Shrine; break;
-                        case 'Q': tiles[x, y] = FieldTile.Decor; break;
-                        case 'I': tiles[x, y] = FieldTile.GlowStone; break;
-                        case 'O':
-                        case 'D':
-                            tiles[x, y] = FieldTile.Door;
-                            doors.Add(new Vector2Int(x, y));
-                            if (c == 'O') caveMouths.Add(new Vector2Int(x, y));
-                            break;
-                        case 'B':
+                        case FieldTile.Boss:
                             if (boss.HasValue) throw new FormatException("보스 'B'는 지역마다 하나만 둘 수 있습니다");
-                            tiles[x, y] = FieldTile.Boss;
-                            boss = new Vector2Int(x, y);
+                            boss = cell;
                             break;
-                        case 'C':
-                            tiles[x, y] = FieldTile.Chest;
-                            chests.Add(new Vector2Int(x, y));
-                            break;
-                        case 'P':
-                            if (start.HasValue) throw new FormatException("시작 위치 'P'가 두 개 이상입니다");
-                            tiles[x, y] = FieldTile.Floor;
-                            start = new Vector2Int(x, y);
-                            break;
-                        default:
-                            throw new FormatException($"맵 {r + 1}번째 줄 {x + 1}번째 칸: 알 수 없는 글자 '{c}'");
+                        case FieldTile.Stream: streams[cell] = FieldTiles.StreamDirection(c); break;
+                    }
+                    if (c == FieldTiles.StartSymbol)
+                    {
+                        if (start.HasValue) throw new FormatException("시작 위치 'P'가 두 개 이상입니다");
+                        start = cell;
                     }
                 }
             }
@@ -214,15 +180,10 @@ namespace WordRPG.Field
         // 맵 밖은 벽으로 취급
         public FieldTile Get(Vector2Int p) => InBounds(p) ? tiles[p.x, p.y] : FieldTile.Wall;
 
-        public static bool IsWalkable(FieldTile tile) =>
-            tile == FieldTile.Floor || tile == FieldTile.Lawn || tile == FieldTile.Grass || tile == FieldTile.Door
-            || tile == FieldTile.Stream || tile == FieldTile.Dock || tile == FieldTile.RuinFloor;
+        public static bool IsWalkable(FieldTile tile) => FieldTiles.Of(tile).Walkable;
 
         // 걸을 수는 없지만 옆에서 [확인]을 누르면 무언가 일어나는 칸
-        public static bool IsInteractive(FieldTile tile) =>
-            tile == FieldTile.Chest || tile == FieldTile.Fountain || tile == FieldTile.Altar || tile == FieldTile.Shop
-            || tile == FieldTile.Boss || tile == FieldTile.Lectern || tile == FieldTile.Gate || tile == FieldTile.Key
-            || tile == FieldTile.Lever || tile == FieldTile.Tablet || tile == FieldTile.Shrine || tile == FieldTile.GlowStone;
+        public static bool IsInteractive(FieldTile tile) => FieldTiles.Of(tile).Interactive;
 
         // 'O'로 적은 출입구인지 (#115): 하는 일은 'D'와 같고 그림만 큰 동굴 입구 (FieldArt.CaveMouthProp)
         public bool IsCaveMouth(Vector2Int p) => caveMouths.Contains(p);

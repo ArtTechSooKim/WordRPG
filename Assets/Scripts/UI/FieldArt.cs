@@ -14,12 +14,10 @@ namespace WordRPG.UI
 
         // done: 연 보물상자, 쓰러뜨린 보스 자리(빈자리), 사전이 놓인 받침대, 연 보스 방 문(길), 열쇠를 가져간 빈 받침대,
         //       당긴 레버, 놓인 덩굴 다리, 푼 석판, 깨어난 유적 제단(빈 받침) (#80), 밝힌 글자 반딧돌 (#112)
+        //       — 끝난 모습이 있는 칸은 FieldTiles 표 (#116)
         public static Sprite ForTile(FieldTile tile, FieldTheme theme, bool done)
         {
-            bool hasDone = done && (tile == FieldTile.Chest || tile == FieldTile.Boss || tile == FieldTile.Lectern
-                                    || tile == FieldTile.Gate || tile == FieldTile.Key || tile == FieldTile.Lever
-                                    || tile == FieldTile.Bridge || tile == FieldTile.Tablet || tile == FieldTile.Shrine
-                                    || tile == FieldTile.GlowStone);
+            bool hasDone = done && FieldTiles.Of(tile).HasDoneLook;
             return Load($"{theme}_{tile}{(hasDone ? "_done" : "")}") ?? PlaceholderArt.ForTile(tile, theme, done);
         }
 
@@ -133,56 +131,44 @@ namespace WordRPG.UI
         // 달리기 흙먼지 색 (#53 사용자 요청: 밟는 바닥에 따라). 먼지 그림(Fx.Dust)은 회색조라 이 색을 곱해 쓴다
         // (밝은 알갱이 = 이 색, 어두운 알갱이 = 이 색의 약 0.5·0.7배). 바닥 타일 색보다 꽤 밝게 잡아야 밝은·어두운 알갱이가 둘 다 보인다.
         // 바닥 색은 Tiles/{테마}_{종류}.png에서 뽑음: 초원 흙길 d3865f · 풀숲 74a334 · 잔디 adbc3a, 서고 돌바닥 4e484a · 카펫 8d977f,
-        // 숲 흙길 a3754e · 풀 74a334. 걸을 수 없는 칸이나 처음 보는 바닥은 그 테마의 길 색
+        // 숲 흙길 a3754e · 풀 74a334. 걸을 수 없는 칸이나 처음 보는 바닥은 그 테마의 길 색 (표에 없는 칸, #116)
         public static Color DustColor(FieldTheme theme, FieldTile tile)
         {
-            switch (theme)
-            {
-                case FieldTheme.Library:
-                    switch (tile)
-                    {
-                        case FieldTile.Grass: return Rgb(0xD2DCE8); // 바닥 안개 — 옅은 푸른 물보라 (#101)
-                        case FieldTile.Lawn: return Rgb(0xDCE2D2);  // 카펫·이끼
-                        default: return Rgb(0xC9C0BC);              // 돌바닥 (보스 빈자리도 돌바닥)
-                    }
-                case FieldTheme.Forest:
-                    switch (tile)
-                    {
-                        case FieldTile.Grass:
-                        case FieldTile.Lawn:
-                        case FieldTile.Boss: return Rgb(0xD2EBA0);  // 숲 풀 (보스 빈자리는 풀밭)
-                        default: return Rgb(0xE3CDB8);              // 숲 흙길
-                    }
-                case FieldTheme.Jungle: // 정글 (#80): 진흙길 · 짙은 풀 · 이끼 땅 · 얕은 강은 물보라 · 유적은 돌가루
-                    switch (tile)
-                    {
-                        case FieldTile.Grass: return Rgb(0xC8E89A);
-                        case FieldTile.Lawn:
-                        case FieldTile.Boss: return Rgb(0xB5DC8C);
-                        case FieldTile.Stream: return Rgb(0xD6F2FF);
-                        case FieldTile.RuinFloor:
-                        case FieldTile.Bridge: return Rgb(0xDDE0CC);
-                        default: return Rgb(0xD9B79A);
-                    }
-                case FieldTheme.Cave: // 동굴 (#112): 회갈 바위 바닥 · 다져진 길 · 청록 빛이끼
-                    switch (tile)
-                    {
-                        case FieldTile.Grass: return Rgb(0xBFE3D4);
-                        case FieldTile.Lawn:
-                        case FieldTile.Boss: return Rgb(0xD9CCC0);
-                        case FieldTile.Bridge: return Rgb(0xDDC7A8);
-                        default: return Rgb(0xC9B39E);
-                    }
-                default:
-                    switch (tile)
-                    {
-                        case FieldTile.Grass: return Rgb(0xD8EC9A);
-                        case FieldTile.Lawn:
-                        case FieldTile.Boss: return Rgb(0xEEF5B8);  // 잔디 (보스 빈자리는 잔디)
-                        default: return Rgb(0xF7DCC8);              // 초원 흙길
-                    }
-            }
+            var dust = DustColors.TryGetValue(theme, out var found) ? found : DustColors[FieldTheme.Meadow];
+            return dust.tiles.TryGetValue(tile, out int hex) ? Rgb(hex) : Rgb(dust.floor);
         }
+
+        private static readonly Dictionary<FieldTheme, (int floor, Dictionary<FieldTile, int> tiles)> DustColors =
+            new Dictionary<FieldTheme, (int, Dictionary<FieldTile, int>)>
+            {
+                [FieldTheme.Meadow] = (0xF7DCC8, new Dictionary<FieldTile, int> // 초원 흙길
+                {
+                    [FieldTile.Grass] = 0xD8EC9A,
+                    [FieldTile.Lawn] = 0xEEF5B8, [FieldTile.Boss] = 0xEEF5B8, // 잔디 (보스 빈자리는 잔디)
+                }),
+                [FieldTheme.Library] = (0xC9C0BC, new Dictionary<FieldTile, int> // 돌바닥 (보스 빈자리도 돌바닥)
+                {
+                    [FieldTile.Grass] = 0xD2DCE8, // 바닥 안개 — 옅은 푸른 물보라 (#101)
+                    [FieldTile.Lawn] = 0xDCE2D2,  // 카펫·이끼
+                }),
+                [FieldTheme.Forest] = (0xE3CDB8, new Dictionary<FieldTile, int> // 숲 흙길
+                {
+                    [FieldTile.Grass] = 0xD2EBA0, [FieldTile.Lawn] = 0xD2EBA0, [FieldTile.Boss] = 0xD2EBA0, // 숲 풀 (보스 빈자리는 풀밭)
+                }),
+                [FieldTheme.Jungle] = (0xD9B79A, new Dictionary<FieldTile, int> // 정글 (#80): 진흙길 · 짙은 풀 · 이끼 땅 · 얕은 강은 물보라 · 유적은 돌가루
+                {
+                    [FieldTile.Grass] = 0xC8E89A,
+                    [FieldTile.Lawn] = 0xB5DC8C, [FieldTile.Boss] = 0xB5DC8C,
+                    [FieldTile.Stream] = 0xD6F2FF,
+                    [FieldTile.RuinFloor] = 0xDDE0CC, [FieldTile.Bridge] = 0xDDE0CC,
+                }),
+                [FieldTheme.Cave] = (0xC9B39E, new Dictionary<FieldTile, int> // 동굴 (#112): 회갈 바위 바닥 · 다져진 길 · 청록 빛이끼
+                {
+                    [FieldTile.Grass] = 0xBFE3D4,
+                    [FieldTile.Lawn] = 0xD9CCC0, [FieldTile.Boss] = 0xD9CCC0,
+                    [FieldTile.Bridge] = 0xDDC7A8,
+                }),
+            };
 
         private static Color Rgb(int hex) => new Color32((byte)(hex >> 16), (byte)(hex >> 8), (byte)hex, 255);
 

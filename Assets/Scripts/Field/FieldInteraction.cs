@@ -28,11 +28,7 @@ namespace WordRPG.Field
 
         // 이름표를 다는 칸: 제단·상점·샘·보스·출입구(동굴 입구 'O'도)·보스 방 문·열쇠, 정글의 레버·석판·유적 제단·나루터 (#80), 동굴의 글자 반딧돌 (#112).
         // 보물상자는 모양만 봐도 알 수 있어 달지 않는다
-        public static bool HasNameTag(FieldTile tile) =>
-            tile == FieldTile.Altar || tile == FieldTile.Shop || tile == FieldTile.Fountain
-            || tile == FieldTile.Boss || tile == FieldTile.Door || tile == FieldTile.Lectern || tile == FieldTile.Gate || tile == FieldTile.Key
-            || tile == FieldTile.Lever || tile == FieldTile.Tablet || tile == FieldTile.Shrine || tile == FieldTile.Dock
-            || tile == FieldTile.GlowStone;
+        public static bool HasNameTag(FieldTile tile) => FieldTiles.Of(tile).HasNameTag;
 
         // 맵의 모든 이름표 칸 (지역에 들어갈 때 이름표를 미리 만들어 둔다)
         public static List<Vector2Int> Landmarks(FieldMap map)

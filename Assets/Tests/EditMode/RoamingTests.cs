@@ -73,10 +73,13 @@ namespace WordRPG.Tests
             }
         }
 
+        // 유적 바닥(';')·나루터('J')에도 들어오지 않음 (#80 — #116 버그 심기 검사에서 빠져 있던 것)
         [Test]
-        public void WanderingMonstersStayNearHomeAndNeverStandOnDoorsOrObjects()
+        public void WanderingMonstersStayNearHomeAndNeverStandOnDoorsObjectsOrRuins()
         {
-            var map = Map(40, 30, (20, 15, ','), (22, 15, 'C'), (39, 15, 'D'), (18, 17, '~'));
+            var cells = new List<(int, int, char)> { (20, 15, ','), (22, 15, 'C'), (39, 15, 'D'), (18, 17, '~'), (18, 13, 'J'), (19, 13, 'J') };
+            for (int y = 12; y <= 18; y++) cells.Add((23, y, ';'));
+            var map = Map(40, 30, cells.ToArray());
             var (roaming, roamer) = One(map, new Vector2Int(2, 2), new RoamingRules { ActiveRadius = 100 });
             for (int i = 0; i < 3000; i++)
             {

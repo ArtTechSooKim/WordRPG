@@ -53,19 +53,17 @@ namespace WordRPG.Field
             {
                 var cell = new Vector2Int(x, y);
                 var center = new Vector2(x + 0.5f, y + 0.5f);
-                switch (map.Get(cell))
+                var tile = map.Get(cell);
+                switch (tile)
                 {
                     case FieldTile.GlowStone:
                         if (isStoneLit != null && isStoneLit(cell)) lights.Add(new LightSource(center, StoneRadius));
                         break;
-                    case FieldTile.Fountain:
-                    case FieldTile.Shop:
-                    case FieldTile.Altar:
-                    case FieldTile.Lectern:
-                        lights.Add(new LightSource(center, CampRadius));
-                        break;
                     case FieldTile.Door:
                         lights.Add(new LightSource(center, DoorRadius));
+                        break;
+                    default:
+                        if (FieldTiles.Of(tile).IsCamp) lights.Add(new LightSource(center, CampRadius)); // 샘·가게·제단·사전
                         break;
                 }
             }

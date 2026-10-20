@@ -215,28 +215,23 @@ namespace WordRPG.Field
             return index >= 0 && index < exits.Count ? exits[index] : null;
         }
 
-        // 이름표 글자: 성유물 제단 · 상점 이름 · 회복의 샘 · 보스 이름 · 출입구는 도착 지역 이름. 이름표가 없는 칸은 null
+        // 이름표 글자: 상점 이름 · 보스 이름 · 사전 이름 · 열쇠 이름 · 출입구는 도착 지역 이름, 나머지는 FieldTiles 표의 기본 글자
+        // (성유물 제단 · 회복의 샘 · 레버 …). 이름표가 없는 칸은 null
         public string LandmarkName(Vector2Int position)
         {
-            switch (Map.Get(position))
+            var tile = Map.Get(position);
+            switch (tile)
             {
-                case FieldTile.Altar: return "성유물 제단";
-                case FieldTile.Fountain: return "회복의 샘";
-                case FieldTile.Shop: return shop != null ? shop.DisplayName : "상점";
+                case FieldTile.Shop: if (shop != null) return shop.DisplayName; break;
                 case FieldTile.Boss: return Boss?.Species.DisplayName;
-                case FieldTile.Lectern: return HasDictionary ? dictionaryName : "빈 받침대";
-                case FieldTile.Gate: return IsMiddleOfGate(position) ? "보스 방 문" : null; // 여러 칸짜리 문은 가운데 칸에만
-                case FieldTile.Key: return bossKey != null ? bossKey.DisplayName : "열쇠";
-                case FieldTile.Lever: return "레버";
-                case FieldTile.Tablet: return "단어 석판";
-                case FieldTile.Shrine: return "유적 제단";
-                case FieldTile.Dock: return "나루터";
-                case FieldTile.GlowStone: return "글자 반딧돌";
+                case FieldTile.Lectern: if (HasDictionary) return dictionaryName; break;
+                case FieldTile.Gate: if (!IsMiddleOfGate(position)) return null; break; // 여러 칸짜리 문은 가운데 칸에만
+                case FieldTile.Key: if (bossKey != null) return bossKey.DisplayName; break;
                 case FieldTile.Door:
                     var exit = GetExit(position);
                     return exit != null && exit.Target != null ? exit.Target.DisplayName : null;
-                default: return null;
             }
+            return FieldTiles.Of(tile).Label;
         }
 
         private bool IsMiddleOfGate(Vector2Int position)

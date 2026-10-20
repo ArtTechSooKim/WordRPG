@@ -48,9 +48,11 @@ namespace WordRPG.Field
             return false;
         }
 
+        private static readonly FieldTile[] CampKinds = FieldTiles.With(TileTraits.Camp); // 샘·가게·제단·사전
+
         private static bool NearCamp(FieldMap map, Vector2Int cell)
         {
-            foreach (var kind in new[] { FieldTile.Fountain, FieldTile.Shop, FieldTile.Altar, FieldTile.Lectern })
+            foreach (var kind in CampKinds)
             foreach (var spot in map.FindAll(kind))
                 if (Mathf.Abs(spot.x - cell.x) <= CampRadius && Mathf.Abs(spot.y - cell.y) <= CampRadius) return true;
             return false;

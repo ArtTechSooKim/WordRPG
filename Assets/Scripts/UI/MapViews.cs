@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using WordRPG.Field;
@@ -26,100 +27,100 @@ namespace WordRPG.UI
         public static readonly Color32 GlowStone = new Color32(120, 220, 255, 255); // 글자 반딧돌 (#112) — 밝히면 더 환하게
         public static readonly Color32 GlowStoneLit = new Color32(214, 248, 255, 255);
         public static readonly Color32 Fog = new Color32(20, 22, 34, 255); // 아직 안 가 본 칸
+        private static readonly Color32 Planks = new Color32(160, 116, 60, 255); // 놓인 덩굴 다리
+        private static readonly Color32 JungleWater = new Color32(38, 104, 150, 255);
+        private static readonly Color32 RuinFloor = new Color32(168, 170, 140, 255);
+        private static readonly Color32 CaveInk = new Color32(64, 50, 104, 255);
+
+        // 테마마다 칸 색 표 (#116): 표에 없는 칸 = 그 테마의 길 색. 끝난 색이 있는 칸은 끝나면 그 색 (연 상자 → 바닥색 등)
+        private sealed class ThemeColors
+        {
+            public readonly Color32 Floor;
+            private readonly Dictionary<FieldTile, (Color32 normal, Color32? done)> colors = new Dictionary<FieldTile, (Color32, Color32?)>();
+
+            public ThemeColors(Color32 floor) => Floor = floor;
+
+            public ThemeColors Set(FieldTile tile, Color32 normal, Color32? done = null)
+            {
+                colors[tile] = (normal, done);
+                return this;
+            }
+
+            public bool Has(FieldTile tile) => colors.ContainsKey(tile);
+
+            public Color32 Of(FieldTile tile, bool done) =>
+                colors.TryGetValue(tile, out var c) ? (done && c.done.HasValue ? c.done.Value : c.normal) : Floor;
+        }
+
+        // 물건 칸은 모든 테마에 같은 밝은 색: 상자·보스·보스 방 문은 끝나면 바닥색, 가져간 열쇠는 빈 받침대
+        private static ThemeColors Landmarks(Color32 floor) => new ThemeColors(floor)
+            .Set(FieldTile.Chest, Chest, floor)
+            .Set(FieldTile.Boss, Boss, floor)
+            .Set(FieldTile.Fountain, Fountain)
+            .Set(FieldTile.Altar, Altar)
+            .Set(FieldTile.Shop, Shop)
+            .Set(FieldTile.Door, Door)
+            .Set(FieldTile.Lectern, Lectern)
+            .Set(FieldTile.Gate, Gate, floor)
+            .Set(FieldTile.Key, Key, Lectern);
+
+        private static readonly Dictionary<FieldTheme, ThemeColors> Themes = new Dictionary<FieldTheme, ThemeColors>
+        {
+            // 초원: 흙길 · 덤불 · 풀숲 · 잔디 · 호수
+            [FieldTheme.Meadow] = Landmarks(new Color32(205, 140, 100, 255))
+                .Set(FieldTile.Wall, new Color32(36, 80, 42, 255))
+                .Set(FieldTile.Grass, new Color32(63, 122, 53, 255))
+                .Set(FieldTile.Lawn, new Color32(150, 190, 70, 255))
+                .Set(FieldTile.Water, new Color32(79, 182, 224, 255)),
+            // 서고: 돌바닥 · 책장 · 바닥 안개 · 카펫 · 잉크 웅덩이
+            [FieldTheme.Library] = Landmarks(new Color32(74, 63, 69, 255))
+                .Set(FieldTile.Wall, new Color32(154, 78, 38, 255))
+                .Set(FieldTile.Grass, new Color32(110, 98, 115, 255))
+                .Set(FieldTile.Lawn, new Color32(88, 104, 86, 255))
+                .Set(FieldTile.Water, new Color32(90, 63, 138, 255)),
+            // 숲: 흙길 · 짙은 덤불 · 고사리 · 이끼 · 늪
+            [FieldTheme.Forest] = Landmarks(new Color32(150, 100, 64, 255))
+                .Set(FieldTile.Wall, new Color32(18, 52, 26, 255))
+                .Set(FieldTile.Grass, new Color32(70, 128, 58, 255))
+                .Set(FieldTile.Lawn, new Color32(48, 92, 44, 255))
+                .Set(FieldTile.Water, new Color32(60, 150, 130, 255)),
+            // 정글 (#80): 짙은 초록 바탕에 진흙길, 얕은 강은 밝은 하늘색(깊은 강보다 옅게), 유적은 돌빛
+            [FieldTheme.Jungle] = Landmarks(new Color32(140, 96, 62, 255))
+                .Set(FieldTile.Wall, new Color32(14, 58, 30, 255))
+                .Set(FieldTile.Grass, new Color32(82, 150, 52, 255))
+                .Set(FieldTile.Lawn, new Color32(44, 108, 52, 255))
+                .Set(FieldTile.Water, JungleWater)
+                .Set(FieldTile.Stream, new Color32(104, 182, 222, 255))
+                .Set(FieldTile.Bridge, JungleWater, Planks) // 놓이기 전엔 물(골짜기)로
+                .Set(FieldTile.RuinWall, new Color32(104, 104, 96, 255))
+                .Set(FieldTile.RuinFloor, RuinFloor)
+                .Set(FieldTile.Dock, Dock)
+                .Set(FieldTile.Lever, Lever)
+                .Set(FieldTile.Tablet, Tablet, RuinFloor)
+                .Set(FieldTile.Shrine, Shrine, RuinFloor)
+                .Set(FieldTile.Decor, new Color32(92, 74, 50, 255)), // 꾸밈 (#86) — 막힌 칸, 은은한 갈색
+            // 동굴 (#112): 짙은 청회색 바위벽, 회갈 바위 바닥, 다져진 길은 더 짙게, 빛이끼는 청록, 먹물은 남보라
+            [FieldTheme.Cave] = Landmarks(new Color32(104, 84, 68, 255))
+                .Set(FieldTile.Wall, new Color32(44, 47, 58, 255))
+                .Set(FieldTile.Lawn, new Color32(140, 116, 100, 255))
+                .Set(FieldTile.Grass, new Color32(72, 134, 116, 255))
+                .Set(FieldTile.Water, CaveInk)
+                .Set(FieldTile.Bridge, CaveInk, Planks) // 놓이기 전엔 먹물 개울로
+                .Set(FieldTile.Lever, Lever)
+                .Set(FieldTile.GlowStone, GlowStone, GlowStoneLit)
+                .Set(FieldTile.Decor, new Color32(70, 66, 64, 255)),
+        };
+
+        private static ThemeColors ColorsOf(FieldTheme theme) => Themes.TryGetValue(theme, out var colors) ? colors : Themes[FieldTheme.Meadow];
 
         // done: 연 상자·쓰러뜨린 보스 → 바닥색으로
-        public static Color32 ColorOf(FieldTile tile, FieldTheme theme, bool done)
-        {
-            if (theme == FieldTheme.Jungle) return JungleColorOf(tile, done);
-            if (theme == FieldTheme.Cave) return CaveColorOf(tile, done);
-            bool library = theme == FieldTheme.Library;
-            bool forest = theme == FieldTheme.Forest;
-            var floor = library ? new Color32(74, 63, 69, 255) : forest ? new Color32(150, 100, 64, 255) : new Color32(205, 140, 100, 255); // 초원 길 = 흙길
-            switch (tile)
-            {
-                case FieldTile.Wall: return library ? new Color32(154, 78, 38, 255) : forest ? new Color32(18, 52, 26, 255) : new Color32(36, 80, 42, 255);
-                case FieldTile.Grass: return library ? new Color32(110, 98, 115, 255) : forest ? new Color32(70, 128, 58, 255) : new Color32(63, 122, 53, 255);
-                case FieldTile.Lawn: return library ? new Color32(88, 104, 86, 255) : forest ? new Color32(48, 92, 44, 255) : new Color32(150, 190, 70, 255);
-                case FieldTile.Water: return library ? new Color32(90, 63, 138, 255) : forest ? new Color32(60, 150, 130, 255) : new Color32(79, 182, 224, 255);
-                case FieldTile.Chest: return done ? floor : Chest;
-                case FieldTile.Boss: return done ? floor : Boss;
-                case FieldTile.Fountain: return Fountain;
-                case FieldTile.Altar: return Altar;
-                case FieldTile.Shop: return Shop;
-                case FieldTile.Door: return Door;
-                case FieldTile.Lectern: return Lectern;
-                case FieldTile.Gate: return done ? floor : Gate;
-                case FieldTile.Key: return done ? Lectern : Key; // 가져가면 빈 받침대
-                default: return floor;
-            }
-        }
+        public static Color32 ColorOf(FieldTile tile, FieldTheme theme, bool done) => ColorsOf(theme).Of(tile, done);
 
-        // 정글 (#80): 짙은 초록 바탕에 진흙길, 얕은 강은 밝은 하늘색(깊은 강보다 옅게), 유적은 돌빛
-        private static Color32 JungleColorOf(FieldTile tile, bool done)
-        {
-            var floor = new Color32(140, 96, 62, 255);
-            var water = new Color32(38, 104, 150, 255);
-            var ruinFloor = new Color32(168, 170, 140, 255);
-            switch (tile)
-            {
-                case FieldTile.Wall: return new Color32(14, 58, 30, 255);
-                case FieldTile.Grass: return new Color32(82, 150, 52, 255);
-                case FieldTile.Lawn: return new Color32(44, 108, 52, 255);
-                case FieldTile.Water: return water;
-                case FieldTile.Stream: return new Color32(104, 182, 222, 255);
-                case FieldTile.Bridge: return done ? new Color32(160, 116, 60, 255) : water; // 놓이기 전엔 물(골짜기)로
-                case FieldTile.RuinWall: return new Color32(104, 104, 96, 255);
-                case FieldTile.RuinFloor: return ruinFloor;
-                case FieldTile.Dock: return Dock;
-                case FieldTile.Lever: return Lever;
-                case FieldTile.Tablet: return done ? ruinFloor : Tablet;
-                case FieldTile.Shrine: return done ? ruinFloor : Shrine;
-                case FieldTile.Decor: return new Color32(92, 74, 50, 255); // 꾸밈 (#86) — 막힌 칸, 은은한 갈색
-                case FieldTile.Chest: return done ? floor : Chest;
-                case FieldTile.Boss: return done ? floor : Boss;
-                case FieldTile.Fountain: return Fountain;
-                case FieldTile.Altar: return Altar;
-                case FieldTile.Shop: return Shop;
-                case FieldTile.Door: return Door;
-                case FieldTile.Lectern: return Lectern;
-                case FieldTile.Gate: return done ? floor : Gate;
-                case FieldTile.Key: return done ? Lectern : Key;
-                default: return floor;
-            }
-        }
+        // 그 테마의 표에 색이 있는지 (길은 표가 아니라 바닥색) — 새 칸 종류의 색을 빠뜨리지 않게 (FieldTilesTests)
+        public static bool HasColor(FieldTile tile, FieldTheme theme) => ColorsOf(theme).Has(tile);
 
-        // 동굴 (#112): 짙은 청회색 바위벽, 회갈 바위 바닥, 다져진 길은 더 짙게, 빛이끼는 청록, 먹물은 남보라
-        private static Color32 CaveColorOf(FieldTile tile, bool done)
-        {
-            var floor = new Color32(104, 84, 68, 255);
-            var ink = new Color32(64, 50, 104, 255);
-            switch (tile)
-            {
-                case FieldTile.Wall: return new Color32(44, 47, 58, 255);
-                case FieldTile.Lawn: return new Color32(140, 116, 100, 255);
-                case FieldTile.Grass: return new Color32(72, 134, 116, 255);
-                case FieldTile.Water: return ink;
-                case FieldTile.Bridge: return done ? new Color32(160, 116, 60, 255) : ink; // 놓이기 전엔 먹물 개울로
-                case FieldTile.Lever: return Lever;
-                case FieldTile.GlowStone: return done ? GlowStoneLit : GlowStone;
-                case FieldTile.Decor: return new Color32(70, 66, 64, 255);
-                case FieldTile.Chest: return done ? floor : Chest;
-                case FieldTile.Boss: return done ? floor : Boss;
-                case FieldTile.Fountain: return Fountain;
-                case FieldTile.Altar: return Altar;
-                case FieldTile.Shop: return Shop;
-                case FieldTile.Door: return Door;
-                case FieldTile.Lectern: return Lectern;
-                case FieldTile.Gate: return done ? floor : Gate;
-                case FieldTile.Key: return done ? Lectern : Key;
-                default: return floor;
-            }
-        }
-
-        // 미니맵에서 '끝난' 모습이 따로 있는 칸 (연 상자·쓰러뜨린 보스·연 문·가져간 열쇠·놓인 다리·푼 석판·깨어난 제단)
-        public static bool HasDoneLook(FieldTile tile) =>
-            tile == FieldTile.Chest || tile == FieldTile.Boss || tile == FieldTile.Gate || tile == FieldTile.Key
-            || tile == FieldTile.Bridge || tile == FieldTile.Tablet || tile == FieldTile.Shrine || tile == FieldTile.GlowStone;
+        // '끝난' 모습이 따로 있는 칸 (연 상자·쓰러뜨린 보스·연 문·가져간 열쇠·놓인 다리·푼 석판·깨어난 제단·밝힌 반딧돌) — FieldTiles 표
+        public static bool HasDoneLook(FieldTile tile) => FieldTiles.Of(tile).HasDoneLook;
 
         // explored: 가 본 칸인지 (null = 전부 보임). 안 가 본 칸은 안개색 — 그 안의 상자·보스도 숨는다
         public static Texture2D Build(FieldMap map, FieldTheme theme, Func<Vector2Int, bool> done, Texture2D reuse = null,
