@@ -41,20 +41,7 @@ namespace WordRPG.UI
             battle.BeginBattle(enemies, area.Words, OnBattleFinished, intro, area.Theme, boss);
         }
 
-        private Music AreaMusic
-        {
-            get
-            {
-                switch (area.Theme)
-                {
-                    case FieldTheme.Library: return Music.Library;
-                    case FieldTheme.Forest: return Music.Forest;
-                    case FieldTheme.Jungle: return Music.Jungle;
-                    case FieldTheme.Cave: return Music.Cave;
-                    default: return Music.Meadow;
-                }
-            }
-        }
+        private Music AreaMusic => ThemeLooks.Of(area.Theme).Music; // 테마 표 (#118)
 
         // 이기면 보상(보스면 길 열림 등), 지면 시작 지점에서 다시 일어남, 도망치면 (#53) 그 자리 그대로
         private void OnBattleFinished(BattlePhase outcome)

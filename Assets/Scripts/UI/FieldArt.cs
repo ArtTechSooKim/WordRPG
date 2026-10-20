@@ -138,6 +138,9 @@ namespace WordRPG.UI
             return dust.tiles.TryGetValue(tile, out int hex) ? Rgb(hex) : Rgb(dust.floor);
         }
 
+        // 그 테마의 먼지 색 줄이 있는지 — 없으면 초원 흙길 색 (ThemeTableTests)
+        public static bool HasDustColors(FieldTheme theme) => DustColors.ContainsKey(theme);
+
         private static readonly Dictionary<FieldTheme, (int floor, Dictionary<FieldTile, int> tiles)> DustColors =
             new Dictionary<FieldTheme, (int, Dictionary<FieldTile, int>)>
             {

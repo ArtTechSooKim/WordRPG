@@ -39,7 +39,7 @@ namespace WordRPG.UI
                 else tile = TileFor(kind, done, fieldArea.Theme);
                 tilemap.SetTile(new Vector3Int(x, y, 0), tile);
             }
-            cam.backgroundColor = PlaceholderArt.OutsideColor(fieldArea.Theme);
+            cam.backgroundColor = ThemeLooks.Of(fieldArea.Theme).Outside;
             DrawProps(fieldArea);
         }
 

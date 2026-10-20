@@ -34,8 +34,8 @@ namespace WordRPG.UI
 
         public FieldDarkness(Transform parent) => this.parent = parent;
 
-        // 어두운 지역인지 — 지금은 동굴 테마만
-        public static bool IsDark(FieldTheme theme) => theme == FieldTheme.Cave;
+        // 어두운 지역인지 — 지금은 동굴 테마만 (테마 표 ThemeLooks, #118)
+        public static bool IsDark(FieldTheme theme) => ThemeLooks.Of(theme).Dark;
 
         // everyStoneLit: 반딧돌을 모두 밝혔는지 (그러면 동굴 전체가 은은하게 — CaveLight.AllLitGlow)
         public void Build(FieldMap fieldMap, FieldTheme theme, Func<Vector2Int, bool> stoneLit, Func<Vector2Int, bool> exploredCell, Func<bool> everyStoneLit = null)

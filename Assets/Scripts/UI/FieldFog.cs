@@ -24,13 +24,14 @@ namespace WordRPG.UI
 
         public FieldFog(Transform parent) => this.parent = parent;
 
-        // 안개를 쓰는 테마와 색 (옅은 푸른 회색 · 옅은 곳의 그늘색 · 가장 짙은 곳의 불투명도)
+        // 안개를 쓰는 테마와 색 (옅은 곳 · 그늘색 · 가장 짙은 곳의 불투명도) — 테마 표 ThemeLooks (#118)
         public static bool StyleFor(FieldTheme theme, out Color32 light, out Color32 shade, out float alpha)
         {
-            light = new Color32(206, 218, 232, 255);
-            shade = new Color32(150, 168, 192, 255);
-            alpha = 0.5f;
-            return theme == FieldTheme.Library;
+            var fog = ThemeLooks.Of(theme).Fog;
+            light = fog?.Light ?? default;
+            shade = fog?.Shade ?? default;
+            alpha = fog?.Alpha ?? 0f;
+            return fog.HasValue;
         }
 
         public void Build(FieldMap map, FieldTheme theme)

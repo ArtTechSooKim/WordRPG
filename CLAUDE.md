@@ -86,7 +86,7 @@
      도달 검사(모든 상자·출입구)는 걷기 + 뗏목 `FieldReach.Flood`. 칸보다 큰 그림(석상·동굴)은 `FieldArt.Prop`(Tiles/{테마}_{종류}_prop.png).
      'Q' 꾸밈(#86, 막힘): 종류는 둘레로 정함 `FieldDecor.Variant` (그림 Tiles/{테마}_Decor_{종류}.png, 1×2는 _prop), 막지 않는 흩뿌림은 `FieldScatter`(Tiles/{테마}_Scatter_{바닥}_n.png).
      정글 맵 원본 = Tools/jungle_map.py (마지막에 widen_maps.widen을 나무만 걷게 해서 한 칸 통로를 넓힘) → Builds/maps/JungleMap.txt를 상수·에셋에 옮김
-   - 동굴 (#112, 1.2 — GDD 9-7): 테마 `FieldTheme.Cave` = 어두운 지역 (`FieldDarkness.IsDark`). 맵 글자 'I' = 글자 반딧돌(규칙 `GlowStones`, 세이브 `WorldState.litStones`),
+   - 동굴 (#112, 1.2 — GDD 9-7): 테마 `FieldTheme.Cave` = 어두운 지역 (`FieldDarkness.IsDark` = 테마 표 `ThemeLooks.Dark`). 맵 글자 'I' = 글자 반딧돌(규칙 `GlowStones`, 세이브 `WorldState.litStones`),
      동굴 칸 = 기본 칸 + 레버·덩굴 다리·꾸밈·반딧돌 (`FieldTiles` 표). 빛 규칙 `CaveLight`·`DarknessMap`(순수): 주인공 3.5칸 + 동료 횃불 1칸 · 밝힌 반딧돌 6칸 ·
      쉼터 물건(샘·가게·제단·사전) 4칸 · 출입구 2.5칸 · 지나간 곳 Memory. 그리기 `FieldDarkness`(칸마다 2×2픽셀 한 장, 주인공 빛이 1/4칸 움직일 때만 다시 칠함, 알파 1 —
      Linear라 0.97만 돼도 바닥이 비침). 빛 밖 몬스터는 빨간 눈만 (`FieldRoamerViews.UpdateEyes` — 사용자: 적의 눈은 모두 빨간색), 꺼진 반딧돌은 희미하게 깜빡(`FieldScreen.Cave`).
@@ -132,11 +132,26 @@
     끝난 모습·끝나면 열림·쉼터 물건·쓰는 테마. 게임 규칙은 이 표만 보고, 화면 모습은 UI 쪽 표가 칸 종류로 찾는다 (미니맵 색 = `MinimapArt` 테마별 표, 먼지 색 = `FieldArt.DustColor` 표).
     새 칸 종류 = `FieldTile` 맨 뒤 + 표 한 줄 + 그림 Tiles/{테마}_{종류}.png + 미니맵 색 + `PlaceholderArt` 한 줄
     (+ [확인]이면 `FieldScreen` Interact, 끝난 모습이면 `CellState.IsDone`). 빠진 것은 FieldTilesTests·AudioArtTests가 잡음.
+    **테마 표 `ThemeLooks`** (#118, UI): 테마마다 화면 모습 한 줄 — 음악·맵 밖 색·전투 배경 바닥·바닥 안개(`FieldFog`)·어둠(`FieldDarkness.IsDark`). 값만 담고 그리는 일은 각 클래스.
+    새 테마 = `FieldTheme` 맨 뒤(에셋에 번호로 저장) + ThemeLooks 한 줄 + `MinimapArt`·`FieldArt.DustColor` 표 한 줄씩 + 그림·음악(`Music` 열거형).
+    빠지면 ThemeTableTests가 잡음 (예전엔 초원 모습으로 조용히 보였음). 새 칸·테마를 넣고 EditMode 테스트를 돌리면 실패 글이 채울 곳을 알려 줌 (#118 실험: 사막 테마 + 모래 칸 → 7개)
     길·물은 이웃 모양으로 테두리 조각을 고른다 (FieldAutotile → FieldArt.AutoTile, 그림 = Tiles/{테마}_{Floor|Water}_auto.png 256칸).
     벽·풀숲도 그림이 있는 테마만: 초원 덤불 Meadow_Wall_auto(짙은 덤불 + 그늘 바탕, #100) · 초원 풀숲 Meadow_Grass_auto(풀숲이 아닌 쪽은 풀잎 모양 테두리, #102) ·
-    서고 바닥 안개 = 몬스터 칸은 돌 + 위에 이어진 안개 한 장 `FieldFog`(그림은 규칙 `FogMap`이 맵에서 바로 — 구름 무늬, 벽엔 안 번짐, 쓰는 테마 = FieldFog.StyleFor #103).
+    서고 바닥 안개 = 몬스터 칸은 돌 + 위에 이어진 안개 한 장 `FieldFog`(그림은 규칙 `FogMap`이 맵에서 바로 — 구름 무늬, 벽엔 안 번짐, 쓰는 테마·색 = 테마 표 `ThemeLooks.Fog` #103·#118).
     구름 무늬는 천천히 흘러감(초당 1px = 1초에 한 번만 다시 칠함 — FogMap.Prepare 자리 고정 + Paint 무늬, #104·#105).
     필드 그림을 바꿀 땐 벽과 땅이 한눈에 구분되는지 실제 맵 시안으로 먼저 확인 (사용자 #100)
+
+## AI가 코드를 고칠 때 확인 방법 (#117 분석 → #118 사용자와 정함)
+
+테스트 통과가 곧 안전은 아니다. 고치는 곳에 따라 확인을 더 한다 (#117: 규칙 코드에 버그 12개를 심어 보니 테스트가 다 잡음 — 화면·세이브·결제는 그 밖)
+- **게임 규칙** (Battle·Words·Heroes·Items·Monsters, Field 규칙·FieldTiles, Game의 규칙 클래스): 고치고 EditMode 테스트면 충분
+- **동작은 그대로 두는 리팩터링**: 바꾸기 전 코드를 임시 테스트에 그대로 옮겨 새 코드와 모든 입력(모든 칸·테마·실제 맵)에서 비교 → 같으면 그 임시 테스트는 지움 (#117·#118).
+  테스트가 정말 잡는지 의심되면 버그를 몇 개 일부러 심어 보고 되돌림 (못 잡으면 테스트를 더함)
+- **세이브·id·버전**: 테스트 통과로 끝내지 않음 — 출시된 id(wordId·itemId·relicId·areaId·companionId·상품 id)가 그대로인지 git diff로 보고,
+  SaveData 필드 의미를 바꾸면 version + 변환 + 예전 세이브 불러오기 테스트 (#89 방식)
+- **결제**: 가짜 상점 테스트만으로 안전하다고 보지 않음 → 결제 코드를 바꾸면 보고서 [사용자가 직접 해야 할 일]에 TestFlight 결제·구매 복원 확인을 넣음
+- **화면·연출**: 테스트는 결과만 봄 → 바꾸기 전·후 캡처를 `_캡처/`에 남겨 비교 (사용자 확인). 전투 연출(BattleScreen.PlayEvents)은 나누기 전에 연출 순서 테스트부터
+- **빌드·출시 설정** (번들 ID·앱 버전·release-1.1 가지·ProjectSettings·워크플로): 사용자 확인 후
 
 ## 폴더 구조
 
@@ -184,6 +199,7 @@ Assets/
                         PaywallView(정식판 안내: 구매·구매 복원·나중에), CompanionViews(가방 > 동료 탭 CompanionPage · 동료 조우 연출 CompanionCutscene — #77),
                         FieldFollower(필드에서 주인공 자취를 한 칸 뒤 따라오는 동료 그림 — 보이기만 함, 칸 영향 없음 #78) · CharacterSheet(주인공과 같은 배치의 캐릭터 시트 자르기), FieldRoamerViews(필드 위 보이는 몬스터 그림·'!') · PreemptView([선제공격] QTE: 집중선·줄어드는 원·2×2 선택지·결과 도장 + TargetLock 조준 괄호),
                         UiRing(두께가 일정한 원 테두리 — 코드로 만들 땐 CanvasRenderer를 먼저 붙임),
+                        ThemeLooks(테마 표: 테마마다 음악·맵 밖 색·전투 바닥·안개·어둠 — #118),
                         FieldArt(필드 타일·잠긴/지역별 출입구) · PlayerArt(주인공) · PlaceholderArt(그림이 없을 때 임시 도트), Sound(음악·효과음·징글),
                         BattleFx(전투 효과) + FieldFx(필드 위 효과) + IdleBob, MapViews(미니맵·지도),
                         UiKit(Palette·글꼴·둥근 패널·아이콘 + WithJosa 한국어 조사), AutoPill — 세로 1080x1920

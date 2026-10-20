@@ -117,7 +117,10 @@ namespace WordRPG.UI
         public static Color32 ColorOf(FieldTile tile, FieldTheme theme, bool done) => ColorsOf(theme).Of(tile, done);
 
         // 그 테마의 표에 색이 있는지 (길은 표가 아니라 바닥색) — 새 칸 종류의 색을 빠뜨리지 않게 (FieldTilesTests)
-        public static bool HasColor(FieldTile tile, FieldTheme theme) => ColorsOf(theme).Has(tile);
+        public static bool HasColor(FieldTile tile, FieldTheme theme) => HasTheme(theme) && ColorsOf(theme).Has(tile);
+
+        // 그 테마의 줄이 표에 있는지 — 없으면 초원 색으로 보임 (ThemeTableTests)
+        public static bool HasTheme(FieldTheme theme) => Themes.ContainsKey(theme);
 
         // '끝난' 모습이 따로 있는 칸 (연 상자·쓰러뜨린 보스·연 문·가져간 열쇠·놓인 다리·푼 석판·깨어난 제단·밝힌 반딧돌) — FieldTiles 표
         public static bool HasDoneLook(FieldTile tile) => FieldTiles.Of(tile).HasDoneLook;

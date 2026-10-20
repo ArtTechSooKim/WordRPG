@@ -23,19 +23,7 @@ namespace WordRPG.UI
         private static readonly Color WaterColor = new Color(0.20f, 0.45f, 0.85f);
         private static readonly Color WaterWave = new Color(0.55f, 0.75f, 1f);
 
-        public static readonly Color OutsideMap = new Color(0.10f, 0.22f, 0.12f);
-
-        public static Color OutsideColor(FieldTheme theme)
-        {
-            switch (theme)
-            {
-                case FieldTheme.Library: return new Color(0.12f, 0.08f, 0.06f);
-                case FieldTheme.Forest: return new Color(0.05f, 0.14f, 0.08f);
-                case FieldTheme.Jungle: return new Color(0.03f, 0.12f, 0.07f);
-                case FieldTheme.Cave: return new Color(0.02f, 0.02f, 0.04f); // 동굴 (#112) — 맵 밖은 캄캄
-                default: return OutsideMap;
-            }
-        }
+        // 맵 밖 색은 테마 표 ThemeLooks.Outside (#118)
 
         // opened: 보물상자는 연 상태, 보스는 쓰러뜨린 뒤 모습
         public static Sprite ForTile(FieldTile tile, FieldTheme theme = FieldTheme.Meadow, bool opened = false)

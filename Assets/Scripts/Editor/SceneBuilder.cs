@@ -41,7 +41,7 @@ namespace WordRPG.EditorTools
         {
             PrepareData();
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-            AddCamera(PlaceholderArt.OutsideMap);
+            AddCamera(ThemeLooks.Of(FieldTheme.Meadow).Outside);
             AddGameManager();
 
             var fieldGo = new GameObject("FieldScreen", typeof(FieldScreen));

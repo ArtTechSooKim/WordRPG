@@ -141,7 +141,7 @@ namespace WordRPG.UI
         public void SetBackdrop(FieldTheme theme, bool boss)
         {
             if (backdropFloor == null) return;
-            backdropFloor.sprite = FieldArt.ForTile(theme == FieldTheme.Library ? FieldTile.Floor : FieldTile.Grass, theme, false); // 숲은 고사리
+            backdropFloor.sprite = FieldArt.ForTile(ThemeLooks.Of(theme).BattleFloor, theme, false); // 테마 표 (#118) — 서고는 돌바닥, 숲은 고사리
             backdropWall.sprite = FieldArt.ForTile(FieldTile.Wall, theme, false);
             backdropTint.color = boss ? new Color(0.2f, 0.04f, 0.3f, 0.8f) : new Color(0, 0, 0, 0.72f);
         }
