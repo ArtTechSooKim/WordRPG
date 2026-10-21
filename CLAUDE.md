@@ -109,6 +109,8 @@
 10. **세로 화면 기준 UI**: 1080×1920 레퍼런스, 한 손 조작, 4지선다 버튼은 화면 하단
 11. **UI는 Figma UI 키트를 따른다** (https://www.figma.com/design/UUDRmdKgisU6B59saw5gJr): 프리팹 없이 코드로 만들고 `UiKit` 도우미를 쓴다
     - 색은 `Palette`(Figma 변수와 같은 값), 모서리 `UiKit.RadiusSm/Md/Lg`(8/16/24): `RoundPanel`, `Pill`(양끝 완전 둥글게), `Outline`(테두리)
+    - 위아래로 미는 목록(ScrollRect)은 오른쪽에 스크롤 막대 `UiKit.VerticalScrollbar`(Figma 'Scrollbar', 넘칠 때만 보임 — #122 사용자:
+      밀 수 있다는 걸 알 수 없음). 목록 칸 오른쪽을 0.945까지로 비우고 막대는 0.955~0.97 (성유물 제단·단어 도감)
     - 글꼴: 제목·숫자·버튼 = Jua(`UiKit.Display`, `MakeButton` 기본), 본문 = Noto Sans KR(`Label`, Bold 지원). `Assets/Resources/UI/Fonts/` (OFL)
     - 아이콘: `UiKit.Icon("gold")`, 아이템은 `UiKit.ItemIcon(item)`. PNG를 `Assets/Resources/UI/Icons/`에 넣으면 `UiAssetImporter`가 스프라이트로 설정
     - 새 화면은 Figma에 먼저 그리고 같은 컴포넌트로 조립. 기호(✓ ▲ ◀ 등)는 Jua에 없을 수 있으니 Noto 글꼴로 (✕는 Noto에도 없음 → ×)

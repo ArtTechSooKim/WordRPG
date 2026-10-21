@@ -63,7 +63,7 @@ namespace WordRPG.UI
 
         private void BuildList(RectTransform parent)
         {
-            var viewport = UiKit.Panel("Viewport", parent, Color.clear, 0.03f, 0.30f, 0.97f, 0.765f); // 투명하지만 스크롤 터치는 받음
+            var viewport = UiKit.Panel("Viewport", parent, Color.clear, 0.03f, 0.30f, 0.945f, 0.765f); // 투명하지만 스크롤 터치는 받음
             viewport.gameObject.AddComponent<RectMask2D>();
 
             var contentGo = new GameObject("Content", typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
@@ -91,6 +91,7 @@ namespace WordRPG.UI
             scroll.vertical = true;
             scroll.movementType = ScrollRect.MovementType.Elastic;
             scroll.scrollSensitivity = 60f;
+            UiKit.VerticalScrollbar(scroll, 0.955f, 0.30f, 0.97f, 0.765f); // 오른쪽 스크롤 막대 (#122)
         }
 
         public void Show(WordDatabase wordBook, GameSession gameSession, DateTime now)

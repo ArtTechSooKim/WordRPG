@@ -11,7 +11,7 @@ namespace WordRPG.UI
 {
     // 성유물 제단 (Figma '성유물 제단' / 'Relic Upgrade Card'): 모은 성유물마다 다음 단계 비용(재료·골드)을 보여주고 강화.
     // 재료·골드를 쓰므로 버튼을 두 번 눌러야 한다. +3이 되면 각성 연출(기술이 더 강한 기술로).
-    // 카드는 모은 성유물 수만큼 만들고, 화면보다 많으면 위아래로 밀어서 본다 (ScrollRect)
+    // 카드는 모은 성유물 수만큼 만들고, 화면보다 많으면 위아래로 밀어서 본다 (ScrollRect + 오른쪽 스크롤 막대 #122)
     public class RelicAltarView
     {
         public const float CardHeight = 200f;
@@ -63,8 +63,8 @@ namespace WordRPG.UI
             layout.childControlWidth = layout.childControlHeight = true;
             layout.childForceExpandWidth = layout.childForceExpandHeight = false;
 
-            // 카드 목록 (넘치면 스크롤)
-            var viewport = UiKit.Rect("CardScroll", root, 0.03f, 0.25f, 0.97f, 0.815f);
+            // 카드 목록 (넘치면 스크롤 — 오른쪽 막대로 더 있다는 걸 보여 줌)
+            var viewport = UiKit.Rect("CardScroll", root, 0.03f, 0.25f, 0.945f, 0.815f);
             viewport.gameObject.AddComponent<RectMask2D>();
             viewport.gameObject.AddComponent<Image>().color = Color.clear; // 빈 곳을 끌어도 스크롤되게
             view.cardList = UiKit.Rect("Cards", viewport, 0, 1, 1, 1);
@@ -81,6 +81,7 @@ namespace WordRPG.UI
             view.scroll.horizontal = false;
             view.scroll.movementType = ScrollRect.MovementType.Clamped;
             view.scroll.scrollSensitivity = 40f;
+            UiKit.VerticalScrollbar(view.scroll, 0.955f, 0.25f, 0.97f, 0.815f);
 
             var resultBox = UiKit.RoundPanel("ResultBox", root, Palette.PanelLight, UiKit.RadiusMd, 0.03f, 0.115f, 0.97f, 0.235f);
             view.resultText = UiKit.Label("Result", resultBox.transform, "", 32, Palette.Text, 0, 0, 1, 1,
