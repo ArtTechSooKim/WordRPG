@@ -9,7 +9,8 @@ namespace WordRPG.Field
     public enum EncounterStyle
     {
         Grass,   // 풀숲을 밟으면 확률로 조우 (초원·서고·숲)
-        Roaming  // 보이는 몬스터가 쫓아옴 — 부딪히면 전투, 가까우면 [선제공격] (#73, 사막부터)
+        Roaming  // 보이는 몬스터가 쫓아옴 — 부딪히면 전투, 가까우면 [선제공격] (#73, 사막부터).
+                 // 풀숲도 확률 조우 — 단, 보이는 몬스터가 나를 쫓는 동안은 없음 (#123, HuntingPlayer)
     }
 
     public enum RoamerState
@@ -56,6 +57,7 @@ namespace WordRPG.Field
         public float ChaseStepSeconds = 0.12f; // 걷기보다 빠르고 달리기보다 느림 → 달리면 따돌림
         public float NoticeSeconds = 0.6f;     // "!" 뒤 출발까지
         public float StunSeconds = 3f;         // 도망친 뒤 멈춤
+        public float CalmSeconds = 2f;         // 전투가 끝난 뒤 이 시간 동안은 새로 알아채지 않음 (#123)
         public float RespawnSeconds = 25f;     // 쓰러뜨린 뒤 다른 곳에서 다시 나타나기까지
         public int SpawnMinDistance = 12;      // 화면 밖에서 나타남
         public int MinSpacing = 6;             // 몬스터끼리 떨어진 거리
@@ -107,6 +109,7 @@ namespace WordRPG.Field
         private readonly List<(float seconds, bool aquatic)> respawns = new List<(float, bool)>();
         private readonly List<RoamerEvent> tickEvents = new List<RoamerEvent>();
         private int nextId;
+        private float calm; // 남은 '알아채지 않는' 시간 (#123)
 
         public RoamingRules Rules { get; }
         public IReadOnlyList<Roamer> Roamers => roamers;
@@ -116,6 +119,7 @@ namespace WordRPG.Field
 
         // 1이면 보통, 작으면 느려짐 ([선제공격] 문제를 푸는 동안)
         public float SlowFactor { get; set; } = 1f;
+        public float CalmLeft => calm;
 
         public int TargetCount => habitat.Count == 0 ? 0 : Mathf.Clamp(habitat.Count / Mathf.Max(1, Rules.CellsPerRoamer), 1, Rules.MaxRoamers);
 
@@ -194,6 +198,22 @@ namespace WordRPG.Field
             roamer.Timer = Rules.StunSeconds;
         }
 
+        // 나를 발견했거나("!") 쫓아오는 몬스터가 있는지 (#123): 그동안은 풀숲 조우를 하지 않는다 —
+        // 그 싸움은 쫓아오는 몬스터와 (연달아 두 번 싸우지 않고, [선제공격] 기회를 풀숲이 빼앗지 않게)
+        public bool HuntingPlayer
+        {
+            get
+            {
+                foreach (var roamer in roamers)
+                    if (roamer.State == RoamerState.Noticing || roamer.State == RoamerState.Chasing) return true;
+                return false;
+            }
+        }
+
+        // 전투가 끝남 (#123): 잠깐 새로 알아채지 않음 — 풀숲 전투에서 나오자마자 옆에서 어슬렁거리던 몬스터가 덮치지 않게.
+        // 이미 쫓던 몬스터는 그대로 쫓는다
+        public void Calm() => calm = Rules.CalmSeconds;
+
         // 돌려주는 목록은 다음 Tick에서 다시 쓴다 (매 프레임 새 목록을 만들지 않게 — #93). 바로 읽고 버릴 것
         public IReadOnlyList<RoamerEvent> Tick(float dt, Vector2Int player)
         {
@@ -209,6 +229,7 @@ namespace WordRPG.Field
                 events.Add(new RoamerEvent(RoamerEventKind.Spawned, roamer, roamer.Position));
             }
 
+            if (calm > 0f) calm -= dt;
             float step = dt * SlowFactor;
             foreach (var roamer in roamers.ToArray())
             {
@@ -224,7 +245,7 @@ namespace WordRPG.Field
                         break;
                     case RoamerState.Wandering:
                     case RoamerState.Returning:
-                        if (d2 <= Rules.DetectRadius * Rules.DetectRadius)
+                        if (calm <= 0f && d2 <= Rules.DetectRadius * Rules.DetectRadius)
                         {
                             roamer.State = RoamerState.Noticing;
                             roamer.Timer = Rules.NoticeSeconds;

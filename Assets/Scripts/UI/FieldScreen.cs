@@ -572,7 +572,9 @@ namespace WordRPG.UI
                 else ShowToast("문이 굳게 닫혀 있다.");
                 return false;
             }
-            if (!fieldTutorialRunning && encounterCounter.OnStep(tile == FieldTile.Grass && roaming == null, rng))
+            // 풀숲 조우 — 보이는 몬스터 지역도 (#123). 단, 보이는 몬스터가 나를 쫓는 동안은 없음 (걸음 수도 안 셈)
+            bool grass = tile == FieldTile.Grass && (roaming == null || !roaming.HuntingPlayer);
+            if (!fieldTutorialRunning && encounterCounter.OnStep(grass, rng))
             {
                 StartCoroutine(Encounter());
                 return false;

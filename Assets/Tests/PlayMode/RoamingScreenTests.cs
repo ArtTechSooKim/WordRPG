@@ -17,7 +17,7 @@ namespace WordRPG.Tests
     // 보이는 몬스터 조우 (#73, 사막부터): 필드에 몬스터가 보이고, 다가가면 쫓아오고, [선제공격]·부딪힘으로 전투
     public class RoamingScreenTests
     {
-        // 30×9. 시작 P (2,4). 바로 오른쪽 덤불 띠(3~5) — 보이는 몬스터 지역에서는 밟아도 조우하지 않음.
+        // 30×9. 시작 P (2,4). 바로 오른쪽 덤불 띠(3~5) — 풀숲 조우 시험(#123)에 씀 (다른 시험은 풀숲 조우 확률 0).
         // 멀리 (20,4)에 덤불 한 칸 = 몬스터가 태어나는 곳 (시작에서 12칸 넘게 떨어진 서식지는 거기뿐)
         private static string Map()
         {
@@ -36,7 +36,21 @@ namespace WordRPG.Tests
             return string.Join("\n", rows);
         }
 
-        private static (FieldScreen field, WordDatabase words) Create(GameSession session, bool tutorials = false)
+        // 30×9. 시작 P (2,4) — 걷는 줄(y=4)엔 풀숲이 없고, 바로 아래 줄(y=3) 3~28이 풀숲 = 몬스터 서식지 (#123 쫓기는 중 시험).
+        // 몬스터는 시작에서 12칸 넘게 떨어진 14~28 중 한 곳에서 태어남
+        private static string ChaseMap()
+        {
+            var rows = Map().Split('\n');
+            var middle = rows[4].ToCharArray(); // y = 4
+            middle[3] = middle[4] = middle[5] = middle[20] = ':';
+            rows[4] = new string(middle);
+            var below = rows[5].ToCharArray(); // y = 3
+            for (int x = 3; x <= 28; x++) below[x] = ',';
+            rows[5] = new string(below);
+            return string.Join("\n", rows);
+        }
+
+        private static (FieldScreen field, WordDatabase words) Create(GameSession session, bool tutorials = false, float grassRate = 0f, string map = null)
         {
             var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 3);
             var enemy = TestData.Species("lizard", new MonsterStats(60, 1, 5), new MonsterStats(0, 0, 0), bite).Set("displayName", "도마뱀");
@@ -46,9 +60,9 @@ namespace WordRPG.Tests
             var words = ScriptableObject.CreateInstance<WordDatabase>().Set("regionId", "sand").Set("regionName", "모래");
             words.ReplaceWords(TestData.SampleWords());
             var area = ScriptableObject.CreateInstance<FieldArea>()
-                .Set("areaId", "sand").Set("displayName", "모래벌판").Set("map", Map())
+                .Set("areaId", "sand").Set("displayName", "모래벌판").Set("map", map ?? Map())
                 .Set("encounters", table).Set("words", words)
-                .Set("encounterRate", 1f).Set("minStepsBetweenEncounters", 0)
+                .Set("encounterRate", grassRate).Set("minStepsBetweenEncounters", 0)
                 .Set("encounterStyle", EncounterStyle.Roaming);
             var field = new GameObject("RoamingField").AddComponent<FieldScreen>();
             field.Configure(area, session, step: 0.05f, animScale: 0.01f, tutorials: tutorials);
@@ -74,9 +88,9 @@ namespace WordRPG.Tests
             var roamer = field.Roaming.Roamers[0];
             Assert.IsFalse(field.IsPreemptAvailable, "멀면 버튼 없음");
 
-            // 덤불 띠를 지나 몬스터 쪽으로 — 덤불을 밟아도 조우하지 않고, 가까워지면 [선제공격]
+            // 덤불 띠를 지나 몬스터 쪽으로 (이 시험은 풀숲 조우 확률 0) — 가까워지면 [선제공격]
             yield return HoldStick(field, Direction.Right, () => field.IsPreemptAvailable || field.IsInBattle, 6f);
-            Assert.IsFalse(field.IsInBattle, "보이는 몬스터 지역에서는 풀숲 조우가 없음");
+            Assert.IsFalse(field.IsInBattle, "풀숲 조우 확률 0");
             Assert.IsTrue(field.IsPreemptAvailable, "쫓아오는 몬스터가 가까우면 [선제공격]");
             Assert.IsTrue(field.IsPreemptLockVisible, "그 몬스터에 빨간 조준 괄호");
             Assert.IsTrue(roamer.State == RoamerState.Chasing || roamer.State == RoamerState.Noticing, "나를 발견함");
@@ -173,6 +187,68 @@ namespace WordRPG.Tests
             Assert.AreEqual(0, field.PreemptStrikes);
             var leader = field.Battle.Engine.Enemies[0].Monster;
             Assert.AreEqual(leader.Stats.MaxHp, leader.CurrentHp, "HP 그대로");
+            Object.Destroy(field.gameObject);
+        }
+
+        // #123: 보이는 몬스터 지역도 풀숲을 밟으면 확률 조우 (초원·서고처럼). 풀숲 전투는 보이는 몬스터와 따로 —
+        // 이겨도 보이는 몬스터는 그대로, 끝나면 잠깐(2초) 몬스터가 새로 알아채지 않음
+        [UnityTest]
+        public IEnumerator GrassEncounterInRoamingAreaIsSeparateFromTheVisibleMonster()
+        {
+            var session = GameSession.NewGame(Hero(), 5);
+            var (field, _) = Create(session, grassRate: 1f);
+            yield return null;
+            yield return null;
+            var roamer = field.Roaming.Roamers[0];
+            Assert.IsFalse(field.Roaming.HuntingPlayer, "몬스터는 멀리서 어슬렁");
+
+            yield return HoldStick(field, Direction.Right, () => field.IsInBattle, 3f);
+            Assert.IsTrue(field.IsInBattle, "풀숲을 밟으면 조우");
+            Assert.AreEqual(new Vector2Int(3, 4), field.PlayerCell, "첫 풀숲 칸에서");
+            yield return WaitFor(() => field.Battle.IsRunning, 3f);
+            yield return PlayUntilResult(field.Battle, answerCorrectly: true);
+            Assert.AreEqual("승리!", field.Battle.ResultTitle);
+            FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
+            yield return WaitFor(() => !field.IsInBattle);
+            Assert.AreEqual(1, field.Roaming.Roamers.Count, "보이는 몬스터는 그대로");
+            Assert.AreSame(roamer, field.Roaming.Roamers[0]);
+            Assert.AreEqual(0, field.Roaming.PendingRespawns);
+            Assert.Greater(field.Roaming.CalmLeft, 1f, "전투 뒤 잠깐은 몬스터가 새로 알아채지 않음");
+            Object.Destroy(field.gameObject);
+        }
+
+        // #123: 보이는 몬스터가 나를 쫓는 동안은 풀숲을 밟아도 조우 없음 — 그 싸움은 쫓아오는 몬스터와 (연달아 두 번 싸우지 않게)
+        [UnityTest]
+        public IEnumerator NoGrassEncounterWhileAMonsterIsChasingYou()
+        {
+            var session = GameSession.NewGame(Hero(), 5);
+            var (field, _) = Create(session, grassRate: 1f, map: ChaseMap());
+            yield return null;
+            yield return null;
+            Assert.AreEqual(1, field.Roaming.Roamers.Count);
+
+            // 풀숲이 없는 줄로 몬스터 쪽으로 → '!' (쫓기 시작)
+            yield return HoldStick(field, Direction.Right, () => field.Roaming.HuntingPlayer || field.IsInBattle, 6f);
+            Assert.IsFalse(field.IsInBattle);
+            Assert.IsTrue(field.Roaming.HuntingPlayer, "몬스터가 나를 발견");
+            yield return WaitFor(() => !field.IsMoving, 1f);
+
+            // 바로 아래 풀숲으로 한 칸 — 조우 확률 1이어도 풀숲 조우 없음
+            int x = field.PlayerCell.x;
+            yield return HoldStick(field, Direction.Down, () => field.PlayerCell.y == 3, 1f);
+            yield return WaitFor(() => !field.IsMoving, 1f);
+            Assert.AreEqual(new Vector2Int(x, 3), field.PlayerCell);
+            Assert.AreEqual(FieldTile.Grass, field.CurrentArea.Map.Get(field.PlayerCell));
+            yield return null;
+            Assert.IsFalse(field.IsInBattle, "쫓기는 중엔 풀숲 조우 없음");
+
+            // 쫓아온 몬스터와 싸움 → 이기면 그 몬스터가 사라짐 (= 풀숲 전투가 아니라 보이는 몬스터 전투)
+            yield return WaitFor(() => field.Battle.IsRunning, 4f);
+            Assert.IsTrue(field.Battle.IsRunning, "쫓아온 몬스터에 부딪혀 전투");
+            yield return PlayUntilResult(field.Battle, answerCorrectly: true);
+            FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
+            yield return WaitFor(() => !field.IsInBattle);
+            Assert.AreEqual(0, field.Roaming.Roamers.Count, "싸운 건 쫓아온 몬스터");
             Object.Destroy(field.gameObject);
         }
 

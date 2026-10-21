@@ -379,7 +379,7 @@ namespace WordRPG.UI
         // 풀숲 가까이 처음 오면 주인공 혼잣말 (#61) — 걸어도 잠깐 남아 있음
         private void MaybeSayGrassLine()
         {
-            if (!showTutorials || fieldTutorialRunning || roaming != null || session.Tutorials.Has(TutorialProgress.Grass) || bubble.IsVisible) return;
+            if (!showTutorials || fieldTutorialRunning || session.Tutorials.Has(TutorialProgress.Grass) || bubble.IsVisible) return; // 보이는 몬스터 지역도 풀숲 조우 (#123)
             if (!GrassNearby(2)) return;
             session.Tutorials.Mark(TutorialProgress.Grass);
             bubble.Say("풀숲에서 뭔가 나올 것 같아…", 2.6f);
