@@ -74,6 +74,8 @@
      맵을 바꿀 땐 에셋의 map 칸도 같이 고칠 것 (상자 id는 위치 기준이라 상자를 옮기면 새 상자)
    - 조우 방식은 FieldArea `encounterStyle`: Grass(풀숲 확률 조우) / Roaming(보이는 몬스터 — 마른 덤불 ','이 서식지, 발견하면 쫓아옴·부딪히면 전투,
      가까우면 [선제공격] = QTE(기회 슬로모션 → 줄어드는 원 + 이미 본 단어 한 문제), 맞히면 HP 20%. 규칙 `RoamingMonsters`·`Preemptive`, 그림 `FieldRoamerViews`·`PreemptView`, #73~75. 정글부터 — 1.1).
+     Roaming 지역도 풀숲 ','을 밟으면 확률 조우 (#123) — 단 보이는 몬스터가 나를 발견·쫓는 중(`RoamingMonsters.HuntingPlayer`, 동굴은 거품 중도)엔 없음,
+     전투가 끝나면 2초 동안 새로 알아채지 않음 (`RoamingMonsters.Calm`, `RoamingRules.CalmSeconds`).
      FieldArea `waterEncounters`가 있으면 뗏목이 다니는 강에도 물에 사는 몬스터(`Roamer.Aquatic`, 정글의 흉내문어 #81). 첫 선제공격 기회엔 `PauseTutorial` 설명(#79).
      나루터가 없는 맵(동굴)이면 waterEncounters = 웅덩이에 숨는 몬스터(`Roamer.Lurker`, 먹물도롱뇽 #113): 이어진 물 덩어리마다 1~2마리 숨어 있다가(안 보임)
      2칸 안에 오면 거품(Surfacing 0.8초) → 옆 땅으로 튀어나와 쫓음 → 놓치면 웅덩이로 돌아가 다시 숨음 (RoamingRules Lurk*)

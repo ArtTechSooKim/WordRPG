@@ -59,6 +59,7 @@ namespace WordRPG.UI
                 }
                 else roaming.Stun(foughtRoamer); // 도망쳤거나 져서 시작 지점으로 — 잠깐 멈춰 거리를 벌림
             }
+            roaming?.Calm(); // 어떤 전투든 끝나면 2초 동안 주변 몬스터가 새로 알아채지 않음 (#123 — 풀숲 전투 뒤 바로 덮치지 않게)
             RefreshPreemptBooks();
             Sound.PlayMusic(AreaMusic);
             encounterCounter.Reset();

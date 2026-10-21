@@ -90,6 +90,26 @@ namespace WordRPG.Tests
             Assert.AreEqual(lurker, roaming.PreemptTarget(near), "튀어나오면 선제공격 대상");
         }
 
+        // #123 풀숲 조우와 겹치지 않게: 거품이 오르는 동안은 '쫓기는 중' (풀숲 조우 없음), 전투 뒤 2초는 거품도 안 올림
+        [Test]
+        public void BubblingCountsAsHuntingAndWaitsAfterABattle()
+        {
+            var map = Map();
+            var roaming = Roaming(map);
+            roaming.Populate(map.Start);
+            var lurker = SmallPoolLurker(roaming);
+            var near = lurker.Home + new Vector2Int(0, -2);
+            Assert.IsFalse(roaming.HuntingPlayer, "숨어만 있으면 풀숲 조우 가능");
+
+            roaming.Calm();
+            for (float t = 0; t < roaming.Rules.CalmSeconds - 0.1f; t += 0.05f) roaming.Tick(0.05f, near);
+            Assert.AreEqual(RoamerState.Lurking, lurker.State, "전투 뒤 잠깐은 가까이 가도 거품 없음");
+
+            for (float t = 0; t < 0.3f; t += 0.05f) roaming.Tick(0.05f, near);
+            Assert.AreEqual(RoamerState.Surfacing, lurker.State, "지나면 평소처럼 거품");
+            Assert.IsTrue(roaming.HuntingPlayer, "거품이 오르는 동안은 쫓기는 중");
+        }
+
         [Test]
         public void LosingTheHeroSendsItBackIntoThePool()
         {

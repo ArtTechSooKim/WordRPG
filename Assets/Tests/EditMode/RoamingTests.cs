@@ -183,6 +183,62 @@ namespace WordRPG.Tests
             Assert.AreEqual(RoamerState.Stunned, roamer.State);
         }
 
+        // 풀숲 조우 (#123): 보이는 몬스터가 나를 발견("!")했거나 쫓는 동안만 '쫓기는 중' — 그동안 풀숲 조우 없음
+        [Test]
+        public void HuntingOnlyWhileAMonsterHasNoticedOrIsChasing()
+        {
+            var map = Map(60, 20, (10, 10, ','));
+            var (roaming, roamer) = One(map, new Vector2Int(55, 2));
+            Run(roaming, new Vector2Int(55, 2), 1f);
+            Assert.IsFalse(roaming.HuntingPlayer, "멀리서 어슬렁 — 풀숲 조우 가능");
+
+            var near = roamer.Position + new Vector2Int(4, 0);
+            roaming.Tick(0.01f, near);
+            Assert.AreEqual(RoamerState.Noticing, roamer.State);
+            Assert.IsTrue(roaming.HuntingPlayer, "'!' 뜬 순간부터");
+            Run(roaming, near, 0.7f);
+            Assert.AreEqual(RoamerState.Chasing, roamer.State);
+            Assert.IsTrue(roaming.HuntingPlayer, "쫓는 동안");
+
+            Run(roaming, new Vector2Int(58, 18), 0.1f); // 달아나서 놓침
+            Assert.AreEqual(RoamerState.Returning, roamer.State);
+            Assert.IsFalse(roaming.HuntingPlayer, "놓치고 돌아가면 다시 풀숲 조우 가능");
+
+            roaming.Stun(roamer);
+            Assert.IsFalse(roaming.HuntingPlayer, "도망친 뒤 멈춘 몬스터도 쫓지 않음");
+        }
+
+        // 전투가 끝나면 (#123) 2초 동안은 가까이 있어도 새로 알아채지 않음 — 풀숲 전투에서 나오자마자 덮치지 않게
+        [Test]
+        public void AfterABattleMonstersWaitBeforeNoticing()
+        {
+            var map = Map(40, 20, (20, 10, ','));
+            var (roaming, roamer) = One(map, new Vector2Int(2, 2), new RoamingRules { LeashRadius = 1 }); // 늘 발견 거리 안에 있게
+            var player = roamer.Position + new Vector2Int(3, 0);
+            roaming.Calm();
+            Assert.AreEqual(roaming.Rules.CalmSeconds, roaming.CalmLeft);
+
+            var events = Run(roaming, player, roaming.Rules.CalmSeconds - 0.1f);
+            Assert.IsFalse(events.Any(e => e.Kind == RoamerEventKind.Noticed || e.Kind == RoamerEventKind.Caught), "잠깐은 못 알아챔");
+            Assert.IsFalse(roaming.HuntingPlayer);
+
+            events = Run(roaming, player, 0.3f);
+            Assert.IsTrue(events.Any(e => e.Kind == RoamerEventKind.Noticed), "지나면 평소처럼 '!'");
+        }
+
+        [Test]
+        public void CalmDoesNotStopAMonsterAlreadyChasing()
+        {
+            var map = Map(40, 20, (20, 10, ','));
+            var (roaming, roamer) = One(map, new Vector2Int(2, 2));
+            var player = roamer.Position + new Vector2Int(4, 0);
+            Run(roaming, player + new Vector2Int(0, 3), 0.7f);
+            Assert.AreEqual(RoamerState.Chasing, roamer.State);
+            roaming.Calm();
+            var events = Run(roaming, player, 1.5f);
+            Assert.IsTrue(events.Any(e => e.Kind == RoamerEventKind.Caught), "이미 쫓던 몬스터는 그대로 쫓아옴");
+        }
+
         [Test]
         public void DefeatedMonsterComesBackLaterSomewhereFar()
         {
