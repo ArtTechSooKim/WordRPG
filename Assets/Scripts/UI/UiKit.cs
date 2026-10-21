@@ -128,6 +128,22 @@ namespace WordRPG.UI
             return image;
         }
 
+        // 세로 스크롤 막대 (Figma 'Scrollbar', #122 사용자: 목록을 아래로 밀 수 있다는 걸 알 수 없음).
+        // 목록 칸(viewport)의 RectMask2D에 잘리지 않게 같은 부모에 둠. 손잡이 길이 = 보이는 비율, 목록이 다 들어가면 숨김
+        public static Scrollbar VerticalScrollbar(ScrollRect scroll, float minX, float minY, float maxX, float maxY)
+        {
+            var track = Pill(Panel("ScrollTrack", scroll.viewport.parent, Palette.Track, minX, minY, maxX, maxY));
+            var handle = Pill(Panel("Handle", track.transform, Palette.TextDim));
+            var bar = track.gameObject.AddComponent<Scrollbar>();
+            bar.handleRect = handle.rectTransform;
+            bar.targetGraphic = handle;
+            bar.direction = Scrollbar.Direction.BottomToTop;
+            bar.navigation = new Navigation { mode = Navigation.Mode.None };
+            scroll.verticalScrollbar = bar;
+            scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
+            return bar;
+        }
+
         // 둥근 테두리만 (차례·대상 표시)
         public static Image Outline(Image image, int radius, int thickness)
         {
