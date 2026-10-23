@@ -48,6 +48,7 @@ namespace WordRPG.UI
                 TextAnchor.MiddleLeft, FontStyle.Normal, true, 24));
             dexLabel = UiKit.Label("DexProgress", top.transform, "", 30, Palette.Text, 0.4f, 0, 0.97f, 1,
                 TextAnchor.MiddleRight);
+            goldSpot = UiKit.Rect("GoldSpot", dexLabel.transform, 0.9f, 0, 1f, 1f); // 골드가 늘 때 반짝이는 자리 (#127)
 
             // 왼쪽 위 미니맵 (누르면 큰 지도). 맵 데이터에서 그리므로 지역이 늘어나도 자동
             minimap = MinimapView.Create(hudRoot);
@@ -534,8 +535,11 @@ namespace WordRPG.UI
         private void RefreshHud()
         {
             areaLabel.text = area.DisplayName;
-            var progress = Dex.GetProgress(area.Words, session.Vocabulary);
-            dexLabel.text = $"발견 {progress.Discovered}/{progress.Total}   {session.Inventory.Gold}G";
+            hudDex = Dex.GetProgress(area.Words, session.Vocabulary);
+            int gold = session.Inventory.Gold;
+            if (shownGold < 0 || gold < shownGold) shownGold = gold; // 처음·돈을 쓰면 바로
+            else if (gold > shownGold && !inBattle && goldMotion == null) goldMotion = StartCoroutine(CountGold(shownGold, gold));
+            dexLabel.text = HudLine();
 
             var hero = session.Hero;
             heroName.text = $"{hero.DisplayName} Lv{hero.Level}";
@@ -558,6 +562,25 @@ namespace WordRPG.UI
             }
             RefreshBadges();
             RefreshObjective();
+        }
+
+        private string HudLine() => $"발견 {hudDex.Discovered}/{hudDex.Total}   {shownGold}G";
+
+        // 골드가 늘면 (#127 사용자: 돈 버는 것도 반짝이며 숫자가 오르게 — 전투·상자·도감 보상): HUD 골드가 굴러 올라가고
+        // 바로 아래에서 '+18G'가 떠오르며 반짝. 전투 중에 번 돈은 필드로 돌아온 뒤에
+        private IEnumerator CountGold(int from, int to)
+        {
+            var plus = UiKit.Display(UiKit.OneLine(UiKit.Label("GoldGain", dexLabel.transform, $"+{to - from}G", 36, Palette.Gold,
+                0.5f, -1.1f, 1f, -0.1f, TextAnchor.MiddleRight)));
+            StartCoroutine(UiMotion.FloatUp(plus.rectTransform, 40f, 1.3f * animationScale));
+            StartCoroutine(BattleFx.Play(goldSpot, Fx.Sparkle, 90f, animationScale));
+            yield return UiMotion.Count(v =>
+            {
+                shownGold = v;
+                dexLabel.text = HudLine();
+            }, from, to, 0.7f * animationScale);
+            goldMotion = null;
+            if (session.Inventory.Gold != shownGold) RefreshHud();
         }
 
         private void ShowToast(string message, float seconds = 2f)

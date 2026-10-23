@@ -216,6 +216,7 @@ Assets/
                         PaywallView(정식판 안내: 구매·구매 복원·나중에), CompanionViews(가방 > 동료 탭 CompanionPage · 동료 조우 연출 CompanionCutscene — #77),
                         FieldFollower(필드에서 주인공 자취를 한 칸 뒤 따라오는 동료 그림 — 보이기만 함, 칸 영향 없음 #78) · CharacterSheet(주인공과 같은 배치의 캐릭터 시트 자르기), FieldRoamerViews(필드 위 보이는 몬스터 그림·'!') · PreemptView([선제공격] QTE: 집중선·줄어드는 원·2×2 선택지·결과 도장 + TargetLock 조준 괄호),
                         UiRing(두께가 일정한 원 테두리 — 코드로 만들 땐 CanvasRenderer를 먼저 붙임),
+                        UiMotion(숫자 굴러 올라가기·톡 커지기·떠오르는 글자 — 결산 능력치·골드, HUD 골드 #127),
                         ThemeLooks(테마 표: 테마마다 음악·맵 밖 색·전투 바닥·안개·어둠 — #118),
                         FieldArt(필드 타일·잠긴/지역별 출입구) · PlayerArt(주인공) · PlaceholderArt(그림이 없을 때 임시 도트), Sound(음악·효과음·징글),
                         BattleFx(전투 효과) + FieldFx(필드 위 효과) + IdleBob, MapViews(미니맵·지도),

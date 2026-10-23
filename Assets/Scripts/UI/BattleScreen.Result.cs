@@ -27,6 +27,9 @@ namespace WordRPG.UI
             ResetFinisher();
 
             int levelBefore = hero.Level, levels = 0;
+            resultStatsBefore = hero.Stats; // 오르기 전 (#127 결산에서 이전 → 새 값으로 굴러 올라감)
+            resultGoldBefore = session.Inventory.Gold;
+            resultExpBefore = hero.Exp;
             BattleReward reward = null;
             companionGrowth = "";
             if (victory)
@@ -54,7 +57,10 @@ namespace WordRPG.UI
 
             resultChoice = -1;
             ShowPanel(resultPanel);
+            if (victory) rewardMotion = StartCoroutine(AnimateRewards(levelBefore, levels, reward));
             while (resultChoice < 0) yield return null;
+            if (rewardMotion != null) StopCoroutine(rewardMotion);
+            rewardMotion = null;
             relayoutResult = null;
 
             // 패배 후 재도전, 또는 '회복' 선택 시 완전 회복 (도망치면 줄어든 HP 그대로).
@@ -125,6 +131,7 @@ namespace WordRPG.UI
 
             growthCard.gameObject.SetActive(false);
             rewardRow.gameObject.SetActive(false);
+            goldTotal.gameObject.SetActive(false);
             dexBanners.gameObject.SetActive(false);
             PlaceMvpAndStats(ref y);
 
@@ -201,6 +208,7 @@ namespace WordRPG.UI
 
             growthCard.gameObject.SetActive(victory);
             rewardRow.gameObject.SetActive(victory);
+            goldTotal.gameObject.SetActive(false);
             if (victory)
             {
                 // 성장: 얼굴 · Lv(오르면 → 새 레벨 + '레벨 업!') · 경험치 막대
@@ -211,13 +219,28 @@ namespace WordRPG.UI
                 int need = hero.IsMaxLevel ? 1 : LevelCurve.ExpToNextLevel(hero.Level);
                 expFill.anchorMax = new Vector2(hero.IsMaxLevel ? 1f : Mathf.Clamp01(hero.Exp / (float)need), 1f);
                 growthExp.text = hero.IsMaxLevel ? $"경험치 +{reward.Exp}   ·   최고 레벨" : $"경험치 +{reward.Exp}   ·   다음 레벨까지 {hero.ExpToNextLevel}";
-                PlaceResult(growthCard, ref y, 200f, ResultGap);
+                // 레벨이 오르면 오른 능력치 칩 (#127 사용자: 레벨이 오르는 의미가 보이게)
+                var rises = levels > 0 ? HeroGrowth.Rises(resultStatsBefore, hero.Stats) : new List<HeroGrowth.Rise>();
+                statRise.gameObject.SetActive(rises.Count > 0);
+                for (int i = 0; i < statChips.Length; i++)
+                {
+                    bool on = i < rises.Count;
+                    statChips[i].Root.gameObject.SetActive(on);
+                    if (on) ShowRise(statChips[i], rises[i], rises[i].After);
+                }
+                PlaceResult(growthCard, ref y, rises.Count > 0 ? 268f : 200f, ResultGap);
 
-                // 보상: 골드 + 재료
+                // 보상: 골드 + 재료 · 보유 골드 (#127)
                 float x = 0f;
-                AddReward(UiKit.Icon("gold"), $"+{reward.Gold}G", ref x);
+                (goldIcon, goldReward) = AddReward(UiKit.Icon("gold"), $"+{reward.Gold}G", ref x);
                 foreach (var item in reward.Items) AddReward(UiKit.ItemIcon(item.Item), $"×{item.Count}", ref x);
                 PlaceResult(rewardRow, ref y, 80f, ResultGap);
+                goldTotal.gameObject.SetActive(reward.Gold > 0);
+                if (reward.Gold > 0)
+                {
+                    goldTotal.text = GoldTotalLine(session.Inventory.Gold);
+                    PlaceResult(goldTotal.rectTransform, ref y, 52f, ResultGap);
+                }
             }
 
             PlaceMvpAndStats(ref y);
@@ -329,8 +352,8 @@ namespace WordRPG.UI
             resultDynamic.Clear();
         }
 
-        // 보상 한 칸: [아이콘] 글자 (가로로 이어 붙임)
-        private void AddReward(Sprite icon, string text, ref float x)
+        // 보상 한 칸: [아이콘] 글자 (가로로 이어 붙임). 반환 = 아이콘·글자 (골드는 굴러 올라가는 연출에 씀)
+        private (RectTransform icon, Text label) AddReward(Sprite icon, string text, ref float x)
         {
             var cell = UiKit.Rect("Reward", rewardRow, 0, 0, 0, 1);
             cell.pivot = new Vector2(0, 0.5f);
@@ -345,6 +368,70 @@ namespace WordRPG.UI
             cell.anchoredPosition = new Vector2(x, 0);
             x += width + 32f;
             resultDynamic.Add(cell.gameObject);
+            return (image.rectTransform, label);
+        }
+
+        private string GoldTotalLine(int gold) => $"<size=30><color=#A6B3D1>보유 골드</color></size>  {resultGoldBefore:N0} → {gold:N0}G";
+
+        private static void ShowRise(StatChip chip, HeroGrowth.Rise rise, int value)
+        {
+            chip.Label.text = rise.Label;
+            chip.Value.text = $"{rise.Before} → {value}";
+            chip.Delta.text = $"▲{value - rise.Before}";
+        }
+
+        // 결산 연출 (#127 사용자: 반짝이면서 숫자가 오르는 게 보이게): 경험치 막대가 차오름 → 능력치 칩이 하나씩 톡·반짝하며 숫자가 오름 →
+        // 골드 '+0G'에서 굴러 올라가고 보유 골드도 이전 → 새 값. 결산을 다시 놓으면(화면 크기가 바뀌면) 글자는 마지막 값으로
+        private IEnumerator AnimateRewards(int levelBefore, int levels, BattleReward reward)
+        {
+            var hero = session.Hero;
+            float s = Mathf.Max(0.01f, animationScale);
+            int needBefore = LevelCurve.ExpToNextLevel(levelBefore);
+            float before = needBefore > 0 ? Mathf.Clamp01(resultExpBefore / (float)needBefore) : 1f;
+            float after = hero.IsMaxLevel ? 1f : Mathf.Clamp01(hero.Exp / (float)LevelCurve.ExpToNextLevel(hero.Level));
+            var rises = levels > 0 ? HeroGrowth.Rises(resultStatsBefore, hero.Stats) : new List<HeroGrowth.Rise>();
+            for (int i = 0; i < rises.Count && i < statChips.Length; i++) ShowRise(statChips[i], rises[i], rises[i].Before);
+            var goldLabel = goldReward;
+            if (reward.Gold > 0)
+            {
+                if (goldLabel != null) goldLabel.text = "+0G";
+                goldTotal.text = GoldTotalLine(resultGoldBefore);
+            }
+
+            if (levels > 0)
+            {
+                yield return FillExp(before, 1f, 0.35f * s);
+                yield return FillExp(0f, after, 0.35f * s);
+            }
+            else yield return FillExp(before, after, 0.5f * s);
+
+            for (int i = 0; i < rises.Count && i < statChips.Length; i++)
+            {
+                var chip = statChips[i];
+                var rise = rises[i];
+                StartCoroutine(BattleFx.Play(chip.Root, Fx.Sparkle, 120f, s));
+                StartCoroutine(UiMotion.Pop(chip.Root, 0.3f * s));
+                yield return UiMotion.Count(v => ShowRise(chip, rise, v), rise.Before, rise.After, 0.45f * s);
+            }
+
+            if (reward.Gold > 0 && goldLabel != null)
+            {
+                StartCoroutine(BattleFx.Play(goldIcon, Fx.Sparkle, 110f, s));
+                StartCoroutine(UiMotion.Pop(goldLabel.transform, 0.3f * s));
+                StartCoroutine(UiMotion.Count(v => { if (goldLabel != null) goldLabel.text = $"+{v}G"; }, 0, reward.Gold, 0.6f * s));
+                yield return UiMotion.Count(v => goldTotal.text = GoldTotalLine(v), resultGoldBefore, session.Inventory.Gold, 0.6f * s);
+            }
+            rewardMotion = null;
+        }
+
+        private IEnumerator FillExp(float from, float to, float seconds)
+        {
+            for (float t = 0f; t < seconds; t += Time.unscaledDeltaTime)
+            {
+                expFill.anchorMax = new Vector2(Mathf.Lerp(from, to, t / seconds), 1f);
+                yield return null;
+            }
+            expFill.anchorMax = new Vector2(to, 1f);
         }
 
         // 기록 알약 하나 (가로로 이어 붙임)
