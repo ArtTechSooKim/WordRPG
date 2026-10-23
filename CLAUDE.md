@@ -104,15 +104,16 @@
      그림 = import_ninja_art.py `build_cave` (Cave_Wall_auto = 바위 윗면 + 밝은 테 + 절벽면), 시안 = Tools/cave_mockup.py
    - 통로는 두 칸 너비 (사용자 요청 #67): 새 맵은 `python Tools/widen_maps.py --only {상수} [--apply]`로 한 칸 통로를 넓힘 (상수·에셋 같이)
 6. **네이밍**: PascalCase 클래스/메서드/프로퍼티, camelCase 필드. SO 필드는 `[SerializeField] private` + 읽기 전용 프로퍼티. 클래스명은 영문, 화면 표시명은 한국어 필드(`displayName = "펜촉이"`). 주석은 한국어
-7. **Git LFS 사용 중**: 이미지·오디오·폰트·네이티브 플러그인. 새 바이너리 타입 추가 시 `.gitattributes` 확인 (새로 클론하면 `git lfs install` 먼저)
+7. **Git LFS 사용 중**: 이미지·오디오·영상(mp4, #129)·폰트·네이티브 플러그인. 새 바이너리 타입 추가 시 `.gitattributes` 확인 (새로 클론하면 `git lfs install` 먼저)
 8. **입력은 Input System 전용**: EventSystem에 `InputSystemUIInputModule` 사용 (`StandaloneInputModule` 금지).
    뒤로가기 = Escape 키 (`FieldScreen.BackPressed`, 안드로이드 뒤로 버튼·PC Esc) → 새 창(패널)을 만들면 각 화면의 `HandleBack`에 닫기 순서를 추가.
    아이폰은 앱이 스스로 꺼지면 안 됨 → 종료는 `GameManager.CanQuit`일 때만.
    새 기능에 처음 하는 사람용 안내가 필요하면 `TutorialProgress`에 id를 더하고 그 상황에서 `GuideHints.Run` — 글은 한 줄,
    화면을 막지 않고, 손끝(Drag·Tap)·화살표로 보여 주고, 해 보면(DoneWhen) 끝 (GDD 7-1, #61).
    화면을 멈추는 설명(`PauseTutorial`)은 사용자가 원한 곳만 (지금: 정글 첫 [선제공격] #79 · 처음 시작 환영과 첫 승리 뒤 목표 #124 — `PauseTutorial.Tell`).
-   처음 시작 흐름 (#124, `FieldScreen.Prologue`): 모습 고르기 → 환영 → 혼잣말 → 깃펜으로 떠오른 이름 → 걷기·달리기 → '풀숲으로 가서 몬스터와 싸워 보세요' → 첫 승리 뒤 목표.
-   테스트는 `Configure(..., setup: true)`로 켬 (기본 끔 — 실제 씬은 켜짐). 메뉴 빨간 점은 `MenuBadges`, 목표 한 줄은 `Objectives`
+   처음 시작 흐름 (#124, `FieldScreen.Prologue`): (새 게임이면 입장 영상 #129 `IntroCinematicView` — Resources/Video/intro.mp4 + 자막표 intro_captions.json,
+   `python Tools/build_intro_video.py`가 Flow 컷들을 이어 만듦, [건너뛰기]·뒤로가기) → 모습 고르기 → 환영 → 혼잣말 → 깃펜으로 떠오른 이름 → 걷기·달리기 → '풀숲으로 가서 몬스터와 싸워 보세요' → 첫 승리 뒤 목표.
+   테스트는 `Configure(..., setup: true, intro: true)`로 켬 (기본 끔 — 실제 씬은 켜짐). 메뉴 빨간 점은 `MenuBadges`, 목표 한 줄은 `Objectives`
 9. **한국어 조사**: 이름 뒤 조사는 `UiKit.WithJosa(name, "이", "가")`로 (펜촉이가 / 책껍질이, 깃펜기사로 / 백과거북으로)
 10. **세로 화면 기준 UI**: 1080×1920 레퍼런스, 한 손 조작, 4지선다 버튼은 화면 하단
 11. **UI는 Figma UI 키트를 따른다** (https://www.figma.com/design/UUDRmdKgisU6B59saw5gJr): 프리팹 없이 코드로 만들고 `UiKit` 도우미를 쓴다
@@ -203,7 +204,7 @@ Assets/
                         새 기능은 맞는 파일에, 기능 묶음이 커지면 새 partial 파일로,
                         DexView(도감), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기),
                         InventoryView(소지품: 주인공·성유물·아이템·징표) + HeroViews(HeroInfoPage·RelicPage·RelicSlotsRow·SkillRowView),
-                        HeroSetupViews(처음 시작: CharacterSelectView 모습 8명 · NameEntryView 이름 — #124),
+                        HeroSetupViews(처음 시작: CharacterSelectView 모습 8명 · NameEntryView 이름 — #124) · IntroCinematicView(입장 영상 + 자막 + [건너뛰기] — #129),
                         SettingsView(설정) + ConfirmDialog(확인 창 · ShowNotice = [확인] 하나), SwitchView, GateCutscene(보스가 연 길을 보여 주는 연출),
                         TrainingView(수련 창: 전체적 암기·오답 위주 암기 → BattleScreen.BeginTraining, 허수아비),
                         SpeechBubble(주인공 머리 위 말풍선 — 팩 DialogInfo·Emote: 점점점·느낌표 풍선, 글자 풍선. 사전 읽기·혼잣말),
@@ -239,6 +240,7 @@ Docs/                   PRD.txt, GDD.md, 아트에셋목록.md, 아이폰출시�
 Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow 필요), zip_ios_for_mac.py (Xcode 프로젝트 → Mac용 zip, 실행 권한 유지),
                         widen_maps.py (맵의 한 칸 통로 → 두 칸), subset_fonts.py (본문 글꼴에서 한자·가나 빼기 — 앱 크기, fontTools 필요),
                         pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구),
+                        build_intro_video.py (입장 영상: Flow 컷 이어 붙이기·Veo 표시 잘라냄·자막표 → Resources/Video, imageio-ffmpeg 필요, #129),
                         cinematic_storyboard.py (입장 시네마틱 7컷 = 영화 구도 스케치 → Builds/cinematic_v2, Figma 'Cinematic (#128)' — Flow img to img로 영상, #128)
 ```
 

@@ -7,23 +7,27 @@ using WordRPG.Game;
 namespace WordRPG.UI
 {
     // 필드 > 처음 시작 (#124 사용자 — 테스터 "갑자기 초원에 떨어져 당황", 스토리 = Docs/GameStory 프롤로그):
+    // (새 게임이면 맨 먼저 입장 영상 #129) →
     // 모습 고르기(8명) → 환영 → 혼잣말 "내 이름조차 기억나지 않아" → 깃펜으로 떠오른 이름 → 걷기·달리기 →
     // "풀숲으로 가서 몬스터와 싸워 보세요" → 첫 승리 뒤 목표(까먹대왕) 한 번. 1.0 세이브로 업데이트한 사람은 모습·이름만 한 번
     public partial class FieldScreen
     {
         private CharacterSelectView characterSelect;
         private NameEntryView nameEntry;
+        private IntroCinematicView introView;
         private Image heroFace; // HUD 주인공 얼굴 (모습을 바꾸면 다시 그림)
         private bool heroSetupRunning;
 
         public CharacterSelectView CharacterSelect => characterSelect;
         public NameEntryView NameEntry => nameEntry;
+        public IntroCinematicView Intro => introView;
         public bool IsHeroSetupRunning => heroSetupRunning;
 
         private void BuildHeroSetup()
         {
             characterSelect = CharacterSelectView.Create(hudRoot);
             nameEntry = NameEntryView.Create(hudRoot);
+            introView = IntroCinematicView.Create(hudRoot); // 맨 위 (#129)
         }
 
         private IEnumerator HeroSetup()
@@ -31,6 +35,16 @@ namespace WordRPG.UI
             heroSetupRunning = true;
             bool fresh = session.IsFreshStart;
             yield return null; // 화면 배치가 끝난 뒤
+
+            // 입장 영상 (#129, 새 게임에서만 — [건너뛰기]·뒤로가기로 넘김). 그동안은 타이틀 음악
+            if (fresh && playIntro)
+            {
+                bool done = false;
+                Sound.PlayMusic(Music.Title);
+                introView.Play(() => done = true);
+                while (!done) yield return null;
+                Sound.PlayMusic(AreaMusic);
+            }
 
             string look = null;
             characterSelect.Show(session.Hero.Data.Looks, session.Hero.LookOrDefault, !fresh, id => look = id);
