@@ -42,6 +42,7 @@ namespace WordRPG.UI
         [Tooltip("처음 하는 사람에게 튜토리얼 안내를 보여 줄지 (테스트에서는 Configure가 꺼 둔다)")]
         [SerializeField] private bool showTutorials = true;
         [SerializeField] private bool heroSetup = true; // 모습·이름을 아직 안 정했으면 고르는 화면 (#124) — 테스트는 Configure로 끔
+        [SerializeField] private bool playIntro = true; // 새 게임이면 입장 영상 (#129) — 테스트는 Configure로 끔
 
         private GameSession session;
         private GameDatabase database;
@@ -214,11 +215,12 @@ namespace WordRPG.UI
         public void Configure(FieldArea fieldArea, GameSession gameSession = null, Action onSave = null,
             float step = 0.16f, float animScale = 1f, BattleConfig config = null, GameDatabase gameDatabase = null,
             GameSettings gameSettings = null, Action onSettingsChanged = null, Action onDeleteSave = null, bool tutorials = false,
-            IStore purchaseStore = null, Entitlements owned = null, bool setup = false)
+            IStore purchaseStore = null, Entitlements owned = null, bool setup = false, bool intro = false)
         {
             area = fieldArea;
             showTutorials = tutorials;
             heroSetup = setup;
+            playIntro = intro;
             store = purchaseStore;
             entitlements = owned;
             session = gameSession;
@@ -321,6 +323,7 @@ namespace WordRPG.UI
             PulseBadges();
             UpdateRoamers(Time.unscaledDeltaTime);
             characterSelect.Tick(Time.unscaledDeltaTime);
+            introView.Tick(Time.unscaledDeltaTime);
             streams.Tick(Time.deltaTime, walker.Position);
             fog.Tick(Time.deltaTime);
             tabletView.Tick(Time.unscaledDeltaTime);
@@ -488,6 +491,11 @@ namespace WordRPG.UI
             if (paywall.IsOpen)
             {
                 paywall.Close(); // 결제 창이 떠 있는 동안은 닫히지 않음
+                return;
+            }
+            if (introView.IsOpen)
+            {
+                introView.Skip(); // 입장 영상은 뒤로가기 = 건너뛰기 (#129)
                 return;
             }
             if (inBattle)

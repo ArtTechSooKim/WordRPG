@@ -24,7 +24,7 @@ namespace WordRPG.Tests
 
         private int saves;
 
-        private FieldScreen CreateField(GameSession session)
+        private FieldScreen CreateField(GameSession session, bool intro = false)
         {
             var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
             var enemy = TestData.Species("slime", new MonsterStats(8, 1, 1), new MonsterStats(0, 0, 0), bite).Set("displayName", "잉크 슬라임");
@@ -39,7 +39,7 @@ namespace WordRPG.Tests
                 .Set("encounters", table).Set("words", words).Set("boss", new BossEncounter(king, 3))
                 .Set("encounterRate", 1f).Set("minStepsBetweenEncounters", 0);
             var field = new GameObject("HeroSetupFieldUnderTest").AddComponent<FieldScreen>();
-            field.Configure(area, session, () => saves++, step: 0.05f, animScale: 0.01f, tutorials: true, setup: true);
+            field.Configure(area, session, () => saves++, step: 0.05f, animScale: 0.01f, tutorials: true, setup: true, intro: intro);
             return field;
         }
 
@@ -51,6 +51,33 @@ namespace WordRPG.Tests
                 new HeroLook("boy", "소년"), new HeroLook("hunter", "사냥꾼"), new HeroLook("knight", "기사")
             });
             return GameSession.NewGame(hero, 1);
+        }
+
+        // #129 입장 영상: 새 게임은 맨 먼저 영상 (오른쪽 위 [건너뛰기]) → 모습 고르기. 하던 사람에겐 없음
+        [UnityTest]
+        public IEnumerator NewGameStartsWithTheIntroVideoThatCanBeSkipped()
+        {
+            var session = NewSession();
+            var field = CreateField(session, intro: true);
+            yield return WaitFor(() => field.Intro != null && field.Intro.IsOpen, 2f);
+            Assert.IsTrue(field.Intro.IsOpen, "새 게임은 입장 영상부터");
+            Assert.IsFalse(field.CharacterSelect.IsOpen, "영상이 끝나야 모습 고르기");
+            Assert.IsTrue(field.IsPanelOpen, "영상 동안 필드는 멈춤");
+            ActiveButton(field.transform, "IntroSkipButton").onClick.Invoke();
+            Assert.IsFalse(field.Intro.IsOpen);
+            yield return WaitFor(() => field.CharacterSelect.IsOpen, 2f);
+            Assert.IsTrue(field.CharacterSelect.IsOpen, "건너뛰면 바로 모습 고르기");
+            Object.Destroy(field.gameObject);
+            yield return null;
+
+            var old = NewSession();
+            old.Record.RecordBattle(true, 3, 0);
+            old.Tutorials.Mark(TutorialProgress.Field);
+            var again = CreateField(old, intro: true);
+            yield return WaitFor(() => again.CharacterSelect != null && again.CharacterSelect.IsOpen, 2f);
+            Assert.IsFalse(again.Intro.IsOpen, "1.0 세이브로 업데이트한 사람에겐 영상 없이 모습 고르기만");
+            Object.Destroy(again.gameObject);
+            yield return null;
         }
 
         [UnityTest]
