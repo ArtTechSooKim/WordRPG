@@ -21,6 +21,9 @@ namespace WordRPG.Game
         // #124 새 튜토리얼 (사용자): 환영 → (프롤로그·이름) → 걷기·달리기 → 풀숲으로 가서 싸우기 → 첫 승리 뒤 목표 까먹대왕 상기
         public const string GrassFight = "field_grass_fight"; // '풀숲으로 가서 몬스터와 싸워 보세요' (첫 전투까지)
         public const string Goal = "field_goal";              // 첫 승리 뒤 '목표는 잊혀진 서고의 까먹대왕을 물리치는 것입니다'
+        // #131 입장 영상(#129)을 본 기록 (사용자: 이미 하던 사람도 영상을 볼 수 있게) — 새 게임이든 하던 세이브든 못 본 사람은 필드에서 한 번.
+        // 튜토리얼 다시 보기(Clear)로는 지우지 않음 — 다시 켤 때마다 영상이 나오지 않게 (그래서 All에도 없음)
+        public const string Intro = "intro_video";
 
         public static readonly IReadOnlyList<string> All = new[]
         {
@@ -41,7 +44,8 @@ namespace WordRPG.Game
         public IEnumerable<string> Seen => seen;
         public bool Has(string id) => seen.Contains(id);
         public void Mark(string id) => seen.Add(id);
-        public void Clear() => seen.Clear();
+        // 튜토리얼 다시 보기: 본 안내·빨간 점을 지움 (입장 영상을 본 기록은 남김)
+        public void Clear() => seen.RemoveWhere(id => id != Intro);
 
         public void MarkAll()
         {

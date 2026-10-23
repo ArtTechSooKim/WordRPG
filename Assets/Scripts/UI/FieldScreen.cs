@@ -42,7 +42,7 @@ namespace WordRPG.UI
         [Tooltip("처음 하는 사람에게 튜토리얼 안내를 보여 줄지 (테스트에서는 Configure가 꺼 둔다)")]
         [SerializeField] private bool showTutorials = true;
         [SerializeField] private bool heroSetup = true; // 모습·이름을 아직 안 정했으면 고르는 화면 (#124) — 테스트는 Configure로 끔
-        [SerializeField] private bool playIntro = true; // 새 게임이면 입장 영상 (#129) — 테스트는 Configure로 끔
+        [SerializeField] private bool playIntro = true; // 입장 영상을 못 본 사람이면 한 번 (#129·#131) — 테스트는 Configure로 끔
 
         private GameSession session;
         private GameDatabase database;
@@ -301,7 +301,7 @@ namespace WordRPG.UI
             EnterArea(area, savedHere ? saved : map.Start, savedHere && onRaft);
 
             if (!string.IsNullOrEmpty(statusMessage)) ShowToast(statusMessage, 3f);
-            if (heroSetup && session.NeedsHeroSetup) StartCoroutine(HeroSetup()); // 모습·이름 → (새 게임이면 프롤로그) → 걷기 안내
+            if (NeedsPrologue) StartCoroutine(Prologue()); // (못 본 입장 영상) → 모습·이름 → (새 게임이면 프롤로그) → 걷기 안내
             else if (showTutorials && !session.Tutorials.Has(TutorialProgress.Field)) StartCoroutine(FieldGuide());
             return true;
         }
