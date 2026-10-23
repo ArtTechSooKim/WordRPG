@@ -307,8 +307,13 @@ namespace WordRPG.UI
             growthExp = UiKit.OneLine(UiKit.Label("Exp", growthCard, "", 34, Palette.TextDim, 0, 1, 1, 1, TextAnchor.MiddleLeft,
                 FontStyle.Normal, true, 22));
             PinTop(growthExp.rectTransform, 192, 142, 28, 44);
+            // 레벨이 오르면 오른 능력치 칩 (#127, Figma '전투 결산: 레벨 업 능력치 · 골드 (#127)')
+            statRise = UiKit.Rect("StatRise", growthCard, 0, 1, 1, 1);
+            PinTop(statRise, 192, 196, 28, 56);
+            for (int i = 0; i < statChips.Length; i++) statChips[i] = StatChipAt(statRise, i, statChips.Length);
 
             rewardRow = UiKit.Rect("Rewards", resultCard, 0, 1, 1, 1);
+            goldTotal = UiKit.Display(UiKit.OneLine(UiKit.Label("GoldTotal", resultCard, "", 40, Palette.Gold, 0, 1, 1, 1, TextAnchor.MiddleLeft)));
 
             // 가장 활약한 성유물
             mvpCard = Card("MVP");
@@ -338,6 +343,22 @@ namespace WordRPG.UI
             resultSecondary.onClick.AddListener(() => resultChoice = 1);
             PinBottom((RectTransform)resultPrimary.transform, 0f, 1f);
             PinBottom((RectTransform)resultSecondary.transform, 0.5f, 1f);
+        }
+
+        // 능력치 칩 하나: [HP] 76 → 84 ▲8 (이름·▲는 Noto — Jua에 ▲가 없을 수 있음)
+        private static StatChip StatChipAt(RectTransform parent, int index, int count)
+        {
+            float w = 1f / count;
+            var panel = UiKit.RoundPanel($"Stat_{index}", parent, Palette.Panel, UiKit.RadiusSm, index * w + 0.005f, 0, (index + 1) * w - 0.005f, 1);
+            panel.raycastTarget = false;
+            UiKit.Outline(UiKit.Panel("Edge", panel.transform, Palette.Gold), UiKit.RadiusSm, 3).raycastTarget = false;
+            var chip = new StatChip { Root = panel.rectTransform };
+            chip.Label = UiKit.OneLine(UiKit.Label("Label", panel.transform, "", 22, Palette.TextDim, 0.04f, 0, 0.22f, 1, TextAnchor.MiddleLeft, FontStyle.Bold));
+            // 숫자는 한 줄로 (#127 캡처: '92 →'와 '100'이 두 줄로 갈라졌음) — 세 자리 → 세 자리도 들어가는 크기
+            chip.Value = UiKit.Display(UiKit.OneLine(UiKit.Label("Value", panel.transform, "", 28, Palette.Text, 0.2f, 0, 0.8f, 1)));
+            chip.Value.horizontalOverflow = HorizontalWrapMode.Overflow;
+            chip.Delta = UiKit.OneLine(UiKit.Label("Delta", panel.transform, "", 22, Palette.Good, 0.78f, 0, 0.97f, 1, TextAnchor.MiddleRight, FontStyle.Bold));
+            return chip;
         }
 
         private RectTransform Card(string name)

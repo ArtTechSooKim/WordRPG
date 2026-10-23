@@ -112,6 +112,19 @@ namespace WordRPG.UI
         private Image growthFace, mvpIcon;
         private Text growthLevel, growthExp, mvpLabel, mvpTitle, mvpDetail;
         private GameObject levelUpPill;
+        // 레벨 업 능력치 칩 · 보유 골드 (#127 사용자: 오를 때 반짝이며 숫자가 오르는 게 보이게)
+        private RectTransform statRise, goldIcon;
+        private readonly StatChip[] statChips = new StatChip[3];
+        private Text goldTotal, goldReward;
+        private MonsterStats resultStatsBefore;
+        private int resultGoldBefore, resultExpBefore;
+        private Coroutine rewardMotion;
+
+        private class StatChip
+        {
+            public RectTransform Root;
+            public Text Label, Value, Delta;
+        }
         private readonly List<GameObject> resultDynamic = new List<GameObject>(); // 판마다 새로 만드는 줄들
 
         // 수련 (#44, Figma 'Battle — 수련'): 허수아비와 싸우며 도감 속 단어만 복습. [수련 종료]를 누르면 수련 결산

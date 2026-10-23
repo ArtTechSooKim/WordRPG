@@ -90,6 +90,10 @@ namespace WordRPG.UI
         private Image confirmImage, confirmGlow, confirmRing;
         private Text confirmLabel;
         private Text areaLabel, dexLabel, toastText;
+        private RectTransform goldSpot;
+        private DexProgress hudDex;
+        private int shownGold = -1;      // HUD에 보이는 골드 (늘면 굴러 올라감 — #127)
+        private Coroutine goldMotion;
         private GameObject toastPanel;
         private float toastUntil;
         private Image flash;
@@ -147,6 +151,7 @@ namespace WordRPG.UI
         public int SaveMarksShown { get; private set; } // '✓ 저장' 표시 횟수 (테스트용)
         public PaywallView Paywall => paywall;
         public bool IsInBattle => inBattle || transitioning;
+        public int ShownGold => shownGold; // HUD 골드 (테스트용)
         public int RespawnsPlayed { get; private set; }   // 지고 나서 다시 일어나는 연출 횟수 (테스트용)
         public bool SawRespawnPose { get; private set; }  // 다시 일어날 때 웅크린 자세를 거쳤는지 (테스트용)
         public int DustPuffs { get; private set; }        // 달릴 때 발밑 먼지 (테스트용)
