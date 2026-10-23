@@ -30,6 +30,19 @@ namespace WordRPG.Tests
             Assert.IsFalse(progress.Seen.Any(), "다시 보기");
         }
 
+        // #131 입장 영상을 본 기록: 세이브에 남고, 튜토리얼 다시 보기로는 지우지 않음 (다시 켤 때마다 영상이 나오지 않게)
+        [Test]
+        public void IntroRecordSurvivesTutorialReplay()
+        {
+            var progress = new TutorialProgress();
+            progress.Mark(TutorialProgress.Intro);
+            progress.Mark(TutorialProgress.Field);
+            progress.Clear();
+            Assert.IsTrue(progress.Has(TutorialProgress.Intro), "영상을 본 기록은 남음");
+            Assert.IsFalse(progress.Has(TutorialProgress.Field), "안내는 다시");
+            CollectionAssert.DoesNotContain(TutorialProgress.All, TutorialProgress.Intro, "다시 보기 목록이 아님");
+        }
+
         [Test]
         public void SeenTutorialsSurviveSaveAndOldSavesStartEmpty()
         {
@@ -42,8 +55,10 @@ namespace WordRPG.Tests
             var session = GameSession.NewGame(heroData);
             session.Tutorials.Mark(TutorialProgress.Field);
             session.Tutorials.Mark(TutorialProgress.Intensity);
+            session.Tutorials.Mark(TutorialProgress.Intro);
             var json = session.ToSaveData(T0).ToJson();
             var loaded = GameSession.FromSaveData(SaveData.FromJson(json), database, heroData);
+            Assert.IsTrue(loaded.Tutorials.Has(TutorialProgress.Intro), "영상을 본 기록 (#131)");
             Assert.IsTrue(loaded.Tutorials.Has(TutorialProgress.Field));
             Assert.IsTrue(loaded.Tutorials.Has(TutorialProgress.Intensity));
             Assert.IsFalse(loaded.Tutorials.Has(TutorialProgress.Potion));

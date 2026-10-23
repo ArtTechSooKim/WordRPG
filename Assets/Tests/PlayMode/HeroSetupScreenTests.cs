@@ -53,7 +53,8 @@ namespace WordRPG.Tests
             return GameSession.NewGame(hero, 1);
         }
 
-        // #129 입장 영상: 새 게임은 맨 먼저 영상 (오른쪽 위 [건너뛰기]) → 모습 고르기. 하던 사람에겐 없음
+        // #129 입장 영상: 새 게임은 맨 먼저 영상 (오른쪽 위 [건너뛰기]) → 모습 고르기.
+        // #131 사용자 "이미 했던 사람도 영상을 볼 수 있게": 하던 사람도 못 봤으면 한 번 → 본 기록이 세이브에 남아 다시는 안 나옴
         [UnityTest]
         public IEnumerator NewGameStartsWithTheIntroVideoThatCanBeSkipped()
         {
@@ -70,13 +71,51 @@ namespace WordRPG.Tests
             Object.Destroy(field.gameObject);
             yield return null;
 
+            Assert.IsTrue(session.Tutorials.Has(TutorialProgress.Intro), "본 기록");
+
+            // 1.0 세이브로 업데이트한 사람: 영상 → 모습 고르기 (프롤로그 대사 없이)
             var old = NewSession();
             old.Record.RecordBattle(true, 3, 0);
             old.Tutorials.Mark(TutorialProgress.Field);
             var again = CreateField(old, intro: true);
-            yield return WaitFor(() => again.CharacterSelect != null && again.CharacterSelect.IsOpen, 2f);
-            Assert.IsFalse(again.Intro.IsOpen, "1.0 세이브로 업데이트한 사람에겐 영상 없이 모습 고르기만");
+            yield return WaitFor(() => again.Intro != null && again.Intro.IsOpen, 2f);
+            Assert.IsTrue(again.Intro.IsOpen, "하던 사람도 못 본 영상은 한 번");
+            Assert.IsFalse(again.CharacterSelect.IsOpen);
+            int before = saves;
+            ActiveButton(again.transform, "IntroSkipButton").onClick.Invoke();
+            yield return WaitFor(() => again.CharacterSelect.IsOpen, 2f);
+            Assert.IsTrue(again.CharacterSelect.IsOpen, "영상 뒤 모습 고르기");
+            Assert.IsTrue(old.Tutorials.Has(TutorialProgress.Intro));
+            Assert.Greater(saves, before, "본 기록을 바로 저장 (모습을 고르기 전에 꺼도 다시 안 나오게)");
             Object.Destroy(again.gameObject);
+            yield return null;
+
+            // 모습·이름은 이미 정했고 영상만 못 본 사람 (1.1 빌드 2에서 하던 세이브): 영상만 보고 바로 필드
+            var setUp = NewSession();
+            setUp.Record.RecordBattle(true, 3, 0);
+            setUp.Tutorials.Mark(TutorialProgress.Field);
+            setUp.Hero.SetLook("knight");
+            setUp.Hero.Rename("아린");
+            var third = CreateField(setUp, intro: true);
+            yield return WaitFor(() => third.Intro != null && third.Intro.IsOpen, 2f);
+            Assert.IsTrue(third.Intro.IsOpen);
+            Assert.IsTrue(third.IsPanelOpen, "영상 동안 필드는 멈춤");
+            ActiveButton(third.transform, "IntroSkipButton").onClick.Invoke();
+            yield return null;
+            yield return null;
+            Assert.IsFalse(third.CharacterSelect.IsOpen, "모습은 다시 고르지 않음");
+            Assert.IsFalse(third.IsHeroSetupRunning);
+            Assert.IsFalse(third.IsPanelOpen, "영상이 끝나면 바로 움직일 수 있음");
+            Object.Destroy(third.gameObject);
+            yield return null;
+
+            // 이미 본 사람: 다시 켜도 영상 없음
+            var fourth = CreateField(setUp, intro: true);
+            yield return null;
+            yield return null;
+            Assert.IsFalse(fourth.Intro.IsOpen, "본 영상은 다시 안 나옴");
+            Assert.IsFalse(fourth.IsHeroSetupRunning);
+            Object.Destroy(fourth.gameObject);
             yield return null;
         }
 

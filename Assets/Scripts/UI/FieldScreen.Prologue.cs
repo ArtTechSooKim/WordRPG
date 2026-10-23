@@ -7,9 +7,9 @@ using WordRPG.Game;
 namespace WordRPG.UI
 {
     // 필드 > 처음 시작 (#124 사용자 — 테스터 "갑자기 초원에 떨어져 당황", 스토리 = Docs/GameStory 프롤로그):
-    // (새 게임이면 맨 먼저 입장 영상 #129) →
+    // (입장 영상을 아직 못 봤으면 맨 먼저 #129 — #131부터 하던 사람도 한 번) →
     // 모습 고르기(8명) → 환영 → 혼잣말 "내 이름조차 기억나지 않아" → 깃펜으로 떠오른 이름 → 걷기·달리기 →
-    // "풀숲으로 가서 몬스터와 싸워 보세요" → 첫 승리 뒤 목표(까먹대왕) 한 번. 1.0 세이브로 업데이트한 사람은 모습·이름만 한 번
+    // "풀숲으로 가서 몬스터와 싸워 보세요" → 첫 승리 뒤 목표(까먹대왕) 한 번. 1.0 세이브로 업데이트한 사람은 영상 → 모습·이름만 한 번
     public partial class FieldScreen
     {
         private CharacterSelectView characterSelect;
@@ -23,6 +23,10 @@ namespace WordRPG.UI
         public IntroCinematicView Intro => introView;
         public bool IsHeroSetupRunning => heroSetupRunning;
 
+        // 필드에 들어올 때 처음 시작 흐름이 필요한지: 모습·이름을 아직 안 정했거나 입장 영상을 아직 못 봄
+        private bool NeedsPrologue => heroSetup && (session.NeedsHeroSetup || WantsIntro);
+        private bool WantsIntro => playIntro && !session.Tutorials.Has(TutorialProgress.Intro);
+
         private void BuildHeroSetup()
         {
             characterSelect = CharacterSelectView.Create(hudRoot);
@@ -30,22 +34,33 @@ namespace WordRPG.UI
             introView = IntroCinematicView.Create(hudRoot); // 맨 위 (#129)
         }
 
-        private IEnumerator HeroSetup()
+        private IEnumerator Prologue()
         {
             heroSetupRunning = true;
             bool fresh = session.IsFreshStart;
             yield return null; // 화면 배치가 끝난 뒤
 
-            // 입장 영상 (#129, 새 게임에서만 — [건너뛰기]·뒤로가기로 넘김). 그동안은 타이틀 음악
-            if (fresh && playIntro)
+            // 입장 영상 (#129, [건너뛰기]·뒤로가기로 넘김). 그동안은 타이틀 음악.
+            // #131 사용자 "이미 했던 사람도 영상을 볼 수 있게": 새 게임만이 아니라 못 본 사람 모두 한 번 (본 기록은 세이브)
+            if (WantsIntro)
             {
                 bool done = false;
                 Sound.PlayMusic(Music.Title);
                 introView.Play(() => done = true);
                 while (!done) yield return null;
                 Sound.PlayMusic(AreaMusic);
+                session.Tutorials.Mark(TutorialProgress.Intro);
+                SaveNow();
             }
 
+            if (session.NeedsHeroSetup) yield return ChooseLookAndName(fresh);
+
+            heroSetupRunning = false;
+            if (showTutorials && !session.Tutorials.Has(TutorialProgress.Field)) StartCoroutine(FieldGuide());
+        }
+
+        private IEnumerator ChooseLookAndName(bool fresh)
+        {
             string look = null;
             characterSelect.Show(session.Hero.Data.Looks, session.Hero.LookOrDefault, !fresh, id => look = id);
             while (look == null) yield return null;
@@ -73,9 +88,6 @@ namespace WordRPG.UI
             RefreshHud();
             SaveNow();
             if (fresh) yield return Monologue($"{session.Hero.DisplayName}…\n그래, 내 이름이야.", 2.4f);
-
-            heroSetupRunning = false;
-            if (showTutorials && !session.Tutorials.Has(TutorialProgress.Field)) StartCoroutine(FieldGuide());
         }
 
         // 주인공 머리 위 혼잣말 — 그동안 움직이지 않음 (heroSetupRunning)
