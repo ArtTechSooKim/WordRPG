@@ -4,7 +4,7 @@
 → 잘라 이어 붙임(컷 사이 0.5초 겹쳐 바뀜) · 처음은 검정에서 밝아짐 · 끝은 하얀 빛으로 · 세로 720×1280 · 소리 없음(게임이 타이틀 음악)
 → Assets/Resources/Video/intro.mp4 + 자막 시간표 intro_captions.json (게임 IntroCinematicView가 읽음)
     python Tools/build_intro_video.py        (pip install imageio-ffmpeg — ffmpeg가 들어 있음)
-④ 백지룡의 날개 컷을 Videos/에 넣으면(이름에 'dragon'·'Wing'·'날개') 자동으로 끼워짐
+④ 백지룡의 날개 = fbee97c9…mp4 (2026-10-24 사용자 추가). 새 컷은 CUTS에 이름 일부를 적으면 끼워짐
 """
 import glob
 import json
@@ -25,7 +25,7 @@ CUTS = [
     ("① 서고 탑과 마을", ["Glowing_letters_drift_over_village"], 0.0, 6.0, "이 세계는 말로 이루어져 있었습니다."),
     ("② 서고 안", ["Glowing_letters_floating_from_book"], 0.5, 4.5, None),
     ("③ 말이 사라짐", ["Villager_looking_at_sky"], 0.0, 6.0, "어느 날, 말이 사라지기 시작했습니다."),
-    ("④ 백지룡의 날개", ["dragon", "Dragon", "날개", "_wing", "Wing"], 0.0, 4.5, None),  # 'wing'만 찾으면 Glowing에 걸림
+    ("④ 백지룡의 날개", ["fbee97c9", "dragon", "Dragon", "날개", "_wing", "Wing"], 0.0, 4.0, None),  # 'wing'만 찾으면 Glowing에 걸림
     ("⑤ 손과 깃펜", ["38c82cb6"], 0.0, 4.5, None),
     ("⑥ 깨어남", ["a40b9981"], 0.0, 4.0, "그리고, 한 모험가가 깨어납니다."),
     ("⑦ 떠나는 모험가", ["127a8d90"], 0.0, 4.0, None),
