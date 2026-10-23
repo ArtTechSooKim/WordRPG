@@ -1,64 +1,52 @@
 fileFormatVersion: 2
-guid: a80e7e3940c1d7f4caba5da46c3655e6
+guid: 8643eb58a634c1a4d841b48d12750e64
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -394591486901757920
-    second: Boy_0
+      213: 6714896951365699460
+    second: villager4_sheet_0
   - first:
-      213: 3137079431536429357
-    second: Boy_1
+      213: -7346373108891037455
+    second: villager4_sheet_1
   - first:
-      213: -3675725876680994150
-    second: Boy_2
+      213: -5924326774512535352
+    second: villager4_sheet_2
   - first:
-      213: 969731002292518049
-    second: Boy_3
+      213: 3055648956862931480
+    second: villager4_sheet_3
   - first:
-      213: 7642467643661132877
-    second: Boy_4
+      213: 6194369717828204197
+    second: villager4_sheet_4
   - first:
-      213: 3766909262790182301
-    second: Boy_5
+      213: 9004958247661445450
+    second: villager4_sheet_5
   - first:
-      213: -930613858175837437
-    second: Boy_6
+      213: -5336374883856773841
+    second: villager4_sheet_6
   - first:
-      213: 5584120095847976178
-    second: Boy_7
+      213: 5415406109415277080
+    second: villager4_sheet_7
   - first:
-      213: 1345364058281845471
-    second: Boy_8
+      213: -1897630841599662376
+    second: villager4_sheet_8
   - first:
-      213: -7254550572551239689
-    second: Boy_9
+      213: -4875198933511133508
+    second: villager4_sheet_9
   - first:
-      213: 999656750702457706
-    second: Boy_10
+      213: 3342544807517337861
+    second: villager4_sheet_10
   - first:
-      213: 1677433810995073178
-    second: Boy_11
+      213: -4986638749351389147
+    second: villager4_sheet_11
   - first:
-      213: -7171694435151628258
-    second: Boy_12
+      213: -7019816265536979778
+    second: villager4_sheet_12
   - first:
-      213: 2023502200736360574
-    second: Boy_13
+      213: -7467286355339560506
+    second: villager4_sheet_13
   - first:
-      213: -3217140052348955330
-    second: Boy_14
-  - first:
-      213: -5177091958347880111
-    second: Boy_15
-  - first:
-      213: -4187844391921603343
-    second: Boy_16
-  - first:
-      213: 885727724114154220
-    second: Boy_17
-  - first:
-      213: 5334996697123639665
-    second: Boy_18
+      213: 5435139388310934482
+    second: villager4_sheet_14
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -151,7 +139,20 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
-    buildTarget: WebGL
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -167,56 +168,12 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Boy_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 95
-        width: 17
-        height: 17
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 028d3df1221268af0800000000000000
-      internalID: -394591486901757920
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Boy_1
+      name: villager4_sheet_0
       rect:
         serializedVersion: 2
         x: 0
         y: 79
-        width: 17
-        height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d29c9ec3f15298b20800000000000000
-      internalID: 3137079431536429357
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Boy_2
-      rect:
-        serializedVersion: 2
-        x: 16
-        y: 79
-        width: 17
+        width: 33
         height: 33
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -226,14 +183,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a92d7bc3ac23dfcc0800000000000000
-      internalID: -3675725876680994150
+      spriteID: 4878181433b103d50800000000000000
+      internalID: 6714896951365699460
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boy_3
+      name: villager4_sheet_1
       rect:
         serializedVersion: 2
         x: 32
@@ -248,14 +205,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 1ac345f653d257d00800000000000000
-      internalID: 969731002292518049
+      spriteID: 1f0511984907c0a90800000000000000
+      internalID: -7346373108891037455
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boy_4
+      name: villager4_sheet_2
       rect:
         serializedVersion: 2
         x: 32
@@ -270,14 +227,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d44a6d394df7f0a60800000000000000
-      internalID: 7642467643661132877
+      spriteID: 8c838dfdf2098cda0800000000000000
+      internalID: -5924326774512535352
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boy_5
+      name: villager4_sheet_3
       rect:
         serializedVersion: 2
         x: 48
@@ -292,14 +249,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d95ccbd3400c64430800000000000000
-      internalID: 3766909262790182301
+      spriteID: 812ab186988d76a20800000000000000
+      internalID: 3055648956862931480
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boy_6
+      name: villager4_sheet_4
       rect:
         serializedVersion: 2
         x: 48
@@ -314,63 +271,19 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 30b9f5860abc513f0800000000000000
-      internalID: -930613858175837437
+      spriteID: 5a6369e6072d6f550800000000000000
+      internalID: 6194369717828204197
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boy_7
+      name: villager4_sheet_5
       rect:
         serializedVersion: 2
         x: 0
-        y: 63
-        width: 17
-        height: 17
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 2fc832824a7ce7d40800000000000000
-      internalID: 5584120095847976178
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Boy_8
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 47
-        width: 17
-        height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: fd2a773ab71bba210800000000000000
-      internalID: 1345364058281845471
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Boy_9
-      rect:
-        serializedVersion: 2
-        x: 15
         y: 15
-        width: 18
+        width: 33
         height: 65
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -380,14 +293,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7f70af5c0b8a25b90800000000000000
-      internalID: -7254550572551239689
+      spriteID: a41a511e0d908fc70800000000000000
+      internalID: 9004958247661445450
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boy_10
+      name: villager4_sheet_6
       rect:
         serializedVersion: 2
         x: 32
@@ -402,14 +315,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a63f0f2b48e7fdd00800000000000000
-      internalID: 999656750702457706
+      spriteID: f2d8663015361f5b0800000000000000
+      internalID: -5336374883856773841
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boy_11
+      name: villager4_sheet_7
       rect:
         serializedVersion: 2
         x: 32
@@ -424,14 +337,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a905796e921774710800000000000000
-      internalID: 1677433810995073178
+      spriteID: 8128d2a1a23672b40800000000000000
+      internalID: 5415406109415277080
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boy_12
+      name: villager4_sheet_8
       rect:
         serializedVersion: 2
         x: 48
@@ -446,14 +359,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e18342398e5097c90800000000000000
-      internalID: -7171694435151628258
+      spriteID: 8d660abbdc24aa5e0800000000000000
+      internalID: -1897630841599662376
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boy_13
+      name: villager4_sheet_9
       rect:
         serializedVersion: 2
         x: 48
@@ -468,41 +381,41 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e78ac15d78ce41c10800000000000000
-      internalID: 2023502200736360574
+      spriteID: cb6a4be5660d75cb0800000000000000
+      internalID: -4875198933511133508
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boy_14
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 15
-        width: 17
-        height: 31
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: e351f03ea2c6a53d0800000000000000
-      internalID: -3217140052348955330
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Boy_15
+      name: villager4_sheet_10
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 33
+        width: 17
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 509b5e9faca136e20800000000000000
+      internalID: 3342544807517337861
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: villager4_sheet_11
+      rect:
+        serializedVersion: 2
+        x: 15
+        y: 0
+        width: 18
         height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -512,14 +425,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 159a4251b464728b0800000000000000
-      internalID: -5177091958347880111
+      spriteID: 52856b15a76ebcab0800000000000000
+      internalID: -4986638749351389147
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boy_16
+      name: villager4_sheet_12
       rect:
         serializedVersion: 2
         x: 31
@@ -534,14 +447,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 1fca6e4b6b9c1e5c0800000000000000
-      internalID: -4187844391921603343
+      spriteID: ebcb8209c4a949e90800000000000000
+      internalID: -7019816265536979778
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boy_17
+      name: villager4_sheet_13
       rect:
         serializedVersion: 2
         x: 31
@@ -556,14 +469,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ce21a8b1cacba4c00800000000000000
-      internalID: 885727724114154220
+      spriteID: 6c93dd98f9ede5890800000000000000
+      internalID: -7467286355339560506
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boy_18
+      name: villager4_sheet_14
       rect:
         serializedVersion: 2
         x: 48
@@ -578,8 +491,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 171dfe1ea37b90a40800000000000000
-      internalID: 5334996697123639665
+      spriteID: 2d3d1012a7e7d6b40800000000000000
+      internalID: 5435139388310934482
       vertices: []
       indices: 
       edges: []

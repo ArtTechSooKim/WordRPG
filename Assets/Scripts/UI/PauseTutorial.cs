@@ -54,6 +54,29 @@ namespace WordRPG.UI
             root.transform.SetSiblingIndex(target.GetSiblingIndex());
         }
 
+        // 읽기만 하는 안내 (#124 처음 시작의 환영·첫 승리 뒤 목표): 단계마다 [다음], 마지막은 [확인]
+        public IEnumerator Tell(IReadOnlyList<string> lines)
+        {
+            root.SetActive(true);
+            hint.gameObject.SetActive(false);
+            next.gameObject.SetActive(true);
+            var label = UiKit.LabelOf(next);
+            for (int i = 0; i < lines.Count; i++)
+            {
+                Step = i;
+                counter.text = lines.Count > 1 ? $"{i + 1} / {lines.Count}" : "";
+                message.text = lines[i];
+                label.text = i == lines.Count - 1 ? "확인" : "다음";
+                nextPressed = false;
+                while (!nextPressed) yield return null;
+            }
+            label.text = "다음";
+            Step = -1;
+            root.SetActive(false);
+        }
+
+        public void PressNext() => nextPressed = true; // 테스트·키보드용
+
         // lines: 단계별 설명. doneOnLast: 마지막 단계에서 직접 해 보면 true. cancelWhen: 상황이 사라지면(전투 시작 등) 저장하지 않고 닫음.
         // onStep: 단계가 바뀔 때 (화면에 범위 표시 같은 것). done: 끝까지 해 봤는지
         public IEnumerator Run(IReadOnlyList<string> lines, Func<bool> doneOnLast, Func<bool> cancelWhen, Action<int> onStep, Action<bool> done)

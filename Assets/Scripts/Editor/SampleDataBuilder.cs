@@ -853,6 +853,20 @@ namespace WordRPG.EditorTools
                 var list = Prop(so, "startingRelics");
                 list.arraySize = startingRelics.Length;
                 for (int i = 0; i < startingRelics.Length; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = startingRelics[i];
+                // 처음에 고르는 모습 8가지 (#124 — 그림은 import_ninja_art.py HERO_LOOKS, 첫 번째가 기본)
+                var looks = new[]
+                {
+                    ("boy", "소년"), ("eskimo", "에스키모"), ("villager", "마을 아이"), ("princess", "공주"),
+                    ("hunter", "사냥꾼"), ("sorcerer", "마법사"), ("knight", "기사"), ("villager4", "시골 소년")
+                };
+                var lookList = Prop(so, "looks");
+                lookList.arraySize = looks.Length;
+                for (int i = 0; i < looks.Length; i++)
+                {
+                    var element = lookList.GetArrayElementAtIndex(i);
+                    element.FindPropertyRelative("lookId").stringValue = looks[i].Item1;
+                    element.FindPropertyRelative("displayName").stringValue = looks[i].Item2;
+                }
             });
         }
 

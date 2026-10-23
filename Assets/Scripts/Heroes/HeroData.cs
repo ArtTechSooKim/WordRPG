@@ -29,6 +29,10 @@ namespace WordRPG.Heroes
         [Tooltip("새 게임을 시작할 때 가지고 있는 성유물 (앞에서부터 칸에 끼움)")]
         [SerializeField] private List<RelicData> startingRelics = new List<RelicData>();
 
+        [Header("모습 (#124)")]
+        [Tooltip("처음에 고르는 모습 — 첫 번째가 기본 (1.0부터의 소년). lookId는 세이브에 저장되니 바꾸지 말 것")]
+        [SerializeField] private List<HeroLook> looks = new List<HeroLook>();
+
         public string DisplayName => displayName;
         public string Description => description;
         public Sprite Portrait => portrait;
@@ -37,6 +41,9 @@ namespace WordRPG.Heroes
         public int StartLevel => startLevel;
         public SkillData BasicSkill => basicSkill;
         public IReadOnlyList<RelicData> StartingRelics => startingRelics;
+        public IReadOnlyList<HeroLook> Looks => looks;
+        public string DefaultLookId => looks.Count > 0 ? looks[0].LookId : HeroLook.Fallback;
+        public bool HasLook(string lookId) => looks.Exists(look => look.LookId == lookId);
 
         public MonsterStats GetStats(int level) => baseStats + growthPerLevel * (level - 1);
     }

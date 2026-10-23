@@ -1,18 +1,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 using WordRPG.Field;
+using WordRPG.Heroes;
 
 namespace WordRPG.UI
 {
     // 시트 맨 아래 줄의 자세 (SeparateAnim/Dead·Item·Special1·Special2와 같은 그림)
     public enum PlayerPose { Dead = 0, Item = 1, Crouch = 2, Wave = 3 }
 
-    // 필드 주인공 그림 (Ninja Adventure 'Boy' 시트, 16×16 칸).
+    // 필드 주인공 그림 (Ninja Adventure 캐릭터 시트, 16×16 칸). 시트 = 고른 모습 Player/{lookId}_sheet (#124, 기본 boy)
     // 시트: 열 = 방향(아래·위·왼쪽·오른쪽), 행 0~3 = 걷기 4프레임(첫 행 = 서 있는 모습), 4 = 공격, 5 = 점프. 시트가 없으면 임시 도트
     // 팩에 달리기 그림이 없어서, 달리기는 걷기의 내딛는 두 칸 사이에 점프 행(앞으로 숙이고 다리를 벌린 모습)을 끼워 만든다
     public static class PlayerArt
     {
-        public const string SheetPath = "Art/NinjaAdventure/Player/Boy";
+        public const string Folder = "Art/NinjaAdventure/Player/";
+        public static string SheetPathOf(string lookId) => Folder + lookId + "_sheet";
+        public static string FacePathOf(string lookId) => Folder + lookId + "_face";
+        public static string SheetPath => SheetPathOf(LookId);
+        public static string LookId { get; private set; } = HeroLook.Fallback;
         public const float FramesPerSecond = 8f;
         private const int Cell = 16;
         private const int WalkFrames = 4;
@@ -21,6 +26,20 @@ namespace WordRPG.UI
         private static Texture2D sheet;
         private static bool loaded;
         private static readonly Dictionary<int, Sprite> Cache = new Dictionary<int, Sprite>();
+
+        // 주인공 모습을 바꿈 (#124): 필드·전투·타이틀·가방의 주인공 그림이 모두 이 시트를 쓴다 (빈 값 = 기본 모습)
+        public static void SetLook(string lookId)
+        {
+            lookId = string.IsNullOrEmpty(lookId) ? HeroLook.Fallback : lookId;
+            if (lookId == LookId) return;
+            LookId = lookId;
+            loaded = false;
+            sheet = null;
+            Cache.Clear();
+        }
+
+        // 고르는 화면의 얼굴 (팩 Faceset 38px)
+        public static Sprite Face(string lookId) => Resources.Load<Sprite>(FacePathOf(lookId));
 
         public static Sprite Get(Direction facing, int step) => Frame(facing, Wrap(step, WalkFrames));
 
