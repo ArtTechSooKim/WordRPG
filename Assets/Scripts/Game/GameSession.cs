@@ -38,6 +38,10 @@ namespace WordRPG.Game
         public Hero Hero { get; }
         public IReadOnlyList<Companion> Companions => companions;   // 얻은 동료 (#77)
         public Companion PartyCompanion { get; private set; }       // 함께 다니는 동료 (없으면 null) — 파티 = 주인공 + 동료 1명
+        // 주인공 모습·이름을 아직 안 정함 (#124): 새 게임, 또는 1.0 세이브로 업데이트한 뒤 처음 → 필드에서 한 번 고르는 화면
+        public bool NeedsHeroSetup => !Hero.HasChosenLook;
+        // 막 시작한 게임 (프롤로그 대사를 보여 줌): 싸운 적도, 걷기 안내를 본 적도 없음
+        public bool IsFreshStart => Record.BattlesFought == 0 && !Tutorials.Has(TutorialProgress.Field);
 
         // 전투에 나서는 순서 (차례도 이 순서): 주인공 → 동료
         public IReadOnlyList<ICombatant> PartyMembers =>
@@ -224,7 +228,7 @@ namespace WordRPG.Game
                 savedCompanions.Add(new CompanionSaveData(companion.Data.CompanionId, companion.Level, companion.Exp, companion.CurrentHp));
             return new SaveData(nowUtc, new HeroSaveData(Hero.Level, Hero.Exp, Hero.CurrentHp), relics,
                     Inventory, Vocabulary, Record, World).WithSkillSlots(skills).WithTutorials(Tutorials.Seen)
-                .WithNotices(Notices.Seen).WithCompanions(savedCompanions, PartyCompanion?.Data.CompanionId);
+                .WithNotices(Notices.Seen).WithCompanions(savedCompanions, PartyCompanion?.Data.CompanionId).WithHeroLook(Hero.CustomName, Hero.LookId);
         }
 
         // 세이브에 있는 성유물을 찾을 수 없으면(삭제·id 변경) 빼고 경고를 남긴다. 성유물이 하나도 없으면 시작 성유물로 채운다.
@@ -254,6 +258,8 @@ namespace WordRPG.Game
                     hero.RestoreRelic(relic, saved.Level, saved.Slot);
                 }
             }
+            hero.Rename(data.HeroName); // 이름·모습 (#124) — 예전 세이브는 빈 문자열 = 아직 안 정함
+            hero.SetLook(data.HeroLook);
 
             if (hero.Relics.Count == 0)
             {

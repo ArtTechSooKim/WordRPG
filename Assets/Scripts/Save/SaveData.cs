@@ -127,6 +127,9 @@ namespace WordRPG.Save
         [SerializeField] private string partyCompanionId = "";
         // 이미 본 업데이트 안내 id (#115, UpdateNotices). 예전 세이브엔 없음 → 업데이트한 사람이라 안내를 한 번 보여 준다
         [SerializeField] private List<string> notices = new List<string>();
+        // 주인공 이름·모습 (#124, 1.1 — 예전 세이브엔 없음 → 빈 문자열 = 아직 안 정함: 업데이트 뒤 처음 켤 때 한 번 고름)
+        [SerializeField] private string heroName = "";
+        [SerializeField] private string heroLook = "";
 
         public int Version => version;
         public DateTime SavedAtUtc => new DateTime(savedAtTicks, DateTimeKind.Utc);
@@ -143,6 +146,8 @@ namespace WordRPG.Save
         public IReadOnlyList<CompanionSaveData> Companions => companions ?? (IReadOnlyList<CompanionSaveData>)new List<CompanionSaveData>();
         public string PartyCompanionId => partyCompanionId ?? "";
         public IReadOnlyList<string> Notices => notices ?? (IReadOnlyList<string>)new List<string>();
+        public string HeroName => heroName ?? "";
+        public string HeroLook => heroLook ?? "";
 
         public SaveData() { }
 
@@ -155,6 +160,13 @@ namespace WordRPG.Save
         public SaveData WithNotices(IEnumerable<string> ids)
         {
             notices = new List<string>(ids);
+            return this;
+        }
+
+        public SaveData WithHeroLook(string name, string look)
+        {
+            heroName = name ?? "";
+            heroLook = look ?? "";
             return this;
         }
 

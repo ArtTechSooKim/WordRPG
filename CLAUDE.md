@@ -53,6 +53,10 @@
      전투는 `GameSession.PartyMembers`(주인공 → 동료 차례), 경험치는 둘 다(`BattleRewardCalculator.ApplyTo`), 이긴 뒤 쓰러진 동료는 HP 1(`AfterBattle`),
      샘·패배 회복(`RestoreHero`)은 동료도. 얻기 = `FieldScreen.MeetCompanion`(조우 연출) — 동료를 새로 만들면 Refresh Game Database (CompanionDataTests)
    - 세션을 쓰기 시작하는 화면(필드·전투)은 `MarkPlaying()`을 불러야 저장된다 (타이틀에서 시작 전엔 저장 안 함)
+   - 주인공 이름·모습 (#124, 1.1): 모습 = HeroData `looks`(`HeroLook` lookId — 출시 뒤 바꾸지 말 것, 그림 Art/NinjaAdventure/Player/{id}_sheet·{id}_face,
+     import_ninja_art.py HERO_LOOKS) — 모습만 다르고 능력은 같음. 세이브 칸 heroName·heroLook (빈 값 = 아직 안 정함 → 필드에서 한 번 고르는 화면
+     `FieldScreen.HeroSetup`, 1.0 세이브도). `Hero.Rename`(규칙 `HeroNames`: 한글·영어·숫자 8글자)·`SetLook`, 그림은 `PlayerArt.SetLook`.
+     이름 뒤 조사는 꼭 `UiKit.WithJosa` (플레이어가 지은 이름이라 받침이 정해져 있지 않음)
    - 업데이트 안내 (#115): `UpdateNotices`(세이브 칸 notices) — 예전 세이브로 켠 사람(= 업데이트한 사람)만 타이틀에서 한 번 (`TitleScreen.ShowUpdateNotice`,
      `ConfirmDialog.ShowNotice` [확인] 하나). 새 게임은 모두 본 것으로 시작, 튜토리얼과 따로. 다음 업데이트 안내는 `UpdateNotices.All` 맨 뒤에 새 id로
    - 설정(`GameSettings`: 음량·진동)은 세이브가 아니라 PlayerPrefs. `GameManager.Settings` / `SaveSettings()`
@@ -106,7 +110,9 @@
    아이폰은 앱이 스스로 꺼지면 안 됨 → 종료는 `GameManager.CanQuit`일 때만.
    새 기능에 처음 하는 사람용 안내가 필요하면 `TutorialProgress`에 id를 더하고 그 상황에서 `GuideHints.Run` — 글은 한 줄,
    화면을 막지 않고, 손끝(Drag·Tap)·화살표로 보여 주고, 해 보면(DoneWhen) 끝 (GDD 7-1, #61).
-   화면을 멈추는 설명(`PauseTutorial`)은 사용자가 원한 곳만 (지금: 정글 첫 [선제공격], #79) 메뉴 빨간 점은 `MenuBadges`, 목표 한 줄은 `Objectives`
+   화면을 멈추는 설명(`PauseTutorial`)은 사용자가 원한 곳만 (지금: 정글 첫 [선제공격] #79 · 처음 시작 환영과 첫 승리 뒤 목표 #124 — `PauseTutorial.Tell`).
+   처음 시작 흐름 (#124, `FieldScreen.Prologue`): 모습 고르기 → 환영 → 혼잣말 → 깃펜으로 떠오른 이름 → 걷기·달리기 → '풀숲으로 가서 몬스터와 싸워 보세요' → 첫 승리 뒤 목표.
+   테스트는 `Configure(..., setup: true)`로 켬 (기본 끔 — 실제 씬은 켜짐). 메뉴 빨간 점은 `MenuBadges`, 목표 한 줄은 `Objectives`
 9. **한국어 조사**: 이름 뒤 조사는 `UiKit.WithJosa(name, "이", "가")`로 (펜촉이가 / 책껍질이, 깃펜기사로 / 백과거북으로)
 10. **세로 화면 기준 UI**: 1080×1920 레퍼런스, 한 손 조작, 4지선다 버튼은 화면 하단
 11. **UI는 Figma UI 키트를 따른다** (https://www.figma.com/design/UUDRmdKgisU6B59saw5gJr): 프리팹 없이 코드로 만들고 `UiKit` 도우미를 쓴다
@@ -197,6 +203,7 @@ Assets/
                         새 기능은 맞는 파일에, 기능 묶음이 커지면 새 partial 파일로,
                         DexView(도감), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기),
                         InventoryView(소지품: 주인공·성유물·아이템·징표) + HeroViews(HeroInfoPage·RelicPage·RelicSlotsRow·SkillRowView),
+                        HeroSetupViews(처음 시작: CharacterSelectView 모습 8명 · NameEntryView 이름 — #124),
                         SettingsView(설정) + ConfirmDialog(확인 창 · ShowNotice = [확인] 하나), SwitchView, GateCutscene(보스가 연 길을 보여 주는 연출),
                         TrainingView(수련 창: 전체적 암기·오답 위주 암기 → BattleScreen.BeginTraining, 허수아비),
                         SpeechBubble(주인공 머리 위 말풍선 — 팩 DialogInfo·Emote: 점점점·느낌표 풍선, 글자 풍선. 사전 읽기·혼잣말),

@@ -18,10 +18,13 @@ namespace WordRPG.Game
         public const string Preempt = "field_preempt"; // 보이는 몬스터가 가까이 오면 [선제공격] 버튼 (#73)
         public const string Raft = "field_raft";       // 처음 나루터에 서면 '물 쪽으로 가면 탈 수 있을 것 같다' (#81)
         public const string CompanionTurn = "battle_companion"; // 처음 동료 차례: '아라 차례 — 아라도 단어를 맞혀야 기술이 나가요' (#81, GDD 9-6)
+        // #124 새 튜토리얼 (사용자): 환영 → (프롤로그·이름) → 걷기·달리기 → 풀숲으로 가서 싸우기 → 첫 승리 뒤 목표 까먹대왕 상기
+        public const string GrassFight = "field_grass_fight"; // '풀숲으로 가서 몬스터와 싸워 보세요' (첫 전투까지)
+        public const string Goal = "field_goal";              // 첫 승리 뒤 '목표는 잊혀진 서고의 까먹대왕을 물리치는 것입니다'
 
         public static readonly IReadOnlyList<string> All = new[]
         {
-            Field, Confirm, Grass, Skill, Intensity, NewWord, Quiz, Potion, Preempt, Raft, CompanionTurn,
+            Field, Confirm, Grass, Skill, Intensity, NewWord, Quiz, Potion, Preempt, Raft, CompanionTurn, GrassFight, Goal,
             MenuBadges.Dex, MenuBadges.Training, MenuBadges.Bag, MenuBadges.Map, MenuBadges.Companion
         };
 

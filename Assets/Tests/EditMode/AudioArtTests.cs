@@ -83,14 +83,23 @@ namespace WordRPG.Tests
                 FieldArt.ForDoor(FieldTheme.Meadow, FieldTheme.Forest, false), "초원 → 숲 출입구는 숲길 입구 그림");
         }
 
+        // 주인공 모습마다 (#124): 걷기 시트(4방향 × 걷기·점프·자세 7행)와 고르는 화면의 얼굴
         [Test]
-        public void PlayerSheetHasFourDirectionsOfWalkFrames()
+        public void EveryHeroLookHasAWalkSheetAndAFace()
         {
-            var sheet = Resources.Load<Texture2D>(PlayerArt.SheetPath);
-            Assert.IsNotNull(sheet, "주인공 시트 없음");
-            Assert.GreaterOrEqual(sheet.width, 64, "4방향");
-            Assert.GreaterOrEqual(sheet.height, 64, "걷기 4프레임");
-            Assert.AreEqual(FilterMode.Point, sheet.filterMode, "도트는 Point 필터로 또렷하게");
+            var hero = UnityEditor.AssetDatabase.LoadAssetAtPath<WordRPG.Heroes.HeroData>("Assets/Data/Hero/hero.asset");
+            Assert.AreEqual(8, hero.Looks.Count, "8명 중에서 고름 (사용자)");
+            Assert.AreEqual(WordRPG.Heroes.HeroLook.Fallback, hero.DefaultLookId, "기본 = 1.0부터의 소년");
+            foreach (var look in hero.Looks)
+            {
+                Assert.IsFalse(string.IsNullOrEmpty(look.DisplayName), look.LookId);
+                var sheet = Resources.Load<Texture2D>(PlayerArt.SheetPathOf(look.LookId));
+                Assert.IsNotNull(sheet, $"{look.LookId} 시트 없음");
+                Assert.AreEqual(64, sheet.width, $"{look.LookId}: 4방향");
+                Assert.AreEqual(112, sheet.height, $"{look.LookId}: 걷기 4 + 공격 + 점프 + 자세");
+                Assert.AreEqual(FilterMode.Point, sheet.filterMode, "도트는 Point 필터로 또렷하게");
+                Assert.IsNotNull(PlayerArt.Face(look.LookId), $"{look.LookId} 얼굴 없음");
+            }
         }
     }
 }

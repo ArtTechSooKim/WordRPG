@@ -232,6 +232,7 @@ namespace WordRPG.UI
             bool hasSave = manager.HasSave;
             var session = manager.Session;
             var hero = session.Hero;
+            PlayerArt.SetLook(hero.LookOrDefault); // 고른 모습 (#124)
             heroImage.sprite = UiKit.HeroPortrait(hero.Data);
             heroImage.enabled = heroImage.sprite != null;
             for (int i = 0; i < relicBadges.Count; i++)

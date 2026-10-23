@@ -28,3 +28,20 @@ MonoBehaviour:
   basicSkill: {fileID: 11400000, guid: 44862ed8e04fc0947b495d2d506e1a25, type: 2}
   startingRelics:
   - {fileID: 11400000, guid: 0e6430d280433c24a9d7318f56367003, type: 2}
+  looks:
+  - lookId: boy
+    displayName: "\uC18C\uB144"
+  - lookId: eskimo
+    displayName: "\uC5D0\uC2A4\uD0A4\uBAA8"
+  - lookId: villager
+    displayName: "\uB9C8\uC744 \uC544\uC774"
+  - lookId: princess
+    displayName: "\uACF5\uC8FC"
+  - lookId: hunter
+    displayName: "\uC0AC\uB0E5\uAFBC"
+  - lookId: sorcerer
+    displayName: "\uB9C8\uBC95\uC0AC"
+  - lookId: knight
+    displayName: "\uAE30\uC0AC"
+  - lookId: villager4
+    displayName: "\uC2DC\uACE8 \uC18C\uB144"

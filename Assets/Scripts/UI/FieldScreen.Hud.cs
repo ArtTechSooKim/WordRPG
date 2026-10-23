@@ -114,7 +114,7 @@ namespace WordRPG.UI
             avatar.rectTransform.pivot = new Vector2(0, 0.5f);
             avatar.rectTransform.sizeDelta = new Vector2(76, 76);
             avatar.rectTransform.anchoredPosition = new Vector2(12, 0);
-            UiKit.IconImage("Face", avatar.transform, UiKit.HeroPortrait(session.Hero.Data), 0.1f, 0.1f, 0.9f, 0.9f);
+            heroFace = UiKit.IconImage("Face", avatar.transform, UiKit.HeroPortrait(session.Hero.Data), 0.1f, 0.1f, 0.9f, 0.9f);
             heroName = UiKit.Label("Name", badge.transform, "", 30, Palette.Text, 0, 0.45f, 0.62f, 0.95f,
                 TextAnchor.MiddleLeft, FontStyle.Bold, true, 18);
             heroName.rectTransform.offsetMin = new Vector2(104, 0);
@@ -191,6 +191,7 @@ namespace WordRPG.UI
             stoneView = GlowStoneQuizView.Create(hudRoot); // 글자 반딧돌 문제 (#113)
             pauseTutorial = PauseTutorial.Create(hudRoot);
             preemptView = PreemptView.Create(hudRoot);
+            BuildHeroSetup(); // 모습 고르기·이름 (#124) — 다른 창보다 위
             guide = GuideHints.Create(transform); // 자기 캔버스로 HUD·전투 위에 (눌림은 받지 않음)
         }
 
@@ -360,6 +361,16 @@ namespace WordRPG.UI
             session.Tutorials.Mark(TutorialProgress.Field);
             SaveNow();
             fieldTutorialRunning = false;
+
+            // #124 처음 시작 흐름: 걷기·달리기 다음 — 목표 한 줄을 가리키며 풀숲으로 가서 첫 전투 (이제 조우가 됨)
+            if (heroSetup && session.Record.BattlesFought == 0 && !session.Tutorials.Has(TutorialProgress.GrassFight))
+            {
+                guide.Show(new GuideHints.Hint { Text = "풀숲으로 가서 몬스터와 싸워 보세요", Target = () => objectivePill });
+                while (!inBattle && session.Record.BattlesFought == 0) yield return null;
+                guide.Hide();
+                session.Tutorials.Mark(TutorialProgress.GrassFight);
+                SaveNow();
+            }
         }
 
         // 그 상황을 처음 만났을 때만 (#61): 물건 옆에 서면 [확인]을 톡톡 누르는 손끝 + 한 줄. 써 보면 끝, 멀어지면 다음에 다시

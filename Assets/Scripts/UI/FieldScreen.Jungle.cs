@@ -209,9 +209,9 @@ namespace WordRPG.UI
             tilemap.SetTile(new Vector3Int(cell.x, cell.y, 0), TileFor(FieldTile.Shrine, true));
             DrawProps(area);
             AfterFieldChange();
-            // 깨어난 동료의 첫마디 = 넓은 정글에서 보스 방 열쇠 찾기 힌트 (GDD 9-6)
+            // 넓은 정글에서 보스 방 열쇠 찾기 힌트 (GDD 9-6) — 아라는 대사가 없는 동료라 주인공 혼잣말로 (#126 사용자: 아라 비중 줄이기)
             if (companion != null && BossGate.HasGate(area) && !BossGate.HasKey(area, session))
-                bubble.Say("빈칸두꺼비가 석판 글자를 삼켰어…\n보스 방 열쇠는 강 건너 동쪽 기슭에 있을 거야", 6f, companion.DisplayName);
+                bubble.Say("제단에 열쇠 그림이 새겨져 있다…\n강 건너 동쪽 기슭을 가리키는 것 같다", 6f);
         }
 
         // 뗏목에 타고 내림 (사용자: 직접 몰기): 폴짝 소리. 처음 타면 안내를 본 것으로

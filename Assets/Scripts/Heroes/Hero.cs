@@ -63,7 +63,12 @@ namespace WordRPG.Heroes
         public int Exp { get; private set; } // 현재 레벨에서 쌓은 경험치
         public int CurrentHp { get; private set; }
 
-        public string DisplayName => Data.DisplayName;
+        // 이름·모습 (#124): 플레이어가 정한 이름이 없으면 HeroData 이름('주인공'), 모습이 없으면(아직 안 고름) 기본 모습으로 그린다
+        public string CustomName { get; private set; } = "";
+        public string LookId { get; private set; } = "";
+        public string DisplayName => string.IsNullOrEmpty(CustomName) ? Data.DisplayName : CustomName;
+        public string LookOrDefault => string.IsNullOrEmpty(LookId) ? Data.DefaultLookId : LookId;
+        public bool HasChosenLook => !string.IsNullOrEmpty(LookId);
         public bool IsFainted => CurrentHp <= 0;
         public bool IsMaxLevel => Level >= LevelCurve.MaxLevel;
         public int ExpToNextLevel => IsMaxLevel ? 0 : LevelCurve.ExpToNextLevel(Level) - Exp;
@@ -78,6 +83,17 @@ namespace WordRPG.Heroes
             Exp = IsMaxLevel ? 0 : Math.Max(0, exp);
             CurrentHp = Stats.MaxHp;
         }
+
+        // 이름은 HeroNames 규칙으로 다듬어 넣는다 (다듬은 뒤 비면 원래 이름 그대로). 반환 = 들어간 이름
+        public string Rename(string name)
+        {
+            CustomName = HeroNames.Clean(name);
+            return DisplayName;
+        }
+
+        // HeroData에 없는 모습(지워졌거나 잘못된 세이브)이면 기본 모습으로
+        public void SetLook(string lookId) =>
+            LookId = string.IsNullOrEmpty(lookId) ? "" : Data.HasLook(lookId) ? lookId : Data.DefaultLookId;
 
         // ------------------------------------------------------------------ 능력치·기술
 

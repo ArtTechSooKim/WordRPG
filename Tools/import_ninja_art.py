@@ -51,7 +51,6 @@ MONSTER_CLEAR_ROWS = {
     "blink_ghost": (15,),
 }
 
-PLAYER = "Actor/Characters/Boy/SpriteSheet.png"
 
 # relicId: (그림 경로, 시트에서 자를 한 칸 크기 — None이면 그대로)
 RELICS = {
@@ -125,6 +124,29 @@ def copy_companions(pack_root=DEFAULT_PACK):
         shutil.copyfile(os.path.join(pack_root, rel, "Faceset.png"), os.path.join(folder, companion_id + ".png"))
         shutil.copyfile(os.path.join(pack_root, rel, "SpriteSheet.png"), os.path.join(folder, companion_id + "_sheet.png"))
     print("companions", len(COMPANIONS), "->", folder)
+
+
+# 주인공 모습 (#124 사용자: 처음에 8명 중에서 고름 — 모습만 다름): lookId → 팩 캐릭터 폴더.
+# 걷기 시트 → Player/{id}_sheet.png, 얼굴(Faceset) → Player/{id}_face.png. 순서·이름표는 hero.asset의 looks
+HERO_LOOKS = {
+    "boy": "Actor/Characters/Boy",               # 소년 (1.0부터의 주인공)
+    "eskimo": "Actor/Characters/Eskimo",         # 에스키모
+    "villager": "Actor/Characters/Villager",     # 마을 아이
+    "princess": "Actor/Characters/Princess",     # 공주
+    "hunter": "Actor/Characters/Hunter",         # 사냥꾼
+    "sorcerer": "Actor/Characters/SorcererOrange",  # 마법사
+    "knight": "Actor/Characters/Knight",         # 기사
+    "villager4": "Actor/Characters/Villager4",   # 시골 소년
+}
+
+
+def copy_hero_looks(pack_root=DEFAULT_PACK):
+    folder = os.path.join(OUT, "Player")
+    os.makedirs(folder, exist_ok=True)
+    for look_id, rel in HERO_LOOKS.items():
+        shutil.copyfile(os.path.join(pack_root, rel, "SpriteSheet.png"), os.path.join(folder, look_id + "_sheet.png"))
+        shutil.copyfile(os.path.join(pack_root, rel, "Faceset.png"), os.path.join(folder, look_id + "_face.png"))
+    print("hero looks", len(HERO_LOOKS), "->", folder)
 
 
 # 소리: 파일 이름 = 게임 코드의 이름(Music·Sfx 열거형을 소문자로)
@@ -1340,8 +1362,7 @@ def main():
     build_scarecrow(pack)
     build_bubbles(pack)
 
-    shutil.copyfile(os.path.join(pack, PLAYER), os.path.join(OUT, "Player", "Boy.png"))
-    print("player <-", PLAYER)
+    copy_hero_looks(pack)  # 주인공 모습 8가지 (#124 — 예전 Player/Boy.png 대신)
 
     copy_relics_and_items(pack)
     copy_companions(pack)

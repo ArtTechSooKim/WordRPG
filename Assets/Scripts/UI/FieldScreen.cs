@@ -41,6 +41,7 @@ namespace WordRPG.UI
         [SerializeField] private float animationScale = 1f;
         [Tooltip("처음 하는 사람에게 튜토리얼 안내를 보여 줄지 (테스트에서는 Configure가 꺼 둔다)")]
         [SerializeField] private bool showTutorials = true;
+        [SerializeField] private bool heroSetup = true; // 모습·이름을 아직 안 정했으면 고르는 화면 (#124) — 테스트는 Configure로 끔
 
         private GameSession session;
         private GameDatabase database;
@@ -161,7 +162,7 @@ namespace WordRPG.UI
                                    || (companionCutscene != null && companionCutscene.IsPlaying)
                                    || (pauseTutorial != null && pauseTutorial.IsShowing)
                                    || (tabletView != null && tabletView.IsOpen)
-                                   || (stoneView != null && stoneView.IsOpen);
+                                   || (stoneView != null && stoneView.IsOpen) || heroSetupRunning;
         public PauseTutorial PauseTutorial => pauseTutorial;
         public bool IsPreemptRangeVisible => preemptRange != null && preemptRange.gameObject.activeSelf;
         public CompanionCutscene CompanionCutscene => companionCutscene;
@@ -209,10 +210,11 @@ namespace WordRPG.UI
         public void Configure(FieldArea fieldArea, GameSession gameSession = null, Action onSave = null,
             float step = 0.16f, float animScale = 1f, BattleConfig config = null, GameDatabase gameDatabase = null,
             GameSettings gameSettings = null, Action onSettingsChanged = null, Action onDeleteSave = null, bool tutorials = false,
-            IStore purchaseStore = null, Entitlements owned = null)
+            IStore purchaseStore = null, Entitlements owned = null, bool setup = false)
         {
             area = fieldArea;
             showTutorials = tutorials;
+            heroSetup = setup;
             store = purchaseStore;
             entitlements = owned;
             session = gameSession;
@@ -279,6 +281,7 @@ namespace WordRPG.UI
             initialized = true;
             rng = new System.Random();
             area = startArea;
+            PlayerArt.SetLook(session.Hero.LookOrDefault); // 고른 모습 (#124)
 
             CreateWorldObjects();
             BuildHud();
@@ -291,7 +294,8 @@ namespace WordRPG.UI
             EnterArea(area, savedHere ? saved : map.Start, savedHere && onRaft);
 
             if (!string.IsNullOrEmpty(statusMessage)) ShowToast(statusMessage, 3f);
-            if (showTutorials && !session.Tutorials.Has(TutorialProgress.Field)) StartCoroutine(FieldGuide());
+            if (heroSetup && session.NeedsHeroSetup) StartCoroutine(HeroSetup()); // 모습·이름 → (새 게임이면 프롤로그) → 걷기 안내
+            else if (showTutorials && !session.Tutorials.Has(TutorialProgress.Field)) StartCoroutine(FieldGuide());
             return true;
         }
 
@@ -312,6 +316,7 @@ namespace WordRPG.UI
             if (saveMark.activeSelf && Time.unscaledTime > saveMarkUntil) saveMark.SetActive(false);
             PulseBadges();
             UpdateRoamers(Time.unscaledDeltaTime);
+            characterSelect.Tick(Time.unscaledDeltaTime);
             streams.Tick(Time.deltaTime, walker.Position);
             fog.Tick(Time.deltaTime);
             UpdateDarkness();
@@ -488,7 +493,7 @@ namespace WordRPG.UI
                 battle.HandleBack();
                 return;
             }
-            if (transitioning || preemptView.IsOpen) return;
+            if (transitioning || preemptView.IsOpen || heroSetupRunning) return; // 모습·이름 고르기는 끝까지 (#124)
             if (tabletView.IsOpen)
             {
                 if (!tabletBusy) CloseTablet();

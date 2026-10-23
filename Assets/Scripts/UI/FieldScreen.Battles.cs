@@ -65,6 +65,8 @@ namespace WordRPG.UI
             encounterCounter.Reset();
             bool wasBoss = bossBattle;
             bossBattle = false;
+            // #124 처음 시작 흐름: 첫 승리 뒤 목표(까먹대왕)를 한 번
+            if (won && !wasBoss && heroSetup && !session.Tutorials.Has(TutorialProgress.Goal)) StartCoroutine(GoalReminder());
 
             if (won && wasBoss)
             {
