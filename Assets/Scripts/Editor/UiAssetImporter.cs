@@ -1,5 +1,8 @@
+using System;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
+using WordRPG.UI;
 
 namespace WordRPG.EditorTools
 {
@@ -7,7 +10,7 @@ namespace WordRPG.EditorTools
     //  - Assets/Resources/UI/Icons: Figma에서 내보낸 아이콘 → 부드러운 UI 스프라이트
     //  - Assets/Resources/Art: 도트 그림(Ninja Adventure 팩) → 16픽셀 = 1칸, 확대해도 또렷하게(Point)
     //  - Assets/Branding: 앱 아이콘 (MobileBuild가 플레이어 설정에 넣음)
-    internal class UiAssetImporter : AssetPostprocessor
+    public class UiAssetImporter : AssetPostprocessor
     {
         private void OnPreprocessTexture()
         {
@@ -49,13 +52,25 @@ namespace WordRPG.EditorTools
         {
             if (!assetPath.StartsWith("Assets/Resources/Audio/")) return;
             var importer = (AudioImporter)assetImporter;
-            bool music = assetPath.StartsWith("Assets/Resources/Audio/Music/");
+            bool music = IsMusic(assetPath);
             var settings = importer.defaultSampleSettings;
             settings.loadType = music ? AudioClipLoadType.Streaming : AudioClipLoadType.DecompressOnLoad;
             settings.compressionFormat = music ? AudioCompressionFormat.Vorbis : AudioCompressionFormat.ADPCM;
             settings.quality = 0.6f;
             importer.defaultSampleSettings = settings;
             importer.forceToMono = !music;
+        }
+
+        // 음악 = Audio/Music 폴더, 또는 유료 소리 폴더 Audio/Licensed에서 이름이 음악(Music 열거형)과 같은 것
+        // (#133 사용자가 찾은 입장 영상 곡 Licensed/intro.wav — 효과음처럼 모노·통째로 메모리에 올리지 않게)
+        public static bool IsMusic(string assetPath)
+        {
+            if (assetPath.StartsWith("Assets/Resources/Audio/Music/")) return true;
+            if (!assetPath.StartsWith("Assets/Resources/Audio/Licensed/")) return false;
+            string name = Path.GetFileNameWithoutExtension(assetPath);
+            foreach (Music track in Enum.GetValues(typeof(Music)))
+                if (track != Music.None && string.Equals(track.ToString(), name, StringComparison.OrdinalIgnoreCase)) return true;
+            return false;
         }
     }
 }
