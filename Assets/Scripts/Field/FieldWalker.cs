@@ -119,10 +119,15 @@ namespace WordRPG.Field
     // 풀숲 조우 판정. 직전 조우 후 최소 걸음 수가 지나야 확률 판정을 시작해 연속 조우로 지치지 않게 한다
     public class EncounterCounter
     {
+        // 처음 하는 사람 (#133 사용자: 첫 풀숲에서 몬스터를 못 만나면 뭘 하라는 건지 모름): 풀숲 두 번째 칸에서 반드시
+        public const int FirstFightGrassSteps = 2;
+
         private readonly float rate;
         private readonly int minStepsBetween;
+        private int guaranteedIn; // 반드시 만나기까지 남은 풀숲 걸음 (0 = 없음)
 
         public int StepsSinceLast { get; private set; }
+        public bool IsGuaranteed => guaranteedIn > 0;
 
         public EncounterCounter(float rate, int minStepsBetween)
         {
@@ -130,13 +135,22 @@ namespace WordRPG.Field
             this.minStepsBetween = minStepsBetween;
         }
 
+        // 지금부터 풀숲을 grassSteps칸 밟으면 확률·최소 걸음과 상관없이 조우 (한 번만)
+        public void GuaranteeWithin(int grassSteps) => guaranteedIn = Math.Max(0, grassSteps);
+
         public bool OnStep(bool onGrass, System.Random rng)
         {
             if (!onGrass) return false;
             StepsSinceLast++;
+            if (guaranteedIn > 0 && --guaranteedIn == 0)
+            {
+                StepsSinceLast = 0;
+                return true;
+            }
             if (StepsSinceLast <= minStepsBetween) return false;
             if (rng.NextDouble() >= rate) return false;
             StepsSinceLast = 0;
+            guaranteedIn = 0;
             return true;
         }
 

@@ -4,7 +4,7 @@ using WordRPG.Game;
 
 namespace WordRPG.UI
 {
-    public enum Music { None, Title, Meadow, Library, Battle, Boss, Forest, Jungle, Cave }
+    public enum Music { None, Title, Meadow, Library, Battle, Boss, Forest, Jungle, Cave, Intro, HeroSelect }
 
     public enum Sfx
     {
@@ -14,7 +14,7 @@ namespace WordRPG.UI
     }
 
     // 배경 음악·효과음 (Ninja Adventure 팩 → Resources/Audio/Music·Sfx, 파일 이름 = 열거형 이름 소문자).
-    // 유료 라이선스 소리(Envato Elements 등)는 Resources/Audio/Licensed/{같은 이름} — 있으면 그걸 먼저 쓴다.
+    // 유료 라이선스 소리(Envato Elements 등)는 Resources/Audio/Licensed/{같은 이름} — 있으면 그걸 먼저 쓴다 (음악도 #133).
     // 그 폴더는 공개 저장소에 올리지 않으므로(재배포 금지) 새로 받은 저장소에서는 팩 소리로 대신 난다 (#66)
     // 음량은 설정(GameSettings)을 따른다. 처음 소리를 낼 때 씬이 바뀌어도 남는 'Sound' 오브젝트를 만든다
     public static class Sound
@@ -52,7 +52,7 @@ namespace WordRPG.UI
             current = track;
             resumeAt = -1f;
             fadingIn = false;
-            var clip = track == Music.None ? null : Load("Audio/Music/" + track.ToString().ToLowerInvariant());
+            var clip = track == Music.None ? null : LoadFirst("Music", track.ToString().ToLowerInvariant());
             music.Stop();
             music.clip = clip;
             music.volume = MusicVolume;
@@ -135,9 +135,11 @@ namespace WordRPG.UI
         public static string[] CandidatePaths(string folder, string name) =>
             new[] { "Audio/Licensed/" + name, $"Audio/{folder}/" + name };
 
-        private static AudioClip LoadSfx(Sfx effect)
+        private static AudioClip LoadSfx(Sfx effect) => LoadFirst("Sfx", effect.ToString().ToLowerInvariant());
+
+        private static AudioClip LoadFirst(string folder, string name)
         {
-            foreach (var path in CandidatePaths("Sfx", effect.ToString().ToLowerInvariant()))
+            foreach (var path in CandidatePaths(folder, name))
             {
                 var clip = Load(path);
                 if (clip != null) return clip;

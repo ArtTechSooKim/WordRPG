@@ -364,9 +364,15 @@ namespace WordRPG.UI
             fieldTutorialRunning = false;
 
             // #124 처음 시작 흐름: 걷기·달리기 다음 — 목표 한 줄을 가리키며 풀숲으로 가서 첫 전투 (이제 조우가 됨)
+            // #133 사용자: 먼저 분신이 풀숲으로 걸어 들어가는 모습을 보여 줌 · 글이 주인공을 가렸음 → 알약은 아래쪽 스틱 위
+            // (화살표는 그대로 목표 한 줄을 가리킴) · 풀숲 두 번째 칸에서 반드시 몬스터 (EnterArea의 FirstFightPending)
             if (heroSetup && session.Record.BattlesFought == 0 && !session.Tutorials.Has(TutorialProgress.GrassFight))
             {
-                guide.Show(new GuideHints.Hint { Text = "풀숲으로 가서 몬스터와 싸워 보세요", Target = () => objectivePill });
+                yield return ShowWayToGrass();
+                guide.Show(new GuideHints.Hint
+                {
+                    Text = "풀숲으로 가서 몬스터와 싸워 보세요", Target = () => objectivePill, PillNear = () => stick.Base
+                });
                 while (!inBattle && session.Record.BattlesFought == 0) yield return null;
                 guide.Hide();
                 session.Tutorials.Mark(TutorialProgress.GrassFight);

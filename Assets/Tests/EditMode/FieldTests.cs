@@ -168,6 +168,74 @@ namespace WordRPG.Tests
             }
             Assert.That(hits, Is.InRange(450, 750), "약 12%");
         }
+
+        // #133 사용자: 처음 하는 사람은 첫 풀숲에서 몬스터를 못 만나면 뭘 하라는 건지 모름 → 풀숲 두 번째 칸에서 반드시
+        [Test]
+        public void FirstFightIsGuaranteedOnTheSecondGrassStep()
+        {
+            var rng = new System.Random(1);
+            var counter = new EncounterCounter(0f, 4); // 확률 0, 안전 걸음 4 — 원래라면 절대 안 나옴
+            counter.GuaranteeWithin(EncounterCounter.FirstFightGrassSteps);
+            Assert.AreEqual(2, EncounterCounter.FirstFightGrassSteps);
+            Assert.IsTrue(counter.IsGuaranteed);
+
+            Assert.IsFalse(counter.OnStep(false, rng), "풀숲이 아닌 칸은 세지 않음");
+            Assert.IsFalse(counter.OnStep(true, rng), "첫 번째 풀숲 칸");
+            Assert.IsTrue(counter.OnStep(true, rng), "두 번째 풀숲 칸에서 반드시 (확률·안전 걸음과 상관없이)");
+            Assert.IsFalse(counter.IsGuaranteed, "한 번만");
+            Assert.AreEqual(0, counter.StepsSinceLast);
+            for (int i = 0; i < 50; i++) Assert.IsFalse(counter.OnStep(true, rng), "그다음은 원래 규칙 (확률 0)");
+
+            // 그 전에 확률로 먼저 만나면 반드시 만나기도 끝 (두 번 연달아 나오지 않게)
+            var lucky = new EncounterCounter(1f, 0);
+            lucky.GuaranteeWithin(3);
+            Assert.IsTrue(lucky.OnStep(true, rng));
+            Assert.IsFalse(lucky.IsGuaranteed);
+        }
+    }
+
+    // 가장 가까운 칸까지 걷는 길 (#133 처음 하는 사람에게 풀숲 가는 길을 보여 주는 분신)
+    public class FieldPathTests
+    {
+        //   y=4  #########
+        //   y=3  #,,,#..,#   ← 왼쪽 풀숲은 벽 너머 (돌아가야 함), 오른쪽 풀숲 (7,3)
+        //   y=2  #...#.,,#
+        //   y=1  #P......#
+        //   y=0  #########
+        private const string Map = "#########\n#,,,#..,#\n#...#.,,#\n#P......#\n#########";
+
+        [Test]
+        public void WalksToTheNearestGrassThenOneMoreInside()
+        {
+            var map = FieldMap.Parse(Map);
+            var walker = new FieldWalker(map, map.Start);
+            var path = FieldReach.PathToNearest(map, map.Start, c => walker.CanStand(c), t => t == FieldTile.Grass);
+
+            Assert.AreEqual(new Vector2Int(1, 3), path[path.Count - 1], "가장 가까운 풀숲 (위로 두 칸)");
+            Assert.AreEqual(2, path.Count, "시작 칸은 빼고");
+            for (int i = 0; i < path.Count; i++)
+                Assert.AreEqual(1, ((i == 0 ? map.Start : path[i - 1]) - path[i]).sqrMagnitude, "한 칸씩 이어짐");
+
+            // 풀숲에 닿은 뒤 같은 방향으로 더 들어갈 풀숲이 없으면 거기서 멈춤 (위는 벽)
+            var deeper = FieldReach.PathToNearest(map, map.Start, c => walker.CanStand(c), t => t == FieldTile.Grass, extra: 1);
+            CollectionAssert.AreEqual(path, deeper);
+
+            // 오른쪽 끝에서 출발하면 바로 위 풀숲 → 같은 방향(위)으로 이어진 풀숲 한 칸 더 안으로
+            var right = new Vector2Int(7, 1);
+            var inside = FieldReach.PathToNearest(map, right, c => walker.CanStand(c), t => t == FieldTile.Grass, extra: 1);
+            CollectionAssert.AreEqual(new[] { new Vector2Int(7, 2), new Vector2Int(7, 3) }, inside);
+            // 그 옆 (6,1)에서는 위 풀숲 (6,2) 다음 칸이 길이라 한 칸 더 가지 않음
+            var beside = FieldReach.PathToNearest(map, new Vector2Int(6, 1), c => walker.CanStand(c), t => t == FieldTile.Grass, extra: 1);
+            CollectionAssert.AreEqual(new[] { new Vector2Int(6, 2) }, beside);
+        }
+
+        [Test]
+        public void NoPathWhenNothingIsReachable()
+        {
+            var map = FieldMap.Parse("#####\n#P.##\n###,#\n#####");
+            var walker = new FieldWalker(map, map.Start);
+            Assert.IsEmpty(FieldReach.PathToNearest(map, map.Start, c => walker.CanStand(c), t => t == FieldTile.Grass));
+        }
     }
 
     public class ChestAndWorldTests

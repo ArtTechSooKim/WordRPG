@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -24,7 +25,7 @@ namespace WordRPG.Tests
 
         private int saves;
 
-        private FieldScreen CreateField(GameSession session, bool intro = false)
+        private FieldScreen CreateField(GameSession session, bool intro = false, float encounterRate = 1f, int minSteps = 0, bool tutorials = true)
         {
             var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
             var enemy = TestData.Species("slime", new MonsterStats(8, 1, 1), new MonsterStats(0, 0, 0), bite).Set("displayName", "잉크 슬라임");
@@ -37,9 +38,9 @@ namespace WordRPG.Tests
             var area = ScriptableObject.CreateInstance<FieldArea>()
                 .Set("areaId", "library").Set("displayName", "잊혀진 서고").Set("map", Map)
                 .Set("encounters", table).Set("words", words).Set("boss", new BossEncounter(king, 3))
-                .Set("encounterRate", 1f).Set("minStepsBetweenEncounters", 0);
+                .Set("encounterRate", encounterRate).Set("minStepsBetweenEncounters", minSteps);
             var field = new GameObject("HeroSetupFieldUnderTest").AddComponent<FieldScreen>();
-            field.Configure(area, session, () => saves++, step: 0.05f, animScale: 0.01f, tutorials: true, setup: true, intro: intro);
+            field.Configure(area, session, () => saves++, step: 0.05f, animScale: 0.01f, tutorials: tutorials, setup: true, intro: intro);
             return field;
         }
 
@@ -64,10 +65,12 @@ namespace WordRPG.Tests
             Assert.IsTrue(field.Intro.IsOpen, "새 게임은 입장 영상부터");
             Assert.IsFalse(field.CharacterSelect.IsOpen, "영상이 끝나야 모습 고르기");
             Assert.IsTrue(field.IsPanelOpen, "영상 동안 필드는 멈춤");
+            Assert.AreEqual(Music.Intro, Sound.CurrentMusic, "#133 입장 영상은 전용 음악");
             ActiveButton(field.transform, "IntroSkipButton").onClick.Invoke();
             Assert.IsFalse(field.Intro.IsOpen);
             yield return WaitFor(() => field.CharacterSelect.IsOpen, 2f);
             Assert.IsTrue(field.CharacterSelect.IsOpen, "건너뛰면 바로 모습 고르기");
+            Assert.AreEqual(Music.HeroSelect, Sound.CurrentMusic, "#133 캐릭터 고르기는 신나는 음악");
             Object.Destroy(field.gameObject);
             yield return null;
 
@@ -133,8 +136,10 @@ namespace WordRPG.Tests
             FindButton(field.transform, "LookCard_hunter").onClick.Invoke();
             Assert.AreEqual("hunter", field.CharacterSelect.Selected);
             StringAssert.Contains("사냥꾼", AllText(field.CharacterSelect.Root.transform));
+            Assert.AreEqual(Music.HeroSelect, Sound.CurrentMusic, "#133 고르는 동안 신나는 음악");
             FindButton(field.transform, "CharacterStartButton").onClick.Invoke();
             yield return null;
+            Assert.AreEqual(Music.Meadow, Sound.CurrentMusic, "고르면 지역 음악으로 (환영·혼잣말은 초원에서)");
             Assert.AreEqual("hunter", session.Hero.LookId);
             Assert.AreEqual("hunter", PlayerArt.LookId, "필드 주인공 그림이 고른 모습으로");
             StringAssert.Contains("hunter", field.PlayerSprite.texture.name);
@@ -215,6 +220,21 @@ namespace WordRPG.Tests
             Assert.AreEqual("풀숲으로 가서 몬스터와 싸워 보세요", field.Guide.CurrentText);
             Assert.IsTrue(session.Tutorials.Has(TutorialProgress.Field));
 
+            // #133 사용자: 그 전에 분신이 가장 가까운 풀숲으로 잔상을 남기며 걸어 들어가고, 카메라가 주인공에게 돌아옴
+            Assert.AreEqual(1, field.WayToGrassShown, "풀숲 가는 길을 한 번 보여 줌");
+            Assert.AreEqual(2, field.WayToGrassTiles, "시작 칸에서 위로 두 칸 (바로 위 풀숲까지)");
+            Assert.Greater(field.WayGhostTrails, 0, "지나간 자리에 잔상");
+            Assert.IsFalse(field.IsCameraPanning, "카메라는 다시 주인공");
+            Assert.IsFalse(field.IsInBattle, "연출이 끝나면 다시 움직일 수 있음");
+            Assert.AreEqual(0, Object.FindObjectsByType<SpriteRenderer>(FindObjectsSortMode.None)
+                .Count(r => r.name.StartsWith("WayGhost")), "분신·잔상은 다 사라짐");
+
+            // #133 사용자: 안내 글이 주인공을 가렸음 → 알약은 주인공보다 아래 (화살표는 목표 한 줄)
+            var corners = new Vector3[4];
+            field.Guide.PillRect.GetWorldCorners(corners);
+            Assert.Less(corners[1].y, field.PlayerScreenPoint.y - 40f, "알약 윗변이 주인공보다 아래");
+            Assert.IsTrue(field.Guide.ArrowVisible, "화살표는 그대로 목표 한 줄을 가리킴");
+
             yield return HoldStick(field, Direction.Up, () => field.IsInBattle, 5f);
             Assert.IsTrue(field.IsInBattle, "풀숲에서 첫 전투");
             yield return WaitFor(() => field.Battle.IsRunning, 3f);
@@ -229,6 +249,38 @@ namespace WordRPG.Tests
             Assert.IsFalse(field.PauseTutorial.IsShowing);
             Assert.IsTrue(session.Tutorials.Has(TutorialProgress.Goal), "한 번만");
             Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
+        // #133 사용자: 첫 풀숲에서 몬스터를 못 만나면 처음 하는 사람은 뭘 하라는 건지 모름 → 풀숲 두 번째 칸에서 반드시.
+        // 확률 0·안전 걸음 4인 지역에서도. 한 번이라도 싸워 본 사람은 원래 규칙
+        [UnityTest]
+        public IEnumerator FirstGrassAlwaysMeetsAMonsterOnTheSecondStep()
+        {
+            var session = NewSession();
+            session.Hero.SetLook("boy");
+            session.Hero.Rename("아린");
+            var field = CreateField(session, encounterRate: 0f, minSteps: 4, tutorials: false);
+            yield return null;
+            yield return HoldStick(field, Direction.Up, () => field.PlayerCell.y == 3, 3f);
+            Assert.AreEqual(new Vector2Int(1, 3), field.PlayerCell, "첫 번째 풀숲 칸");
+            Assert.IsFalse(field.IsInBattle, "첫 칸은 아직");
+            yield return HoldStick(field, Direction.Right, () => field.IsInBattle, 3f);
+            Assert.IsTrue(field.IsInBattle, "두 번째 풀숲 칸에서 반드시 전투");
+            Assert.AreEqual(new Vector2Int(2, 3), field.PlayerCell);
+            Object.Destroy(field.gameObject);
+            yield return null;
+
+            var veteran = NewSession();
+            veteran.Hero.SetLook("boy");
+            veteran.Hero.Rename("아린");
+            veteran.Record.RecordBattle(true, 3, 0);
+            var again = CreateField(veteran, encounterRate: 0f, minSteps: 4, tutorials: false);
+            yield return null;
+            yield return HoldStick(again, Direction.Up, () => again.PlayerCell.y == 3, 3f);
+            yield return HoldStick(again, Direction.Right, () => again.PlayerCell.x == 5 || again.IsInBattle, 3f);
+            Assert.IsFalse(again.IsInBattle, "싸워 본 사람은 원래 규칙 (확률 0이면 안 나옴)");
+            Object.Destroy(again.gameObject);
             yield return null;
         }
     }

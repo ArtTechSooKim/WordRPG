@@ -159,6 +159,9 @@ MUSIC = {
     "forest": "Audio/Musics/11 - Clearing.ogg",
     "jungle": "Audio/Musics/30 - Ruins.ogg",  # 1.1 메아리 정글 (#80) — 고대 유적이 있는 정글
     "cave": "Audio/Musics/2 - The Cave.ogg",  # 1.2 어두운 밀림 동굴 (#115)
+    # #133 사용자: 입장 영상은 이야기를 보여 주니 따로 · 캐릭터 고르기는 신나게. 사용자가 찾은 곡은 Audio/Licensed/{이름}에 두면 먼저 쓰임
+    "intro": "Audio/Musics/6 - Story.ogg",          # 입장 영상 (임시 — 사용자가 곡을 찾는 중)
+    "heroselect": "Audio/Musics/20 - Good Time.ogg",  # 캐릭터 고르기
 }
 SFX = {
     "click": "Audio/Sounds/Menu/Move2.wav",  # 가벼운 찰칵 (0.04초)

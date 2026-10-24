@@ -15,9 +15,19 @@ namespace WordRPG.Tests
             Assert.IsNotNull(clip, "Resources/Video/intro.mp4");
             Assert.Less(clip.width, clip.height, "세로 영상");
             var captions = IntroCaptions.Load();
-            Assert.AreEqual(3, captions.captions.Count, "자막 세 줄 (스토리 프롤로그)");
+            // #133 사용자: 세 줄로는 세계관 설명이 부족 → 말의 세계 · 서고와 기억 · 말이 사라짐 · 하얀 날개 · 깃펜 · 깨어남 · 모험의 시작
+            Assert.GreaterOrEqual(captions.captions.Count, 8, "세계관을 풀어 주는 자막");
             Assert.That(captions.duration, Is.EqualTo((float)clip.length).Within(0.6f), "자막표 길이 = 영상 길이");
             Assert.LessOrEqual(captions.duration, 40f, "입장 영상은 짧게");
+            float lastEnd = 0f;
+            foreach (var line in captions.captions)
+            {
+                Assert.GreaterOrEqual(line.end - line.start, 2.5f, $"읽을 시간: {line.text}");
+                Assert.GreaterOrEqual(line.start, lastEnd, $"앞 자막과 겹치지 않음: {line.text}");
+                Assert.LessOrEqual(line.text.Split('\n').Length, 2, $"두 줄까지 (화면 아래 자막 칸): {line.text}");
+                Assert.LessOrEqual(line.end, captions.duration, $"영상이 끝나기 전에: {line.text}");
+                lastEnd = line.end;
+            }
         }
 
         [Test]

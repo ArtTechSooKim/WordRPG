@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -39,6 +40,46 @@ namespace WordRPG.Field
             var cells = new HashSet<Vector2Int>();
             foreach (var (cell, _) in seen) cells.Add(cell);
             return cells;
+        }
+
+        // from에서 걸어서 가장 가까운 목표 칸까지의 길 (#133 처음 하는 사람에게 풀숲 가는 길 보여 주기).
+        // from은 빼고 다음 칸부터 목표 칸까지, 갈 수 없으면 빈 목록. 목표에 닿은 뒤 같은 방향으로 이어진 목표 칸을 extra칸까지 더 간다 (풀숲 안으로)
+        public static List<Vector2Int> PathToNearest(FieldMap map, Vector2Int from, Func<Vector2Int, bool> canStand,
+            Func<FieldTile, bool> isGoal, int extra = 0)
+        {
+            var path = new List<Vector2Int>();
+            var cameFrom = new Dictionary<Vector2Int, Vector2Int> { [from] = from };
+            var queue = new Queue<Vector2Int>();
+            queue.Enqueue(from);
+            Vector2Int? goal = null;
+            while (queue.Count > 0 && goal == null)
+            {
+                var cell = queue.Dequeue();
+                foreach (var step in Steps)
+                {
+                    var next = cell + step;
+                    if (cameFrom.ContainsKey(next) || !map.InBounds(next) || !canStand(next)) continue;
+                    cameFrom[next] = cell;
+                    if (isGoal(map.Get(next)))
+                    {
+                        goal = next;
+                        break;
+                    }
+                    queue.Enqueue(next);
+                }
+            }
+            if (goal == null) return path;
+
+            for (var cell = goal.Value; cell != from; cell = cameFrom[cell]) path.Add(cell);
+            path.Reverse();
+            var direction = path[path.Count - 1] - (path.Count > 1 ? path[path.Count - 2] : from);
+            for (int i = 0; i < extra; i++)
+            {
+                var next = path[path.Count - 1] + direction;
+                if (!map.InBounds(next) || !canStand(next) || !isGoal(map.Get(next))) break;
+                path.Add(next);
+            }
+            return path;
         }
 
         // 그 칸 바로 옆(위·아래·왼·오른)에 갈 수 있는지 — 옆에서 [확인]으로 쓰는 물건용
