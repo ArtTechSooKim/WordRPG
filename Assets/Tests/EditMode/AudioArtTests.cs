@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using UnityEngine;
+using WordRPG.EditorTools;
 using WordRPG.Field;
 using WordRPG.UI;
 
@@ -56,6 +57,18 @@ namespace WordRPG.Tests
         public void LicensedSoundIsTriedBeforeThePackSound()
         {
             CollectionAssert.AreEqual(new[] { "Audio/Licensed/newword", "Audio/Sfx/newword" }, Sound.CandidatePaths("Sfx", "newword"));
+            CollectionAssert.AreEqual(new[] { "Audio/Licensed/intro", "Audio/Music/intro" }, Sound.CandidatePaths("Music", "intro"), "음악도 (#133)");
+        }
+
+        // #133 사용자가 찾은 입장 영상 곡(Licensed/intro.wav)은 음악으로 가져옴 — 스테레오·스트리밍·Vorbis (효과음은 모노·미리 풀어 둠)
+        [Test]
+        public void LicensedMusicIsImportedAsMusic()
+        {
+            Assert.IsTrue(UiAssetImporter.IsMusic("Assets/Resources/Audio/Music/meadow.ogg"));
+            Assert.IsTrue(UiAssetImporter.IsMusic("Assets/Resources/Audio/Licensed/intro.wav"), "입장 영상 곡");
+            Assert.IsTrue(UiAssetImporter.IsMusic("Assets/Resources/Audio/Licensed/HeroSelect.mp3"), "대소문자·확장자 상관없음");
+            Assert.IsFalse(UiAssetImporter.IsMusic("Assets/Resources/Audio/Licensed/newword.wav"), "효과음");
+            Assert.IsFalse(UiAssetImporter.IsMusic("Assets/Resources/Audio/Sfx/click.wav"));
         }
 
         [Test]
