@@ -208,6 +208,7 @@ namespace WordRPG.UI
         public string LastGateBanner => lastGateBanner;
         public Vector3 LastGateCamera => lastGateCamera; // 길이 열리는 순간 카메라 위치
         public Vector3 CameraPosition => cam.transform.position;
+        public Vector2 PlayerScreenPoint => cam.WorldToScreenPoint(player.position); // 주인공의 화면 위치 (테스트용 — 안내가 가리는지)
 
         // 코드로 만들 때(테스트) Start 전에 호출. session을 안 주면 GameManager 것을 쓴다
         // database: 세이브의 마지막 지역이 다른 곳이면 거기서 시작하기 위해 지역을 찾는 데 쓴다 (소지품 화면의 아이템 찾기에도)
@@ -682,6 +683,7 @@ namespace WordRPG.UI
             var map = area.Map;
             walker = new FieldWalker(map, position, cell => IsDoorLocked(cell) || IsPaywalled(cell), cell => IsCleared(area, cell), rafting);
             encounterCounter = new EncounterCounter(area.EncounterRate, area.MinStepsBetweenEncounters);
+            if (FirstFightPending) encounterCounter.GuaranteeWithin(EncounterCounter.FirstFightGrassSteps); // #133
             session.World.SetPosition(area.AreaId, position, rafting);
             SetUpRoamers(position);
 
