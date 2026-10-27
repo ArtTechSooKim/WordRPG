@@ -80,14 +80,15 @@ namespace WordRPG.UI
             Destroy(group.gameObject);
         }
 
-        private void Float(BattleUnit unit, string text, Color color, int size)
+        // pop: 처음에 크게 찍혔다 줄어듦 (회복 숫자 — #137)
+        private void Float(BattleUnit unit, string text, Color color, int size, bool pop = false)
         {
             Cue($"숫자 {unit?.DisplayName} {text} #{ColorUtility.ToHtmlStringRGB(color)} {size}");
             if (!viewOf.TryGetValue(unit, out var view)) return;
-            StartCoroutine(FloatRoutine(view.Root, text, color, size));
+            StartCoroutine(FloatRoutine(view.Root, text, color, size, pop));
         }
 
-        private IEnumerator FloatRoutine(RectTransform target, string text, Color color, int size)
+        private IEnumerator FloatRoutine(RectTransform target, string text, Color color, int size, bool pop = false)
         {
             // 큰 숫자(보스 결정타)는 칸보다 커도 잘리지 않게 한 줄로 넘쳐 그린다
             var label = UiKit.Display(UiKit.OneLine(UiKit.Label("Float", root, text, size + 8, color, 0.5f, 0.5f, 0.5f, 0.5f,
@@ -106,6 +107,7 @@ namespace WordRPG.UI
                 t += Time.unscaledDeltaTime;
                 float k = Mathf.Clamp01(t / duration);
                 rt.position = start + Vector3.up * (140f * k * canvas.scaleFactor);
+                if (pop) rt.localScale = Vector3.one * (k < 0.18f ? Mathf.Lerp(1.7f, 1f, k / 0.18f) : 1f);
                 var c = label.color;
                 c.a = 1f - k * k;
                 label.color = c;
@@ -149,13 +151,13 @@ namespace WordRPG.UI
         }
 
         // 카드 위에 효과 애니메이션 (기다리지 않고 바로 다음 연출로)
-        // slow: 효과를 몇 배 느리게 (보스 결정타), scale: 크기 배율
-        private void PlayFx(BattleUnit unit, Fx fx, float slow = 1f, float scale = 1f)
+        // slow: 효과를 몇 배 느리게 (보스 결정타), scale: 크기 배율, tint·offset·squash: 색·자리·세로 배율 (#137 기술 연출 — 기록엔 안 남김)
+        private void PlayFx(BattleUnit unit, Fx fx, float slow = 1f, float scale = 1f, Color? tint = null, Vector2 offset = default, float squash = 1f)
         {
             Cue($"효과 {fx} {unit?.DisplayName}" + (slow != 1f || scale != 1f ? $" 느리게{CueNumber(slow)} 크기{CueNumber(scale)}" : ""));
             if (unit == null || !viewOf.TryGetValue(unit, out var view)) return;
             float size = (unit.IsPlayerSide ? 200f : 300f) * scale;
-            StartCoroutine(BattleFx.Play(view.Root, fx, size, animationScale * slow));
+            StartCoroutine(BattleFx.Play(view.Root, fx, size, animationScale * slow, tint, offset, squash));
         }
 
         private static bool Has(IReadOnlyList<BattleEvent> events, BattleEventType type, BattleUnit target = null)

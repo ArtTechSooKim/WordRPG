@@ -20,3 +20,4 @@ MonoBehaviour:
   power: 100
   chargeTurns: 0
   quizDirection: 0
+  fx: 3

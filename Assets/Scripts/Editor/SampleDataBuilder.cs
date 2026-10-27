@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -1051,6 +1052,40 @@ namespace WordRPG.EditorTools
             });
         }
 
+        // 기술마다 전투 연출 (#137, 그림 = UI SkillLooks). 없는 기술은 Auto(종류대로)
+        private static readonly Dictionary<string, SkillFx> SkillFxById = new Dictionary<string, SkillFx>
+        {
+            ["hero_swing"] = SkillFx.Slash,
+            ["nib_ink_splash"] = SkillFx.Ink, ["quill_ink_storm"] = SkillFx.Ink,
+            ["wand_spell_bolt"] = SkillFx.Thunder, ["wand_thunder_spell"] = SkillFx.Thunder, ["doc_cram_bolt"] = SkillFx.Thunder,
+            ["lamp_firefly_swarm"] = SkillFx.Light, ["lamp_glow_flash"] = SkillFx.Light,
+            ["gem_letter_shower"] = SkillFx.Letters, ["gem_letter_echo"] = SkillFx.Letters, ["doc_fill_blank"] = SkillFx.Letters,
+            ["doc_highlight_sweep"] = SkillFx.Highlight, ["doc_finish_sentence"] = SkillFx.Heavy,
+            ["whip_vine_lash"] = SkillFx.Plant, ["whip_thorn_storm"] = SkillFx.Plant,
+            ["ara_pebble"] = SkillFx.Rock,
+            ["lantern_wisdom_light"] = SkillFx.HealLight, ["lumi_healing_light"] = SkillFx.HealLight,
+            ["grail_recall"] = SkillFx.HealLight, ["grail_blessing"] = SkillFx.HealLight,
+            ["leaf_sprout_heal"] = SkillFx.HealLeaf, ["leaf_world_breath"] = SkillFx.HealLeaf, ["ara_sprout"] = SkillFx.HealLeaf,
+            ["gourd_sip"] = SkillFx.HealWater, ["gourd_spring"] = SkillFx.HealWater,
+            ["shell_book_shield"] = SkillFx.GuardBook, ["tortoise_encyclo_wall"] = SkillFx.GuardBook, ["doc_pencilcase_guard"] = SkillFx.GuardBook,
+            ["flute_echo_veil"] = SkillFx.GuardEcho, ["flute_echo_wall"] = SkillFx.GuardEcho, ["ara_echo"] = SkillFx.GuardEcho,
+            ["hourglass_pause"] = SkillFx.GuardTime, ["hourglass_rewind"] = SkillFx.GuardTime,
+            ["seed_full_stop"] = SkillFx.GuardSeed, ["seed_period_grove"] = SkillFx.GuardSeed,
+            // 적
+            ["slime_splat"] = SkillFx.Ink, ["newt_ink_spit"] = SkillFx.Ink, ["octopus_ink_mimic"] = SkillFx.Ink,
+            ["bat_scratch"] = SkillFx.Claw, ["larva_chew"] = SkillFx.Claw, ["owl_question_peck"] = SkillFx.Claw, ["spider_spell_bite"] = SkillFx.Claw,
+            ["goblin_blank_bonk"] = SkillFx.Heavy, ["boss_forget_bonk"] = SkillFx.Heavy, ["boss_amnesia"] = SkillFx.Heavy,
+            ["raccoon_tail_slam"] = SkillFx.Heavy, ["vine_slam"] = SkillFx.Heavy,
+            ["frog_tongue_lash"] = SkillFx.Whip, ["lizard_tail_grab"] = SkillFx.Whip,
+            ["goblin_forget_fog"] = SkillFx.Spore, ["mushroom_spell_spore"] = SkillFx.Spore, ["larva_silk_spray"] = SkillFx.Spore,
+            ["spider_tangle_web"] = SkillFx.Spore, ["vine_ellipsis_spore"] = SkillFx.Spore,
+            ["ghost_blink_brush"] = SkillFx.Swirl, ["kappa_batchim_swap"] = SkillFx.Swirl, ["raccoon_muddle_whirl"] = SkillFx.Swirl,
+            ["snake_squiggle_squeeze"] = SkillFx.Swirl,
+            ["kappa_plate_splash"] = SkillFx.Water, ["frog_blank_croak"] = SkillFx.Sound,
+            ["boss_memory_drain"] = SkillFx.Drain, ["frog_gulp"] = SkillFx.Drain, ["vine_swallow_sentence"] = SkillFx.Drain,
+            ["raccoon_acorn_snack"] = SkillFx.HealLeaf,
+        };
+
         private static SkillData Skill(string id, string name, string description, SkillKind kind, SkillTarget target,
             int power, QuizDirection direction, int chargeTurns = 0)
         {
@@ -1064,6 +1099,7 @@ namespace WordRPG.EditorTools
                 Prop(so, "power").intValue = power;
                 Prop(so, "quizDirection").enumValueIndex = (int)direction;
                 Prop(so, "chargeTurns").intValue = chargeTurns;
+                Prop(so, "fx").enumValueIndex = SkillFxById.TryGetValue(id, out var fx) ? (int)fx : (int)SkillFx.Auto;
             });
         }
 

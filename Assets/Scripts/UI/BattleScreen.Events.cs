@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using WordRPG.Battle;
+using WordRPG.Monsters;
 
 namespace WordRPG.UI
 {
@@ -14,6 +15,8 @@ namespace WordRPG.UI
     {
         private IEnumerator PlayEvents(IReadOnlyList<BattleEvent> events)
         {
+            playingEvents = events; // 기술 연출이 대상을 찾을 때 (#137)
+            highlightedUse = null;
             foreach (var e in events)
             {
                 if (e.Type == BattleEventType.Damage && IsBossFinisher(events, e))
@@ -98,11 +101,12 @@ namespace WordRPG.UI
             return 0.5f;
         }
 
-        // 강도를 올려 쓴 기술(×1.2 등)은 배율 글자 + 크리티컬 소리, 조금 더 기다림
+        // 강도를 올려 쓴 기술(×1.2 등)은 배율 글자 + 크리티컬 소리, 조금 더 기다림. 쓰는 카드의 몸짓·날아가는 그림 (#137)
         private float ShowSkillUsed(BattleEvent e)
         {
             bool charged = e.Multiplier > 1.001f;
             Log($"{e.Actor.DisplayName}의 {e.Skill.DisplayName}" + (charged ? $" ×{FormatMultiplier(e.Multiplier)}!" : "!"));
+            PlaySkillStart(e);
             if (!charged) return 0.5f;
             Float(e.Actor, $"×{FormatMultiplier(e.Multiplier)}!", Palette.Gold, 56);
             Sound.Play(Sfx.Critical);
@@ -118,12 +122,14 @@ namespace WordRPG.UI
             return 0.7f;
         }
 
-        // 결정타가 아닌 피해. 수련 허수아비는 HP가 줄지 않고 '누적 피해'가 쌓임, 0이면 '막음!'
+        // 결정타가 아닌 피해. 수련 허수아비는 HP가 줄지 않고 '누적 피해'가 쌓임, 0이면 '막음!'.
+        // 효과는 기술마다 (#137 SkillLooks) — 보호막이 다 깎이면 깨지는 연출 + 로그에 '보호막이 깨졌다!'
         private float ShowDamage(BattleEvent e)
         {
             var d = shown[e.Target];
             bool dummyHit = e.Target.Monster != null && e.Target.Monster.Species.IsTrainingDummy;
             shown[e.Target] = (dummyHit ? d.hp : Mathf.Max(0, d.hp - e.Amount), Mathf.Max(0, d.shield - e.Absorbed));
+            bool shieldBroke = e.Absorbed > 0 && d.shield > 0 && shown[e.Target].shield == 0;
             if (dummyHit)
             {
                 trainingDamage += e.Amount;
@@ -132,50 +138,53 @@ namespace WordRPG.UI
             Sync(e.Target);
             string dmgText = e.Amount > 0 ? $"-{e.Amount}" : "막음!";
             Sound.Play(e.Amount <= 0 ? Sfx.Shield : e.IsCritical ? Sfx.Critical : Sfx.Hit);
-            PlayFx(e.Target, e.Amount <= 0 ? Fx.Shield : e.IsCritical ? Fx.Explosion : e.Target.IsPlayerSide ? Fx.Claw : Fx.Slash);
+            PlayHit(e, shieldBroke);
             // 콤보 중인 아군 공격은 숫자가 단계만큼 더 크게
             int boost = e.Actor != null && e.Actor.IsPlayerSide ? comboStep * 5 : 0;
             Float(e.Target, e.IsCritical ? $"크리티컬! {dmgText}" : dmgText,
                 e.Amount > 0 ? Palette.Bad : Palette.Info, (e.IsCritical ? 58 : 48) + boost);
             Log(e.Absorbed > 0
-                ? $"{e.Target.DisplayName} 피해 {e.Amount} (보호막이 {e.Absorbed} 흡수)"
+                ? $"{e.Target.DisplayName} 피해 {e.Amount} (보호막이 {e.Absorbed} 흡수" + (shieldBroke ? " — 보호막이 깨졌다!)" : ")")
                 : $"{e.Target.DisplayName} 피해 {e.Amount}" + (e.IsCritical ? " — 크리티컬!" : ""));
             return 0.6f;
         }
 
         private float ShowHeal(BattleEvent e)
         {
-            ShowRecovery(e.Target, e.Amount);
+            ShowRecovery(e.Target, e.Amount, SkillLooks.Of(e.Skill, e.Actor == null || e.Actor.IsPlayerSide));
             Log($"{e.Target.DisplayName} HP +{e.Amount}" + (e.IsCritical ? " — 크리티컬!" : ""));
             return 0.6f;
         }
 
         private float ShowItemUsed(BattleEvent e)
         {
-            ShowRecovery(e.Target, e.Amount);
+            ShowRecovery(e.Target, e.Amount, SkillLooks.Of(SkillFx.HealLight));
             Log($"{UiKit.WithJosa(e.Item.DisplayName, "을", "를")} 썼다! HP +{e.Amount}");
             return 0.6f;
         }
 
-        // 회복 기술·상처약 공통: 화면 HP를 올리고 초록 숫자 + 회복 소리·효과 (로그는 각자)
-        private void ShowRecovery(BattleUnit target, int amount)
+        // 회복 기술·상처약 공통: 화면 HP를 올리고 크게 찍히는 초록 숫자 + 회복 소리 + 회복 연출(#137 — 마법진·빛기둥·알갱이·HP 막대가 차오름). 로그는 각자
+        private void ShowRecovery(BattleUnit target, int amount, SkillLook look)
         {
             var h = shown[target];
             shown[target] = (h.hp + amount, h.shield);
             Sync(target);
-            Float(target, $"+{amount}", Palette.Good, 48);
+            Float(target, $"+{amount}", Palette.Good, 60, pop: true);
             Sound.Play(Sfx.Heal);
-            PlayFx(target, Fx.Heal);
+            PlayRecovery(target, h.hp, look);
         }
 
+        // 보호막: 막이 튕기며 덮고(#137) 기술마다 다른 효과 그림, 남아 있는 동안 카드 테두리
         private float ShowShield(BattleEvent e)
         {
             var s = shown[e.Target];
             shown[e.Target] = (s.hp, s.shield + e.Amount);
+            var look = SkillLooks.Of(e.Skill, e.Actor == null || e.Actor.IsPlayerSide);
+            PlayShield(e.Target, look); // 테두리 색을 먼저 정하고 Sync가 테두리를 켬
             Sync(e.Target);
             Float(e.Target, $"보호막 +{e.Amount}", Palette.Info, 40);
             Sound.Play(Sfx.Shield);
-            PlayFx(e.Target, Fx.Shield);
+            PlayFx(e.Target, look.Hit, 1f, 1f, look.Tint);
             Log($"{e.Target.DisplayName} 보호막 +{e.Amount}");
             return 0.6f;
         }

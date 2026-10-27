@@ -259,6 +259,7 @@ namespace WordRPG.UI
         // 전투 연습 씬(단독)에서만 직접 받는다 — 필드에서는 FieldScreen이 넘겨 준다
         private void Update()
         {
+            PulseShieldAuras(); // 보호막 테두리가 숨 쉬듯 (#137)
             if (loopBattles && FieldScreen.BackPressed()) HandleBack();
             if (relayoutResult != null && IsResultVisible
                 && !Mathf.Approximately(((RectTransform)resultPanel.transform).rect.height, resultLayoutHeight))

@@ -136,14 +136,15 @@ namespace WordRPG.Tests
                 BattleEvent.Defeated(enemy),
                 BattleEvent.Victory());
 
+            // #137: 기술을 쓰면 카드가 상대에게 달려감(몸짓) · 크리티컬도 기술 효과 + 폭발 · 보호막이 받아 내면 물결
             AssertCues(
                 "로그 정답! [처음 만남 → 학습 ▲]", "기다림 0.5",
                 "콤보 글자 3", "소리 Combo 1.08", "기다림 0.45",
-                "로그 주인공의 strike ×1.5!", $"숫자 주인공 ×1.5! {Gold} 56", "소리 Critical", "기다림 0.7",
+                "로그 주인공의 strike ×1.5!", "몸짓 Lunge 주인공", $"숫자 주인공 ×1.5! {Gold} 56", "소리 Critical", "기다림 0.7",
                 // 콤보 2단계(Good!)라 아군 공격 숫자는 +10 크게
-                "HP 슬라임 28/0", "소리 Critical", "효과 Explosion 슬라임", $"숫자 슬라임 크리티컬! -12 {Bad} 68", "로그 슬라임 피해 12 — 크리티컬!", "기다림 0.6",
-                "HP 슬라임 28/0", "소리 Shield", "효과 Shield 슬라임", $"숫자 슬라임 막음! {Info} 58", "로그 슬라임 피해 0 (보호막이 4 흡수)", "기다림 0.6",
-                "HP 슬라임 21/0", "소리 Hit", "효과 Slash 슬라임", $"숫자 슬라임 -7 {Bad} 58", "로그 슬라임 피해 7 (보호막이 3 흡수)", "기다림 0.6",
+                "HP 슬라임 28/0", "소리 Critical", "효과 Slash 슬라임", "효과 Explosion 슬라임", $"숫자 슬라임 크리티컬! -12 {Bad} 68", "로그 슬라임 피해 12 — 크리티컬!", "기다림 0.6",
+                "HP 슬라임 28/0", "소리 Shield", "효과 Shield 슬라임", "보호막 물결 슬라임", $"숫자 슬라임 막음! {Info} 58", "로그 슬라임 피해 0 (보호막이 4 흡수)", "기다림 0.6",
+                "HP 슬라임 21/0", "소리 Hit", "효과 Slash 슬라임", "보호막 물결 슬라임", $"숫자 슬라임 -7 {Bad} 58", "로그 슬라임 피해 7 (보호막이 3 흡수)", "기다림 0.6",
                 "로그 슬라임 쓰러졌다!", "소리 Faint", "효과 Smoke 슬라임", "기다림 0.5",
                 End());
             Assert.AreEqual("Good!", screen.LastComboText);
@@ -165,7 +166,7 @@ namespace WordRPG.Tests
             AssertCues(
                 "로그 오답… [학습 → 처음 만남 ▼]", "기다림 0.5",
                 "로그 주인공의 strike 실패…", $"숫자 주인공 실패 {Dim} 44", "소리 Fail", "효과 Smoke 주인공", "기다림 0.7",
-                "로그 슬라임의 bite!", "기다림 0.5",
+                "로그 슬라임의 bite!", "몸짓 Lunge 슬라임", "기다림 0.5",
                 "HP 주인공 91/0", "소리 Hit", "효과 Claw 주인공", $"숫자 주인공 -9 {Bad} 48", "로그 주인공 피해 9", "기다림 0.6",
                 End("라운드 2"), "기다림 0.2",
                 End("라운드 2"));
@@ -184,12 +185,16 @@ namespace WordRPG.Tests
                 BattleEvent.Heal(hero, hero, Mend, 20, true),
                 BattleEvent.ItemUsed(hero, potion, 40));
 
+            // #137: 보호막·회복 기술은 제자리에서 마법진(몸짓 Cast) · 보호막은 막이 튕기며 덮음 ·
+            // 회복은 크게 찍히는 숫자 + 발밑 마법진·빛기둥·알갱이(회복 빛) — 상처약도 같은 빛
             AssertCues(
                 "로그 정답! [복습]", "기다림 0.5",
-                "로그 주인공의 guard!", "기다림 0.5",
-                "HP 주인공 100/15", $"숫자 주인공 보호막 +15 {Info} 40", "소리 Shield", "효과 Shield 주인공", "로그 주인공 보호막 +15", "기다림 0.6",
-                "HP 주인공 120/15", $"숫자 주인공 +20 {Good} 48", "소리 Heal", "효과 Heal 주인공", "로그 주인공 HP +20 — 크리티컬!", "기다림 0.6",
-                "HP 주인공 160/15", $"숫자 주인공 +40 {Good} 48", "소리 Heal", "효과 Heal 주인공", "로그 상처약을 썼다! HP +40", "기다림 0.6",
+                "로그 주인공의 guard!", "몸짓 Cast 주인공", "효과 Circle 주인공 느리게1 크기1.3", "기다림 0.5",
+                "보호막 막 주인공", "HP 주인공 100/15", $"숫자 주인공 보호막 +15 {Info} 40", "소리 Shield", "효과 Shield 주인공", "로그 주인공 보호막 +15", "기다림 0.6",
+                "HP 주인공 120/15", $"숫자 주인공 +20 {Good} 60", "소리 Heal", "회복 빛 주인공", "효과 Circle 주인공 느리게1 크기1.5", "효과 Heal 주인공",
+                "로그 주인공 HP +20 — 크리티컬!", "기다림 0.6",
+                "HP 주인공 160/15", $"숫자 주인공 +40 {Good} 60", "소리 Heal", "회복 빛 주인공", "효과 Circle 주인공 느리게1 크기1.5", "효과 Heal 주인공",
+                "로그 상처약을 썼다! HP +40", "기다림 0.6",
                 End());
         }
 
@@ -242,7 +247,7 @@ namespace WordRPG.Tests
                 BattleEvent.Victory());
 
             AssertCues(
-                "로그 주인공의 strike!", "기다림 0.5",
+                "로그 주인공의 strike!", "몸짓 Lunge 주인공", "기다림 0.5",
                 "HP 까먹대왕 35/0", "소리 Hit", "효과 Slash 까먹대왕", $"숫자 까먹대왕 -5 {Bad} 48", "로그 까먹대왕 피해 5", "기다림 0.6",
                 "결정타 까먹대왕", "로그 결정타! 까먹대왕 피해 30", "소리 Critical 0.55", "소리 Hit 0.6",
                 "효과 Explosion 까먹대왕 느리게3 크기1.8", $"숫자 까먹대왕 -30 {Bad} 96", "어둡게 0.75 0.25", "HP 까먹대왕 5/0",
@@ -286,12 +291,70 @@ namespace WordRPG.Tests
 
             AssertCues(
                 "로그 정답! [학습 → 복습 ▲]", "기다림 0.5",
-                "로그 주인공의 strike!", "기다림 0.5",
-                "HP 허수아비 80/0", "소리 Critical", "효과 Explosion 허수아비", $"숫자 허수아비 크리티컬! -25 {Bad} 58", "로그 허수아비 피해 25 — 크리티컬!", "기다림 0.6",
+                "로그 주인공의 strike!", "몸짓 Lunge 주인공", "기다림 0.5",
+                "HP 허수아비 80/0", "소리 Critical", "효과 Slash 허수아비", "효과 Explosion 허수아비", $"숫자 허수아비 크리티컬! -25 {Bad} 58", "로그 허수아비 피해 25 — 크리티컬!", "기다림 0.6",
                 "HP 허수아비 80/0", "소리 Hit", "효과 Slash 허수아비", $"숫자 허수아비 -10 {Bad} 48", "로그 허수아비 피해 10", "기다림 0.6",
                 End("수련"), "기다림 0.2",
                 End("수련"));
             StringAssert.Contains("누적 피해 35", AllText(screen));
+        }
+
+        // #137 기술마다 다른 연출: 돌팔매는 몸짓 없이 돌이 날아감 · 번개는 마법진 + 번쩍 · 글자 소나기 · 형광펜(기술 한 번에 한 줄) ·
+        // 적의 울음은 소리 고리. 기다리는 시간은 그대로 (몸짓·효과는 겹쳐 돌아감)
+        [UnityTest]
+        public IEnumerator EachSkillPlaysItsOwnLook()
+        {
+            yield return Begin();
+            var pebble = TestData.Skill("pebble", SkillKind.Damage, SkillTarget.SingleEnemy, 10).Set("fx", SkillFx.Rock);
+            var bolt = TestData.Skill("bolt", SkillKind.Damage, SkillTarget.SingleEnemy, 10).Set("fx", SkillFx.Thunder);
+            var shower = TestData.Skill("shower", SkillKind.Damage, SkillTarget.AllEnemies, 10).Set("fx", SkillFx.Letters);
+            var marker = TestData.Skill("marker", SkillKind.Damage, SkillTarget.AllEnemies, 10).Set("fx", SkillFx.Highlight);
+            var croak = TestData.Skill("croak", SkillKind.Damage, SkillTarget.AllEnemies, 10).Set("fx", SkillFx.Sound);
+            yield return Play(
+                BattleEvent.SkillUsed(hero, pebble), BattleEvent.Damage(hero, enemy, pebble, 3, 0, false),
+                BattleEvent.SkillUsed(hero, bolt), BattleEvent.Damage(hero, enemy, bolt, 3, 0, false),
+                BattleEvent.SkillUsed(hero, shower), BattleEvent.Damage(hero, enemy, shower, 3, 0, false),
+                BattleEvent.SkillUsed(hero, marker), BattleEvent.Damage(hero, enemy, marker, 3, 0, false), BattleEvent.Damage(hero, enemy, marker, 3, 0, false),
+                BattleEvent.SkillUsed(enemy, croak), BattleEvent.Damage(enemy, hero, croak, 3, 0, false));
+
+            Assert.AreEqual("날아감 RockFly 주인공→슬라임", cues[cues.IndexOf("로그 주인공의 pebble!") + 1], "돌팔매는 몸짓 없이 돌만");
+            AssertInOrder("날아감 RockFly 주인공→슬라임", "효과 Rock 슬라임 느리게1 크기1.1",
+                "로그 주인공의 bolt!", "몸짓 Cast 주인공", "효과 Thunder 슬라임 느리게1 크기1.3", "번쩍",
+                "로그 주인공의 shower!", "글자 소나기 슬라임",
+                "로그 주인공의 marker!", "형광펜",
+                "로그 슬라임의 croak!", "몸짓 Cast 슬라임", "효과 Ring 주인공", "소리 고리 주인공");
+            Assert.AreEqual(1, cues.FindAll(c => c == "형광펜").Count, "형광펜은 기술 한 번에 한 줄");
+            Assert.AreEqual(5 * 2 + 1, cues.FindAll(c => c.StartsWith("기다림")).Count, "사건마다 기다림 한 번 (기술 5 + 피해 6 = 11)");
+        }
+
+        // 보호막: 받아 내면 물결, 다 깎이면 깨짐(조각) + 로그 '보호막이 깨졌다!'. 남아 있는 동안만 카드 둘레 테두리
+        [UnityTest]
+        public IEnumerator ShieldRipplesThenBreaksWhenItRunsOut()
+        {
+            yield return Begin();
+            yield return Play(
+                BattleEvent.Shield(hero, hero, Guard, 5, false),
+                BattleEvent.Damage(enemy, hero, Bite, 2, 3, false),
+                BattleEvent.Damage(enemy, hero, Bite, 4, 2, false));
+
+            AssertInOrder("보호막 막 주인공", "HP 주인공 100/5",
+                "HP 주인공 98/2", "보호막 물결 주인공", "로그 주인공 피해 2 (보호막이 3 흡수)",
+                "HP 주인공 94/0", "보호막 깨짐 주인공", "로그 주인공 피해 4 (보호막이 2 흡수 — 보호막이 깨졌다!)");
+            Assert.AreEqual(1, cues.FindAll(c => c.StartsWith("보호막 깨짐")).Count);
+
+            var view = UnitView.Create(screen.transform, "AuraCard", 0f, 0f, 1f, 1f);
+            view.Bind(hero);
+            view.Sync(50, 5);
+            Assert.IsTrue(ShieldAura(view).activeSelf, "보호막이 있으면 테두리");
+            view.Sync(50, 0);
+            Assert.IsFalse(ShieldAura(view).activeSelf, "다 깎이면 테두리도 꺼짐");
+        }
+
+        private static GameObject ShieldAura(UnitView view)
+        {
+            foreach (var t in view.Root.GetComponentsInChildren<Transform>(true))
+                if (t.name == "ShieldAura") return t.gameObject;
+            return null;
         }
 
         // 연출이 기다리는 횟수 (= 프레임을 넘기는 자리): 사건마다 한 번, 결정타 한 번, 보스 쓰러짐은 어둡게 + 기다림 두 번, 연출 없는 사건은 0.

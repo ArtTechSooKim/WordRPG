@@ -24,7 +24,12 @@ namespace WordRPG.UI
         private Text hpText;
         private GameObject shieldTag;
         private Text shieldText;
+        private Image shieldAura;
+        private Color shieldColor = new Color(0.6f, 0.85f, 1f);
         private Color baseColor;
+
+        // HP 막대 채움의 오른쪽 끝 (회복 때 차오르는 빛이 따라감 — #137)
+        public Vector3 HpEdgeWorld => hpFill.TransformPoint(new Vector3(hpFill.rect.xMax, hpFill.rect.center.y, 0f));
 
         public static UnitView Create(Transform parent, string name, float minX, float minY, float maxX, float maxY)
         {
@@ -70,6 +75,12 @@ namespace WordRPG.UI
                 TextAnchor.MiddleCenter, FontStyle.Normal, true, 14));
             view.shieldTag = tag.gameObject;
             view.shieldTag.SetActive(false);
+
+            // 보호막이 남아 있는 동안 카드 둘레의 테두리 (#137 — 숨 쉬듯 밝아졌다 어두워짐, BattleScreen이 PulseShield로)
+            view.shieldAura = UiKit.Outline(UiKit.Panel("ShieldAura", card.transform, Color.clear, -0.025f, -0.025f, 1.025f, 1.025f),
+                UiKit.RadiusLg, 6);
+            view.shieldAura.raycastTarget = false;
+            view.shieldAura.gameObject.SetActive(false);
 
             // 차례(금색)·대상(파랑) 표시 테두리
             view.frame = UiKit.Outline(UiKit.Panel("Frame", view.Root, Color.clear), UiKit.RadiusLg, 6);
@@ -117,11 +128,22 @@ namespace WordRPG.UI
             hpText.text = HpCaption ?? $"HP {hp}/{maxHp}";
             shieldTag.SetActive(shield > 0);
             shieldText.text = shield.ToString();
+            shieldAura.gameObject.SetActive(shield > 0);
 
             bool fainted = hp <= 0;
             art.color = fainted ? new Color(0.22f, 0.22f, 0.26f) : baseColor;
             initial.color = fainted ? new Color(1, 1, 1, 0.25f) : new Color(1, 1, 1, 0.92f);
             artSprite.color = fainted ? new Color(0.35f, 0.35f, 0.35f, 0.6f) : Color.white;
+        }
+
+        // 보호막 테두리 색 = 마지막에 받은 보호막 기술의 빛 색 (물방울 = 하늘, 책 = 금빛 …)
+        public void SetShieldColor(Color color) => shieldColor = color;
+        public Color ShieldColor => shieldColor;
+
+        public void PulseShield(float time)
+        {
+            if (!shieldAura.gameObject.activeSelf) return;
+            shieldAura.color = new Color(shieldColor.r, shieldColor.g, shieldColor.b, 0.55f + 0.3f * Mathf.Sin(time * 3.2f));
         }
 
         public void SetFrame(Color? color)

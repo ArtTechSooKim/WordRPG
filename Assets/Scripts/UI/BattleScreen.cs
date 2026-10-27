@@ -456,6 +456,7 @@ namespace WordRPG.UI
                     saveProgress?.Invoke(); // 단어 학습 기록은 답할 때마다 저장
                     bool correct = choice >= 0 && question.IsCorrect(choice) && secondsTaken <= battleConfig.AnswerTimeLimitSeconds;
                     bool more = correct && engine.Phase == BattlePhase.AnsweringQuiz; // 아직 맞혀야 할 단어가 남음
+                    lastWord = question.Word.English; // 글자 소나기가 이 단어의 글자를 쏟음 (#137)
 
                     // 4. 정답/오답 표시. 틀리면 정답을 꼭 보여줘서 학습 순간으로 만든다
                     MarkChoices(question, choice);

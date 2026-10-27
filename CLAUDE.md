@@ -142,6 +142,10 @@
     - **유료 라이선스 소리(Envato Elements)**: `Resources/Audio/Licensed/{같은 이름}.wav`에 두면 팩 소리보다 먼저 쓰임. 이 폴더·받은 원본(`*-utc/`)·
       라이선스 증명서는 .gitignore — 공개 저장소에 올리면 재배포라 안 됨. 저장소엔 팩 소리가 대신 있음 (지금: newword, 작업메모 #66). 음악도 같은 방식 (#133)
     - 전투: 효과 `BattleFx`(Fx 열거형 = Art/NinjaAdventure/Fx/{소문자}.png 정사각 프레임 시트), 배경은 지역 타일(`BattleScreen.SetBackdrop`).
+      **기술마다 연출** (#137, 1.2): `SkillData.fx`(`SkillFx` — 에셋에 번호로 저장, 새 종류는 맨 뒤) → UI 표 `SkillLooks`(몸짓 Lunge/Cast · 효과 그림·색·크기 ·
+      날아가는 그림 · 화면 번쩍 · 흔들림 · 특수 Letters/Highlight/Rings · 빛 색 · 회복 알갱이) → 그리기 `BattleScreen.SkillFx`(겹쳐 돌려서 기다리는 시간은 그대로).
+      회복 = 발밑 마법진·빛기둥·알갱이·카드 빛·HP 막대가 차오름, 보호막 = 막이 튕김 + 남아 있는 동안 카드 테두리(`UnitView.PulseShield`) + 물결·깨짐.
+      새 기술은 `SampleDataBuilder.SkillFxById`와 에셋 fx를 같이 (SkillLooksTests: Auto 금지·회복/보호막/공격 종류와 맞는지·표·그림 빠짐)
       필드에서 같은 효과를 월드에 그리려면 `FieldFx.Play`(1 = 한 칸 크기, tint로 색 입히기) — 다시 일어남(Heal·Sparkle),
       달리기 먼지(Dust = 회색조 그림 × 바닥 색 `FieldArt.DustColor` — 새 바닥 타일을 만들면 색도 정할 것).
       지역 사이 길의 출입구(초원↔숲↔정글, #120) = 옆 길과 이어진 바닥(`FieldAutotile.DoorFloorMask`, 맵 밖으로도 이어짐) + 맵 끝에서 비치는 빛
@@ -181,7 +185,7 @@ Assets/
   Scripts/              WordRPG.asmdef (런타임)
     Core/               CSV 파서 등 공용
     Words/              단어, 숙련도(VocabularyProgress), 출제(WordSelector), 4지선다(QuizGenerator), 수련 출제(TrainingQuizProvider — 이미 본 단어만)
-    Monsters/           적 몬스터 MonsterSpecies·SkillData SO, MonsterInstance, ICombatant(싸우는 것 공통), LevelCurve
+    Monsters/           적 몬스터 MonsterSpecies·SkillData SO(+ 전투 연출 종류 SkillFx #137), MonsterInstance, ICombatant(싸우는 것 공통), LevelCurve
     Heroes/             HeroData SO(주인공), Hero(레벨·HP·성유물 3칸·기술 칸 3개 SkillSlot), RelicData SO(성유물: 기술·각성·보너스·강화 비용), RelicUpgrade(강화 규칙),
                         CompanionData SO + Companion(동료 #77: 레벨·경험치·HP, 기본 기술 + 레벨에 배우는 기술, 성유물 없음 — 파티 = 주인공 + 동료 1명)
     Items/              ItemData SO(재료·상처약·징표·기술문서), Inventory, ShopData SO + Shop(구매 규칙)
@@ -205,7 +209,7 @@ Assets/
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
     UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투 + 보스 결정타 연출 + 전투 결산, 단독 연습 모드도 있음)
                         — 둘 다 partial로 나눔 (#93): FieldScreen.cs(상태·이동·입력) + .Places([확인] 장소)·.Jungle(정글 기믹)·.Battles(조우·전투 뒤·수련)·
-                        .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴)·.Cave(동굴 어둠·반딧돌 #112) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout·.Events(사건 연출: 사건 종류마다 Show… 함수 — #119).
+                        .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴)·.Cave(동굴 어둠·반딧돌 #112) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout·.Events(사건 연출: 사건 종류마다 Show… 함수 — #119)·.SkillFx(기술 연출: 몸짓·회복·보호막·특수 — #137).
                         새 기능은 맞는 파일에, 기능 묶음이 커지면 새 partial 파일로,
                         DexView(도감), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기),
                         InventoryView(소지품: 주인공·성유물·아이템·징표) + HeroViews(HeroInfoPage·RelicPage·RelicSlotsRow·SkillRowView),
@@ -223,7 +227,7 @@ Assets/
                         FieldFollower(필드에서 주인공 자취를 한 칸 뒤 따라오는 동료 그림 — 보이기만 함, 칸 영향 없음 #78) · CharacterSheet(주인공과 같은 배치의 캐릭터 시트 자르기), FieldRoamerViews(필드 위 보이는 몬스터 그림·'!') · PreemptView([선제공격] QTE: 집중선·줄어드는 원·2×2 선택지·결과 도장 + TargetLock 조준 괄호),
                         UiRing(두께가 일정한 원 테두리 — 코드로 만들 땐 CanvasRenderer를 먼저 붙임),
                         UiMotion(숫자 굴러 올라가기·톡 커지기·떠오르는 글자 — 결산 능력치·골드, HUD 골드 #127),
-                        ThemeLooks(테마 표: 테마마다 음악·맵 밖 색·전투 바닥·안개·어둠 — #118),
+                        ThemeLooks(테마 표: 테마마다 음악·맵 밖 색·전투 바닥·안개·어둠 — #118), SkillLooks(기술 연출 표: SkillFx마다 몸짓·효과·색 — #137),
                         FieldArt(필드 타일·잠긴/지역별 출입구) · PlayerArt(주인공) · PlaceholderArt(그림이 없을 때 임시 도트), Sound(음악·효과음·징글),
                         BattleFx(전투 효과) + FieldFx(필드 위 효과) + IdleBob, MapViews(미니맵·지도),
                         UiKit(Palette·글꼴·둥근 패널·아이콘 + WithJosa 한국어 조사), AutoPill — 세로 1080x1920

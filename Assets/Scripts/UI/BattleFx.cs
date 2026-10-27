@@ -5,8 +5,14 @@ using UnityEngine.UI;
 
 namespace WordRPG.UI
 {
-    // Sparkle·Dust는 필드에서 씀 (다시 일어날 때 반짝이, 달릴 때 뒤로 튀는 흙먼지 = 폭발의 마지막 3칸을 회색조로 — FieldFx, 바닥 색은 FieldArt.DustColor)
-    public enum Fx { Slash, Claw, Explosion, Heal, Shield, Smoke, Sparkle, Dust }
+    // Sparkle·Dust는 필드에서 씀 (다시 일어날 때 반짝이, 달릴 때 뒤로 튀는 흙먼지 = 폭발의 마지막 3칸을 회색조로 — FieldFx, 바닥 색은 FieldArt.DustColor).
+    // Thunder부터는 기술마다 다른 효과 (#137, 표 = SkillLooks). Leaf·Spark는 칸마다 모양이 다른 알갱이 (애니메이션이 아님)
+    public enum Fx
+    {
+        Slash, Claw, Explosion, Heal, Shield, Smoke, Sparkle, Dust,
+        Thunder, Water, Plant, Rock, RockFly, Boost, Ring, Circle, ShieldGold, Spirit,
+        SlashCurved, SlashDouble, ClawDouble, SmokeRing, WaterPillar, Leaf, Spark
+    }
 
     // 전투 효과 애니메이션 (Ninja Adventure FX → Art/NinjaAdventure/Fx/{이름}.png, 정사각 프레임을 가로로 이어 붙인 시트).
     // 카드 위에 잠깐 겹쳐 그렸다가 사라진다. 그림이 없으면 아무것도 하지 않는다
@@ -33,14 +39,20 @@ namespace WordRPG.UI
             return frames;
         }
 
-        // target 가운데에 size 크기로 한 번 재생. animScale: 연출 시간 배율
-        public static IEnumerator Play(RectTransform target, Fx fx, float size, float animScale)
+        // target 가운데에 size 크기로 한 번 재생. animScale: 연출 시간 배율.
+        // tint: 그림에 곱할 색 · offset: 가운데에서 비킨 자리(px) · squash: 세로 배율(발밑 마법진은 납작하게) · rotation: 기울기(도) — #137
+        public static IEnumerator Play(RectTransform target, Fx fx, float size, float animScale,
+            Color? tint = null, Vector2 offset = default, float squash = 1f, float rotation = 0f)
         {
             var frames = Frames(fx);
             if (frames == null || frames.Length == 0 || target == null) yield break;
 
             var image = UiKit.IconImage($"Fx_{fx}", target, frames[0], 0.5f, 0.6f, 0.5f, 0.6f);
-            image.rectTransform.sizeDelta = new Vector2(size, size);
+            image.preserveAspect = false;
+            image.color = tint ?? Color.white;
+            image.rectTransform.sizeDelta = new Vector2(size, size * squash);
+            image.rectTransform.anchoredPosition = offset;
+            image.rectTransform.localEulerAngles = new Vector3(0f, 0f, rotation);
             float frameTime = animScale / FramesPerSecond;
             foreach (var frame in frames)
             {

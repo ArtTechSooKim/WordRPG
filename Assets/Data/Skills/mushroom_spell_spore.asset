@@ -19,3 +19,4 @@ MonoBehaviour:
   target: 1
   power: 12
   quizDirection: 0
+  fx: 14

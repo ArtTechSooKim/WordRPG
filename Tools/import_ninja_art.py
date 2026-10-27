@@ -202,6 +202,24 @@ FX = {
     "smoke": ("FX/Smoke/Smoke/SpriteSheet.png", 6),            # 쓰러짐
     "sparkle": ("FX/Magic/Spark/SpriteSheet.png", 10),         # 다시 일어날 때 반짝이 (필드)
     "dust": ("FX/Elemental/Explosion/SpriteSheet.png", 9, 6, "gray"),  # 달릴 때 뒤로 튀는 흙먼지 — 폭발의 마지막 3칸 (#51 사용자 지정), 색은 바닥 따라 (#53)
+    # 기술마다 다른 효과 (#137, 표 = UI SkillLooks). 흰·밝은 그림은 게임에서 색을 입힘
+    "thunder": ("FX/Elemental/Thunder/SpriteSheet.png", 8),        # 번개
+    "water": ("FX/Elemental/Water/SpriteSheet.png", 11),           # 물 · 잉크(보라를 입힘)
+    "plant": ("FX/Elemental/Plant/SpriteSheet.png", 8),            # 덩굴
+    "rock": ("FX/Elemental/Rock/SpriteSheet.png", 14, 7),          # 돌이 부서짐 (뒤쪽 7칸)
+    "rockfly": ("FX/Projectile/SpriteSheetRock.png", 4),           # 날아가는 돌
+    "boost": ("FX/Magic/Boost/SpriteSheet.png", 8),                # 반짝이 (빛·글자)
+    "ring": ("FX/Magic/Circle/SpriteSheetWhite.png", 4),           # 흰 고리 (소리·메아리)
+    "circle": ("FX/Magic/Circle/SpriteSheetSpark2.png", 5),        # 마법진 (회복 발밑·시전)
+    "shieldgold": ("FX/Magic/Shield/SpriteSheetYellow.png", 6),    # 금빛 방패 (책·필통)
+    "spirit": ("FX/Magic/Spirit/SpriteSheet.png", 5),              # 소용돌이 (모래시계·뒤죽박죽)
+    "slashcurved": ("FX/SlashFx/SlashCurved/SpriteSheet.png", 4),  # 휘감는 줄 (혀·꼬리·형광펜)
+    "slashdouble": ("FX/SlashFx/SlashDouble/SpriteSheet.png", 4),  # 크게 덮침 (방망이)
+    "clawdouble": ("FX/SlashFx/ClawDouble/SpriteSheet.png", 4),    # 적의 할퀴기
+    "smokering": ("FX/Smoke/SmokeCircular/SpriteSheet.png", 8),    # 포자·안개
+    "waterpillar": ("FX/Elemental/WaterPillar/SpriteSheet.png", 9),  # 물로 회복
+    "leaf": ("FX/Particle/Leaf.png", 6),                           # 잎 알갱이 (칸마다 모양이 다름 — 회복 때 솟음)
+    "spark": ("FX/Particle/Spark.png", 7),                         # 빛 알갱이
 }
 
 
