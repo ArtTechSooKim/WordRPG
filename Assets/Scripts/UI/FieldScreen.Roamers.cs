@@ -80,6 +80,7 @@ namespace WordRPG.UI
             if (!paused && preemptGrace > 0f && !quiz) preemptGrace -= dt;
             else if (!paused)
             {
+                roaming.Quiet = session.Effects.Quiet;
                 bool chance = preemptPrompt.activeSelf && preemptWindow < PreemptWindowSeconds;
                 roaming.SlowFactor = quiz ? PreemptSlow : chance ? PreemptChanceSlow : 1f;
                 var events = roaming.Tick(dt, walker.Position);
@@ -165,6 +166,7 @@ namespace WordRPG.UI
         private bool BumpOpensPreempt(Roamer bumped)
         {
             if (preemptGrace > 0f) return true;
+            if (session.Effects.Quiet) return false; // 살금살금 물약 중엔 몬스터가 알아채지 않음 — 일부러 부딪히면 전투
             if (!showTutorials || session.Tutorials.Has(TutorialProgress.Preempt) || preemptBooks.Count == 0) return false;
             roaming.Alert(bumped);
             return true;

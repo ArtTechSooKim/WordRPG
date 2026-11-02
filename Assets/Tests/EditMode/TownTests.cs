@@ -102,7 +102,7 @@ namespace WordRPG.Tests
             }
         }
 
-        // 사용자 결정: 상점은 상처약만 판다 (강화 재료를 사면 너무 쉬워서). 재료는 적 드롭·보물상자·보스로
+        // 사용자 결정: 상점은 상처약과 물약만 판다 (강화 재료를 사면 너무 쉬워서). 재료는 적 드롭·보물상자·보스로
         [Test]
         public void ShopsSellHealingItemsNotUpgradeMaterials()
         {
@@ -113,7 +113,7 @@ namespace WordRPG.Tests
             foreach (var entry in shop.Entries)
             {
                 Assert.AreNotEqual(ItemKind.Material, entry.Item.Kind, $"{shop.name}: 강화 재료 {entry.Item.name}을(를) 팔면 안 됨");
-                Assert.IsTrue(entry.Item.IsHealingItem, $"{shop.name}: {entry.Item.name}은(는) 회복 아이템이 아님");
+                Assert.IsTrue(entry.Item.IsHealingItem || entry.Item.IsEffectItem, $"{shop.name}: {entry.Item.name}은(는) 회복·효과 물약이 아님");
             }
         }
 

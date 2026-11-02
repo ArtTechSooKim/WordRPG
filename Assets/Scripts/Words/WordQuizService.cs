@@ -19,10 +19,14 @@ namespace WordRPG.Words
         private readonly WordSelector selector;
         private readonly Random rng;
         private readonly Func<DateTime> utcNow;
+        private readonly Func<bool> wantNewWord;  // 호기심 물약 (#146): 참이면 새 단어부터. 이 단어장에 더 없으면 평소대로
+        private readonly Action newWordTaken;
 
         public WordQuizService(IReadOnlyList<WordEntry> words, VocabularyProgress progress, MasteryRules rules,
-            Random rng, WordSelector selector = null, Func<DateTime> utcNow = null)
+            Random rng, WordSelector selector = null, Func<DateTime> utcNow = null, Func<bool> wantNewWord = null, Action newWordTaken = null)
         {
+            this.wantNewWord = wantNewWord;
+            this.newWordTaken = newWordTaken;
             this.words = words;
             this.progress = progress;
             this.rules = rules;
@@ -33,7 +37,13 @@ namespace WordRPG.Words
 
         public QuizQuestion NextQuestion(QuizDirection preferredDirection)
         {
-            var word = selector.SelectNext(words, progress, utcNow(), rng);
+            WordEntry word = null;
+            if (wantNewWord != null && wantNewWord())
+            {
+                word = selector.SelectNew(words, progress, rng);
+                if (word != null) newWordTaken?.Invoke();
+            }
+            word ??= selector.SelectNext(words, progress, utcNow(), rng);
             bool isNew = progress.GetLevel(word.Id) == MasteryLevel.New;
             // 처음 보는 단어는 카드로 뜻을 보여준 직후라 '영→한'으로만 묻는다
             var direction = isNew ? QuizDirection.EnglishToMeaning : preferredDirection;

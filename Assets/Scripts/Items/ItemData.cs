@@ -12,6 +12,14 @@ namespace WordRPG.Items
         Key           // 보스 방 열쇠 (#76) — 맵의 열쇠 받침대 'K'에서 얻음. 쓰지 않고 가지고만 있으면 보스 방 문을 열 수 있다
     }
 
+    // 소모품의 특별한 효과 (#146): 필드에서 쓰면 PotionEffects에 쌓인다. 에셋에 번호로 저장 — 새 효과는 맨 뒤에
+    public enum ItemEffect
+    {
+        None,
+        NewWords, // 호기심 물약: 전투 문제에 새 단어만 effectAmount개
+        Quiet     // 살금살금 물약: effectAmount걸음 동안 몬스터를 안 만남
+    }
+
     [CreateAssetMenu(fileName = "NewItem", menuName = "WordRPG/Item", order = 20)]
     public class ItemData : ScriptableObject
     {
@@ -27,6 +35,9 @@ namespace WordRPG.Items
         [SerializeField] private int healAmount;
         [Tooltip("기술문서: 배우는 기술")]
         [SerializeField] private SkillData taughtSkill;
+        [Tooltip("소모품: 필드에서 쓰면 남는 효과 (#146)")]
+        [SerializeField] private ItemEffect effect;
+        [SerializeField] private int effectAmount;
 
         public string ItemId => itemId;
         public string DisplayName => displayName;
@@ -36,9 +47,14 @@ namespace WordRPG.Items
         public Color PlaceholderColor => placeholderColor;
         public int HealAmount => healAmount;
         public SkillData TaughtSkill => taughtSkill;
+        public ItemEffect Effect => effect;
+        public int EffectAmount => effectAmount;
 
         // 필드·전투에서 쓸 수 있는 회복 아이템
         public bool IsHealingItem => kind == ItemKind.Consumable && healAmount > 0;
+
+        // 필드에서 쓰면 효과가 남는 물약 (#146)
+        public bool IsEffectItem => kind == ItemKind.Consumable && effect != ItemEffect.None && effectAmount > 0;
 
         // 기술을 배울 수 있는 기술문서
         public bool IsSkillDocument => kind == ItemKind.SkillDocument && taughtSkill != null;

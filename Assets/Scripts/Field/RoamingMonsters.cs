@@ -257,6 +257,9 @@ namespace WordRPG.Field
             return best;
         }
 
+        // 살금살금 물약 (#146): 켜져 있으면 나를 알아채지 않고, 쫓던 몬스터도 돌아감. 걸어서 부딪히는 것은 그대로 전투
+        public bool Quiet { get; set; }
+
         // 나를 본 것으로 (부딪혔을 때 선제공격 안내 — #145): 이미 쫓는 중이면 그대로
         public void Alert(Roamer roamer)
         {
@@ -331,7 +334,7 @@ namespace WordRPG.Field
                 switch (roamer.State)
                 {
                     case RoamerState.Lurking:
-                        if (calm <= 0f && d2 <= Rules.LurkRadius * Rules.LurkRadius + 1) // 2칸 안 (대각선 한 칸 어긋남까지)
+                        if (calm <= 0f && !Quiet && d2 <= Rules.LurkRadius * Rules.LurkRadius + 1) // 2칸 안 (대각선 한 칸 어긋남까지)
                         {
                             roamer.State = RoamerState.Surfacing;
                             roamer.Timer = Rules.SurfaceSeconds;
@@ -339,14 +342,19 @@ namespace WordRPG.Field
                         }
                         break;
                     case RoamerState.Surfacing:
-                        if (roamer.Timer <= 0f) Emerge(roamer, player, d2, events);
+                        if (Quiet)
+                        {
+                            roamer.State = RoamerState.Lurking;
+                            events.Add(new RoamerEvent(RoamerEventKind.Dived, roamer, roamer.Position));
+                        }
+                        else if (roamer.Timer <= 0f) Emerge(roamer, player, d2, events);
                         break;
                     case RoamerState.Stunned:
                         if (roamer.Timer <= 0f) StartReturning(roamer);
                         break;
                     case RoamerState.Wandering:
                     case RoamerState.Returning:
-                        if (calm <= 0f && d2 <= Rules.DetectRadius * Rules.DetectRadius)
+                        if (calm <= 0f && !Quiet && d2 <= Rules.DetectRadius * Rules.DetectRadius)
                         {
                             roamer.State = RoamerState.Noticing;
                             roamer.Timer = Rules.NoticeSeconds;
@@ -360,14 +368,19 @@ namespace WordRPG.Field
                         }
                         break;
                     case RoamerState.Noticing:
-                        if (roamer.Timer <= 0f)
+                        if (Quiet)
+                        {
+                            StartReturning(roamer);
+                            events.Add(new RoamerEvent(RoamerEventKind.GaveUp, roamer, roamer.Position));
+                        }
+                        else if (roamer.Timer <= 0f)
                         {
                             roamer.State = RoamerState.Chasing;
                             roamer.Timer = 0f;
                         }
                         break;
                     case RoamerState.Chasing:
-                        if (d2 > Rules.GiveUpRadius * Rules.GiveUpRadius)
+                        if (Quiet || d2 > Rules.GiveUpRadius * Rules.GiveUpRadius)
                         {
                             StartReturning(roamer);
                             events.Add(new RoamerEvent(RoamerEventKind.GaveUp, roamer, roamer.Position));

@@ -347,7 +347,8 @@ namespace WordRPG.UI
                 if (quizService == null || quizWords != words)
                 {
                     quizWords = words;
-                    quizService = new WordQuizService(words.Words, session.Vocabulary, masteryRules, rng);
+                    quizService = new WordQuizService(words.Words, session.Vocabulary, masteryRules, rng,
+                        wantNewWord: () => session.Effects.NewWordsLeft > 0, newWordTaken: () => session.Effects.SpendNewWord());
                 }
                 provider = quizService;
             }

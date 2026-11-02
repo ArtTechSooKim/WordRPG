@@ -53,6 +53,21 @@ namespace WordRPG.Words
             return picked;
         }
 
+        // 아직 안 만난 단어 하나 (호기심 물약 #146). 이 단어장에 더 없으면 null
+        public WordEntry SelectNew(IReadOnlyList<WordEntry> words, VocabularyProgress progress, Random rng)
+        {
+            var fresh = new List<WordEntry>();
+            foreach (var word in words)
+            {
+                var p = progress.Find(word.Id);
+                if ((p == null || p.Level == MasteryLevel.New) && !recent.Contains(word.Id)) fresh.Add(word);
+            }
+            if (fresh.Count == 0) return null;
+            var picked = PickRandom(fresh, rng);
+            Remember(picked.Id);
+            return picked;
+        }
+
         private void Remember(string wordId)
         {
             recent.Remove(wordId);

@@ -107,6 +107,8 @@ namespace WordRPG.UI
         private readonly Dictionary<string, RectTransform> badges = new Dictionary<string, RectTransform>();
         private RectTransform objectivePill; // 목표 한 줄 (#61): 미니맵 아래
         private Text objectiveText;
+        private RectTransform quietPill, newWordPill;   // 효과 물약이 남은 동안 목표 한 줄 아래 (#146)
+        private Text quietText, newWordText;
         private Objective objective;
         private GameObject saveMark;       // 저장될 때 잠깐 '✓ 저장' (#61, 자동 저장 안내 대신)
         private float saveMarkUntil, lastSaveMark = -999f;
@@ -581,6 +583,9 @@ namespace WordRPG.UI
         {
             session.World.SetPosition(area.AreaId, walker.Position, walker.Rafting);
             stepsTaken++;
+            bool quietStep = session.Effects.Quiet; // 효과가 끝나는 걸음까지 보호
+            if (session.Effects.TakeStep()) ShowToast("물약 효과가 끝났다 — 이제 몬스터가 다시 나타나요", 2.5f);
+            if (quietPill.gameObject.activeSelf) RefreshEffects();
             minimap.SetPlayer(walker.Position);
             RefreshNameTags();
             if (session.World.Reveal(area.AreaId, walker.Map.Width, walker.Map.Height, walker.Position) > 0)
@@ -603,7 +608,7 @@ namespace WordRPG.UI
                 return false;
             }
             // 풀숲 조우 — 보이는 몬스터 지역도 (#123). 단, 보이는 몬스터가 나를 쫓는 동안은 없음 (걸음 수도 안 셈)
-            bool grass = tile == FieldTile.Grass && (roaming == null || !roaming.HuntingPlayer);
+            bool grass = tile == FieldTile.Grass && (roaming == null || !roaming.HuntingPlayer) && !quietStep; // 살금살금 물약 #146
             if (!fieldTutorialRunning && encounterCounter.OnStep(grass, rng))
             {
                 StartCoroutine(Encounter());

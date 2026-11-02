@@ -365,6 +365,7 @@ namespace WordRPG.UI
             var item = materials[Mathf.Clamp(selected, 0, materials.Count - 1)];
             SetDetail(UiKit.ItemIcon(item), item.DisplayName, $"보유 {session.Inventory.GetCount(item)}개", item.Description);
             if (item.IsHealingItem) ShowPotion(item);
+            else if (item.IsEffectItem) ShowEffectPotion(item);
             else if (item.IsSkillDocument) ShowDocument(item);
             else ShowUsage(item);
         }
@@ -401,10 +402,36 @@ namespace WordRPG.UI
             ((RectTransform)usageBox.transform).anchorMax = new Vector2(0.68f, 0.34f);
         }
 
+        // 효과 물약 (#146): 쓰는 곳 + 지금 남은 효과 + [사용하기]. 또 쓰면 더해짐
+        private void ShowEffectPotion(ItemData item)
+        {
+            bool quiet = item.Effect == ItemEffect.Quiet;
+            int left = quiet ? session.Effects.QuietStepsLeft : session.Effects.NewWordsLeft;
+            string what = quiet ? $"{item.EffectAmount}걸음 동안 몬스터를 안 만나요" : $"전투 문제에 새 단어만 {item.EffectAmount}개";
+            string now = left <= 0 ? "지금은 효과 없음" : quiet ? $"지금 {left}걸음 남음 — 또 쓰면 더해져요" : $"지금 {left}개 남음 — 또 쓰면 더해져요";
+            SetUsage(UiKit.ItemIcon(item), $"쓰는 곳  필드 — {what}", now, Palette.TextDim);
+            UiKit.LabelOf(useButton).text = "사용하기";
+            UiKit.SetColor(useButton, Palette.Info);
+            useButton.gameObject.SetActive(true);
+            useButton.interactable = session.Inventory.GetCount(item) > 0;
+            ((RectTransform)usageBox.transform).anchorMax = new Vector2(0.68f, 0.34f);
+        }
+
         private void UseSelectedItem()
         {
             if (materials.Count == 0) return;
             var item = materials[Mathf.Clamp(selectedMaterial, 0, materials.Count - 1)];
+            if (item.IsEffectItem)
+            {
+                if (!session.UseEffectItem(item)) return;
+                Sound.Play(Sfx.EvolveLight);
+                onChanged?.Invoke();
+                CollectItems();
+                ShowMaterial(Mathf.Min(selectedMaterial, Mathf.Max(0, materials.Count - 1)));
+                detailMeta.text = $"{UiKit.WithJosa(item.DisplayName, "을", "를")} 마셨어요   (남은 {session.Inventory.GetCount(item)}개)";
+                detailMeta.color = Palette.Good;
+                return;
+            }
             if (item.IsSkillDocument)
             {
                 int index = selectedMaterial;

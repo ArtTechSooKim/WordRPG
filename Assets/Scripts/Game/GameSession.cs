@@ -52,6 +52,7 @@ namespace WordRPG.Game
         public WorldState World { get; }
         public TutorialProgress Tutorials { get; private set; } = new TutorialProgress(); // 이미 본 안내 (#36)
         public UpdateNotices Notices { get; private set; } = new UpdateNotices();       // 이미 본 업데이트 안내 (#115)
+        public PotionEffects Effects { get; private set; } = new PotionEffects();       // 효과 물약이 남긴 효과 (#146)
         public IReadOnlyList<string> LoadWarnings => loadWarnings;
 
         // 연속 정답 수 (전투 콤보). 전투가 끝나도 이어지지만 세이브에는 넣지 않는다 — 게임을 다시 켜면 0부터
@@ -144,6 +145,14 @@ namespace WordRPG.Game
             return Hero.Heal(item.HealAmount);
         }
 
+        // 효과 물약을 쓴다 (#146). 없으면 쓰지 않고 false
+        public bool UseEffectItem(ItemData item)
+        {
+            if (item == null || !item.IsEffectItem || !Inventory.TryRemove(item)) return false;
+            Effects.Apply(item);
+            return true;
+        }
+
         // 성유물을 얻는다 (보물상자·보스). 이미 가진 것이면 null
         public OwnedRelic GrantRelic(RelicData relic) => relic != null ? Hero.AddRelic(relic) : null;
 
@@ -228,7 +237,8 @@ namespace WordRPG.Game
                 savedCompanions.Add(new CompanionSaveData(companion.Data.CompanionId, companion.Level, companion.Exp, companion.CurrentHp));
             return new SaveData(nowUtc, new HeroSaveData(Hero.Level, Hero.Exp, Hero.CurrentHp), relics,
                     Inventory, Vocabulary, Record, World).WithSkillSlots(skills).WithTutorials(Tutorials.Seen)
-                .WithNotices(Notices.Seen).WithCompanions(savedCompanions, PartyCompanion?.Data.CompanionId).WithHeroLook(Hero.CustomName, Hero.LookId);
+                .WithNotices(Notices.Seen).WithCompanions(savedCompanions, PartyCompanion?.Data.CompanionId).WithHeroLook(Hero.CustomName, Hero.LookId)
+                .WithPotionEffects(Effects.NewWordsLeft, Effects.QuietStepsLeft);
         }
 
         // 세이브에 있는 성유물을 찾을 수 없으면(삭제·id 변경) 빼고 경고를 남긴다. 성유물이 하나도 없으면 시작 성유물로 채운다.
@@ -287,6 +297,7 @@ namespace WordRPG.Game
             var session = new GameSession(hero, data.Inventory, data.Vocabulary, data.Record, data.World);
             session.Tutorials = new TutorialProgress(data.Tutorials);
             session.Notices = new UpdateNotices(data.Notices);
+            session.Effects = new PotionEffects(data.NewWordsLeft, data.QuietStepsLeft);
             RestoreCompanions(session, data, database, warnings);
             session.loadWarnings.AddRange(warnings);
             return session;

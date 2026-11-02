@@ -43,7 +43,8 @@
 5. **저장 데이터는 id 문자열로 참조**: wordId, itemId, relicId, areaId. 에셋 이름이 바뀌어도 세이브가 깨지지 않게 (세이브 v2: 주인공 + 성유물, v1 몬스터 파티는 불러올 때 변환)
    - 아이템·성유물·몬스터·지역을 새로 만들면 `WordRPG > Data > Refresh Game Database` 실행 (안 하면 세이브에서 불러올 수 없음, DataIntegrityTests가 잡음)
    - 성유물은 시작·보물상자(ChestContent.relic)·보스(BossEncounter.rewardRelic)·반딧돌 보상(FieldArea.glowStoneRelic) 중 하나에서 얻을 수 있어야 하고, 강화 재료는 적 드롭·상자에서 얻을 수 있어야 함.
-     상점은 회복 아이템(상처약)만 판다 — 사용자 결정 (TownDataTests가 검사)
+     상점은 회복 아이템과 효과 물약만 판다 (강화 재료는 안 팜) — 사용자 결정 (TownTests가 검사). 효과 물약 (#146, 숲 상점부터): ItemData `effect`(`ItemEffect` — 에셋에 번호로 저장, 새 효과는 맨 뒤)·`effectAmount` →
+     가방에서 `GameSession.UseEffectItem` → `PotionEffects`(세이브 칸 newWordsLeft·quietStepsLeft): 호기심 물약 = `WordQuizService` wantNewWord(새 단어가 실제로 나올 때만 줄어듦) · 살금살금 물약 = 걸음 수 + `RoamingMonsters.Quiet`. 알약은 `FieldScreen.RefreshEffects`
    - 기술문서(ItemKind.SkillDocument)는 taughtSkill이 있어야 하고 상자·보스(BossEncounter.rewardItem)에서 얻을 수 있어야 함 (SkillDocumentDataTests).
      전투 기술 = 기본 기술(고정) + 기술 칸 3개(성유물 기술·기술문서 기술), 세이브에는 칸 순서를 키 문자열로 저장
    - 이미 출시된 id는 바꾸지 말 것. SaveData에 필드 추가는 자유(예전 세이브는 기본값), 기존 필드 의미를 바꿀 때만 version 올리고 변환.
@@ -205,7 +206,7 @@ Assets/
                         BossGate(보스 방 문: 열쇠 K + 단어 40개 → G가 열림 — #76),
                         Ruins(유적: 석판 T 4개 + 정글 단어 60개 → 제단 A에서 동료) · Levers(레버 Y → 덩굴 다리 H) · CellState(칸의 끝난 모습·지나갈 수 있음) — #80,
                         TabletQuiz(석판 3문제: 틀리면 벌점 없이 다시, 숙련도는 처음 답만 — #81), GlowStones(글자 반딧돌: 밝힘·밝힌 수·모두 밝힌 보상 — #112·#115),
-                        UpdateNotices(업데이트 안내: 업데이트한 사람만 타이틀에서 한 번 — #115),
+                        UpdateNotices(업데이트 안내: 업데이트한 사람만 타이틀에서 한 번 — #115), PotionEffects(효과 물약이 남긴 효과 — #146),
                         RelicTutorials(성유물 안내 규칙: 언제 · 가장 가까운 제단과 그 앞 칸 — #142)
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
     UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투 + 보스 결정타 연출 + 전투 결산, 단독 연습 모드도 있음)

@@ -97,6 +97,10 @@ namespace WordRPG.UI
             objectiveText.rectTransform.offsetMin = new Vector2(62, 0);
             objectiveText.rectTransform.offsetMax = new Vector2(-22, 0);
 
+            // 효과 물약이 남은 동안 (#146, Figma '필드 — 물약 효과'): 목표 한 줄 아래 작은 알약
+            (quietPill, quietText) = BuildEffectPill("QuietPill", "potion_quiet");
+            (newWordPill, newWordText) = BuildEffectPill("NewWordPill", "potion_curious");
+
             // 저장될 때 잠깐 (#61): 메뉴 아래 작은 알약
             var mark = UiKit.Pill(UiKit.Panel("SaveMark", hudRoot, Palette.Scrim, 1, 0.865f, 1, 0.865f));
             mark.raycastTarget = false;
@@ -457,6 +461,43 @@ namespace WordRPG.UI
                 if (dot.gameObject.activeSelf) dot.localScale = Vector3.one * scale;
         }
 
+        private (RectTransform pill, Text text) BuildEffectPill(string name, string itemId)
+        {
+            var back = UiKit.Pill(UiKit.Panel(name, hudRoot, Palette.Scrim, 0, 0.865f, 0, 0.865f));
+            back.raycastTarget = false;
+            var rect = back.rectTransform;
+            rect.pivot = new Vector2(0, 1);
+            var item = database != null ? database.FindItem(itemId) : null;
+            var icon = UiKit.IconImage("Icon", rect, item != null ? UiKit.ItemIcon(item) : null, 0, 0.5f, 0, 0.5f);
+            icon.rectTransform.pivot = new Vector2(0, 0.5f);
+            icon.rectTransform.sizeDelta = new Vector2(36, 36);
+            icon.rectTransform.anchoredPosition = new Vector2(14, 0);
+            icon.enabled = icon.sprite != null;
+            var text = UiKit.OneLine(UiKit.Label("Text", rect, "", 26, Palette.Text, 0, 0, 1, 1, TextAnchor.MiddleLeft, FontStyle.Bold));
+            text.rectTransform.offsetMin = new Vector2(58, 0);
+            text.rectTransform.offsetMax = new Vector2(-20, 0);
+            rect.gameObject.SetActive(false);
+            return (rect, text);
+        }
+
+        // 효과 물약 알약: 남은 것만 목표 한 줄 아래에 차례로
+        private void RefreshEffects()
+        {
+            float y = -(minimap.Height + 12f + 60f + 8f);
+            y = PlaceEffectPill(quietPill, quietText, session.Effects.QuietStepsLeft, $"몬스터 피하기 {session.Effects.QuietStepsLeft}걸음", y);
+            PlaceEffectPill(newWordPill, newWordText, session.Effects.NewWordsLeft, $"새 단어 {session.Effects.NewWordsLeft}개", y);
+        }
+
+        private static float PlaceEffectPill(RectTransform pill, Text text, int left, string line, float y)
+        {
+            pill.gameObject.SetActive(left > 0);
+            if (left <= 0) return y;
+            text.text = line;
+            pill.sizeDelta = new Vector2(text.preferredWidth + 82f, 52f);
+            pill.anchoredPosition = new Vector2(24, y);
+            return y - 60f;
+        }
+
         private void RefreshObjective()
         {
             objective = Objectives.Current(session, area);
@@ -580,6 +621,7 @@ namespace WordRPG.UI
             }
             RefreshBadges();
             RefreshObjective();
+            RefreshEffects();
         }
 
         private string HudLine() => $"발견 {hudDex.Discovered}/{hudDex.Total}   {shownGold}G";

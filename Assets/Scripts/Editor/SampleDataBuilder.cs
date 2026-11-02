@@ -32,6 +32,15 @@ namespace WordRPG.EditorTools
                 new Color(0.9f, 0.35f, 0.3f), ItemKind.Consumable, 40);
             var largePotion = Item("potion_large", "큰 상처약", "HP를 120 회복하는 진한 약. 필드·전투에서 쓸 수 있다.",
                 new Color(0.85f, 0.2f, 0.3f), ItemKind.Consumable, 120);
+            // --- 숲 상점부터 파는 물약 (#146 사용자): 특제 상처약은 큰 상처약에 비례한 값, 효과 물약은 필드에서 마심 ---
+            var greatPotion = Item("potion_great", "특제 상처약", "HP를 240 회복하는 특제 약. 필드·전투에서 쓸 수 있다.",
+                new Color(0.95f, 0.45f, 0.25f), ItemKind.Consumable, 240);
+            var quietPotion = Item("potion_quiet", "살금살금 물약", "마시면 100걸음 동안 몬스터를 만나지 않는다. 필드에서 쓸 수 있다.",
+                new Color(0.45f, 0.75f, 0.85f), ItemKind.Consumable, effect: ItemEffect.Quiet, effectAmount: 100);
+            var curiousPotion = Item("potion_curious", "호기심 물약", "마시면 전투 문제에 새 단어만 10개 나온다. 필드에서 쓸 수 있다.",
+                new Color(1f, 0.82f, 0.3f), ItemKind.Consumable, effect: ItemEffect.NewWords, effectAmount: 10);
+            var forestPotions = new[] { new ShopEntry(potion, 30), new ShopEntry(largePotion, 90), new ShopEntry(greatPotion, 180),
+                new ShopEntry(quietPotion, 150), new ShopEntry(curiousPotion, 500) };
 
             // --- 지역 도감 완성 징표 (지역 특색에 맞는 기념물) ---
             var meadowKeepsake = Item("keepsake_meadow", "네잎클로버 책갈피",
@@ -211,8 +220,7 @@ namespace WordRPG.EditorTools
                 new ChestContent(sparkleDust, 3),        // 늪 한가운데
                 new ChestContent(null, 0, 60, hourglass),// 버섯 공터 — 시간의 모래시계
                 new ChestContent(null, 0, 150));         // 버섯 공터 아래 구석
-            var forestShop = ShopAsset("forest_shop", "숲속 쉼터 가게",
-                new ShopEntry(potion, 30), new ShopEntry(largePotion, 90));
+            var forestShop = ShopAsset("forest_shop", "숲속 쉼터 가게", forestPotions);
             AssignShopIfEmpty("Assets/Data/Areas/forest.asset", forestShop);
             SetFullVersionArea("Assets/Data/Areas/forest.asset"); // 숲부터는 정식판 (#40)
             // 보스의 사전 (#45): 보스를 물리치면 그 맵 쉼터의 받침대(L)에 놓인다 — 서고는 샘의 방, 숲은 입구 야영지
@@ -315,8 +323,7 @@ namespace WordRPG.EditorTools
                 new ChestContent(sparkleDust, 2, 60),     // 동쪽 기슭 맨 아래
                 new ChestContent(potion, 2),              // 야영지
                 new ChestContent(null, 0, 200));          // 강 아래쪽 모래톱 둘째
-            var jungleShop = ShopAsset("jungle_shop", "메아리 야영지 가게",
-                new ShopEntry(potion, 30), new ShopEntry(largePotion, 90));
+            var jungleShop = ShopAsset("jungle_shop", "메아리 야영지 가게", forestPotions);
             AssignShopIfEmpty(junglePath, jungleShop);
             SetFullVersionArea(junglePath); // 정식판에 포함 (추가 결제 없음 — 사용자)
             SetDictionary(junglePath, "정글의 사전");
@@ -401,8 +408,7 @@ namespace WordRPG.EditorTools
                 new ChestContent(hardCover, 3),           // 개울가 굴 (레버 옆)
                 new ChestContent(potion, 2),              // 반딧불 쉼터
                 new ChestContent(shinyInk, 3, 200));      // 무너진 갱도 (숨은 방)
-            var caveShop = ShopAsset("cave_shop", "반딧불 쉼터 가게",
-                new ShopEntry(potion, 30), new ShopEntry(largePotion, 90));
+            var caveShop = ShopAsset("cave_shop", "반딧불 쉼터 가게", forestPotions);
             AssignShopIfEmpty(cavePath, caveShop);
             SetFullVersionArea(cavePath); // 정식판에 포함 (추가 결제 없음)
             SetDictionary(cavePath, "동굴의 사전");
@@ -957,7 +963,7 @@ namespace WordRPG.EditorTools
         }
 
         private static ItemData Item(string id, string name, string description, Color color,
-            ItemKind kind = ItemKind.Material, int healAmount = 0, SkillData taughtSkill = null)
+            ItemKind kind = ItemKind.Material, int healAmount = 0, SkillData taughtSkill = null, ItemEffect effect = ItemEffect.None, int effectAmount = 0)
         {
             return CreateIfMissing<ItemData>($"{Root}/Items/{id}.asset", so =>
             {
@@ -968,6 +974,8 @@ namespace WordRPG.EditorTools
                 Prop(so, "placeholderColor").colorValue = color;
                 Prop(so, "healAmount").intValue = healAmount;
                 Prop(so, "taughtSkill").objectReferenceValue = taughtSkill;
+                Prop(so, "effect").enumValueIndex = (int)effect;
+                Prop(so, "effectAmount").intValue = effectAmount;
             });
         }
 

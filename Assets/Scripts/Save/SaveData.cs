@@ -130,6 +130,9 @@ namespace WordRPG.Save
         // 주인공 이름·모습 (#124, 1.1 — 예전 세이브엔 없음 → 빈 문자열 = 아직 안 정함: 업데이트 뒤 처음 켤 때 한 번 고름)
         [SerializeField] private string heroName = "";
         [SerializeField] private string heroLook = "";
+        // 효과 물약이 남긴 효과 (#146, 1.2 — 예전 세이브엔 없음 → 0 = 효과 없음)
+        [SerializeField] private int newWordsLeft;
+        [SerializeField] private int quietStepsLeft;
 
         public int Version => version;
         public DateTime SavedAtUtc => new DateTime(savedAtTicks, DateTimeKind.Utc);
@@ -148,6 +151,8 @@ namespace WordRPG.Save
         public IReadOnlyList<string> Notices => notices ?? (IReadOnlyList<string>)new List<string>();
         public string HeroName => heroName ?? "";
         public string HeroLook => heroLook ?? "";
+        public int NewWordsLeft => newWordsLeft;
+        public int QuietStepsLeft => quietStepsLeft;
 
         public SaveData() { }
 
@@ -160,6 +165,13 @@ namespace WordRPG.Save
         public SaveData WithNotices(IEnumerable<string> ids)
         {
             notices = new List<string>(ids);
+            return this;
+        }
+
+        public SaveData WithPotionEffects(int newWords, int quietSteps)
+        {
+            newWordsLeft = newWords;
+            quietStepsLeft = quietSteps;
             return this;
         }
 
