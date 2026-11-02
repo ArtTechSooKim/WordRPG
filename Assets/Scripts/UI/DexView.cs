@@ -121,8 +121,10 @@ namespace WordRPG.UI
             progressText.text = $"{progress.Discovered} / {progress.Total} 발견      완전 숙련 {progress.Mastered}개" +
                                 (wrongNote > 0 ? $"      오답 노트 {wrongNote}" : "");
             progressFill.anchorMax = new Vector2(progress.Ratio, 1);
-            rewardText.text = RewardText(progress);
-            var keepsakeIcon = UiKit.ItemIcon(region.CompletionKeepsake);
+            var next = Dex.NextReward(region, session.Record);
+            rewardText.text = RewardText(progress, next);
+            var shown = next ?? (region.Rewards.Count > 0 ? region.Rewards[region.Rewards.Count - 1] : null);
+            var keepsakeIcon = UiKit.ItemIcon(shown?.Keepsake);
             rewardIcon.sprite = keepsakeIcon;
             rewardIcon.enabled = keepsakeIcon != null;
 
@@ -131,18 +133,19 @@ namespace WordRPG.UI
             for (int i = 0; i < region.Words.Count; i++) rows.Add(CreateRow(i, region.Words[i]));
         }
 
-        private string RewardText(DexProgress progress)
+        // 다음에 받을 보상 (#147). 다 받았으면 마지막 보상과 '획득 완료'
+        private string RewardText(DexProgress progress, DexReward next)
         {
-            var keepsake = region.CompletionKeepsake;
-            if (keepsake == null && region.CompletionGold <= 0) return "이 지역은 완성 보상이 없어요";
+            if (region.Rewards.Count == 0) return "이 지역은 도감 보상이 없어요";
 
-            var reward = new StringBuilder("완성 보상: ");
-            if (keepsake != null) reward.Append($"징표 '{keepsake.DisplayName}'");
-            if (keepsake != null && region.CompletionGold > 0) reward.Append(" + ");
-            if (region.CompletionGold > 0) reward.Append($"{region.CompletionGold} 골드");
+            var shown = next ?? region.Rewards[region.Rewards.Count - 1];
+            var reward = new StringBuilder(next != null ? "다음 보상: " : "마지막 보상: ");
+            if (shown.Keepsake != null) reward.Append($"징표 '{shown.Keepsake.DisplayName}'");
+            if (shown.Keepsake != null && shown.Gold > 0) reward.Append(" + ");
+            if (shown.Gold > 0) reward.Append($"{shown.Gold} 골드");
 
-            bool claimed = !string.IsNullOrEmpty(region.RegionId) && session.Record.HasClaimedRegion(region.RegionId);
-            reward.Append(claimed ? "\n★ 획득 완료!" : $"\n앞으로 {progress.Total - progress.Discovered}개 더 발견하면 받아요");
+            int left = next != null ? Math.Max(0, next.WordsNeeded(progress.Total) - progress.Discovered) : 0;
+            reward.Append(next == null ? "\n★ 획득 완료!" : $"\n앞으로 {left}개 더 발견하면 받아요");
             return reward.ToString();
         }
 

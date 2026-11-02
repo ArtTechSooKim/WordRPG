@@ -53,6 +53,9 @@ namespace WordRPG.UI
             root.transform.SetSiblingIndex(target.GetSiblingIndex());
         }
 
+        // 열려 있는 창(가방 등) 위에서 설명할 때 (#147)
+        public void BringToFront() => root.transform.SetAsLastSibling();
+
         // 읽기만 하는 안내 (#124 처음 시작의 환영·첫 승리 뒤 목표)
         public IEnumerator Tell(IReadOnlyList<string> lines) => Run(lines, null, null, null);
 

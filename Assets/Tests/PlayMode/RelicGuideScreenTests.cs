@@ -36,7 +36,7 @@ namespace WordRPG.Tests
         {
             var session = GameSession.NewGame(TestData.Hero(new MonsterStats(999, 5, 10), relics), 1);
             // 이 테스트와 상관없는 안내는 본 것으로
-            foreach (var id in new[] { TutorialProgress.Field, TutorialProgress.Confirm, TutorialProgress.Grass, TutorialProgress.GrassFight, TutorialProgress.Goal })
+            foreach (var id in new[] { TutorialProgress.Field, TutorialProgress.Confirm, TutorialProgress.Grass, TutorialProgress.GrassFight, TutorialProgress.Goal, TutorialProgress.RelicSkills })
                 session.Tutorials.Mark(id);
             session.Record.RecordBattle(true, 1, 0);
             return session;
@@ -77,6 +77,47 @@ namespace WordRPG.Tests
             foreach (var rect in hud.GetComponentsInChildren<RectTransform>(true))
                 if (rect.name == $"RelicCell_{index}") return rect.Find("Back").GetComponent<Button>();
             return null;
+        }
+
+        // 끼우기와 기술 넣기는 다른 일 (#147 사용자): 새 성유물을 고른 뒤 처음 한 번 설명. 글을 눌러야 넘어감
+        [UnityTest]
+        public IEnumerator RelicGuideExplainsEquippingAndPlacingSkills()
+        {
+            var starter = Relic("starter");
+            var session = Session(starter);
+            session.Tutorials.Clear();
+            foreach (var id in new[] { TutorialProgress.Field, TutorialProgress.Confirm, TutorialProgress.Grass, TutorialProgress.GrassFight, TutorialProgress.Goal })
+                session.Tutorials.Mark(id);
+            var found = Relic("found");
+            session.GrantRelic(found);
+            session.Tutorials.Mark(MenuBadges.Bag);
+            var field = CreateField(Area("camp", CampMap), session);
+            yield return null;
+            yield return null;
+            var hud = Hud(field);
+            FindButton(hud, "BagButton").onClick.Invoke();
+            yield return null;
+            FindButton(hud.Find("InventoryView"), "TabRelics").onClick.Invoke();
+            yield return null;
+            Cell(hud, 1).onClick.Invoke();
+            yield return null;
+            yield return null;
+
+            Assert.IsTrue(field.PauseTutorial.IsShowing, "설명이 멈춰서 기다림");
+            StringAssert.Contains("끼우면 능력치", field.PauseTutorial.Message);
+            field.PauseTutorial.PressNext();
+            yield return null;
+            yield return null;
+            StringAssert.Contains("[기술 넣기]", field.PauseTutorial.Message);
+            field.PauseTutorial.PressNext();
+            yield return null;
+            yield return null;
+            field.PauseTutorial.PressNext();
+            yield return null;
+            yield return null;
+            Assert.IsFalse(field.PauseTutorial.IsShowing);
+            Assert.IsTrue(session.Tutorials.Has(TutorialProgress.RelicSkills), "다시 나오지 않음");
+            Object.Destroy(field.gameObject);
         }
 
         // 처음 더 얻은 성유물: 빨간 점 → 가방 → 성유물 탭 → 새 성유물 → 바꾸는 곳

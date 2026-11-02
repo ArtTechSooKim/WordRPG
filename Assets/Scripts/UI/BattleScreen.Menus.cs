@@ -237,13 +237,18 @@ namespace WordRPG.UI
             enemiesAway = false;
         }
 
-        // 기술(과 대상)이 정해짐: 주인공의 공격 기술이면 강도를 고르고, 아니면 바로 문제로
+        // 기술(과 대상)이 정해짐: 주인공의 공격 기술이면 강도를 고르고(설정에서 정해 뒀으면 그 강도로 #147), 아니면 바로 문제로
         private void Commit(SkillData skill, BattleUnit target)
         {
             if (engine.CurrentActor.IsPlayerSide && BattleEngine.CanChooseIntensity(skill) && battleConfig.MaxIntensity > 1 && IntensityUnlocked)
             {
-                ShowIntensityMenu(skill, target);
-                return;
+                int fixedIntensity = settings != null ? Mathf.Min(settings.BattleIntensity, battleConfig.MaxIntensity) : 0;
+                if (fixedIntensity == 0)
+                {
+                    ShowIntensityMenu(skill, target);
+                    return;
+                }
+                pickedIntensity = fixedIntensity;
             }
             pickedTarget = target;
             pickedSkill = skill;

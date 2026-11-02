@@ -120,6 +120,8 @@ namespace WordRPG.Save
         // 주인공 기술 칸 ("relic:{relicId}" / "doc:{itemId}"). 기술문서가 생기기 전 세이브에는 없음 → 끼운 성유물 기술로 채움
         [SerializeField] private List<string> skillSlots = new List<string>();
         [SerializeField] private bool hasSkillSlots;
+        // 기본 기술 자리에 대신 넣은 기술 (#147, 같은 형식). 비어 있으면 기본 기술 (예전 세이브도)
+        [SerializeField] private string basicSeat = "";
         // 이미 본 튜토리얼 id (TutorialProgress). 예전 세이브에는 없음 → 처음부터 한 번씩 보여 준다
         [SerializeField] private List<string> tutorials = new List<string>();
         // 얻은 동료와 파티에 넣은 동료 id (#77, 1.1 — 예전 세이브엔 없음 → 동료 없이 시작). 빈 문자열 = 동료가 쉬는 중
@@ -145,6 +147,7 @@ namespace WordRPG.Save
         public WorldState World => world;
         public IReadOnlyList<string> SkillSlots => skillSlots;
         public bool HasSkillSlots => hasSkillSlots;
+        public string BasicSeat => basicSeat ?? "";
         public IReadOnlyList<string> Tutorials => tutorials ?? (IReadOnlyList<string>)new List<string>();
         public IReadOnlyList<CompanionSaveData> Companions => companions ?? (IReadOnlyList<CompanionSaveData>)new List<CompanionSaveData>();
         public string PartyCompanionId => partyCompanionId ?? "";
@@ -189,10 +192,11 @@ namespace WordRPG.Save
             return this;
         }
 
-        public SaveData WithSkillSlots(IEnumerable<string> keys)
+        public SaveData WithSkillSlots(IEnumerable<string> keys, string basicSeatKey = "")
         {
             skillSlots = new List<string>(keys);
             hasSkillSlots = true;
+            basicSeat = basicSeatKey ?? "";
             return this;
         }
 

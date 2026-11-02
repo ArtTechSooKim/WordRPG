@@ -220,7 +220,7 @@ namespace WordRPG.UI
             if (!IsOpen || picked != int.MinValue) return;
             picked = index;
             bool correct = question.IsCorrect(index);
-            Sound.Play(correct ? Sfx.Critical : Sfx.Wrong);
+            Sound.Play(correct ? Sfx.Preempt : Sfx.Wrong); // 맞히면 카칭! (#147 사용자)
             if (correct) Sound.Play(Sfx.Hit, 0.6f);
             else if (vibrate) Haptics.Vibrate();
             for (int i = 0; i < choices.Count; i++)

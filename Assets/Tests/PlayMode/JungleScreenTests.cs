@@ -154,6 +154,26 @@ namespace WordRPG.Tests
             UnityEngine.Object.Destroy(field.gameObject);
         }
 
+        // 목표 두 줄 (#147): 유적이 있는 지역은 둘째 줄에 유적 목표, 동료를 깨운 뒤엔 한 줄
+        [UnityTest]
+        public IEnumerator RuinsGoalShowsOnASecondLine()
+        {
+            var area = Area(RuinsMap, Ara(), shrineWords: 4);
+            var session = Session(area, 2);
+            var field = Field(area, session);
+            yield return null;
+            Assert.IsNotEmpty(field.ObjectiveText, "첫째 줄");
+            StringAssert.StartsWith("유적의 석판을 채우자 0/", field.SideObjectiveText);
+            UnityEngine.Object.Destroy(field.gameObject);
+            yield return null;
+
+            session.AddCompanion(area.ShrineCompanion);
+            field = Field(area, session);
+            yield return null;
+            Assert.IsEmpty(field.SideObjectiveText, "동료를 깨우면 한 줄");
+            UnityEngine.Object.Destroy(field.gameObject);
+        }
+
         [UnityTest]
         public IEnumerator ShrineWakesTheCompanionWhenTabletsAndWordsAreReady()
         {

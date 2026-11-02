@@ -42,7 +42,7 @@ namespace WordRPG.UI
         private System.Random rng;
         private GameSession session;
         private GameDatabase database; // 가방의 상처약 찾기용 (id → 에셋)
-        private GameSettings settings; // 진동 여부. GameManager가 없으면(테스트) null
+        private GameSettings settings; // 진동 여부·전투 강도. 없으면(테스트) null
         private Action saveProgress;
         private string pendingStatusMessage;
         private WordQuizService quizService;
@@ -200,8 +200,9 @@ namespace WordRPG.UI
         // gameDatabase: 상처약 등 아이템 찾기용. 안 주면 GameManager 것
         public void Configure(EncounterTable table, WordDatabase wordBook, GameSession gameSession = null,
             float animScale = 1f, BattleConfig config = null, Action onProgress = null, bool loop = true,
-            GameDatabase gameDatabase = null)
+            GameDatabase gameDatabase = null, GameSettings gameSettings = null)
         {
+            settings = gameSettings;
             encounter = table;
             words = wordBook;
             database = gameDatabase;

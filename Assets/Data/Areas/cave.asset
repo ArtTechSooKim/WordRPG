@@ -141,7 +141,7 @@ MonoBehaviour:
 
 '
   encounters: {fileID: 11400000, guid: fc3d11cecdc73a34eafdac7c129359ed, type: 2}
-  words: {fileID: 11400000, guid: 27944492cc3a8d54a9c106fdeb1cd299, type: 2}
+  words: {fileID: 11400000, guid: 5f371803871f9dd499e7cfff437b0665, type: 2}
   encounterRate: 0.12
   minStepsBetweenEncounters: 4
   encounterStyle: 1
@@ -198,7 +198,7 @@ MonoBehaviour:
     rewardRelic: {fileID: 11400000, guid: a2ebf8ddc9bf04b4ba08bed501c79075, type: 2}
     rewardItem: {fileID: 11400000, guid: 1297b3048185677489b60cd5ed655847, type: 2}
   bossKey: {fileID: 11400000, guid: 6b549213061020449b26370e0467ef0f, type: 2}
-  bossGateWords: 40
+  bossGateWords: 120
   shrineCompanion: {fileID: 0}
   shrineWords: 60
   glowStoneRelic: {fileID: 11400000, guid: 6342b1987d1925f4ea9d7fe71a94d883, type: 2}

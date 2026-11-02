@@ -81,9 +81,7 @@ RELIC_TILES = {
 ITEMS = {
     "potion": "Items/Potion/Medipack.png",       # 상처약
     "potion_large": "Items/Potion/LifePot.png",  # 큰 상처약
-    "potion_great": "Items/Potion/Heart.png",    # 특제 상처약 (#146)
-    "potion_quiet": "Items/Potion/WaterPot.png", # 살금살금 물약 (#146)
-    "potion_curious": "Items/Potion/MilkPot.png", # 호기심 물약 (#146) — 금빛으로 물들임
+    # 특제 상처약·살금살금 물약·호기심 물약(potion_great·potion_quiet·potion_curious)은 PixelLab으로 그려 바로 넣음 (#147) — 팩에 없어서 여기 표에 안 넣음
     "keepsake_forest": "Items/Food/Nut.png",     # 도토리 책갈피 (숲 도감 완성 징표)
     "keepsake_library": "Items/Resource/feather.png",  # 깃털 책갈피 (서고 도감 완성 징표, #62)
     # 기술문서 (두루마리)
@@ -106,7 +104,6 @@ ITEMS = {
 }
 # 같은 그림을 다른 색으로 (채널별 곱)
 ITEM_TINTS = {
-    "potion_curious": (1.0, 0.82, 0.3),
     "jungle_key": (0.75, 1.0, 0.62),
     "glow_moss": (0.55, 1.0, 1.6),
     "cave_key": (0.78, 0.92, 1.12),
@@ -167,6 +164,7 @@ MUSIC = {
     "intro": "Audio/Musics/6 - Story.ogg",          # 입장 영상 (임시 — 사용자가 곡을 찾는 중)
     "heroselect": "Audio/Musics/20 - Good Time.ogg",  # 캐릭터 고르기
 }
+# preempt.wav(선제공격 '카칭')는 팩에 없어서 Tools/make_preempt_sfx.py가 만듦 (#147) — 이 표에 넣지 말 것
 SFX = {
     "click": "Audio/Sounds/Menu/Move2.wav",  # 가벼운 찰칵 (0.04초)
     "correct": "Audio/Sounds/Bonus/Bonus.wav",

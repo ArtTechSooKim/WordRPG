@@ -415,37 +415,45 @@ namespace WordRPG.Tests
                 .Set("shrineCompanion", ara).Set("shrineWords", 2);
         }
 
+        // #147 사용자: 유적과 보스 목표가 둘 다 보이게 — 첫째 줄은 보스, 둘째 줄은 유적
         [Test]
-        public void RuinsComeFirstUntilTheKeyIsFound()
+        public void RuinsAndBossGoalsShowTogether()
         {
             var area = Area();
             var session = GameSession.NewGame(TestData.Hero(new MonsterStats(100, 10, 10)), 5);
+            Assert.IsNull(Objectives.Side(session, area), "첫 전투 전엔 한 줄");
             session.Record.RecordBattle(true, 1, 0);
 
-            var goal = Objectives.Current(session, area);
-            Assert.AreEqual(ObjectiveKind.SolveTablets, goal.Kind, "처음엔 유적의 석판");
-            Assert.AreEqual(new Vector2Int(5, 3), goal.Cell, "안 푼 석판에 별");
+            Assert.AreEqual(ObjectiveKind.FindKey, Objectives.Current(session, area).Kind, "첫째 줄 = 보스 목표 (열쇠)");
+            var side = Objectives.Side(session, area);
+            Assert.AreEqual(ObjectiveKind.SolveTablets, side.Value.Kind, "둘째 줄 = 유적의 석판");
+            Assert.AreEqual(new Vector2Int(5, 3), side.Value.Cell, "안 푼 석판에 별");
 
             Ruins.SolveTablet(area, session.World, new Vector2Int(5, 3));
-            Assert.AreEqual(ObjectiveKind.GatherEcho, Objectives.Current(session, area).Kind, "석판을 다 풀면 단어 모으기");
+            Assert.AreEqual(ObjectiveKind.GatherEcho, Objectives.Side(session, area).Value.Kind, "석판을 다 풀면 단어 모으기");
 
             for (int i = 0; i < 2; i++) session.Vocabulary.Discover(area.Words.Words[i].Id, System.DateTime.UtcNow);
-            goal = Objectives.Current(session, area);
-            Assert.AreEqual(ObjectiveKind.WakeCompanion, goal.Kind);
-            Assert.AreEqual(new Vector2Int(3, 3), goal.Cell, "제단에 별");
+            side = Objectives.Side(session, area);
+            Assert.AreEqual(ObjectiveKind.WakeCompanion, side.Value.Kind);
+            Assert.AreEqual(new Vector2Int(3, 3), side.Value.Cell, "제단에 별");
+            Assert.AreEqual(ObjectiveKind.FindKey, Objectives.Current(session, area).Kind, "보스 목표는 그대로");
 
             session.AddCompanion(area.ShrineCompanion);
-            Assert.AreEqual(ObjectiveKind.FindKey, Objectives.Current(session, area).Kind, "동료를 깨우면 보스 목표(열쇠)로");
+            Assert.IsNull(Objectives.Side(session, area), "동료를 깨우면 한 줄");
         }
 
         [Test]
-        public void FindingTheKeyFirstSkipsTheRuins()
+        public void TheBossGoalMovesOnWithoutWaitingForTheRuins()
         {
             var area = Area();
             var session = GameSession.NewGame(TestData.Hero(new MonsterStats(100, 10, 10)), 5);
             session.Record.RecordBattle(true, 1, 0);
             BossGate.TakeKey(area, session);
-            Assert.AreEqual(ObjectiveKind.GatherWords, Objectives.Current(session, area).Kind, "동료는 선택 — 열쇠를 찾았으면 바로 보스 목표");
+            Assert.AreEqual(ObjectiveKind.GatherWords, Objectives.Current(session, area).Kind, "열쇠를 찾으면 다음 보스 목표");
+            Assert.AreEqual(ObjectiveKind.SolveTablets, Objectives.Side(session, area).Value.Kind, "유적 목표는 남음");
+
+            session.World.MarkBossDefeated(area.BossId);
+            Assert.AreEqual(ObjectiveKind.SolveTablets, Objectives.Side(session, area).Value.Kind, "보스를 이겨도 유적은 남음 (동료는 선택)");
         }
     }
 }

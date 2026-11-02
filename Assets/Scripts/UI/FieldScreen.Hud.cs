@@ -84,18 +84,9 @@ namespace WordRPG.UI
             AddBadge(MenuBadges.Map, (RectTransform)minimap.Button.transform);
 
             // 목표 한 줄 (#61): 미니맵 바로 아래. 누르면 큰 지도 (목표 칸에 별)
-            var goal = UiKit.Pill(UiKit.Panel("Objective", hudRoot, Palette.Scrim, 0, 0.865f, 0, 0.865f));
-            objectivePill = goal.rectTransform;
-            objectivePill.pivot = new Vector2(0, 1);
-            UiKit.AddButton(goal).onClick.AddListener(OpenMap);
-            var star = UiKit.Label("Star", objectivePill, "★", 32, Palette.Gold, 0, 0, 0, 1, TextAnchor.MiddleCenter, FontStyle.Bold);
-            star.rectTransform.pivot = new Vector2(0, 0.5f);
-            star.rectTransform.sizeDelta = new Vector2(40, 0);
-            star.rectTransform.anchoredPosition = new Vector2(18, 0);
-            objectiveText = UiKit.OneLine(UiKit.Label("Text", objectivePill, "", 28, Palette.Text, 0, 0, 1, 1, TextAnchor.MiddleLeft,
-                FontStyle.Bold));
-            objectiveText.rectTransform.offsetMin = new Vector2(62, 0);
-            objectiveText.rectTransform.offsetMax = new Vector2(-22, 0);
+            (objectivePill, objectiveText) = BuildObjectivePill("Objective");
+            (sideObjectivePill, sideObjectiveText) = BuildObjectivePill("SideObjective");
+            sideObjectivePill.gameObject.SetActive(false);
 
             // 효과 물약이 남은 동안 (#146, Figma '필드 — 물약 효과'): 목표 한 줄 아래 작은 알약
             (quietPill, quietText) = BuildEffectPill("QuietPill", "potion_quiet");
@@ -334,7 +325,7 @@ namespace WordRPG.UI
         // 말풍선이 떠 있는 동안은 이름표를 숨긴다 (말풍선과 겹치지 않게)
         private void RefreshNameTags() =>
             nameTags.Refresh(walker.Position, cell => bubble.IsVisible || IsCleared(area, cell)
-                || walker.Map.Get(cell) == FieldTile.Key && BossGate.HasKey(area, session));
+                || walker.Map.Get(cell) == FieldTile.Key && BossGate.KeyTaken(area, session));
 
         // 설정 > [튜토리얼 다시 보기]: 본 안내·빨간 점을 지우고 걷기 안내부터 다시 (전투·[확인] 안내도 그 상황에서 다시)
         private void ReplayTutorial()
@@ -461,6 +452,23 @@ namespace WordRPG.UI
                 if (dot.gameObject.activeSelf) dot.localScale = Vector3.one * scale;
         }
 
+        // 목표 알약 (Figma 'Field — 정글 목표 두 줄 #147'): 누르면 지도
+        private (RectTransform pill, Text text) BuildObjectivePill(string name)
+        {
+            var back = UiKit.Pill(UiKit.Panel(name, hudRoot, Palette.Scrim, 0, 0.865f, 0, 0.865f));
+            var rect = back.rectTransform;
+            rect.pivot = new Vector2(0, 1);
+            UiKit.AddButton(back).onClick.AddListener(OpenMap);
+            var star = UiKit.Label("Star", rect, "★", 32, Palette.Gold, 0, 0, 0, 1, TextAnchor.MiddleCenter, FontStyle.Bold);
+            star.rectTransform.pivot = new Vector2(0, 0.5f);
+            star.rectTransform.sizeDelta = new Vector2(40, 0);
+            star.rectTransform.anchoredPosition = new Vector2(18, 0);
+            var text = UiKit.OneLine(UiKit.Label("Text", rect, "", 28, Palette.Text, 0, 0, 1, 1, TextAnchor.MiddleLeft, FontStyle.Bold));
+            text.rectTransform.offsetMin = new Vector2(62, 0);
+            text.rectTransform.offsetMax = new Vector2(-22, 0);
+            return (rect, text);
+        }
+
         private (RectTransform pill, Text text) BuildEffectPill(string name, string itemId)
         {
             var back = UiKit.Pill(UiKit.Panel(name, hudRoot, Palette.Scrim, 0, 0.865f, 0, 0.865f));
@@ -480,10 +488,11 @@ namespace WordRPG.UI
             return (rect, text);
         }
 
-        // 효과 물약 알약: 남은 것만 목표 한 줄 아래에 차례로
+        // 효과 물약 알약: 남은 것만 목표 줄 아래에 차례로
         private void RefreshEffects()
         {
             float y = -(minimap.Height + 12f + 60f + 8f);
+            if (sideObjectivePill.gameObject.activeSelf) y -= 68f;
             y = PlaceEffectPill(quietPill, quietText, session.Effects.QuietStepsLeft, $"몬스터 피하기 {session.Effects.QuietStepsLeft}걸음", y);
             PlaceEffectPill(newWordPill, newWordText, session.Effects.NewWordsLeft, $"새 단어 {session.Effects.NewWordsLeft}개", y);
         }
@@ -504,7 +513,21 @@ namespace WordRPG.UI
             objectiveText.text = ObjectiveLine(objective);
             objectivePill.sizeDelta = new Vector2(Mathf.Clamp(objectiveText.preferredWidth + 88f, 200f, 700f), 60f);
             objectivePill.anchoredPosition = new Vector2(24, -(minimap.Height + 12f));
-            minimap.SetGoal(objective.Cell);
+
+            sideObjective = Objectives.Side(session, area);
+            bool twoLines = sideObjective.HasValue;
+            if (sideObjectivePill.gameObject.activeSelf != twoLines)
+            {
+                sideObjectivePill.gameObject.SetActive(twoLines);
+                RefreshEffects(); // 알약이 한 줄 아래로
+            }
+            if (twoLines)
+            {
+                sideObjectiveText.text = ObjectiveLine(sideObjective.Value);
+                sideObjectivePill.sizeDelta = new Vector2(Mathf.Clamp(sideObjectiveText.preferredWidth + 88f, 200f, 700f), 60f);
+                sideObjectivePill.anchoredPosition = new Vector2(24, -(minimap.Height + 12f + 68f));
+            }
+            minimap.SetGoal(objective.Cell, sideObjective?.Cell);
         }
 
         private string ObjectiveLine(Objective goal)
@@ -544,7 +567,7 @@ namespace WordRPG.UI
         {
             if (!CanOpenMenu) return;
             ClearBadge(MenuBadges.Map);
-            mapView.Show(area, minimap.Texture, walker.Position, session, objective.Cell);
+            mapView.Show(area, minimap.Texture, walker.Position, session, objective.Cell, sideObjective?.Cell);
         }
 
         private void OpenBag() => OpenBag(BagTab.Hero);

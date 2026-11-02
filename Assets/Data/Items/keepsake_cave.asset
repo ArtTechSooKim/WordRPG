@@ -14,9 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: WordRPG::WordRPG.Items.ItemData
   itemId: keepsake_cave
   displayName: "\uBC18\uB527\uBD88 \uCC45\uAC08\uD53C"
-  description: "\uC5B4\uB450\uC6B4 \uBC00\uB9BC \uB3D9\uAD74 \uB3C4\uAC10\uC744 \uC644\uC131\uD55C
-    \uC99D\uD45C. \uBC18\uB527\uBD88 \uD55C \uB9C8\uB9AC\uAC00 \uAE43\uB4E4\uC5B4
-    \uC740\uC740\uD558\uAC8C \uBE5B\uB09C\uB2E4."
+  description: "\uC232\uACFC \uC815\uAE00\uACFC \uB3D9\uAD74\uC758 \uB2E8\uC5B4\uB97C \uBAA8\uB450 \uCC3E\uC740 \uC99D\uD45C. \uBC18\uB527\uBD88 \uD55C \uB9C8\uB9AC\uAC00 \uAE43\uB4E4\uC5B4 \uC740\uC740\uD558\uAC8C \uBE5B\uB09C\uB2E4."
   kind: 2
   icon: {fileID: 0}
   placeholderColor: {r: 1, g: 0.9, b: 0.4, a: 1}

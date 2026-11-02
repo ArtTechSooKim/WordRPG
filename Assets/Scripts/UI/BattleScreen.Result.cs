@@ -281,9 +281,7 @@ namespace WordRPG.UI
         private void FillMvp(SkillData skill, int damage, int total)
         {
             var hero = session.Hero;
-            SkillSlot slot = null;
-            foreach (var candidate in hero.SkillSlots)
-                if (candidate.Skill == skill) slot = candidate;
+            var slot = hero.SourceOf(skill);
             Sprite icon;
             if (slot?.Relic != null)
             {
@@ -449,7 +447,7 @@ namespace WordRPG.UI
             resultDynamic.Add(pill.gameObject);
         }
 
-        // 지역 도감을 다 채운 순간 결과 화면에 붙는 배너: 징표 아이콘 + "★ 초원 도감 완성!"
+        // 도감 보상을 받은 순간 결과 화면에 붙는 배너: 징표 아이콘 + "★ 단어 75개 발견!" / "★ 초원·서고 도감 완성!"
         private void AddDexBanner(DexCompletion completion, ref float y)
         {
             var row = UiKit.Rect("DexBanner", dexBanners, 0, 1, 1, 1);
@@ -462,7 +460,7 @@ namespace WordRPG.UI
             icon.rectTransform.pivot = new Vector2(0, 0.5f);
             icon.rectTransform.sizeDelta = new Vector2(104, 0);
             icon.rectTransform.anchoredPosition = new Vector2(16, 0);
-            var headline = UiKit.Display(UiKit.Label("Headline", row, $"★ {completion.Region.RegionName} 도감 완성!", 44, Palette.Gold,
+            var headline = UiKit.Display(UiKit.Label("Headline", row, completion.Headline, 44, Palette.Gold,
                 0, 0.5f, 1, 0.94f, TextAnchor.MiddleLeft, FontStyle.Normal, true, 24));
             headline.rectTransform.offsetMin = new Vector2(136, 0);
             headline.rectTransform.offsetMax = new Vector2(-16, 0);
@@ -478,7 +476,7 @@ namespace WordRPG.UI
         private static string CompletionText(DexCompletion completion)
         {
             string keepsake = completion.Keepsake != null ? $"징표 '{completion.Keepsake.DisplayName}' + " : "";
-            return $"★ {completion.Region.RegionName} 도감 완성!  {keepsake}{completion.Gold} 골드 획득";
+            return $"{completion.Headline}  {keepsake}{completion.Gold} 골드 획득";
         }
 
         private void OnDexClicked()

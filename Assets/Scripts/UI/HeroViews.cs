@@ -161,6 +161,9 @@ namespace WordRPG.UI
         private readonly Text[] statValues = new Text[3];
         private readonly List<SkillRowView> skillRows = new List<SkillRowView>();
         private Action<int> onSlotClicked;
+        private Button basicButton; // 기본 기술(휘두르기)을 다른 기술과 바꿨을 때만 [휘두르기 넣기] (#147)
+
+        public Action PutBasicSkill { get; set; }
 
         public static HeroInfoPage Create(RectTransform parent, float minX, float minY, float maxX, float maxY, Action<int> slotClicked)
         {
@@ -212,6 +215,9 @@ namespace WordRPG.UI
             }
 
             UiKit.Display(UiKit.Label("SkillsHeader", box, "기술", 44, Palette.Gold, 0.027f, 0.57f, 0.5f, 0.612f, TextAnchor.MiddleLeft));
+            basicButton = UiKit.MakeButton("PutBasicSkillButton", box, "", Palette.Info, 30, 0.6f, 0.567f, 0.973f, 0.619f);
+            basicButton.onClick.AddListener(() => PutBasicSkill?.Invoke());
+            basicButton.gameObject.SetActive(false);
             var skillArea = UiKit.Rect("Skills", box, 0.027f, 0.165f, 0.973f, 0.565f);
             for (int i = 0; i < MaxSkillRows; i++) skillRows.Add(SkillRowView.Create(skillArea, $"SkillRow_{i}"));
 
@@ -223,7 +229,7 @@ namespace WordRPG.UI
             star.rectTransform.anchoredPosition = new Vector2(24, 0);
             effectLine1 = UiKit.Label("Line1", effect.transform, "", 28, Palette.Text, 0.085f, 0.5f, 0.98f, 0.92f,
                 TextAnchor.MiddleLeft, FontStyle.Normal, true, 18);
-            effectLine2 = UiKit.Label("Line2", effect.transform, "기술 = 기본 기술 1개 + 끼운 성유물마다 1개", 26, Palette.TextDim, 0.085f, 0.08f, 0.98f, 0.5f,
+            effectLine2 = UiKit.Label("Line2", effect.transform, "전투 기술은 4개 — 성유물 탭의 [기술 넣기]로 바꿔요", 26, Palette.TextDim, 0.085f, 0.08f, 0.98f, 0.5f,
                 TextAnchor.MiddleLeft, FontStyle.Normal, true, 16);
         }
 
@@ -258,6 +264,8 @@ namespace WordRPG.UI
             statValues[2].text = stats.Defense + (bonus.Defense > 0 ? $" (+{bonus.Defense})" : "");
 
             ShowSkills(hero);
+            basicButton.gameObject.SetActive(!hero.UsesBasicSkill && hero.Data.BasicSkill != null);
+            if (basicButton.gameObject.activeSelf) UiKit.LabelOf(basicButton).text = $"{hero.Data.BasicSkill.DisplayName} 넣기";
             effectLine1.text = EffectSummary(hero);
         }
 

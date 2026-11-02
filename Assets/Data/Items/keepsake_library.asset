@@ -14,9 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: WordRPG::WordRPG.Items.ItemData
   itemId: keepsake_library
   displayName: "\uAE43\uD138 \uCC45\uAC08\uD53C"
-  description: "\uC78A\uD600\uC9C4 \uC11C\uACE0 \uB3C4\uAC10\uC744 \uC644\uC131\uD55C
-    \uC99D\uD45C. \uC624\uB798\uB41C \uCC45\uC7A5 \uC0AC\uC774\uC5D0\uC11C \uCC3E\uC740
-    \uAE43\uD138\uC774 \uB07C\uC6CC\uC838 \uC788\uB2E4."
+  description: "\uCD08\uC6D0\uACFC \uC78A\uD600\uC9C4 \uC11C\uACE0\uC758 \uB2E8\uC5B4\uB97C \uBAA8\uB450 \uCC3E\uC740 \uC99D\uD45C. \uC624\uB798\uB41C \uCC45\uC7A5 \uC0AC\uC774\uC5D0\uC11C \uCC3E\uC740 \uAE43\uD138\uC774 \uB07C\uC6CC\uC838 \uC788\uB2E4."
   kind: 2
   icon: {fileID: 0}
   placeholderColor: {r: 0.95, g: 0.85, b: 0.6, a: 1}

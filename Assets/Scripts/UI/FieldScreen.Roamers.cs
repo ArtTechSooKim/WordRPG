@@ -218,6 +218,7 @@ namespace WordRPG.UI
             preemptPrompt.SetActive(false);
             preemptLock.SetActive(false);
             Vector2? Focus() => roamerViews.WorldPosition(target) is Vector3 world ? MarkPoint(world) : null;
+            Sound.Play(Sfx.Preempt); // 카칭! (#147 사용자: 띡띡 소리만 있어서 심심함)
             preemptView.Show(question, Preemptive.AnswerSeconds, index =>
             {
                 bool correct = question.IsCorrect(index);

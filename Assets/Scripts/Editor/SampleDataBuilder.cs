@@ -40,15 +40,15 @@ namespace WordRPG.EditorTools
             var curiousPotion = Item("potion_curious", "호기심 물약", "마시면 전투 문제에 새 단어만 10개 나온다. 필드에서 쓸 수 있다.",
                 new Color(1f, 0.82f, 0.3f), ItemKind.Consumable, effect: ItemEffect.NewWords, effectAmount: 10);
             var forestPotions = new[] { new ShopEntry(potion, 30), new ShopEntry(largePotion, 90), new ShopEntry(greatPotion, 180),
-                new ShopEntry(quietPotion, 150), new ShopEntry(curiousPotion, 500) };
+                new ShopEntry(quietPotion, 150), new ShopEntry(curiousPotion, 2000) };
 
             // --- 지역 도감 완성 징표 (지역 특색에 맞는 기념물) ---
             var meadowKeepsake = Item("keepsake_meadow", "네잎클로버 책갈피",
-                "초원 도감을 완성한 증표. 행운을 부르는 네잎클로버가 곱게 눌려 있다.", new Color(0.35f, 0.8f, 0.35f), ItemKind.Keepsake);
+                "초원에서 단어를 모아 받은 증표. 행운을 부르는 네잎클로버가 곱게 눌려 있다.", new Color(0.35f, 0.8f, 0.35f), ItemKind.Keepsake);
             var forestKeepsake = Item("keepsake_forest", "도토리 책갈피",
-                "숲 도감을 완성한 증표. 반질반질한 도토리가 매달려 있다.", new Color(0.6f, 0.4f, 0.2f), ItemKind.Keepsake);
+                "숲에서 단어를 모아 받은 증표. 반질반질한 도토리가 매달려 있다.", new Color(0.6f, 0.4f, 0.2f), ItemKind.Keepsake);
             var libraryKeepsake = Item("keepsake_library", "깃털 책갈피",
-                "잊혀진 서고 도감을 완성한 증표. 오래된 책장 사이에서 찾은 깃털이 끼워져 있다.", new Color(0.95f, 0.85f, 0.6f), ItemKind.Keepsake);
+                "초원과 잊혀진 서고의 단어를 모두 찾은 증표. 오래된 책장 사이에서 찾은 깃털이 끼워져 있다.", new Color(0.95f, 0.85f, 0.6f), ItemKind.Keepsake);
 
             // --- 기술: 기본기는 쉬운 영→한, 성유물 기술은 대부분 어려운 한→영 ---
             var swing = Skill("hero_swing", "휘두르기", "들고 있는 사전으로 힘껏 휘두른다.", SkillKind.Damage, SkillTarget.SingleEnemy, 18, QuizDirection.EnglishToMeaning);
@@ -172,14 +172,15 @@ namespace WordRPG.EditorTools
 
             // 단어장(CSV에서 만들어짐)에 지역 정보와 도감 완성 보상 지정. 이미 지정돼 있으면 건드리지 않음
             WordCsvImporter.ImportAll();
-            ConfigureRegion("Assets/Data/Words/tier1_meadow.asset", "meadow", "초원", meadowKeepsake, 500, 1);
-            ConfigureRegion("Assets/Data/Words/tier2_forest.asset", "forest", "숲", forestKeepsake, 700, 3);
+            // 단어장 (#147 사용자): 초원·서고가 150개, 숲·정글·동굴이 300개를 같이 씀. 징표는 지역마다 그대로 — 발견한 수에 닿을 때마다
+            ConfigureRegion(CommonWords, "common", "초원·서고",
+                new DexReward("meadow", "초원", meadowKeepsake, 500, 75, 1),
+                new DexReward("library", "잊혀진 서고", libraryKeepsake, 600, 0, 2));
             // (#62) 서고도 자기 단어장: 교육과정 기본 어휘 중·고 공통 중 어려운 600
-            ConfigureRegion("Assets/Data/Words/tier1_library.asset", "library", "잊혀진 서고", libraryKeepsake, 600, 2);
 
             // --- 필드: 초원. 보물상자는 맵의 C를 위→아래, 왼→오른 순으로 대응 (강화 재료·성유물을 얻는 곳) ---
             Area("meadow", "초원", MeadowMap, meadowEncounters,
-                AssetDatabase.LoadAssetAtPath<WordDatabase>("Assets/Data/Words/tier1_meadow.asset"),
+                AssetDatabase.LoadAssetAtPath<WordDatabase>(CommonWords),
                 new ChestContent(sparkleDust, 2),        // 북서: 오래된 숲 풀숲 오솔길 끝
                 new ChestContent(hardCover, 2),          // 북동: 작은 못 옆 풀숲
                 new ChestContent(null, 0, 50, book),     // 호수 곶 끝 — 두 번째 성유물
@@ -194,13 +195,12 @@ namespace WordRPG.EditorTools
 
             // --- 던전: 잊혀진 서고 (초원 북쪽 동굴 입구로 연결). 단어장은 서고 것 (#62 — 예전에는 초원과 같았음) ---
             Area("library", "잊혀진 서고", LibraryMap, dungeonEncounters,
-                AssetDatabase.LoadAssetAtPath<WordDatabase>("Assets/Data/Words/tier1_library.asset"),
+                AssetDatabase.LoadAssetAtPath<WordDatabase>(CommonWords),
                 new ChestContent(null, 0, 120),          // 보스 앞 회랑 왼쪽 구석
                 new ChestContent(null, 0, 100, lantern), // 서쪽 열람실
                 new ChestContent(null, 0, 80, wand),     // 동쪽 잉크 서고
                 new ChestContent(largePotion, 1),        // 샘의 방 옆 벽감
                 new ChestContent(shinyInk, 3));          // 아래 서가 막다른 곳
-            SwitchWordBookIf("Assets/Data/Areas/library.asset", "Assets/Data/Words/tier1_meadow.asset", "Assets/Data/Words/tier1_library.asset");
             ConfigureAreaIfNew("Assets/Data/Areas/library.asset", so =>
             {
                 Prop(so, "theme").enumValueIndex = (int)FieldTheme.Library;
@@ -213,7 +213,7 @@ namespace WordRPG.EditorTools
             });
             // --- 두 번째 지역: 숲 (2단계 단어). 초원 마을 동쪽 출입구 — 서고 보스를 물리치면 열린다 ---
             Area("forest", "숲", ForestMap, forestEncounters,
-                AssetDatabase.LoadAssetAtPath<WordDatabase>("Assets/Data/Words/tier2_forest.asset"),
+                AssetDatabase.LoadAssetAtPath<WordDatabase>(AdvancedWords),
                 new ChestContent(null, 0, 60, whip),     // 부엉이 골짜기 북서 끝 — 덩굴 채찍
                 new ChestContent(hardCover, 3),          // 골짜기 위 풀숲
                 new ChestContent(shinyInk, 3),           // 개울 건너 징검다리
@@ -257,7 +257,7 @@ namespace WordRPG.EditorTools
             // --- 1.1 메아리 정글 (#80, GDD 9-6): 숲 보스 뒤 새 지역(정식판). 보이는 몬스터 + [선제공격], 깊은 강은 뗏목, 유적에서 아라 ---
             var vineFiber = Item("vine_fiber", "덩굴 섬유", "정글 덩굴에서 뽑은 질긴 섬유. 정글의 성유물을 강화한다.", new Color(0.4f, 0.65f, 0.25f));
             var jungleKeepsake = Item("keepsake_jungle", "메아리 풀잎 책갈피",
-                "메아리 정글 도감을 완성한 증표. 귀에 대면 단어가 메아리처럼 들리는 풀잎이 끼워져 있다.", new Color(0.35f, 0.75f, 0.4f), ItemKind.Keepsake);
+                "메아리 정글에서 단어를 모아 받은 증표. 귀에 대면 단어가 메아리처럼 들리는 풀잎이 끼워져 있다.", new Color(0.35f, 0.75f, 0.4f), ItemKind.Keepsake);
             var jungleKey = Item("jungle_key", "정글 열쇠", "메아리 정글 깊은 곳, 빈칸두꺼비의 공터 문을 여는 이끼 낀 열쇠.",
                 new Color(0.6f, 0.85f, 0.4f), ItemKind.Key);
             var echoVeil = Skill("flute_echo_veil", "메아리 장막", "피리 소리가 메아리 장막이 되어 모두를 지킨다.", SkillKind.Guard, SkillTarget.AllAllies, 10, QuizDirection.MeaningToEnglish);
@@ -281,8 +281,9 @@ namespace WordRPG.EditorTools
             var batchimSwap = Skill("kappa_batchim_swap", "받침 바꾸기", "받침을 몰래 바꿔 철자를 헷갈리게 한다.", SkillKind.Damage, SkillTarget.SingleEnemy, 20, QuizDirection.EnglishToMeaning);
             var inkMimic = Skill("octopus_ink_mimic", "먹물 흉내", "들은 말을 엉터리로 흉내 내며 먹물을 뿜는다.", SkillKind.Damage, SkillTarget.AllEnemies, 16, QuizDirection.EnglishToMeaning);
             // 빈칸두꺼비 숫자는 #88 시뮬레이션으로 맞춤 (아라와 함께 정답률 80%면 10라운드쯤, 혼자·정답률 60%면 도전)
-            var tongueLash = Skill("frog_tongue_lash", "혀 날름", "긴 혀를 날름 내밀어 후려친다.", SkillKind.Damage, SkillTarget.SingleEnemy, 40, QuizDirection.EnglishToMeaning);
-            var blankCroak = Skill("frog_blank_croak", "빈칸 울음", "개굴! 울음소리에 머릿속이 하얗게 빈칸이 된다.", SkillKind.Damage, SkillTarget.AllEnemies, 26, QuizDirection.EnglishToMeaning);
+            var tongueLash = Skill("frog_tongue_lash", "혀 날름", "긴 혀를 잔뜩 말아 힘을 모았다가 힘껏 후려친다.", SkillKind.Damage, SkillTarget.SingleEnemy, 270, QuizDirection.EnglishToMeaning,
+                chargeTurns: 1); // 보스가 뒤로 갈수록 세게 (#147)
+            var blankCroak = Skill("frog_blank_croak", "빈칸 울음", "개굴! 울음소리에 머릿속이 하얗게 빈칸이 된다.", SkillKind.Damage, SkillTarget.AllEnemies, 120, QuizDirection.EnglishToMeaning);
             var gulp = Skill("frog_gulp", "꿀꺽 삼키기", "석판의 글자를 꿀꺽 삼켜 HP를 회복한다.", SkillKind.Heal, SkillTarget.Self, 10, QuizDirection.EnglishToMeaning);
             var tailLizard = Monster("tail_lizard", "말꼬리 도마뱀", "남의 말꼬리를 잡고 늘어지는 도마뱀. 정글 풀숲을 재빠르게 누빈다.", MonsterRole.Attacker,
                 new Color(0.5f, 0.75f, 0.35f), new MonsterStats(28, 14, 10), new MonsterStats(5, 3, 2), new[] { tailGrab },
@@ -294,7 +295,7 @@ namespace WordRPG.EditorTools
                 new Color(0.4f, 0.7f, 0.45f), new MonsterStats(30, 15, 9), new MonsterStats(6, 3, 2), new[] { inkMimic },
                 enemyExp: 15, enemyGold: 14, drops: new[] { new ItemDrop(sparkleDust, 0.4f), new ItemDrop(vineFiber, 0.25f) });
             var blankFrog = Monster("boss_blank_frog", "빈칸두꺼비", "유적 석판의 글자를 꿀꺽 삼켜 빈칸으로 만든 거대한 두꺼비. 정글의 메아리를 앗아 갔다.", MonsterRole.Attacker,
-                new Color(0.45f, 0.7f, 0.35f), new MonsterStats(60, 30, 12), new MonsterStats(6, 5, 1), new[] { tongueLash, blankCroak, gulp },
+                new Color(0.45f, 0.7f, 0.35f), new MonsterStats(124, 30, 12), new MonsterStats(16, 5, 1), new[] { tongueLash, blankCroak, gulp }, // HP·기술 #147
                 enemyExp: 70, enemyGold: 90,
                 drops: new[] { new ItemDrop(vineFiber, 1f, 3), new ItemDrop(shinyInk, 1f, 2), new ItemDrop(hardCover, 1f, 2), new ItemDrop(sparkleDust, 1f, 2) });
             var jungleEncounters = Encounters("jungle_field", 1, 2,
@@ -303,11 +304,10 @@ namespace WordRPG.EditorTools
             var riverEncounters = Encounters("jungle_river", 1, 2,
                 new EncounterTable.Entry(mimicOctopus, 13, 15, 10));
 
-            ConfigureRegion("Assets/Data/Words/tier3_jungle.asset", "jungle", "메아리 정글", jungleKeepsake, 800, 4);
             const string junglePath = "Assets/Data/Areas/jungle.asset";
             // 보물상자 15개 (맵의 C를 위→아래, 왼→오른 순). 강 위쪽·아래쪽 모래톱 4개는 뗏목에서 [확인] (사용자)
             Area("jungle", "메아리 정글", JungleMap, jungleEncounters,
-                AssetDatabase.LoadAssetAtPath<WordDatabase>("Assets/Data/Words/tier3_jungle.asset"),
+                AssetDatabase.LoadAssetAtPath<WordDatabase>(AdvancedWords),
                 new ChestContent(null, 0, 80, gourd),     // 강 위쪽 모래톱 — 정글 조롱박
                 new ChestContent(null, 0, 60, flute),     // 유적 북서 방 — 메아리 피리
                 new ChestContent(null, 0, 200),           // 유적 북동 방
@@ -327,14 +327,14 @@ namespace WordRPG.EditorTools
             AssignShopIfEmpty(junglePath, jungleShop);
             SetFullVersionArea(junglePath); // 정식판에 포함 (추가 결제 없음 — 사용자)
             SetDictionary(junglePath, "정글의 사전");
-            SetBossGate(junglePath, jungleKey, 40);
+            SetBossGate(junglePath, jungleKey, 80);
             ConfigureAreaIfNew(junglePath, so =>
             {
                 Prop(so, "theme").enumValueIndex = (int)FieldTheme.Jungle;
                 Prop(so, "encounterStyle").enumValueIndex = (int)EncounterStyle.Roaming;
                 Prop(so, "waterEncounters").objectReferenceValue = riverEncounters;
                 Prop(so, "shrineCompanion").objectReferenceValue = AssetDatabase.LoadAssetAtPath<CompanionData>($"{Root}/Companions/ara.asset");
-                Prop(so, "shrineWords").intValue = 60;
+                Prop(so, "shrineWords").intValue = 100;
                 var boss = Prop(so, "boss");
                 boss.FindPropertyRelative("species").objectReferenceValue = blankFrog;
                 boss.FindPropertyRelative("level").intValue = 17;
@@ -346,7 +346,7 @@ namespace WordRPG.EditorTools
             //     숫자는 BalanceSimulationTests(동굴 전투·보스)로 맞춤 — 정글 보스를 이긴 주인공 Lv17~19 + 아라 기준
             var glowMoss = Item("glow_moss", "빛이끼", "동굴 벽에서 은은하게 빛나는 이끼. 동굴의 성유물을 강화한다.", new Color(0.4f, 0.85f, 0.8f));
             var caveKeepsake = Item("keepsake_cave", "반딧불 책갈피",
-                "어두운 밀림 동굴 도감을 완성한 증표. 반딧불 한 마리가 깃들어 은은하게 빛난다.", new Color(1f, 0.9f, 0.4f), ItemKind.Keepsake);
+                "숲과 정글과 동굴의 단어를 모두 찾은 증표. 반딧불 한 마리가 깃들어 은은하게 빛난다.", new Color(1f, 0.9f, 0.4f), ItemKind.Keepsake);
             var caveKey = Item("cave_key", "동굴 열쇠", "어두운 밀림 동굴 깊은 곳, 말줄임덩굴의 방 문을 여는 푸른 수정빛 열쇠.",
                 new Color(0.6f, 0.8f, 1f), ItemKind.Key);
             var glowFlash = Skill("lamp_glow_flash", "반딧빛 번쩍", "등잔의 반딧빛이 번쩍 터져 적 전체를 눈부시게 때린다.", SkillKind.Damage, SkillTarget.AllEnemies, 26, QuizDirection.MeaningToEnglish);
@@ -367,8 +367,9 @@ namespace WordRPG.EditorTools
             var tangleWeb = Skill("spider_tangle_web", "엉킴 거미줄", "철자를 엉키게 하는 거미줄을 흩뿌린다.", SkillKind.Damage, SkillTarget.AllEnemies, 16, QuizDirection.EnglishToMeaning);
             var spellBite = Skill("spider_spell_bite", "철자 깨물기", "단어의 철자 하나를 콱 깨물어 떼어 간다.", SkillKind.Damage, SkillTarget.SingleEnemy, 24, QuizDirection.EnglishToMeaning);
             var inkSpit = Skill("newt_ink_spit", "먹물 뱉기", "웅덩이에서 머금은 먹물을 힘껏 뱉는다.", SkillKind.Damage, SkillTarget.SingleEnemy, 22, QuizDirection.EnglishToMeaning);
-            var vineSlam = Skill("vine_slam", "덩굴 후려치기", "굵은 덩굴로 힘껏 후려친다.", SkillKind.Damage, SkillTarget.SingleEnemy, 44, QuizDirection.EnglishToMeaning);
-            var ellipsisSpore = Skill("vine_ellipsis_spore", "말줄임 포자", "포자를 흩뿌려 하려던 말이 '…'로 끊기게 한다.", SkillKind.Damage, SkillTarget.AllEnemies, 28, QuizDirection.EnglishToMeaning);
+            var vineSlam = Skill("vine_slam", "덩굴 후려치기", "굵은 덩굴에 힘을 잔뜩 모았다가 내리친다.", SkillKind.Damage, SkillTarget.SingleEnemy, 310, QuizDirection.EnglishToMeaning,
+                chargeTurns: 1); // 보스가 뒤로 갈수록 세게 (#147)
+            var ellipsisSpore = Skill("vine_ellipsis_spore", "말줄임 포자", "포자를 흩뿌려 하려던 말이 '…'로 끊기게 한다.", SkillKind.Damage, SkillTarget.AllEnemies, 135, QuizDirection.EnglishToMeaning);
             var swallowSentence = Skill("vine_swallow_sentence", "문장 삼키기", "문장의 끝을 꿀꺽 삼켜 HP를 회복한다.", SkillKind.Heal, SkillTarget.Self, 10, QuizDirection.EnglishToMeaning);
             var blinkGhost = Monster("blink_ghost", "깜빡유령", "방금 외운 단어를 깜빡 잊게 만드는 유령. 빛 밖에서 깜빡깜빡 나타났다 사라진다.", MonsterRole.Attacker,
                 new Color(0.8f, 0.85f, 0.95f), new MonsterStats(24, 14, 8), new MonsterStats(5, 3, 2), new[] { blinkBrush },
@@ -383,7 +384,7 @@ namespace WordRPG.EditorTools
                 new Color(0.4f, 0.3f, 0.7f), new MonsterStats(30, 15, 9), new MonsterStats(6, 3, 2), new[] { inkSpit },
                 enemyExp: 17, enemyGold: 16, drops: new[] { new ItemDrop(glowMoss, 0.3f), new ItemDrop(shinyInk, 0.3f) });
             var ellipsisVine = Monster("boss_ellipsis_vine", "말줄임덩굴", "문장의 끝을 삼켜 '…'만 남기는 거대한 덩굴. 덩굴로 반딧돌을 덮어 동굴을 캄캄하게 만들었다.", MonsterRole.Attacker,
-                new Color(0.35f, 0.6f, 0.35f), new MonsterStats(66, 32, 13), new MonsterStats(6, 5, 1), new[] { vineSlam, ellipsisSpore, swallowSentence },
+                new Color(0.35f, 0.6f, 0.35f), new MonsterStats(116, 32, 13), new MonsterStats(16, 5, 1), new[] { vineSlam, ellipsisSpore, swallowSentence }, // HP·기술 #147
                 enemyExp: 90, enemyGold: 120,
                 drops: new[] { new ItemDrop(glowMoss, 1f, 3), new ItemDrop(vineFiber, 1f, 2), new ItemDrop(shinyInk, 1f, 2), new ItemDrop(hardCover, 1f, 2), new ItemDrop(sparkleDust, 1f, 2) });
             var caveEncounters = Encounters("cave_field", 1, 2,
@@ -393,11 +394,14 @@ namespace WordRPG.EditorTools
             var inkPoolEncounters = Encounters("cave_water", 1, 2,
                 new EncounterTable.Entry(inkNewt, 16, 18, 10));
 
-            ConfigureRegion("Assets/Data/Words/tier4_cave.asset", "cave", "어두운 밀림 동굴", caveKeepsake, 900, 5);
+            ConfigureRegion(AdvancedWords, "advanced", "숲·정글·동굴",
+                new DexReward("forest", "숲", forestKeepsake, 700, 100, 3),
+                new DexReward("jungle", "메아리 정글", jungleKeepsake, 800, 200, 4),
+                new DexReward("cave", "어두운 밀림 동굴", caveKeepsake, 900, 0, 5));
             const string cavePath = "Assets/Data/Areas/cave.asset";
             // 보물상자 10개 (맵의 C를 위→아래, 왼→오른 순). 성유물은 반딧돌을 모두 밝힌 보상(반딧돌 등잔)과 보스(마침표 씨앗)
             Area("cave", "어두운 밀림 동굴", CaveMap, caveEncounters,
-                AssetDatabase.LoadAssetAtPath<WordDatabase>("Assets/Data/Words/tier4_cave.asset"),
+                AssetDatabase.LoadAssetAtPath<WordDatabase>(AdvancedWords),
                 new ChestContent(null, 0, 250),           // 옛 광부 쉼터 (숨은 방)
                 new ChestContent(glowMoss, 3),            // 수정 굴 (열쇠 옆)
                 new ChestContent(largePotion, 2),         // 숨은 틈
@@ -412,7 +416,7 @@ namespace WordRPG.EditorTools
             AssignShopIfEmpty(cavePath, caveShop);
             SetFullVersionArea(cavePath); // 정식판에 포함 (추가 결제 없음)
             SetDictionary(cavePath, "동굴의 사전");
-            SetBossGate(cavePath, caveKey, 40);
+            SetBossGate(cavePath, caveKey, 120); // 단어장을 같이 쓰니 앞 지역보다 많이 (#147 사용자: 숲 40 · 정글 80 · 유적 100 · 동굴 120)
             ConfigureAreaIfNew(cavePath, so =>
             {
                 Prop(so, "theme").enumValueIndex = (int)FieldTheme.Cave;
@@ -943,7 +947,9 @@ namespace WordRPG.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void ConfigureRegion(string wordBookPath, string regionId, string regionName, ItemData keepsake, int gold, int storyOrder)
+        private const string CommonWords = "Assets/Data/Words/tier1_common.asset", AdvancedWords = "Assets/Data/Words/tier2_advanced.asset";
+
+        private static void ConfigureRegion(string wordBookPath, string regionId, string regionName, params DexReward[] rewards)
         {
             var book = AssetDatabase.LoadAssetAtPath<WordDatabase>(wordBookPath);
             if (book == null)
@@ -953,13 +959,8 @@ namespace WordRPG.EditorTools
             }
             if (!string.IsNullOrEmpty(book.RegionId)) return;
 
-            var so = new SerializedObject(book);
-            Prop(so, "regionId").stringValue = regionId;
-            Prop(so, "regionName").stringValue = regionName;
-            Prop(so, "completionKeepsake").objectReferenceValue = keepsake;
-            Prop(so, "completionGold").intValue = gold;
-            Prop(so, "storyOrder").intValue = storyOrder;
-            so.ApplyModifiedPropertiesWithoutUndo();
+            book.ConfigureRegion(regionId, regionName, rewards);
+            EditorUtility.SetDirty(book);
         }
 
         private static ItemData Item(string id, string name, string description, Color color,

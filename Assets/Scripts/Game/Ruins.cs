@@ -86,7 +86,7 @@ namespace WordRPG.Game
                 case FieldTile.Boss: return world.IsBossDefeated(area.BossId);
                 case FieldTile.Lectern: return BossDictionary.IsUnlocked(area, world);
                 case FieldTile.Gate: return BossGate.IsOpen(area, session);
-                case FieldTile.Key: return BossGate.HasKey(area, session);
+                case FieldTile.Key: return BossGate.KeyTaken(area, session);
                 case FieldTile.Lever: return Levers.IsPulled(area, world, cell);
                 case FieldTile.Bridge: return Levers.IsBridgeBuilt(area, world, cell);
                 case FieldTile.Tablet: return Ruins.IsTabletSolved(area, world, cell);

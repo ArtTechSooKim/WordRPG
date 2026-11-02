@@ -10,6 +10,7 @@ namespace WordRPG.UI
     // ① 가방: 성유물을 처음 더 얻으면 가방에 빨간 점 → 가방을 누르면 성유물 탭 · 새 성유물 · 바꾸는 곳을 한 줄씩.
     //    칸이 가득 차서 못 끼운 성유물이 처음 생기면 다시 빨간 점 → 이번엔 직접 바꿔 끼워 보게 (그때가 진짜 바꾸는 순간)
     // ② 제단: 강화할 재료가 처음 모이면 제단 앞으로 옮겨서 설명(PauseTutorial — 사용자가 원함)하고 강화까지 해 보게
+    // ③ 끼우기와 기술 넣기 (#147 사용자): 둘은 다른 일 — 가방 안내 중 새 성유물을 고른 뒤 처음 한 번 설명
     public partial class FieldScreen
     {
         private const float AltarGuideIdleSeconds = 1.5f; // 얻었다는 알림을 읽을 틈
@@ -38,6 +39,7 @@ namespace WordRPG.UI
                 guide.Show(new GuideHints.Hint { Text = $"새로 얻은 {named} 눌러 보세요", Target = () => page.CellRect(relic), Gesture = GuideHints.Gesture.Tap });
                 while (OnRelics() && page.Selected != relic) yield return null;
             }
+            if (OnRelics()) yield return ExplainRelicSkills();
 
             if (!swap)
             {
@@ -66,6 +68,22 @@ namespace WordRPG.UI
                 yield return null;
             }
             guide.Hide();
+        }
+
+        // 성유물 끼우기와 기술 넣기는 다른 일 (#147 사용자)
+        private IEnumerator ExplainRelicSkills()
+        {
+            if (session.Tutorials.Has(TutorialProgress.RelicSkills)) yield break;
+            session.Tutorials.Mark(TutorialProgress.RelicSkills);
+            guide.Hide();
+            pauseTutorial.BringToFront();
+            string basic = session.Hero.Data.BasicSkill != null ? session.Hero.Data.BasicSkill.DisplayName : "기본 기술";
+            yield return pauseTutorial.Tell(new[]
+            {
+                "성유물을 끼우면 능력치가 올라요\n끼울 수 있는 칸은 3개예요",
+                "기술은 따로 골라요\n전투에 들고 갈 기술 4개를 [기술 넣기]로 정해요",
+                $"끼운 성유물과 기술문서의 기술을 넣을 수 있고\n{basic}도 다른 기술과 바꿀 수 있어요"
+            });
         }
 
         // UpdateGuide에서 (서 있을 때만 불림): 강화할 재료가 처음 모였고 잠깐 한가하면 제단 안내

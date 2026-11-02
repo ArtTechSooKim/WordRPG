@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using WordRPG.Game;
@@ -19,12 +20,13 @@ namespace WordRPG.UI
     }
 
     // 소지품 (Figma '소지품 — 주인공' / '— 성유물' / '— 재료(아이템)' / '— 징표 진열장'):
-    // 주인공 탭 = 끼운 성유물 + 능력치·기술, 성유물 탭 = 모은 성유물 · 장착/빼기, 아이템 탭 = 4칸 격자 + 고른 아이템 상세(쓰는 곳 ·
+    // 주인공 탭 = 끼운 성유물 + 능력치·기술, 성유물 탭 = 모은 성유물 · 장착/빼기, 아이템 탭 = 4칸 격자(넘치면 위아래로 밈 #147) + 고른 아이템 상세(쓰는 곳 ·
     // 상처약은 [사용하기]), 징표 탭 = 지역 도감 완성 징표 진열장. 아이템은 세이브에 id만 있어서 GameDatabase로 찾는다
     public class InventoryView
     {
-        public const int SlotCount = 8;
+        public const int SlotCount = 8; // 처음 보이는 칸 (4칸 × 2줄). 아이템이 더 많으면 줄이 늘어나고 위아래로 밀어서 봄 (#147)
         private const int ShelfCount = 3;
+        private const float ItemGap = 24f;
 
         private class Slot
         {
@@ -72,6 +74,8 @@ namespace WordRPG.UI
         private GameDatabase database;
         private readonly List<ItemData> materials = new List<ItemData>();
         private List<KeepsakeEntry> keepsakes = new List<KeepsakeEntry>();
+        private RectTransform itemGrid;
+        private ScrollRect itemScroll;
         private int keepsakePage;                    // 진열장 쪽 (3칸씩, #97 — 지역이 3개를 넘음)
         private GameObject keepsakePager;
         private Button keepsakePrev, keepsakeNext;
@@ -117,6 +121,11 @@ namespace WordRPG.UI
             close.onClick.AddListener(view.Hide);
 
             view.learnView = SkillLearnView.Create(root); // 가방 위에 덮는다
+            view.heroPage.PutBasicSkill = () => view.learnView.ShowBasicSkill(view.session, learned =>
+            {
+                if (learned) view.onChanged?.Invoke();
+                view.heroPage.Show(view.session.Hero);
+            });
             view.relicPage.PlaceSkill = relic => view.learnView.ShowRelicSkill(view.session, relic, learned =>
             {
                 if (learned) view.onChanged?.Invoke();
@@ -127,18 +136,33 @@ namespace WordRPG.UI
             return view;
         }
 
-        // 4칸 × 2줄 (Figma 'Item Slot' 240×240)
+        // 4칸 × 2줄이 보이고 넘치면 위아래로 밈 (Figma 'Item Slot', '소지품 — 아이템 스크롤 #147').
+        // 전에는 8칸 고정이라 먼저 얻은 재료가 칸을 채우면 상처약이 안 보이고 쓸 수도 없었음
         private void BuildMaterials(RectTransform root)
         {
             var page = UiKit.Rect("MaterialsPage", root, 0.022f, 0.53f, 0.978f, 0.8f);
             materialsPage = page.gameObject;
-            const float gapX = 24f / 1032f, gapY = 24f / 518f;
-            float w = (1f - 3 * gapX) / 4f, h = (1f - gapY) / 2f;
-            for (int i = 0; i < SlotCount; i++)
+            var viewport = UiKit.Rect("Viewport", page, 0, 0, 0.972f, 1);
+            viewport.offsetMin = new Vector2(-ItemGap / 2f, -ItemGap / 2f); // 칸마다 둘레를 반 칸격씩 비우므로 바깥 칸이 위·아래 창과 줄이 맞게
+            viewport.offsetMax = new Vector2(ItemGap / 2f, ItemGap / 2f);
+            viewport.gameObject.AddComponent<RectMask2D>();
+            viewport.gameObject.AddComponent<Image>().color = Color.clear; // 칸 사이를 밀어도 스크롤
+            itemGrid = UiKit.Rect("Grid", viewport, 0, 1, 1, 1);
+            itemGrid.pivot = new Vector2(0.5f, 1);
+            itemScroll = viewport.gameObject.AddComponent<ScrollRect>();
+            itemScroll.content = itemGrid;
+            itemScroll.viewport = viewport;
+            itemScroll.horizontal = false;
+            itemScroll.movementType = ScrollRect.MovementType.Clamped;
+            UiKit.VerticalScrollbar(itemScroll, 0.984f, 0, 1, 1);
+            AddSlots(SlotCount);
+        }
+
+        private void AddSlots(int upTo)
+        {
+            for (int i = slots.Count; i < upTo; i++)
             {
-                int col = i % 4, row = i / 4;
-                float x = col * (w + gapX), top = 1f - row * (h + gapY);
-                var panel = UiKit.RoundPanel($"ItemSlot_{i}", page, Palette.Panel, UiKit.RadiusMd, x, top - h, x + w, top);
+                var panel = UiKit.RoundPanel($"ItemSlot_{i}", itemGrid, Palette.Panel, UiKit.RadiusMd, 0, 0, 1, 1);
                 var button = UiKit.AddButton(panel);
                 var colors = button.colors;
                 colors.disabledColor = Color.white; // 빈 칸 색은 직접 지정 (반투명 판)
@@ -151,6 +175,28 @@ namespace WordRPG.UI
                 slot.Border = UiKit.Outline(UiKit.Panel("Border", panel.transform, Palette.Gold), UiKit.RadiusMd, 6);
                 slot.Border.raycastTarget = false;
                 slots.Add(slot);
+            }
+        }
+
+        // 칸을 아이템 수에 맞춰 놓음: 보이는 영역에 2줄이 들어가는 비율로 (화면 크기가 달라져도 맞음), 빈 칸은 줄을 채울 만큼만
+        private void LayOutSlots()
+        {
+            int shown = Mathf.Max(SlotCount, Mathf.CeilToInt(materials.Count / 4f) * 4);
+            AddSlots(shown);
+            int rows = shown / 4;
+            itemGrid.anchorMin = new Vector2(0, 1f - rows / 2f);
+            itemGrid.anchorMax = Vector2.one;
+            itemGrid.sizeDelta = Vector2.zero;
+            var inset = Vector2.one * ItemGap / 2f;
+            for (int i = 0; i < slots.Count; i++)
+            {
+                slots[i].Root.SetActive(i < shown);
+                var rect = (RectTransform)slots[i].Root.transform;
+                int col = i % 4, row = i / 4;
+                rect.anchorMin = new Vector2(col / 4f, 1f - (row + 1f) / rows);
+                rect.anchorMax = new Vector2((col + 1f) / 4f, 1f - (float)row / rows);
+                rect.offsetMin = inset;
+                rect.offsetMax = -inset;
             }
         }
 
@@ -292,6 +338,9 @@ namespace WordRPG.UI
                 var item = database != null ? database.FindItem(stack.ItemId) : null;
                 if (item != null && item.Kind != ItemKind.Keepsake) materials.Add(item);
             }
+            var inBagOrder = materials.OrderBy(item => item.BagOrder).ThenBy(item => item.HealAmount).ToList();
+            materials.Clear();
+            materials.AddRange(inBagOrder);
         }
 
         public void Hide() => Root.SetActive(false);
@@ -322,7 +371,11 @@ namespace WordRPG.UI
             else companionPage.Hide();
             if (tab == BagTab.Relics) relicPage.Show(session, database, relic, onChanged);
             else relicPage.Hide();
-            if (tab == BagTab.Items) ShowMaterial(0);
+            if (tab == BagTab.Items)
+            {
+                ShowMaterial(0);
+                itemScroll.verticalNormalizedPosition = 1f; // 맨 위(상처약)부터
+            }
             if (tab == BagTab.Keepsakes)
             {
                 keepsakePage = 0;
@@ -341,6 +394,7 @@ namespace WordRPG.UI
         private void ShowMaterial(int selected)
         {
             selectedMaterial = selected;
+            LayOutSlots();
             for (int i = 0; i < slots.Count; i++)
             {
                 var slot = slots[i];
@@ -550,16 +604,16 @@ namespace WordRPG.UI
             var progress = chosen.Progress;
             if (!chosen.Owned)
             {
-                SetDetail(UiKit.Icon("lock"), "???", $"{chosen.RegionName} 도감 {progress.Discovered} / {progress.Total}",
-                    $"{chosen.RegionName} 단어 도감을 모두 채우면 받을 수 있어요");
+                SetDetail(UiKit.Icon("lock"), "???", $"{chosen.Region.RegionName} 도감 {progress.Discovered} / {chosen.WordsNeeded}",
+                    $"{chosen.Region.RegionName} 단어를 {chosen.WordsNeeded}개 발견하면 받을 수 있어요");
                 return;
             }
 
             SetDetail(UiKit.ItemIcon(chosen.Keepsake), chosen.Keepsake.DisplayName,
-                $"{chosen.RegionName} 도감 {progress.Total} / {progress.Total} 완성", chosen.Keepsake.Description);
+                $"{chosen.RegionName} 징표 — {chosen.Region.RegionName} 단어 {chosen.WordsNeeded}개 발견", chosen.Keepsake.Description);
             detailMeta.color = Palette.Gold;
-            if (chosen.Region.CompletionGold > 0)
-                SetUsage(UiKit.Icon("gold"), $"완성 보상으로 {chosen.Region.CompletionGold} 골드도 함께 받았어요", null, Palette.TextDim);
+            if (chosen.Reward.Gold > 0)
+                SetUsage(UiKit.Icon("gold"), $"보상으로 {chosen.Reward.Gold} 골드도 함께 받았어요", null, Palette.TextDim);
         }
 
         private void SetDetail(Sprite icon, string name, string meta, string description)

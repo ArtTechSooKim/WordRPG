@@ -47,16 +47,19 @@ namespace WordRPG.Heroes
     }
 
     // 혼자 싸우는 주인공. 능력치 = 레벨 능력치 + 끼운 성유물 보너스.
-    // 기술 = 기본 기술(항상) + 기술 칸 3개 (끼운 성유물의 기술 또는 기술문서로 배운 기술) — 전투 기술은 최대 4개.
+    // 기술 = 기본 기술 자리 1개 + 기술 칸 3개 (끼운 성유물의 기술 또는 기술문서로 배운 기술) — 전투 기술은 최대 4개.
     //   성유물을 끼울 때 기술 칸이 비어 있으면 그 기술이 자동으로 들어가고, 가득이면 새 기술은 기존 것과 바꿔야 한다.
+    //   기본 기술 자리도 다른 기술과 바꿀 수 있다 (#147 사용자: 휘두르기도) — 비어 있으면 기본 기술. 공격 기술은 하나 이상 남긴다
     // 성유물은 여러 개 모으고(Relics) 그중 3개까지 칸에 끼운다(Slots)
     public class Hero : ICombatant
     {
         public const int SkillSlotCount = 3; // 기본 기술 말고 고를 수 있는 기술 칸
+        public const int BasicSeat = SkillSlotCount; // 바꿀 자리 번호: 0~2 = 기술 칸, 이 번호 = 기본 기술 자리
 
         private readonly List<OwnedRelic> relics = new List<OwnedRelic>();
         private readonly OwnedRelic[] slots = new OwnedRelic[HeroData.SlotCount];
         private readonly List<SkillSlot> skillSlots = new List<SkillSlot>();
+        private SkillSlot basicSeat; // 기본 기술 자리에 대신 넣은 기술. null이면 기본 기술
 
         public HeroData Data { get; }
         public int Level { get; private set; }
@@ -111,13 +114,14 @@ namespace WordRPG.Heroes
 
         public MonsterStats Stats => LevelStats + RelicBonus;
 
-        // 기본 기술 + 기술 칸 순서대로 (같은 기술은 한 번만)
+        // 기본 기술 자리 + 기술 칸 순서대로 (같은 기술은 한 번만)
         public IReadOnlyList<SkillData> Skills
         {
             get
             {
                 var list = new List<SkillData>();
-                if (Data.BasicSkill != null) list.Add(Data.BasicSkill);
+                var first = basicSeat != null ? basicSeat.Skill : Data.BasicSkill;
+                if (first != null) list.Add(first);
                 foreach (var slot in skillSlots)
                 {
                     var skill = slot.Skill;
@@ -131,14 +135,37 @@ namespace WordRPG.Heroes
 
         public bool HasSkillRoom => skillSlots.Count < SkillSlotCount;
 
-        // 이 기술이 든 기술 칸 (기본 기술이면 null)
-        public SkillSlot SourceOf(SkillData skill) => skillSlots.Find(s => s.Skill == skill);
+        public SkillSlot BasicSeatSlot => basicSeat;
+        public bool UsesBasicSkill => basicSeat == null;
 
-        public bool Knows(ItemData document) => document != null && skillSlots.Exists(s => s.Document == document);
+        // 이 기술이 든 칸 (기본 기술이면 null)
+        public SkillSlot SourceOf(SkillData skill) =>
+            basicSeat != null && basicSeat.Skill == skill ? basicSeat : skillSlots.Find(s => s.Skill == skill);
 
-        public bool HasSkillOf(OwnedRelic relic) => relic != null && skillSlots.Exists(s => s.Relic == relic);
+        public bool Knows(ItemData document) =>
+            document != null && (skillSlots.Exists(s => s.Document == document) || basicSeat?.Document == document);
 
-        // 기술문서로 기술을 배운다. 칸이 가득이면 replace(0~2) 칸의 기술과 바꾼다. 배웠으면 true
+        public bool HasSkillOf(OwnedRelic relic) =>
+            relic != null && (skillSlots.Exists(s => s.Relic == relic) || basicSeat?.Relic == relic);
+
+        // 그 자리의 기술 (seat = 0~2 기술 칸, BasicSeat = 기본 기술 자리)
+        public SkillData SkillInSeat(int seat)
+        {
+            if (seat == BasicSeat) return basicSeat != null ? basicSeat.Skill : Data.BasicSkill;
+            return seat >= 0 && seat < skillSlots.Count ? skillSlots[seat].Skill : null;
+        }
+
+        // 그 자리를 incoming으로 바꿔도 공격 기술이 하나는 남는지 (회복·보호막만 들고 가면 적을 쓰러뜨릴 수 없음)
+        public bool CanReplace(int seat, SkillData incoming)
+        {
+            if (incoming != null && incoming.Kind == SkillKind.Damage) return true;
+            var leaving = SkillInSeat(seat);
+            foreach (var skill in Skills)
+                if (skill != leaving && skill.Kind == SkillKind.Damage) return true;
+            return false;
+        }
+
+        // 기술문서로 기술을 배운다. 칸이 가득이면 replace 자리(0~2, BasicSeat)의 기술과 바꾼다. 배웠으면 true
         public bool LearnSkill(ItemData document, int replace = -1)
         {
             if (document == null || !document.IsSkillDocument || Knows(document)) return false;
@@ -161,9 +188,39 @@ namespace WordRPG.Heroes
                 skillSlots.Add(slot);
                 return true;
             }
+            if (!CanReplace(replace, slot.Skill)) return false;
+            if (replace == BasicSeat)
+            {
+                basicSeat = slot;
+                return true;
+            }
             if (replace < 0 || replace >= skillSlots.Count) return false;
             skillSlots[replace] = slot;
             return true;
+        }
+
+        // 기본 기술을 다시 넣는다 (#147). 기술 칸이 비었으면 기본 기술 자리의 기술은 빈 칸으로.
+        // 가득이면 replace 자리의 기술이 빠짐: BasicSeat = 기본 기술 자리의 기술 · 0~2 = 그 칸의 기술 (기본 기술 자리의 기술이 그 칸으로)
+        public bool PutBackBasicSkill(int replace = -1)
+        {
+            if (basicSeat == null) return false;
+            if (HasSkillRoom) skillSlots.Add(basicSeat);
+            else if (replace >= 0 && replace < skillSlots.Count) skillSlots[replace] = basicSeat;
+            else if (replace != BasicSeat) return false;
+            basicSeat = null;
+            return true;
+        }
+
+        // 세이브를 되살릴 때
+        public void RestoreBasicSeat(SkillSlot slot) => basicSeat = slot;
+
+        // 성유물을 빼서 공격 기술이 하나도 안 남으면 기본 기술로 돌아감
+        private void KeepAnAttackSkill()
+        {
+            if (basicSeat == null) return;
+            foreach (var skill in Skills)
+                if (skill.Kind == SkillKind.Damage) return;
+            basicSeat = null;
         }
 
         // ------------------------------------------------------------------ 성유물 모으기·끼우기
@@ -201,7 +258,11 @@ namespace WordRPG.Heroes
         }
 
         // 저장된 기술 칸을 되살릴 때 (성유물·기술문서를 먼저 되살린 뒤). 끼우지 않은 성유물·없는 문서는 건너뜀
-        public void ClearSkillSlots() => skillSlots.Clear();
+        public void ClearSkillSlots()
+        {
+            skillSlots.Clear();
+            basicSeat = null;
+        }
 
         public OwnedRelic SlotAt(int slot) => slot >= 0 && slot < slots.Length ? slots[slot] : null;
 
@@ -243,7 +304,9 @@ namespace WordRPG.Heroes
             slots[slot] = incoming;
             int skillIndex = outgoing != null ? skillSlots.FindIndex(s => s.Relic == outgoing) : -1;
             if (skillIndex >= 0) skillSlots[skillIndex] = new SkillSlot(incoming);
+            else if (outgoing != null && basicSeat?.Relic == outgoing) basicSeat = new SkillSlot(incoming);
             else if (HasSkillRoom) PlaceRelicSkill(incoming);
+            KeepAnAttackSkill();
             ClampHp();
             return true;
         }
@@ -255,6 +318,8 @@ namespace WordRPG.Heroes
             if (slot < 0) return false;
             slots[slot] = null;
             skillSlots.RemoveAll(s => s.Relic == relic);
+            if (basicSeat?.Relic == relic) basicSeat = null;
+            KeepAnAttackSkill();
             ClampHp();
             return true;
         }

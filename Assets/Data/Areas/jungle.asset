@@ -193,7 +193,7 @@ MonoBehaviour:
 
 '
   encounters: {fileID: 11400000, guid: 2df1216ce864f0140b486638ec355ba1, type: 2}
-  words: {fileID: 11400000, guid: b31fb12b453cd7d4b8a5439f9ea08080, type: 2}
+  words: {fileID: 11400000, guid: 5f371803871f9dd499e7cfff437b0665, type: 2}
   encounterRate: 0.12
   minStepsBetweenEncounters: 4
   encounterStyle: 1
@@ -273,9 +273,9 @@ MonoBehaviour:
     rewardRelic: {fileID: 11400000, guid: c1b6fa3bfe04f3f419423dc9bc22b3e6, type: 2}
     rewardItem: {fileID: 11400000, guid: 296875e2b8c144241a537aec31c871df, type: 2}
   bossKey: {fileID: 11400000, guid: 3754fc86bfc73ef42af9f87a064dbd92, type: 2}
-  bossGateWords: 40
+  bossGateWords: 80
   shrineCompanion: {fileID: 11400000, guid: 52ba6ccb4d7a2cf44b9de8c5f1a97d8f, type: 2}
-  shrineWords: 60
+  shrineWords: 100
   glowStoneRelic: {fileID: 0}
   requiresFullVersion: 1
   dictionaryName: "\uC815\uAE00\uC758 \uC0AC\uC804"

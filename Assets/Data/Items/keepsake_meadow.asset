@@ -14,9 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: WordRPG::WordRPG.Items.ItemData
   itemId: keepsake_meadow
   displayName: "\uB124\uC78E\uD074\uB85C\uBC84 \uCC45\uAC08\uD53C"
-  description: "\uCD08\uC6D0 \uB3C4\uAC10\uC744 \uC644\uC131\uD55C \uC99D\uD45C.
-    \uD589\uC6B4\uC744 \uBD80\uB974\uB294 \uB124\uC78E\uD074\uB85C\uBC84\uAC00 \uACF1\uAC8C
-    \uB20C\uB824 \uC788\uB2E4."
+  description: "\uCD08\uC6D0\uC5D0\uC11C \uB2E8\uC5B4\uB97C \uBAA8\uC544 \uBC1B\uC740 \uC99D\uD45C. \uD589\uC6B4\uC744 \uBD80\uB974\uB294 \uB124\uC78E\uD074\uB85C\uBC84\uAC00 \uACF1\uAC8C \uB20C\uB824 \uC788\uB2E4."
   kind: 2
   icon: {fileID: 0}
   placeholderColor: {r: 0.35, g: 0.8, b: 0.35, a: 1}

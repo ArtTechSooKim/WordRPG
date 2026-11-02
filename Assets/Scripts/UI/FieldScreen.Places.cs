@@ -84,7 +84,7 @@ namespace WordRPG.UI
                     break;
                 case BossGateState.NeedWords:
                     bubble.Say("보스를 상대하려면 새로운 단어로 힘을 모아야해", 4f,
-                        $"이 지역에서 발견한 단어 {BossGate.WordsFound(area, session)} / {area.BossGateWords}");
+                        $"{area.Words.RegionName} 단어 {BossGate.WordsFound(area, session)} / {area.BossGateWords}");
                     break;
                 case BossGateState.Ready:
                     if (!BossGate.TryOpen(area, session)) return;
@@ -174,7 +174,7 @@ namespace WordRPG.UI
             if (completed.Count > 0)
             {
                 SaveNow();
-                ShowToast($"★ {area.Words.RegionName} 도감 완성! 보상을 받았다", 3f);
+                ShowToast($"{completed[0].Headline} 보상을 받았다", 3f);
             }
             RefreshHud();
             interactCooldown = 0.5f;

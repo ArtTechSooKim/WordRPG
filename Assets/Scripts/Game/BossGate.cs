@@ -14,7 +14,8 @@ namespace WordRPG.Game
     }
 
     // 보스 방 문 (#76, 2026-10-16 사용자 결정): 맵에 숨겨 둔 열쇠(K)를 찾고 + 그 지역 단어를 40개 발견해야 보스 방(G)이 열린다.
-    // 플레이 시간을 늘리고 지역마다 단어를 충분히 만나게 하려는 것. 연 문은 세이브(WorldState.openedGates)에 남는다
+    // 플레이 시간을 늘리고 지역마다 단어를 충분히 만나게 하려는 것. 연 문은 세이브(WorldState.openedGates)에 남는다.
+    // 문을 열면 열쇠는 더 쓸 데가 없어서 소지품에서 사라진다 (#147)
     public static class BossGate
     {
         public static bool HasGate(FieldArea area) => area != null && area.Map.Find(FieldTile.Gate).HasValue;
@@ -27,6 +28,9 @@ namespace WordRPG.Game
 
         public static bool HasKey(FieldArea area, GameSession session) =>
             area.BossKey != null && session.Inventory.GetCount(area.BossKey) > 0;
+
+        // 열쇠를 이미 가져갔는지: 갖고 있거나, 문을 열어서 다 썼거나 → 받침대는 빈 모습 그대로
+        public static bool KeyTaken(FieldArea area, GameSession session) => HasKey(area, session) || IsOpen(area, session);
 
         public static BossGateState State(FieldArea area, GameSession session)
         {
@@ -45,13 +49,22 @@ namespace WordRPG.Game
         {
             if (State(area, session) != BossGateState.Ready) return false;
             session.World.MarkGateOpened(area.AreaId);
+            session.Inventory.TryRemove(area.BossKey);
             return true;
+        }
+
+        // 예전 세이브 (#147 전에 문을 연 사람): 다 쓴 열쇠가 소지품에 남아 있으면 치움. 불러올 때 지역마다 부름
+        public static void DiscardUsedKey(FieldArea area, GameSession session)
+        {
+            if (area.BossKey == null || !IsOpen(area, session)) return;
+            int left = session.Inventory.GetCount(area.BossKey);
+            if (left > 0) session.Inventory.TryRemove(area.BossKey, left);
         }
 
         // 열쇠 받침대 'K': 아직 없으면 열쇠를 얻는다. 반환값: 이번에 얻었는지
         public static bool TakeKey(FieldArea area, GameSession session)
         {
-            if (area.BossKey == null || HasKey(area, session)) return false;
+            if (area.BossKey == null || KeyTaken(area, session)) return false;
             session.Inventory.Add(area.BossKey);
             return true;
         }

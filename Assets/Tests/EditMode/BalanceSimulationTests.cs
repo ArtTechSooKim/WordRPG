@@ -130,19 +130,7 @@ namespace WordRPG.Tests
             }
         }
 
-        [Test]
-        public void JungleBossIsAChallengeButBeatable()
-        {
-            var boss = new[] { ("boss_blank_frog", 17) };
-            var (withAra, _, rounds) = Many(() => JungleHero(16), Ara, boss, 0.8);
-            var (alone, _, _) = Many(() => JungleHero(13), null, boss, 0.6);
-            Assert.Greater(withAra, 0.8f, $"레벨 16 + 아라, 정답률 80%면 이길 만해야 — {withAra:P0}");
-            Assert.Less(rounds, 15f, $"보스전이 너무 길지 않게 — 평균 {rounds:0.0}라운드");
-            Assert.Less(alone, 0.8f, $"숲 직후 레벨 혼자·정답률 60%면 쉽지 않아야 — {alone:P0}");
-        }
-
-        // 1.2 어두운 밀림 동굴 (#115): 정글 보스를 이긴 주인공(Lv17, 글자 구슬·지팡이·조롱박) + 아라 — 일반 전투는 대부분 이기고,
-        // 보스 말줄임덩굴 Lv20은 레벨을 좀 올리면 이길 만해야 (정글과 같은 기준)
+        // 1.2 어두운 밀림 동굴 (#115): 정글 보스를 이긴 주인공(Lv17, 글자 구슬·지팡이·조롱박) + 아라 — 일반 전투는 대부분 이김
         private static Hero CaveHero(int level) => MakeHero(level, ("relic_letter_gem", 1), ("relic_wand", 2), ("relic_gourd", 1));
 
         [Test]
@@ -154,17 +142,6 @@ namespace WordRPG.Tests
                 var (win, _, _) = Many(() => CaveHero(17), Ara, group, 0.75);
                 Assert.Greater(win, 0.85f, $"정답률 75%로 {string.Join(",", group)} — 이긴 비율 {win:P0}");
             }
-        }
-
-        [Test]
-        public void CaveBossIsAChallengeButBeatable()
-        {
-            var boss = new[] { ("boss_ellipsis_vine", 20) };
-            var (withAra, _, rounds) = Many(() => CaveHero(19), Ara, boss, 0.8);
-            var (alone, _, _) = Many(() => CaveHero(17), null, boss, 0.6);
-            Assert.Greater(withAra, 0.8f, $"레벨 19 + 아라, 정답률 80%면 이길 만해야 — {withAra:P0}");
-            Assert.Less(rounds, 15f, $"보스전이 너무 길지 않게 — 평균 {rounds:0.0}라운드");
-            Assert.Less(alone, 0.8f, $"정글 직후 레벨 혼자·정답률 60%면 쉽지 않아야 — {alone:P0}");
         }
 
         // 헷갈너구리 (#144 사용자: 서고 보스보다 너무 약함 — 비슷하거나 더 어렵게): 보스보다 같은 만큼 높은 레벨·같은 강화로 맞붙어 비교한다
@@ -182,6 +159,12 @@ namespace WordRPG.Tests
                 .Max(s => BattleFormulas.ExpectedDamage(s.Power, boss.Stats.Attack, hero.Stats.Defense)) / (float)hero.Stats.MaxHp;
         }
 
+        private static Hero JungleBossHero(int level, int wand, int whip, int leaf) =>
+            MakeHero(level, ("relic_wand", wand), ("relic_whip", whip), ("relic_leaf", leaf));
+
+        private static Hero CaveBossHero(int level, int gem, int wand, int gourd) =>
+            MakeHero(level, ("relic_letter_gem", gem), ("relic_wand", wand), ("relic_gourd", gourd));
+
         [Test]
         public void ForestBossIsAtLeastAsHardAsTheLibraryBoss()
         {
@@ -197,6 +180,41 @@ namespace WordRPG.Tests
             }
             Assert.Greater(BiggestHitShare("boss_muddle_raccoon", 12, MakeHero(14, ("relic_quill", 5), ("relic_lantern", 5), ("relic_book", 5))), 0.4f,
                 "+5 셋 Lv14(사용자가 쉽다고 한 상태)에도 큰 한 방은 HP의 40% 넘게");
+        }
+
+        private static int HitsToDefeat(string speciesId, int bossLevel, Hero hero)
+        {
+            var boss = new MonsterInstance(Load<MonsterSpecies>($"Monsters/{speciesId}.asset"), bossLevel);
+            int best = hero.Skills.Where(s => s.Kind == SkillKind.Damage).Max(s => BattleFormulas.ExpectedDamage(s.Power, hero.Stats.Attack, boss.Stats.Defense));
+            return (int)Math.Ceiling((double)boss.Stats.MaxHp / best);
+        }
+
+        // 보스는 뒤로 갈수록 어렵게 (#147 사용자): 보스보다 같은 만큼 높은 레벨·같은 강화로 맞붙으면 큰 한 방이 내 HP에서 차지하는 몫이 커지고,
+        // 정글부터는 쓰러뜨리는 데 드는 대수도 많아짐. 그래도 HP가 가득하면 한 방에 쓰러지지는 않음.
+        // 이기는 비율은 보지 않음 — 시뮬레이션은 강도 고르기·상처약을 안 써서 서고 보스부터 거의 0% (체감은 휴대폰에서)
+        [Test]
+        public void BossesGetHarderInStoryOrder()
+        {
+            foreach (var (gap, a, b, c) in new[] { (3, 2, 1, 1), (5, 3, 2, 2), (7, 5, 3, 3) })
+            {
+                var bosses = new (string id, int level, Hero hero)[]
+                {
+                    ("boss_forget_king", 7, LibraryBossHero(7 + gap, a, b, c)),
+                    ("boss_muddle_raccoon", 12, ForestBossHero(12 + gap, a, b, c)),
+                    ("boss_blank_frog", 17, JungleBossHero(17 + gap, a, b, c)),
+                    ("boss_ellipsis_vine", 20, CaveBossHero(20 + gap, a, b, c)),
+                };
+                for (int i = 0; i < bosses.Length; i++)
+                {
+                    var (id, level, hero) = bosses[i];
+                    float hit = BiggestHitShare(id, level, hero);
+                    Assert.Less(hit, 1f, $"{id} ({gap}레벨 위): 가득 찬 HP를 한 방에 깎으면 안 됨");
+                    if (i == 0) continue;
+                    var before = bosses[i - 1];
+                    Assert.Greater(hit, BiggestHitShare(before.id, before.level, before.hero), $"{id} ({gap}레벨 위): 큰 한 방이 앞 보스보다 세야");
+                    if (i >= 2) Assert.Greater(HitsToDefeat(id, level, hero), HitsToDefeat(before.id, before.level, before.hero), $"{id} ({gap}레벨 위): 쓰러뜨리는 데 앞 보스보다 오래 걸려야");
+                }
+            }
         }
 
         // 레벨 차이 경험치 (#88): 몬스터보다 높을수록 한 레벨에 25%씩 줄고 5%에서 멈춤
@@ -278,13 +296,18 @@ namespace WordRPG.Tests
                 ("헷갈너구리 Lv12 vs Lv17 (+3·+2·+2)", "boss_muddle_raccoon", 12, () => ForestBossHero(17, 3, 2, 2)),
                 ("헷갈너구리 Lv12 vs Lv19 (+5·+3·+3)", "boss_muddle_raccoon", 12, () => ForestBossHero(19, 5, 3, 3)),
                 ("헷갈너구리 Lv12 vs Lv14 (+5 셋 — 사용자)", "boss_muddle_raccoon", 12, () => MakeHero(14, ("relic_quill", 5), ("relic_lantern", 5), ("relic_book", 5))),
-                ("빈칸두꺼비 Lv17 vs Lv16 + 아라", "boss_blank_frog", 17, () => JungleHero(16)),
-                ("말줄임덩굴 Lv20 vs Lv19 + 아라", "boss_ellipsis_vine", 20, () => CaveHero(19)),
+                ("빈칸두꺼비 Lv17 vs Lv20 (+2·+1·+1)", "boss_blank_frog", 17, () => JungleBossHero(20, 2, 1, 1)),
+                ("빈칸두꺼비 Lv17 vs Lv22 (+3·+2·+2)", "boss_blank_frog", 17, () => JungleBossHero(22, 3, 2, 2)),
+                ("빈칸두꺼비 Lv17 vs Lv24 (+5·+3·+3)", "boss_blank_frog", 17, () => JungleBossHero(24, 5, 3, 3)),
+                ("말줄임덩굴 Lv20 vs Lv23 (+2·+1·+1)", "boss_ellipsis_vine", 20, () => CaveBossHero(23, 2, 1, 1)),
+                ("말줄임덩굴 Lv20 vs Lv25 (+3·+2·+2)", "boss_ellipsis_vine", 20, () => CaveBossHero(25, 3, 2, 2)),
+                ("말줄임덩굴 Lv20 vs Lv27 (+5·+3·+3)", "boss_ellipsis_vine", 20, () => CaveBossHero(27, 5, 3, 3)),
             };
             foreach (var (label, id, level, make) in bossRows)
             {
                 Threat(label, id, level, make);
                 foreach (double acc in new[] { 0.6, 0.8 }) Row("  " + label, make, null, new[] { (id, level) }, acc);
+                if (id == "boss_blank_frog" || id == "boss_ellipsis_vine") Row("  " + label + " + 아라", make, Ara, new[] { (id, level) }, 0.8);
             }
             foreach (double acc in new[] { 0.6, 0.8 })
             {

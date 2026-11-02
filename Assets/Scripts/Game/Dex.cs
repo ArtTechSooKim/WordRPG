@@ -21,18 +21,28 @@ namespace WordRPG.Game
         }
     }
 
-    // 지역 도감 완성 보상이 지급된 기록 (결과 화면 표시용)
+    // 도감 보상이 지급된 기록 (결과 화면 표시용)
     public class DexCompletion
     {
         public WordDatabase Region { get; }
-        public ItemData Keepsake { get; }
-        public int Gold { get; }
+        public DexReward Reward { get; }
+        public ItemData Keepsake => Reward.Keepsake;
+        public int Gold => Reward.Gold;
 
-        public DexCompletion(WordDatabase region)
+        public DexCompletion(WordDatabase region, DexReward reward)
         {
             Region = region;
-            Keepsake = region.CompletionKeepsake;
-            Gold = region.CompletionGold;
+            Reward = reward;
+        }
+
+        // 단어장을 다 채웠으면 도감 완성, 중간 보상이면 찾은 단어 수
+        public string Headline
+        {
+            get
+            {
+                int needed = Reward.WordsNeeded(Region.Words.Count);
+                return needed >= Region.Words.Count ? $"★ {Region.RegionName} 도감 완성!" : $"★ 단어 {needed}개 발견!";
+            }
         }
     }
 
@@ -49,6 +59,17 @@ namespace WordRPG.Game
                 if (level == MasteryLevel.Mastered) mastered++;
             }
             return new DexProgress(discovered, region.Words.Count, mastered);
+        }
+
+        public static bool IsEarned(DexReward reward, DexProgress progress) =>
+            progress.Total > 0 && progress.Discovered >= reward.WordsNeeded(progress.Total);
+
+        // 아직 안 받은 보상 중 가장 먼저 받을 것. 다 받았으면 null
+        public static DexReward NextReward(WordDatabase region, PlayerRecord record)
+        {
+            foreach (var reward in region.Rewards)
+                if (!record.HasClaimedRegion(reward.RegionId)) return reward;
+            return null;
         }
 
         // 학습 ★☆☆☆ ... 완전 숙련 ★★★★. 미발견은 빈 문자열

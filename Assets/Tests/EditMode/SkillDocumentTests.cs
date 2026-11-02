@@ -48,6 +48,88 @@ namespace WordRPG.Tests
             return session;
         }
 
+        // 휘두르기도 바꿔 넣기 (#147 사용자): 전투 기술 4칸 모두 바꿀 수 있음
+        [Test]
+        public void TheBasicSkillSeatCanBeSwappedAndPutBack()
+        {
+            var session = FullSession();
+            var hero = session.Hero;
+            session.Inventory.Add(cramDoc);
+
+            Assert.IsTrue(hero.UsesBasicSkill);
+            Assert.IsTrue(session.LearnSkill(cramDoc, Hero.BasicSeat));
+            CollectionAssert.AreEqual(new[] { cram, splash, shield, light }, hero.Skills.ToArray(), "휘두르기 자리에 벼락치기");
+            Assert.IsFalse(hero.UsesBasicSkill);
+            Assert.IsTrue(hero.Knows(cramDoc));
+            Assert.AreSame(cramDoc, hero.SourceOf(cram).Document);
+
+            Assert.IsTrue(hero.PutBackBasicSkill(1), "책 방패를 빼고 휘두르기를 다시 넣음");
+            CollectionAssert.AreEqual(new[] { heroData.BasicSkill, splash, cram, light }, hero.Skills.ToArray(), "벼락치기는 빠진 칸으로 옮겨 감");
+            Assert.IsTrue(hero.UsesBasicSkill);
+            Assert.IsFalse(hero.PutBackBasicSkill(0), "이미 있음");
+
+            session.Inventory.Add(sweepDoc);
+            session.LearnSkill(sweepDoc, Hero.BasicSeat);
+            Assert.IsTrue(hero.PutBackBasicSkill(Hero.BasicSeat), "기본 기술 자리의 기술을 뺌");
+            CollectionAssert.AreEqual(new[] { heroData.BasicSkill, splash, cram, light }, hero.Skills.ToArray());
+        }
+
+        // 뺀 성유물의 기술이 기본 기술 자리에 있었으면 그 자리는 휘두르기로 돌아감. 바꿔 끼우면 새 성유물 기술이 같은 자리에
+        [Test]
+        public void RemovingARelicInTheBasicSeatBringsTheBasicSkillBack()
+        {
+            var session = FullSession();
+            var hero = session.Hero;
+            session.Inventory.Add(cramDoc);
+            session.LearnSkill(cramDoc, 0); // 잉크 뿌리기가 칸에서 빠짐
+            var quillOwned = hero.Find(quill);
+            Assert.IsTrue(hero.PlaceRelicSkill(quillOwned, Hero.BasicSeat));
+            Assert.AreSame(splash, hero.Skills[0]);
+            Assert.IsTrue(hero.HasSkillOf(quillOwned));
+
+            Assert.IsTrue(hero.Unequip(quillOwned));
+            Assert.IsTrue(hero.UsesBasicSkill);
+            Assert.AreSame(heroData.BasicSkill, hero.Skills[0]);
+        }
+
+        // 공격 기술은 하나 남음: 회복·보호막만 들고 갈 수 없음. 뺀 성유물 때문에 없어지면 휘두르기가 돌아옴
+        [Test]
+        public void AnAttackSkillAlwaysStays()
+        {
+            var healA = Document("doc_heal_a", TestData.Skill("heal_a", SkillKind.Heal, SkillTarget.AllAllies, 5));
+            var session = FullSession();
+            var hero = session.Hero;
+            session.Inventory.Add(healA);
+            // 지금: 휘두르기(공격) · 잉크 뿌리기(공격) · 방패 · 빛
+            Assert.IsTrue(session.LearnSkill(healA, Hero.BasicSeat), "잉크 뿌리기가 남으니 휘두르기를 회복으로 바꿀 수 있음");
+            CollectionAssert.AreEqual(new[] { healA.TaughtSkill, splash, shield, light }, hero.Skills.ToArray());
+            Assert.IsFalse(hero.CanReplace(0, shield), "마지막 공격 기술은 회복·보호막으로 못 바꿈");
+            Assert.IsTrue(hero.CanReplace(0, cram), "공격 기술로는 바꿀 수 있음");
+
+            Assert.IsTrue(hero.Unequip(hero.Find(quill)), "공격 기술을 가진 성유물을 뺌");
+            Assert.IsTrue(hero.UsesBasicSkill, "공격 기술이 없어지면 휘두르기가 돌아옴");
+            Assert.AreSame(heroData.BasicSkill, hero.Skills[0]);
+        }
+
+        [Test]
+        public void TheBasicSeatSurvivesSavingAndOldSavesKeepTheBasicSkill()
+        {
+            var session = FullSession();
+            session.Inventory.Add(cramDoc);
+            session.LearnSkill(cramDoc, Hero.BasicSeat);
+            var database = ScriptableObject.CreateInstance<GameDatabase>();
+            database.ReplaceContents(new MonsterSpecies[0], new[] { cramDoc, sweepDoc, potion }, new FieldArea[0], new[] { quill, book, lantern });
+
+            var data = SaveTestsHelper.RoundTrip(session.ToSaveData(new DateTime(2026, 11, 3, 0, 0, 0, DateTimeKind.Utc)));
+            StringAssert.Contains("doc:skilldoc_cram", data.ToJson());
+            var loaded = GameSession.FromSaveData(data, database, heroData);
+            CollectionAssert.AreEqual(new[] { cram, splash, shield, light }, loaded.Hero.Skills.ToArray(), "자리 그대로");
+            Assert.AreEqual(0, loaded.LoadWarnings.Count);
+
+            var old = GameSession.FromSaveData(Save.SaveData.FromJson(data.ToJson().Replace("\"basicSeat\": \"doc:skilldoc_cram\"", "\"basicSeat\": \"\"")), database, heroData);
+            Assert.IsTrue(old.Hero.UsesBasicSkill, "칸이 비어 있는 예전 세이브 = 기본 기술");
+        }
+
         [Test]
         public void RelicSkillsFillTheThreeSkillSlotsLikeBefore()
         {

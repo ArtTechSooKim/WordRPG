@@ -160,21 +160,25 @@ namespace WordRPG.Game
         public bool LearnSkill(ItemData document, int replace = -1) =>
             document != null && document.IsSkillDocument && Inventory.GetCount(document) > 0 && Hero.LearnSkill(document, replace);
 
-        // 도감을 모두 채운 지역의 보상(징표 + 골드)을 지급한다. 지역당 한 번만 — 이미 받은 지역은 건너뜀.
+        // 단어를 정해진 수만큼 발견한 도감 보상(징표 + 골드)을 지급한다 (#147 — 단어장 하나에 보상 여러 개). 보상마다 한 번만.
         // 나중에 단어가 추가돼 완성률이 내려가도 받은 보상은 그대로 유지
         public List<DexCompletion> ClaimDexRewards(IEnumerable<WordDatabase> regions)
         {
             var completed = new List<DexCompletion>();
             foreach (var region in regions)
             {
-                if (region == null || string.IsNullOrEmpty(region.RegionId)) continue;
-                if (Record.HasClaimedRegion(region.RegionId)) continue;
-                if (!Dex.GetProgress(region, Vocabulary).IsComplete) continue;
+                if (region == null) continue;
+                var progress = Dex.GetProgress(region, Vocabulary);
+                foreach (var reward in region.Rewards)
+                {
+                    if (string.IsNullOrEmpty(reward.RegionId) || Record.HasClaimedRegion(reward.RegionId)) continue;
+                    if (!Dex.IsEarned(reward, progress)) continue;
 
-                Record.MarkRegionClaimed(region.RegionId);
-                if (region.CompletionKeepsake != null) Inventory.Add(region.CompletionKeepsake);
-                if (region.CompletionGold > 0) Inventory.AddGold(region.CompletionGold);
-                completed.Add(new DexCompletion(region));
+                    Record.MarkRegionClaimed(reward.RegionId);
+                    if (reward.Keepsake != null) Inventory.Add(reward.Keepsake);
+                    if (reward.Gold > 0) Inventory.AddGold(reward.Gold);
+                    completed.Add(new DexCompletion(region, reward));
+                }
             }
             return completed;
         }
@@ -236,7 +240,7 @@ namespace WordRPG.Game
             foreach (var companion in companions)
                 savedCompanions.Add(new CompanionSaveData(companion.Data.CompanionId, companion.Level, companion.Exp, companion.CurrentHp));
             return new SaveData(nowUtc, new HeroSaveData(Hero.Level, Hero.Exp, Hero.CurrentHp), relics,
-                    Inventory, Vocabulary, Record, World).WithSkillSlots(skills).WithTutorials(Tutorials.Seen)
+                    Inventory, Vocabulary, Record, World).WithSkillSlots(skills, Hero.BasicSeatSlot?.Key).WithTutorials(Tutorials.Seen)
                 .WithNotices(Notices.Seen).WithCompanions(savedCompanions, PartyCompanion?.Data.CompanionId).WithHeroLook(Hero.CustomName, Hero.LookId)
                 .WithPotionEffects(Effects.NewWordsLeft, Effects.QuietStepsLeft);
         }
@@ -300,6 +304,9 @@ namespace WordRPG.Game
             session.Effects = new PotionEffects(data.NewWordsLeft, data.QuietStepsLeft);
             RestoreCompanions(session, data, database, warnings);
             session.loadWarnings.AddRange(warnings);
+            if (database != null)
+                foreach (var area in database.Areas)
+                    if (area != null) BossGate.DiscardUsedKey(area, session); // 예전 세이브에 남은 다 쓴 열쇠 (#147)
             return session;
         }
 
@@ -327,6 +334,8 @@ namespace WordRPG.Game
         private static void RestoreSkillSlots(Hero hero, SaveData data, GameDatabase database, List<string> warnings)
         {
             hero.ClearSkillSlots();
+            var seat = SlotFromKey(hero, data.BasicSeat, database); // 먼저 — 그래야 그 기술이 기술 칸에 또 들어가지 않음
+            if (seat != null && (seat.Relic == null || hero.IsEquipped(seat.Relic))) hero.RestoreBasicSeat(seat);
             foreach (var key in data.SkillSlots)
             {
                 if (key == null) continue;
@@ -343,6 +352,20 @@ namespace WordRPG.Game
                         warnings.Add($"세이브의 기술 '{key}'를 찾을 수 없어 기술 칸에서 뺐습니다");
                 }
             }
+        }
+
+        private static SkillSlot SlotFromKey(Hero hero, string key, GameDatabase database)
+        {
+            if (string.IsNullOrEmpty(key) || database == null) return null;
+            if (key.StartsWith("relic:"))
+            {
+                var relic = database.FindRelic(key.Substring(6));
+                var owned = relic != null ? hero.Find(relic) : null;
+                return owned != null ? new SkillSlot(owned) : null;
+            }
+            if (!key.StartsWith("doc:")) return null;
+            var document = database.FindItem(key.Substring(4));
+            return document != null && document.IsSkillDocument ? new SkillSlot(document) : null;
         }
 
         private static Hero CreateHero(HeroData heroData, int level)

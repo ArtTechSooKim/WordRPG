@@ -2,11 +2,12 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using WordRPG.Battle;
 using WordRPG.Game;
 
 namespace WordRPG.UI
 {
-    // 설정 (Figma '설정 (#37)'): 소리(배경 음악·효과음), 진동, [튜토리얼 다시 보기] [입장 영상 다시 보기](#138), [처음부터 다시 하기], 정식판, 정보.
+    // 설정 (Figma '설정 — 전투 강도 (#147)'): 소리(배경 음악·효과음), 전투 강도, 진동, [튜토리얼 다시 보기] [입장 영상 다시 보기](#138), [처음부터 다시 하기], 정식판, 정보.
     // 정식판 칸 (#63, 앱스토어 심사 대비): 언제든 [정식판 보기](정식판 안내 창)와 [구매 복원] — 숲 입구까지 가지 않아도 살 수 있고 되찾을 수 있다.
     // 값을 바꿀 때마다 onSettingsChanged로 저장. 처음부터는 실수로 지우지 않게 확인 창을 두 번 거쳐야 onDeleteSave
     // ('설정 — 처음부터 1차/2차 확인 (#37)')
@@ -17,6 +18,8 @@ namespace WordRPG.UI
         public ConfirmDialog Dialog { get; private set; }
 
         private Slider music, sfx;
+        private readonly System.Collections.Generic.List<Button> intensityOptions = new System.Collections.Generic.List<Button>();
+        private Text intensitySub;
         private SwitchView vibration;
         private GameSettings settings;
         private Action onSettingsChanged;
@@ -52,7 +55,7 @@ namespace WordRPG.UI
             UiKit.Display(UiKit.Label("Title", root, "설정", 56, Palette.Gold, 0, 0.93f, 1, 0.99f));
 
             // 소리
-            var sound = Section(root, "소리", 0.775f, 0.915f);
+            var sound = Section(root, "소리", 0.79f, 0.915f);
             Row(sound, "music", "배경 음악", null, 0.47f, 0.71f);
             view.music = UiKit.MakeSlider("MusicSlider", sound, 0.44f, 0.47f, 0.965f, 0.71f);
             view.music.onValueChanged.AddListener(v => view.Change(s => s.MusicVolume = v, false));
@@ -62,8 +65,10 @@ namespace WordRPG.UI
             view.sfx.onValueChanged.AddListener(v => view.Change(s => s.SfxVolume = v, false));
             view.SaveOnRelease(view.sfx);
 
+            view.BuildIntensity(Section(root, "전투 강도", 0.695f, 0.78f));
+
             // 게임: 진동 + 튜토리얼 다시 보기 · 입장 영상 다시 보기 (두 버튼 배치는 아래 정식판 칸과 같음)
-            var game = Section(root, "게임", 0.6f, 0.76f);
+            var game = Section(root, "게임", 0.545f, 0.685f);
             Row(game, null, "진동", "틀렸을 때 짧게 떨려요", 0.43f, 0.8f);
             view.vibration = SwitchView.Create("VibrationSwitch", game, 0.84f, 0.5f, 0.965f, 0.73f);
             view.replayButton = UiKit.MakeButton("TutorialReplayButton", game, "튜토리얼 다시 보기", Palette.Neutral, 38,
@@ -74,13 +79,13 @@ namespace WordRPG.UI
             view.introReplayButton.onClick.AddListener(view.ReplayIntro);
 
             // 저장: 자동 저장 안내 + 처음부터 다시 하기
-            var save = Section(root, "저장", 0.43f, 0.585f);
+            var save = Section(root, "저장", 0.4f, 0.535f);
             Row(save, null, "자동 저장", "답할 때마다, 전투가 끝날 때마다 저절로 저장돼요", 0.44f, 0.8f);
             var restart = UiKit.MakeButton("RestartButton", save, "처음부터 다시 하기", Palette.Confirm, 42, 0.035f, 0.08f, 0.965f, 0.38f);
             restart.onClick.AddListener(view.AskRestart);
 
             // 정식판: 상태 한 줄 + [정식판 보기] [구매 복원]
-            var full = Section(root, "정식판", 0.27f, 0.415f);
+            var full = Section(root, "정식판", 0.255f, 0.39f);
             view.purchaseSection = full.gameObject;
             view.purchaseTitle = UiKit.Label("Label_정식판", full, "", 34, Palette.Text, 0.035f, 0.58f, 0.965f, 0.8f,
                 TextAnchor.LowerLeft, FontStyle.Bold);
@@ -93,7 +98,7 @@ namespace WordRPG.UI
             view.restoreButton.onClick.AddListener(view.Restore);
 
             // 정보
-            var info = Section(root, "정보", 0.11f, 0.255f);
+            var info = Section(root, "정보", 0.11f, 0.245f);
             UiKit.Label("Version", info, $"버전 {Application.version}", 28, Palette.TextDim, 0.035f, 0.4f, 0.965f, 0.66f,
                 TextAnchor.MiddleLeft);
             UiKit.Label("Fonts", info, "글꼴  Jua · Noto Sans KR — SIL Open Font License 1.1", 28, Palette.TextDim,
@@ -105,6 +110,42 @@ namespace WordRPG.UI
             view.Dialog = ConfirmDialog.Create(root);
             view.Root.SetActive(false);
             return view;
+        }
+
+        // 전투 강도 (#147 사용자): [매번 고르기] 또는 ×1 ~ ×2 중 하나. 고르면 전투에서 강도를 묻지 않고 그 강도로 공격
+        private void BuildIntensity(RectTransform section)
+        {
+            intensitySub = UiKit.OneLine(UiKit.Label("IntensitySub", section, "", 24, Palette.TextDim, 0.3f, 0.66f, 0.965f, 0.96f, TextAnchor.MiddleRight));
+            var config = new BattleConfig();
+            const float first = 0.285f, gap = 0.012f;
+            float w = (0.93f - first - config.MaxIntensity * gap) / config.MaxIntensity;
+            for (int i = 0; i <= config.MaxIntensity; i++)
+            {
+                float minX = i == 0 ? 0.035f : 0.035f + first + gap + (i - 1) * (w + gap);
+                float maxX = i == 0 ? 0.035f + first : minX + w;
+                string label = i == 0 ? "매번 고르기" : "×" + config.IntensityMultiplier(i).ToString("0.##");
+                var button = UiKit.MakeButton($"IntensityOption_{i}", section, label, Palette.Neutral, 34, minX, 0.09f, maxX, 0.62f);
+                int value = i;
+                button.onClick.AddListener(() =>
+                {
+                    Change(s => s.BattleIntensity = value);
+                    RefreshIntensity();
+                });
+                intensityOptions.Add(button);
+            }
+        }
+
+        private void RefreshIntensity()
+        {
+            int chosen = Mathf.Clamp(settings.BattleIntensity, 0, intensityOptions.Count - 1);
+            for (int i = 0; i < intensityOptions.Count; i++)
+            {
+                UiKit.SetColor(intensityOptions[i], i == chosen ? Palette.Gold : Palette.Neutral);
+                UiKit.LabelOf(intensityOptions[i]).color = i == chosen ? Palette.OnAccent : Palette.Text;
+            }
+            intensitySub.text = chosen == 0 ? "공격할 때마다 골라요"
+                : chosen == 1 ? "늘 이 강도로 — 단어 1개를 맞히면 발동"
+                : $"늘 이 강도로 — 단어 {chosen}개를 모두 맞혀야 발동";
         }
 
         // 둥근 판 + 금색 소제목
@@ -158,6 +199,7 @@ namespace WordRPG.UI
             music.SetValueWithoutNotify(settings.MusicVolume);
             sfx.SetValueWithoutNotify(settings.SfxVolume);
             vibration.Bind(settings.Vibration, on => Change(s => s.Vibration = on));
+            RefreshIntensity();
             Dialog.Hide();
             Root.transform.SetAsLastSibling();
             Root.SetActive(true);

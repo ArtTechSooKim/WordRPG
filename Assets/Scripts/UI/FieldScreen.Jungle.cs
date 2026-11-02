@@ -183,7 +183,7 @@ namespace WordRPG.UI
                     bubble.Say("석판의 빈칸을 먼저 채워야 할 것 같다", 3.5f, $"채운 석판 {solved} / {total}");
                     break;
                 case ShrineState.NeedWords:
-                    bubble.Say("메아리가 아직 약하다…\n정글 단어를 더 모으자", 4f, $"{region}에서 발견한 단어 {BossGate.WordsFound(area, session)} / {area.ShrineWords}");
+                    bubble.Say("메아리가 아직 약하다…\n새 단어를 더 모으자", 4f, $"{region}에서 발견한 단어 {BossGate.WordsFound(area, session)} / {area.ShrineWords}");
                     break;
                 case ShrineState.Ready:
                     StartCoroutine(AwakenShrine(cell));
@@ -210,7 +210,7 @@ namespace WordRPG.UI
             DrawProps(area);
             AfterFieldChange();
             // 넓은 정글에서 보스 방 열쇠 찾기 힌트 (GDD 9-6) — 아라는 대사가 없는 동료라 주인공 혼잣말로 (#126 사용자: 아라 비중 줄이기)
-            if (companion != null && BossGate.HasGate(area) && !BossGate.HasKey(area, session))
+            if (companion != null && BossGate.HasGate(area) && !BossGate.KeyTaken(area, session))
                 bubble.Say("제단에 열쇠 그림이 새겨져 있다…\n강 건너 동쪽 기슭을 가리키는 것 같다", 6f);
         }
 

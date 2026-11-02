@@ -13,7 +13,7 @@ namespace WordRPG.Game
         FindKey,     // 이 지역 보스 방 문이 잠겼고 열쇠가 없음 (#76) — 열쇠 자리는 별로 알려 주지 않는다 (찾는 재미)
         GatherWords, // 열쇠는 있지만 이 지역 단어를 덜 발견함 (#76)
         OpenGate,    // 문을 열 수 있음 (#76) — 문에 별
-        // 유적 (#87, 정글 — 동료는 선택이라 열쇠를 찾기 전까지만 보여 줌. 열쇠를 찾으면 위의 보스 목표로)
+        // 유적 (#87, 정글 — #147부터 보스 목표와 나란히 둘째 줄 Objectives.Side)
         SolveTablets,  // 유적의 석판을 채우자 n/4 — 아직 안 푼 석판에 별
         GatherEcho,    // 석판은 다 풀었고 이 지역 단어가 모자람 → 단어를 모아 메아리를 깨우자 n/60
         WakeCompanion, // 다 갖춤 → 유적 제단에서 동료를 깨우자 — 제단에 별
@@ -73,23 +73,29 @@ namespace WordRPG.Game
             return new Objective(ObjectiveKind.FillDex);
         }
 
-        // 지금 지역 보스: 보스 방 문이 잠겼으면 문부터 (#76). 유적이 있는 지역은 열쇠를 찾기 전까지 유적 먼저 (#87 —
-        // 깨어난 동료가 열쇠 자리를 알려 주는 흐름, GDD 9-6). 동료는 선택이라 열쇠를 먼저 찾으면 바로 보스 목표로
+        // 둘째 줄 (#147 사용자: 정글에서 유적과 보스 목표가 둘 다 보이게): 지금 지역에 아직 안 깨운 동료가 있으면 유적 단계. 없으면 null
+        public static Objective? Side(GameSession session, FieldArea current)
+        {
+            if (session == null || current == null || session.Record.BattlesFought == 0) return null;
+            switch (Ruins.State(current, session))
+            {
+                case ShrineState.NeedTablets:
+                    foreach (var tablet in Ruins.Tablets(current))
+                        if (!Ruins.IsTabletSolved(current, session.World, tablet))
+                            return new Objective(ObjectiveKind.SolveTablets, null, current, tablet);
+                    return null;
+                case ShrineState.NeedWords: return new Objective(ObjectiveKind.GatherEcho, null, current);
+                case ShrineState.Ready: return new Objective(ObjectiveKind.WakeCompanion, null, current, current.Map.Find(FieldTile.Shrine));
+                default: return null;
+            }
+        }
+
+        // 지금 지역 보스: 보스 방 문이 잠겼으면 문부터 (#76). 반딧돌이 있는 지역은 열쇠를 찾기 전까지 반딧돌 먼저 (#113)
         private static Objective BossObjective(GameSession session, FieldArea area)
         {
             var gate = BossGate.State(area, session);
             if (gate == BossGateState.NeedKey)
             {
-                switch (Ruins.State(area, session))
-                {
-                    case ShrineState.NeedTablets:
-                        foreach (var tablet in Ruins.Tablets(area))
-                            if (!Ruins.IsTabletSolved(area, session.World, tablet))
-                                return new Objective(ObjectiveKind.SolveTablets, null, area, tablet);
-                        break;
-                    case ShrineState.NeedWords: return new Objective(ObjectiveKind.GatherEcho, null, area);
-                    case ShrineState.Ready: return new Objective(ObjectiveKind.WakeCompanion, null, area, area.Map.Find(FieldTile.Shrine));
-                }
                 int stones = GlowStones.Stones(area).Count;
                 if (stones > 0 && GlowStones.LitCount(area, session.World) < stones) return new Objective(ObjectiveKind.LightStones, null, area);
             }

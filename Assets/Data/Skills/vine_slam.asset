@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: WordRPG::WordRPG.Monsters.SkillData
   skillId: vine_slam
   displayName: "\uB369\uAD74 \uD6C4\uB824\uCE58\uAE30"
-  description: "\uAD75\uC740 \uB369\uAD74\uB85C \uD798\uAECF \uD6C4\uB824\uCE5C\uB2E4."
+  description: "\uAD75\uC740 \uB369\uAD74\uC5D0 \uD798\uC744 \uC794\uB729 \uBAA8\uC558\uB2E4\uAC00 \uB0B4\uB9AC\uCE5C\uB2E4."
   kind: 0
   target: 0
-  power: 44
+  power: 310
+  chargeTurns: 1
   quizDirection: 0
   fx: 3

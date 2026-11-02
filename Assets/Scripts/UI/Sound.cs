@@ -10,7 +10,7 @@ namespace WordRPG.UI
     {
         Click, Correct, Wrong, Hit, Critical, Heal, Shield, Fail, Faint, Encounter,
         Victory, Defeat, LevelUp, NewWord, Coin, Fountain, EvolveLight, Evolve, DexComplete, Door,
-        GateOpen, Combo, Respawn, Flee
+        GateOpen, Combo, Respawn, Flee, Preempt
     }
 
     // 배경 음악·효과음 (Ninja Adventure 팩 → Resources/Audio/Music·Sfx, 파일 이름 = 열거형 이름 소문자).

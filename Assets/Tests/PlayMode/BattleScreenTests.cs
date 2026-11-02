@@ -339,7 +339,7 @@ namespace WordRPG.Tests
             var keepsake = TestData.Item("keepsake_test").Set("displayName", "시험 징표");
             var oneWord = ScriptableObject.CreateInstance<WordDatabase>()
                 .Set("regionId", "test").Set("regionName", "시험 지역")
-                .Set("completionKeepsake", keepsake).Set("completionGold", 777);
+                .Set("rewards", new List<DexReward> { new DexReward("test", "시험 지역", keepsake, 777) });
             oneWord.ReplaceWords(new List<WordEntry> { new WordEntry("", "abandon", "버리다, 포기하다", "v") });
 
             var session = GameSession.NewGame(hero, 1);
@@ -503,6 +503,33 @@ namespace WordRPG.Tests
             Assert.IsNotNull(ActiveButton(screen.transform, "Intensity_0"), "다음은 강도");
             Assert.AreEqual(homeY, enemy.position.y, 0.5f, "고른 뒤 제자리");
             Object.Destroy(screen.gameObject);
+        }
+
+        // 설정에서 강도를 정해 두면 묻지 않고 그 강도로 공격 (#147 사용자)
+        [UnityTest]
+        public IEnumerator FixedIntensitySkipsTheIntensityMenu()
+        {
+            var strike = TestData.Skill("strike", SkillKind.Damage, SkillTarget.SingleEnemy, 40).Set("displayName", "찌르기");
+            var hero = Hero(new MonsterStats(500, 30, 10), strike);
+            var tank = TestData.Species("tank", new MonsterStats(9999, 1, 50), new MonsterStats(0, 0, 0), strike);
+            var go = new GameObject("FixedIntensityTest");
+            var screen = go.AddComponent<BattleScreen>();
+            screen.Configure(Table(tank), Words(), GameSession.NewGame(hero, 1), animScale: 0.01f, gameSettings: new GameSettings { BattleIntensity = 3 });
+            yield return null;
+            yield return null;
+
+            ActiveButton(screen.transform, "SkillButton_0").onClick.Invoke();
+            yield return null;
+            Assert.IsNull(ActiveButton(screen.transform, "Intensity_0"), "강도를 묻지 않음");
+            for (int frame = 0; frame < 600 && ActiveButton(screen.transform, "Choice_0") == null; frame++)
+            {
+                ActiveButton(screen.transform, "CardConfirmButton")?.onClick.Invoke();
+                yield return null;
+            }
+            var quizText = AllText(screen.transform.Find("BattleCanvas/SafeArea/Bottom/QuizPanel"));
+            StringAssert.Contains("×1.5", quizText, "설정한 강도");
+            StringAssert.Contains("0/3", quizText, "단어 3개 연속");
+            Object.Destroy(go);
         }
 
         [UnityTest]

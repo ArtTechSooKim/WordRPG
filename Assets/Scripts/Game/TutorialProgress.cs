@@ -22,6 +22,7 @@ namespace WordRPG.Game
         public const string GrassFight = "field_grass_fight"; // '풀숲으로 가서 몬스터와 싸워 보세요' (첫 전투까지)
         public const string Goal = "field_goal";              // 첫 승리 뒤 '목표는 잊혀진 서고의 까먹대왕을 물리치는 것입니다'
         public const string Altar = "field_altar";            // 강화할 재료가 처음 모이면 제단 앞으로 옮겨 설명 (#142 사용자)
+        public const string RelicSkills = "bag_relic_skills"; // 성유물 끼우기와 기술 넣기는 다른 일 — 성유물 안내 중에 설명 (#147 사용자)
         // #131 입장 영상(#129)을 본 기록 (사용자: 이미 하던 사람도 영상을 볼 수 있게) — 새 게임이든 하던 세이브든 못 본 사람은 필드에서 한 번.
         // 튜토리얼 다시 보기(Clear)로는 지우지 않음 — 다시 켤 때마다 영상이 나오지 않게 (그래서 All에도 없음)
         // #138 사용자 "아직 못 본 사람은 볼 수 있게": 1.1의 기록(intro_video)은 영상을 못 열어도 남아서 정말 봤는지 알 수 없음 → 1.2부터 새 id.
@@ -30,7 +31,7 @@ namespace WordRPG.Game
 
         public static readonly IReadOnlyList<string> All = new[]
         {
-            Field, Confirm, Grass, Skill, Intensity, NewWord, Quiz, Potion, Preempt, Raft, CompanionTurn, GrassFight, Goal, Altar,
+            Field, Confirm, Grass, Skill, Intensity, NewWord, Quiz, Potion, Preempt, Raft, CompanionTurn, GrassFight, Goal, Altar, RelicSkills,
             MenuBadges.Dex, MenuBadges.Training, MenuBadges.Bag, MenuBadges.Map, MenuBadges.Companion, MenuBadges.RelicNew, MenuBadges.RelicSwap
         };
 

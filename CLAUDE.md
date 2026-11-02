@@ -28,15 +28,15 @@
 - **핵심 루프**: 탐험 → 랜덤 조우 → 전투(기술마다 단어 문제) → 보상(경험치·재료·성유물) → 레벨업·성유물 강화(+3 각성) → 새 지역·어려운 단어
 - **현재 단계**: MVP 이후 확장 — 초원(마을)·잊혀진 서고(던전)·숲(2번째 지역, 서고 보스를 물리치면 열림), 주인공 + 성유물 8개(3칸 장착),
   적 6종 + 보스 2 (+ 1.1 메아리 정글 — 2026-10 출시, 가지 release-1.1: 숲 보스 공터 위 출입구, 적 3종 + 빈칸두꺼비, 동료 아라)
-  (+ 1.2 어두운 밀림 동굴 완성 — main, TestFlight 중 #139: 정글 강 가운데 섬의 'O' 출입구(입장 조건 없음), 적 4종 + 말줄임덩굴, 설계 GDD 9-7). 단어 = 2022 개정 교육과정 영어과 기본 어휘(교육부 고시, 저작권 없음 — GDD 11-2)에서 **지역마다 150개**(#76: 초원·서고 = 중·고 공통,
-  숲 = 고급에서 자주 쓰는 순 — `Tools/trim_wordbooks.py`). 남은 단어는 `Docs/단어_예비_중고공통.csv`(900)·`Docs/단어_예비_고급.csv`(850) — 새 지역은 위에서부터 150개.
-  뜻은 Claude 초안 + 사용자 검수. 맵은 2026-10-03에 넓이 4배. 보스 방은 열쇠 + 그 지역 단어 40개 발견으로 열림(#76)
+  (+ 1.2 어두운 밀림 동굴 완성 — main, TestFlight 중 #139: 정글 강 가운데 섬의 'O' 출입구(입장 조건 없음), 적 4종 + 말줄임덩굴, 설계 GDD 9-7). 단어 = 2022 개정 교육과정 영어과 기본 어휘(교육부 고시, 저작권 없음 — GDD 11-2)에서 **단어장 2개를 지역들이 같이 씀**(#147 사용자: 초원·서고 = 중·고 공통 150 `tier1_common` · 숲·정글·동굴 = 고급 300 `tier2_advanced`, 전체 2,198개 중 450개).
+  남은 단어는 `Docs/단어_예비_중고공통.csv`(1050)·`Docs/단어_예비_고급.csv`(698) — 위에서부터, 버전마다 300개쯤 (6~7버전까지, GDD 9-8). 단어장에서 빠진 단어의 세이브 기록은 그대로 남음.
+  뜻은 Claude 초안 + 사용자 검수. 맵은 2026-10-03에 넓이 4배. 보스 방은 열쇠 + 그 단어장 단어 N개 발견으로 열림(#76, #147: 서고 40 · 숲 40 · 정글 80 · 유적 100 · 동굴 120)
 
 ## 기술 규칙 (반드시 준수)
 
 1. **게임 데이터는 ScriptableObject**: 주인공(HeroData), 성유물(RelicData), 적 몬스터, 스킬, 아이템, 출현표, 단어장. 하드코딩 금지
    - 단어는 `Assets/Data/Words/*.csv`를 고치면 같은 이름의 `WordDatabase` .asset이 자동 갱신됨.
-     지역마다 자기 단어장, 한 단어는 한 단어장에만 (RegionDataTests). 단어를 늘릴 땐 남의 사이트·사전을 긁어 오지 않는다 (GDD 11-2)
+     여러 지역이 단어장 하나를 같이 쓸 수 있고(#147), 한 단어는 한 단어장에만 (RegionDataTests). 단어를 늘릴 땐 남의 사이트·사전을 긁어 오지 않는다 (GDD 11-2)
 2. **로직과 UI 분리**: `Words/ Monsters/ Heroes/ Items/ Battle/`은 순수 C# (MonoBehaviour 없음). UI는 `BattleEngine`이 돌려주는 `BattleEvent` 목록을 연출만 한다
 3. **새 로직에는 EditMode 테스트**: `Assets/Tests/EditMode/`. SO는 `TestData` 도우미로 생성
 4. **시간·랜덤은 주입**: 로직에서 `DateTime.UtcNow`, `UnityEngine.Random` 직접 사용 금지 → `DateTime nowUtc` / `System.Random` 파라미터로 받기 (테스트 결정성)
@@ -46,7 +46,7 @@
      상점은 회복 아이템과 효과 물약만 판다 (강화 재료는 안 팜) — 사용자 결정 (TownTests가 검사). 효과 물약 (#146, 숲 상점부터): ItemData `effect`(`ItemEffect` — 에셋에 번호로 저장, 새 효과는 맨 뒤)·`effectAmount` →
      가방에서 `GameSession.UseEffectItem` → `PotionEffects`(세이브 칸 newWordsLeft·quietStepsLeft): 호기심 물약 = `WordQuizService` wantNewWord(새 단어가 실제로 나올 때만 줄어듦) · 살금살금 물약 = 걸음 수 + `RoamingMonsters.Quiet`. 알약은 `FieldScreen.RefreshEffects`
    - 기술문서(ItemKind.SkillDocument)는 taughtSkill이 있어야 하고 상자·보스(BossEncounter.rewardItem)에서 얻을 수 있어야 함 (SkillDocumentDataTests).
-     전투 기술 = 기본 기술(고정) + 기술 칸 3개(성유물 기술·기술문서 기술), 세이브에는 칸 순서를 키 문자열로 저장
+     전투 기술 = 기본 기술 자리(휘두르기 — 바꿀 수 있음 #147: `Hero.BasicSeat`·`PutBackBasicSkill`, 세이브 칸 basicSeat, 공격 기술은 하나 남김 `CanReplace`) + 기술 칸 3개(성유물 기술·기술문서 기술), 세이브에는 칸 순서를 키 문자열로 저장
    - 이미 출시된 id는 바꾸지 말 것. SaveData에 필드 추가는 자유(예전 세이브는 기본값), 기존 필드 의미를 바꿀 때만 version 올리고 변환.
      version을 올리면 예전 앱은 그 세이브를 '너무 새로움'으로 보고 건드리지 않음 (GameManager.SaveBlocked, 깨진 세이브와 구분)
    - 게임 진행 상태는 `GameManager.Instance.Session`에서 얻고, 바뀌면 `GameManager.Save()` 호출
@@ -60,19 +60,19 @@
      이름 뒤 조사는 꼭 `UiKit.WithJosa` (플레이어가 지은 이름이라 받침이 정해져 있지 않음)
    - 업데이트 안내 (#115): `UpdateNotices`(세이브 칸 notices) — 예전 세이브로 켠 사람(= 업데이트한 사람)만 타이틀에서 한 번 (`TitleScreen.ShowUpdateNotice`,
      `ConfirmDialog.ShowNotice` [확인] 하나). 새 게임은 모두 본 것으로 시작, 튜토리얼과 따로. 다음 업데이트 안내는 `UpdateNotices.All` 맨 뒤에 새 id로
-   - 설정(`GameSettings`: 음량·진동)은 세이브가 아니라 PlayerPrefs. `GameManager.Settings` / `SaveSettings()`
+   - 설정(`GameSettings`: 음량·진동·전투 강도 `BattleIntensity` #147 — 0 = 매번 고르기, 1~ = 묻지 않고 그 강도)은 세이브가 아니라 PlayerPrefs. `GameManager.Settings` / `SaveSettings()`
    - **수익화** (GDD 9-3): 산 상품(`Entitlements`, 정식판 id `com.arttechsoo.wordrpg.full` — 바꾸지 말 것)도 세이브가 아니라 PlayerPrefs.
      결제는 `IStore`(실제 `UnityIapStore` = Unity IAP 5, 테스트는 가짜 — `GameManager.StoreOverride`/`FieldScreen.Configure`).
      정식판이 필요한 지역은 FieldArea `requiresFullVersion` (숲·정글·동굴) → 입구에서 `PaywallView`, 어디서든 설정 > 정식판(보기·구매 복원).
      앱 버전(PlayerSettings.bundleVersion)은 앱스토어 버전과 같아야 함 (지금 main = **1.2 개발 중**(동굴, #110). **1.1 출시·고침은 가지 `release-1.1`**에서 빌드하고
      고친 것은 main에도 합침 — main에서 1.1을 빌드하지 말 것. 1.0 심사 코드는 태그 v1.0-build3, 1.0을 고쳐 다시 내야 하면 그 태그에서 가지를 땀). 지원·개인정보 웹 페이지 = `gh-pages` 브랜치 (작업메모)
-   - 새 지역(단어장)은 regionId·regionName·징표 아이템(종류 Keepsake)·골드·storyOrder(이야기 순서 = 징표 진열장 순서, 다음 번호)를 지정해야 함 (RegionDataTests가 검사)
+   - 새 단어장은 regionId·regionName·도감 보상 `rewards`(`DexReward` 한 줄 = 보상 id·이름·징표(종류 Keepsake)·골드·wordsNeeded(0 = 다 채웠을 때)·storyOrder(징표 진열장 순서) — #147. 보상 id는 세이브에 적히니 출시 뒤 바꾸지 말 것)를 지정해야 함 (RegionDataTests가 검사)
    - 수련용 허수아비는 MonsterSpecies `trainingDummy`(맞아도 HP 그대로, 기술 없음) — 게임에 하나, 출현표에 넣지 말 것 (TrainingTests)
    - 필드 맵은 FieldArea의 글자 맵 (GDD 7·9장). 상자 수 = 내용물 수, 출입구 수 = 연결 수(서로 왕복), B ↔ 보스 지정,
      모든 상자·샘·출입구 도달 가능 (AreaDataTests·DungeonDataTests가 검사). 지역을 새로 만들면 Refresh Game Database
    - 맵 글자 'L' = 사전 받침대: 보스가 있는 맵마다 쉼터에 하나, FieldArea `dictionaryName` 필수 (BossDictionaryTests). 하루 한 번 읽기 = `BossDictionary`
    - 맵 글자 'G' = 보스 방 문, 'K' = 열쇠 받침대 (#76): 보스가 있는 맵마다 G 한 덩어리(가운데 칸에 이름표)·K 하나 + FieldArea `bossKey`(종류 Key)·`bossGateWords`(40).
-     열쇠 + 그 지역 단어 40개 발견 → [확인]으로 열림 (규칙 `BossGate`, 세이브 `WorldState.openedGates`). 열쇠는 문 밖, 보스는 문 안에서만 닿아야 함 (BossGateDataTests)
+     열쇠 + 그 단어장 단어 N개 발견 → [확인]으로 열림 (규칙 `BossGate`, 세이브 `WorldState.openedGates`). 열면 열쇠는 소지품에서 사라짐 (#147 — 받침대는 `BossGate.KeyTaken`, 예전 세이브는 불러올 때 `DiscardUsedKey`). 열쇠는 문 밖, 보스는 문 안에서만 닿아야 함 (BossGateDataTests)
    - 맵 글자 ':' = 잔디(걸을 수 있고 조우 없음). 출입구 연결(AreaExit)의 openedByBossOf = 그 지역 보스를 물리쳐야 열림 →
      보스를 이기면 FieldScreen이 카메라로 그 출입구를 보여 주는 연출(GateCutscene). 잠긴 길은 진짜 보스가 열어야 함 (GateDataTests)
    - 맵 원본은 SampleDataBuilder의 MeadowMap·LibraryMap·ForestMap·JungleMap·CaveMap 상수. 이미 있는 에셋은 Create Sample Data가 덮어쓰지 않으므로
@@ -111,7 +111,7 @@
    아이폰은 앱이 스스로 꺼지면 안 됨 → 종료는 `GameManager.CanQuit`일 때만.
    새 기능에 처음 하는 사람용 안내가 필요하면 `TutorialProgress`에 id를 더하고 그 상황에서 `GuideHints.Run` — 글은 한 줄,
    화면을 막지 않고, 손끝(Drag·Tap)·화살표로 보여 주고, 해 보면(DoneWhen) 끝 (GDD 7-1, #61).
-   화면을 멈추는 설명(`PauseTutorial`)은 사용자가 원한 곳만 (지금: 정글 첫 [선제공격] #79 · 처음 시작 환영과 첫 승리 뒤 목표 #124 · 제단 안내 #142 — `PauseTutorial.Tell`/`Run`, 시간을 멈추고 버튼이나 글을 눌러야 넘어감 #145).
+   화면을 멈추는 설명(`PauseTutorial`)은 사용자가 원한 곳만 (지금: 정글 첫 [선제공격] #79 · 처음 시작 환영과 첫 승리 뒤 목표 #124 · 제단 안내 #142 · 가방의 끼우기/기술 넣기 설명 #147 — `PauseTutorial.Tell`/`Run`, 시간을 멈추고 버튼이나 글을 눌러야 넘어감 #145).
    처음 시작 흐름 (#124, `FieldScreen.Prologue`): (입장 영상을 아직 못 봤으면 — 새 게임·하던 세이브 모두 한 번 #131, 본 기록 `TutorialProgress.Intro`(1.2부터 intro_played — #138)는
    튜토리얼 다시 보기로 안 지워짐, 못 열면(`IntroCinematicView.Failed`) 기록 안 함, 설정 > [입장 영상 다시 보기] 필드·타이틀 · 영상 #129 `IntroCinematicView` — Resources/Video/intro.mp4 + 자막표 intro_captions.json,
    `python Tools/build_intro_video.py`가 Flow 컷들을 이어 만듦 — 자막은 스크립트의 CAPTIONS 표(#133 10줄), [건너뛰기]·뒤로가기) → 모습 고르기 → 환영 → 혼잣말 → 깃펜으로 떠오른 이름 → 걷기·달리기 →
@@ -119,7 +119,7 @@
    '풀숲으로 가서 몬스터와 싸워 보세요'(알약은 스틱 위 — 주인공을 가리지 않게, 화살표는 목표 한 줄) → 첫 승리 뒤 목표.
    한 번도 싸우지 않은 사람은 풀숲 두 번째 칸에서 반드시 조우 (`FirstFightPending` → `EncounterCounter.GuaranteeWithin`, #133).
    음악: 입장 영상 `Music.Intro` · 캐릭터 고르기 `Music.HeroSelect`(고르면 지역 음악) — #133, 사용자가 찾은 곡은 Licensed 폴더에.
-   테스트는 `Configure(..., setup: true, intro: true)`로 켬 (기본 끔 — 실제 씬은 켜짐). 메뉴 빨간 점은 `MenuBadges`, 목표 한 줄은 `Objectives`
+   테스트는 `Configure(..., setup: true, intro: true)`로 켬 (기본 끔 — 실제 씬은 켜짐). 메뉴 빨간 점은 `MenuBadges`, 목표 한 줄은 `Objectives` (유적처럼 보스와 나란한 목표는 둘째 줄 `Objectives.Side` #147)
 9. **한국어 조사**: 이름 뒤 조사는 `UiKit.WithJosa(name, "이", "가")`로 (펜촉이가 / 책껍질이, 깃펜기사로 / 백과거북으로)
 10. **세로 화면 기준 UI**: 1080×1920 레퍼런스, 한 손 조작, 4지선다 버튼은 화면 하단
 11. **UI는 Figma UI 키트를 따른다** (https://www.figma.com/design/UUDRmdKgisU6B59saw5gJr): 프리팹 없이 코드로 만들고 `UiKit` 도우미를 쓴다
@@ -134,12 +134,12 @@
       (`font.HasCharacter`는 에디터에서 OS 글꼴까지 찾아 주므로 글꼴 검사에 못 씀 — 테스트는 cmap 표를 직접 읽음)
 12. **도트 그림·소리는 Ninja Adventure 팩(CC0)**: `python Tools/import_ninja_art.py` 가 쓸 파일만 골라 복사·가공한다 (원본 팩 경로는 스크립트 안)
     - 적 몬스터: `Assets/Resources/Art/NinjaAdventure/Monsters/{speciesId}.png` → `WordRPG > Data > Link Monster Art`(Create All Scenes에도 포함)가 Sprite 칸에 연결
-    - 성유물: `Art/NinjaAdventure/Relics/{relicId}.png` (`UiKit.RelicIcon`, RelicData.icon이 비면 사용), 상처약 등 도트 아이템: `Art/NinjaAdventure/Items/{itemId}.png`
+    - 성유물: `Art/NinjaAdventure/Relics/{relicId}.png` (`UiKit.RelicIcon`, RelicData.icon이 비면 사용), 상처약 등 도트 아이템: `Art/NinjaAdventure/Items/{itemId}.png` (특제 상처약·살금살금·호기심 물약은 PixelLab #147 — 팩에 없어 import 표에 안 넣음)
     - 주인공 얼굴: HeroData.portrait가 비면 필드 주인공 정면 (`UiKit.HeroPortrait`)
     - 필드 타일 `FieldArt`(Tiles/{테마}_{종류}[_done].png — 같은 종류 변형 _v1·_v2…가 있으면 칸 위치로 섞음 `FieldDecor.TileVariant` #98, 예: 서고 책장·바랜 종이), 주인공 `PlayerArt`(4방향×걷기 4프레임 시트를 코드로 자름, 달리기 = 걷기 + 점프 행 `GetRun`). 없으면 `PlaceholderArt`
     - `Assets/Resources/Art/` 그림은 가져올 때 16px = 1칸, Point 필터 (`UiAssetImporter`)
     - 소리: `Sound.PlayMusic(Music.X)` / `Sound.Play(Sfx.X)`, 파일 = `Resources/Audio/Music|Sfx/{열거형 소문자}`. 음량은 설정을 따름.
-      `UiKit.AddButton`/`MakeButton`은 누르면 딸깍 소리 (`clickSound: false`로 끔). 새 소리를 쓰면 열거형 + 스크립트 표에 같이 추가 (AudioArtTests가 검사)
+      `UiKit.AddButton`/`MakeButton`은 누르면 딸깍 소리 (`clickSound: false`로 끔). 새 소리를 쓰면 열거형 + 스크립트 표에 같이 추가 (AudioArtTests가 검사). 선제공격 '카칭'(preempt)만 팩에 없어 `Tools/make_preempt_sfx.py`로 합성 (#147)
     - **유료 라이선스 소리(Envato Elements)**: `Resources/Audio/Licensed/{같은 이름}.wav`에 두면 팩 소리보다 먼저 쓰임. 이 폴더·받은 원본(`*-utc/`)·
       라이선스 증명서는 .gitignore — 공개 저장소에 올리면 재배포라 안 됨. 저장소엔 팩 소리가 대신 있음 (지금: newword, 작업메모 #66). 음악도 같은 방식 (#133)
     - 전투: 효과 `BattleFx`(Fx 열거형 = Art/NinjaAdventure/Fx/{소문자}.png 정사각 프레임 시트), 배경은 지역 타일(`BattleScreen.SetBackdrop`).
@@ -214,7 +214,7 @@ Assets/
                         .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴)·.Cave(동굴 어둠·반딧돌 #112)·.RelicGuides(성유물 바꾸기·제단 안내 #142) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout·.Events(사건 연출: 사건 종류마다 Show… 함수 — #119)·.SkillFx(기술 연출: 몸짓·회복·보호막·특수 — #137).
                         새 기능은 맞는 파일에, 기능 묶음이 커지면 새 partial 파일로,
                         DexView(도감), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기),
-                        InventoryView(소지품: 주인공·성유물·아이템·징표) + HeroViews(HeroInfoPage·RelicPage·RelicSlotsRow·SkillRowView),
+                        InventoryView(소지품: 주인공·성유물·아이템(넘치면 스크롤, 놓는 순서 `ItemData.BagOrder` #147)·징표) + HeroViews(HeroInfoPage·RelicPage·RelicSlotsRow·SkillRowView),
                         HeroSetupViews(처음 시작: CharacterSelectView 모습 8명 · NameEntryView 이름 — #124) · IntroCinematicView(입장 영상 + 자막 + [건너뛰기] — #129),
                         SettingsView(설정) + ConfirmDialog(확인 창 · ShowNotice = [확인] 하나), SwitchView, GateCutscene(보스가 연 길을 보여 주는 연출),
                         TrainingView(수련 창: 전체적 암기·오답 위주 암기 → BattleScreen.BeginTraining, 허수아비),
@@ -250,7 +250,7 @@ Docs/                   PRD.txt, GDD.md, 아트에셋목록.md, 아이폰출시�
 .github/workflows/      ios-testflight.yml (GitHub Mac 서버에서 서명·TestFlight 업로드)
 Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow 필요), zip_ios_for_mac.py (Xcode 프로젝트 → Mac용 zip, 실행 권한 유지),
                         widen_maps.py (맵의 한 칸 통로 → 두 칸), subset_fonts.py (본문 글꼴에서 한자·가나 빼기 — 앱 크기, fontTools 필요),
-                        pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구),
+                        pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구), make_preempt_sfx.py (선제공격 '카칭' 소리 합성 #147),
                         build_intro_video.py (입장 영상: Flow 컷 이어 붙이기·Veo 표시 잘라냄·자막표 → Resources/Video, imageio-ffmpeg 필요, #129 —
                         컷 원본은 저장소 밖 Builds/cinematic_pixellab/Videos, release-1.1 폴더에선 그 경로를 인자로),
                         cinematic_storyboard.py (입장 시네마틱 7컷 = 영화 구도 스케치 → Builds/cinematic_v2, Figma 'Cinematic (#128)' — Flow img to img로 영상, #128)

@@ -162,8 +162,8 @@ namespace WordRPG.UI
     {
         public RectTransform Rect { get; private set; }
         private RawImage image;
-        private RectTransform player, goal;
-        private Vector2Int? goalCell;
+        private RectTransform player, goal, sideGoal;
+        private Vector2Int? goalCell, sideGoalCell;
         private int width = 1, height = 1;
         private RectInt window = new RectInt(0, 0, 1, 1);
 
@@ -180,8 +180,16 @@ namespace WordRPG.UI
             dot.raycastTarget = false;
             UiKit.Pad(dot.rectTransform, dotSize * 0.18f);
             picture.player = ring.rectTransform;
-            // 목표 칸 (#61 목표 한 줄): 금색 별. 보이는 범위 밖이면 가장자리에 붙어 그쪽을 가리킨다
-            var star = UiKit.OneLine(UiKit.Label("Goal", picture.Rect, "★", Mathf.RoundToInt(dotSize * 1.9f), Palette.Gold, 0, 0, 0, 0,
+            // 목표 칸 (#61 목표 한 줄): 금색 별. 보이는 범위 밖이면 가장자리에 붙어 그쪽을 가리킨다. 둘째 줄 목표(#147)도 같은 별
+            picture.goal = GoalStar("Goal", picture.Rect, dotSize);
+            picture.sideGoal = GoalStar("SideGoal", picture.Rect, dotSize);
+            ring.transform.SetAsLastSibling(); // 내 위치 점이 별 위에
+            return picture;
+        }
+
+        private static RectTransform GoalStar(string name, RectTransform parent, float dotSize)
+        {
+            var star = UiKit.OneLine(UiKit.Label(name, parent, "★", Mathf.RoundToInt(dotSize * 1.9f), Palette.Gold, 0, 0, 0, 0,
                 TextAnchor.MiddleCenter, FontStyle.Bold));
             star.raycastTarget = false;
             star.rectTransform.sizeDelta = new Vector2(dotSize * 2.4f, dotSize * 2.4f);
@@ -189,9 +197,7 @@ namespace WordRPG.UI
             outline.effectColor = new Color32(26, 20, 48, 255);
             outline.effectDistance = new Vector2(2, -2);
             star.gameObject.SetActive(false);
-            picture.goal = star.rectTransform;
-            ring.transform.SetAsLastSibling(); // 내 위치 점이 별 위에
-            return picture;
+            return star.rectTransform;
         }
 
         public void SetTexture(Texture2D texture)
@@ -210,23 +216,31 @@ namespace WordRPG.UI
             PlaceGoal();
         }
 
-        public void SetGoal(Vector2Int? cell)
+        public void SetGoal(Vector2Int? cell, Vector2Int? side = null)
         {
             goalCell = cell;
+            sideGoalCell = side;
             PlaceGoal();
         }
 
         public bool GoalVisible => goal.gameObject.activeSelf;
+        public bool SideGoalVisible => sideGoal.gameObject.activeSelf;
 
         private void PlaceGoal()
         {
-            goal.gameObject.SetActive(goalCell.HasValue);
-            if (!goalCell.HasValue) return;
-            var cell = goalCell.Value;
+            PlaceStar(goal, goalCell);
+            PlaceStar(sideGoal, sideGoalCell);
+        }
+
+        private void PlaceStar(RectTransform star, Vector2Int? target)
+        {
+            star.gameObject.SetActive(target.HasValue);
+            if (!target.HasValue) return;
+            var cell = target.Value;
             var anchor = new Vector2(Mathf.Clamp01((cell.x - window.x + 0.5f) / window.width),
                 Mathf.Clamp01((cell.y - window.y + 0.5f) / window.height));
-            goal.anchorMin = goal.anchorMax = anchor;
-            goal.anchoredPosition = Vector2.zero;
+            star.anchorMin = star.anchorMax = anchor;
+            star.anchoredPosition = Vector2.zero;
         }
 
         public void SetPlayer(Vector2Int cell)
@@ -261,7 +275,7 @@ namespace WordRPG.UI
 
         public float Height => root.sizeDelta.y;
 
-        public void SetGoal(Vector2Int? cell) => Picture.SetGoal(cell);
+        public void SetGoal(Vector2Int? cell, Vector2Int? side = null) => Picture.SetGoal(cell, side);
 
         public static MinimapView Create(Transform parent)
         {
@@ -385,12 +399,12 @@ namespace WordRPG.UI
             return view;
         }
 
-        public void Show(FieldArea area, Texture2D texture, Vector2Int playerCell, GameSession session, Vector2Int? goal = null)
+        public void Show(FieldArea area, Texture2D texture, Vector2Int playerCell, GameSession session, Vector2Int? goal = null, Vector2Int? sideGoal = null)
         {
             title.text = $"지도 · {area.DisplayName}";
             picture.SetTexture(texture);
             picture.SetPlayer(playerCell);
-            picture.SetGoal(goal);
+            picture.SetGoal(goal, sideGoal);
             // 지도는 가로 936·세로 1000 안에 꽉 차게, 한 칸은 정수 px로
             float cell = Mathf.Floor(Mathf.Min(936f / texture.width, 1000f / texture.height));
             frame.sizeDelta = new Vector2(texture.width * cell + 48, texture.height * cell + 48);

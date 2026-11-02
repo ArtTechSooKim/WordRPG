@@ -41,6 +41,38 @@ namespace WordRPG.Tests
             for (int i = 0; i < count; i++) session.Vocabulary.Discover(area.Words.Words[i].Id, Now);
         }
 
+        // 문을 열면 열쇠는 소지품에서 사라짐 (#147 사용자). 받침대는 빈 채로 — 다시 받지 못함
+        [Test]
+        public void OpeningTheGateUsesUpTheKey()
+        {
+            var area = Area(needWords: 1);
+            var session = Session();
+            Discover(session, area, 1);
+            Assert.IsTrue(BossGate.TakeKey(area, session));
+            Assert.IsTrue(BossGate.TryOpen(area, session));
+
+            Assert.AreEqual(0, session.Inventory.GetCount(area.BossKey), "열쇠가 사라짐");
+            Assert.AreEqual(BossGateState.Open, BossGate.State(area, session), "문은 계속 열려 있음");
+            Assert.IsTrue(BossGate.KeyTaken(area, session), "받침대는 빈 모습");
+            Assert.IsFalse(BossGate.TakeKey(area, session), "다시 받지 못함");
+            Assert.AreEqual(0, session.Inventory.GetCount(area.BossKey));
+        }
+
+        // 예전 세이브: 문을 연 뒤 소지품에 남은 열쇠는 불러올 때 치움. 아직 안 연 지역의 열쇠는 그대로
+        [Test]
+        public void OldSavesLoseOnlyUsedKeys()
+        {
+            var area = Area(needWords: 1);
+            var session = Session();
+            BossGate.TakeKey(area, session);
+            BossGate.DiscardUsedKey(area, session);
+            Assert.AreEqual(1, session.Inventory.GetCount(area.BossKey), "아직 문을 안 열었으면 그대로");
+
+            session.World.MarkGateOpened(area.AreaId);
+            BossGate.DiscardUsedKey(area, session);
+            Assert.AreEqual(0, session.Inventory.GetCount(area.BossKey), "다 쓴 열쇠는 치움");
+        }
+
         [Test]
         public void GateOpensOnlyWithTheKeyAndEnoughWords()
         {

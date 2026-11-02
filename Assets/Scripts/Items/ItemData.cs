@@ -51,6 +51,9 @@ namespace WordRPG.Items
         public int EffectAmount => effectAmount;
 
         // 필드·전투에서 쓸 수 있는 회복 아이템
+        // 가방에 놓이는 순서 (#147): 바로 쓰는 것부터 — 상처약 → 효과 물약 → 기술문서 → 재료 → 열쇠
+        public int BagOrder => IsHealingItem ? 0 : IsEffectItem ? 1 : IsSkillDocument ? 2 : Kind == ItemKind.Key ? 4 : 3;
+
         public bool IsHealingItem => kind == ItemKind.Consumable && healAmount > 0;
 
         // 필드에서 쓰면 효과가 남는 물약 (#146)

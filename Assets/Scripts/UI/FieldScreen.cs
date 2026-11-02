@@ -107,9 +107,12 @@ namespace WordRPG.UI
         private readonly Dictionary<string, RectTransform> badges = new Dictionary<string, RectTransform>();
         private RectTransform objectivePill; // 목표 한 줄 (#61): 미니맵 아래
         private Text objectiveText;
+        private RectTransform sideObjectivePill; // 둘째 줄 (#147): 정글 유적처럼 보스와 나란한 목표
+        private Text sideObjectiveText;
         private RectTransform quietPill, newWordPill;   // 효과 물약이 남은 동안 목표 한 줄 아래 (#146)
         private Text quietText, newWordText;
         private Objective objective;
+        private Objective? sideObjective;
         private GameObject saveMark;       // 저장될 때 잠깐 '✓ 저장' (#61, 자동 저장 안내 대신)
         private float saveMarkUntil, lastSaveMark = -999f;
         private const float SaveMarkGap = 20f; // 자주 저장돼도 이 간격보다 자주 띄우지 않음
@@ -150,6 +153,7 @@ namespace WordRPG.UI
         public GuideHints Guide => guide;
         public string ObjectiveText => objectivePill != null && objectivePill.gameObject.activeSelf ? objectiveText.text : "";
         public Objective CurrentObjective => objective;
+        public string SideObjectiveText => sideObjectivePill != null && sideObjectivePill.gameObject.activeSelf ? sideObjectiveText.text : "";
         public bool IsBadgeVisible(string id) => badges.TryGetValue(id, out var dot) && dot.gameObject.activeSelf;
         public int SaveMarksShown { get; private set; } // '✓ 저장' 표시 횟수 (테스트용)
         public PaywallView Paywall => paywall;
@@ -765,7 +769,7 @@ namespace WordRPG.UI
             battle = battleGo.AddComponent<BattleScreen>();
             if (showTutorials) battle.SetGuide(guide); // 첫 전투 안내 (기술·새 단어·첫 문제·강도·상처약 — 한 줄씩)
             battle.Configure(area.Encounters, area.Words, session, animationScale, battleConfig, saveProgress, loop: false,
-                gameDatabase: database);
+                gameDatabase: database, gameSettings: settings);
         }
 
         // 메뉴는 걷는 중·전투 중·다른 창이 열려 있을 때는 열지 않는다
