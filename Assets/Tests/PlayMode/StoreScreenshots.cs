@@ -287,6 +287,115 @@ namespace WordRPG.Tests
             Object.Destroy(field.gameObject);
             Object.Destroy(cam.gameObject);
         }
+
+        // 8) 어두운 밀림 동굴 (1.2): 밝힌 반딧돌 하나와 주인공 둘레만 밝음 — 지나온 길은 희미하게 남음
+        [UnityTest]
+        public IEnumerator Cave()
+        {
+            var db = AssetDatabase.LoadAssetAtPath<GameDatabase>("Assets/Data/GameDatabase.asset");
+            var heroData = AssetDatabase.LoadAssetAtPath<HeroData>("Assets/Data/Hero/hero.asset");
+            var cave = db.FindArea("cave");
+            var cam = MakeCamera();
+            var session = Session(heroData, db, 30);
+            session.SetPartyCompanion(session.AddCompanion(AssetDatabase.LoadAssetAtPath<CompanionData>("Assets/Data/Companions/ara.asset")));
+            Study(session, cave.Words, 60, DateTime.UtcNow);
+            int h = cave.Map.Height;
+            foreach (var stone in GlowStones.Stones(cave))
+                if (stone.y == h - 1 - 30) GlowStones.Light(cave, session.World, stone); // 맵 글자 위에서 30번째 줄
+            for (int row = 56; row >= 23; row -= 2)
+                session.World.Reveal("cave", cave.Map.Width, h, new Vector2Int(25, h - 1 - row));
+            session.World.SetPosition("cave", new Vector2Int(25, h - 1 - 23));
+            var field = Field(cave, session, db);
+            yield return new WaitForSecondsRealtime(1f);
+            yield return Shot("8_cave");
+            Object.Destroy(field.gameObject);
+            Object.Destroy(cam.gameObject);
+        }
+
+        // 9) 기술 연출 (#137): 동굴 전투에서 회복·보호막·공격을 차례로 — store_screenshots.py가 잘라서 한 장으로 모음 (SKILL_STRIPS)
+        [UnityTest]
+        public IEnumerator SkillEffects()
+        {
+            var db = AssetDatabase.LoadAssetAtPath<GameDatabase>("Assets/Data/GameDatabase.asset");
+            var heroData = AssetDatabase.LoadAssetAtPath<HeroData>("Assets/Data/Hero/hero.asset");
+            var cave = db.FindArea("cave");
+            var cam = MakeCamera();
+            var rt = new RenderTexture(W, H, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+            cam.targetTexture = rt;
+            var session = Session(heroData, db, 30);
+            session.SetPartyCompanion(session.AddCompanion(AssetDatabase.LoadAssetAtPath<CompanionData>("Assets/Data/Companions/ara.asset")));
+            Study(session, cave.Words, 60, DateTime.UtcNow);
+            session.World.SetPosition("cave", cave.Map.Start);
+            var field = Field(cave, session, db);
+            yield return new WaitForSecondsRealtime(0.5f);
+
+            var battle = field.Battle;
+            battle.BeginBattle(new List<MonsterInstance> { new MonsterInstance(db.FindMonster("ink_newt"), 30), new MonsterInstance(db.FindMonster("blink_ghost"), 30) },
+                cave.Words, _ => { }, null, cave.Theme);
+            yield return WaitFor(() => battle.Engine != null && battle.Engine.Phase == BattlePhase.ChoosingSkill, 15f);
+            yield return new WaitForSecondsRealtime(0.5f);
+            // 효과가 만들어질 때의 화면 좌표가 캡처와 같도록 캔버스를 한 번만 바꿔 둠 (Shot은 찍을 때만 바꿈)
+            foreach (var c in Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None))
+            {
+                if (!c.isRootCanvas) continue;
+                c.renderMode = RenderMode.ScreenSpaceCamera;
+                c.worldCamera = cam;
+                c.planeDistance = 1f;
+                c.sortingOrder += 1000;
+            }
+            yield return null;
+            Canvas.ForceUpdateCanvases();
+            yield return new WaitForSecondsRealtime(0.3f);
+
+            const BindingFlags any = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
+            typeof(BattleScreen).GetMethod("HideAllPanels", any)?.Invoke(battle, null);
+            typeof(BattleScreen).GetField("lastWord", any)?.SetValue(battle, "memory");
+            var play = typeof(BattleScreen).GetMethod("PlayEvents", any);
+            var engine = battle.Engine;
+            BattleUnit hero = engine.Party[0], ara = engine.Party[1], newt = engine.Enemies[0], ghost = engine.Enemies[1];
+            SkillData Skill(string id) => AssetDatabase.LoadAssetAtPath<SkillData>($"Assets/Data/Skills/{id}.asset");
+
+            ara.Combatant.TakeDamage(40); // HP가 가득이면 회복 숫자가 최대를 넘어 보임
+            typeof(BattleScreen).GetMethod("Snapshot", any)?.Invoke(battle, null);
+            var scenes = new List<(string name, float at, BattleEvent[] events)>
+            {
+                ("9_fx_heal", 1.35f, new[] { BattleEvent.SkillUsed(hero, Skill("gourd_spring")),
+                    BattleEvent.Heal(hero, hero, Skill("gourd_spring"), 20, false), BattleEvent.Heal(hero, ara, Skill("gourd_spring"), 20, false) }),
+                ("9_fx_shield", 1.25f, new[] { BattleEvent.SkillUsed(ara, Skill("ara_echo")),
+                    BattleEvent.Shield(ara, hero, Skill("ara_echo"), 8, false), BattleEvent.Shield(ara, ara, Skill("ara_echo"), 8, false) }),
+                ("9_fx_ink", 1.22f, new[] { BattleEvent.SkillUsed(hero, Skill("quill_ink_storm")),
+                    BattleEvent.Damage(hero, newt, Skill("quill_ink_storm"), 22, 0, false), BattleEvent.Damage(hero, ghost, Skill("quill_ink_storm"), 22, 0, false) }),
+                ("9_fx_letters", 0.9f, new[] { BattleEvent.SkillUsed(hero, Skill("gem_letter_shower")),
+                    BattleEvent.Damage(hero, newt, Skill("gem_letter_shower"), 24, 0, false), BattleEvent.Damage(hero, ghost, Skill("gem_letter_shower"), 24, 0, false) }),
+            };
+            Directory.CreateDirectory(Out);
+            foreach (var (name, at, events) in scenes)
+            {
+                bool done = false;
+                battle.StartCoroutine(Then((IEnumerator)play.Invoke(battle, new object[] { (IReadOnlyList<BattleEvent>)events }), () => done = true));
+                for (float start = Time.realtimeSinceStartup; Time.realtimeSinceStartup - start < at;) yield return null;
+                cam.Render();
+                RenderTexture.active = rt;
+                var tex = new Texture2D(W, H, TextureFormat.RGB24, false);
+                tex.ReadPixels(new Rect(0, 0, W, H), 0, 0);
+                tex.Apply();
+                RenderTexture.active = null;
+                File.WriteAllBytes(Path.Combine(Out, name + ".png"), tex.EncodeToPNG());
+                Object.Destroy(tex);
+                while (!done) yield return null;
+                yield return new WaitForSecondsRealtime(0.6f);
+            }
+            cam.targetTexture = null;
+            Object.Destroy(rt);
+            Object.Destroy(field.gameObject);
+            Object.Destroy(cam.gameObject);
+        }
+
+        private static IEnumerator Then(IEnumerator routine, Action done)
+        {
+            yield return routine;
+            done();
+        }
     }
 }
 #endif

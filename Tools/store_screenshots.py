@@ -29,10 +29,20 @@ SHOTS = [
     ("2_quiz", "기술을 쓰려면 영단어를 맞혀라!", "4지선다 단어 문제 · 빨리 맞히면 크리티컬"),
     ("3_new_word", "처음 만난 단어는 뜻부터", "발견한 단어는 도감에 차곡차곡"),
     ("1_field", "넓은 맵을 탐험하는 RPG", "숨은 보물상자 · 미니맵 · 지역마다 새 단어"),
+    ("8_cave", "어둠을 밝히며 나아가는 동굴", "단어를 맞혀 글자 반딧돌을 밝혀요"),
+    ("9_skill_fx", "기술마다 다른 연출", "공격도 회복도 보호막도 더 역동적으로"),
     ("4_finisher", "보스를 물리치고 새 길을 열자", "연속으로 맞히면 콤보, 마지막은 결정타!"),
     ("5_summary", "한 판마다 외운 단어 정리", "틀린 단어는 오답 노트로, 곧 다시 나와요"),
     ("6_altar", "성유물을 모아 강화하고 각성!", "+3이 되면 기술이 더 강해져요"),
     ("7_dex", "교육과정 필수 어휘 도감", "지역마다 150개 · 숙련도 별을 모아 완성"),
+]
+
+# 기술 연출 한 장 (#137): 실제 전투 장면에서 효과가 보이는 줄만 잘라 위아래로 모음 — (게임 화면, 이름표, 위, 아래)
+SKILL_STRIPS = [
+    ("9_fx_letters", "글자 소나기", 170, 860),
+    ("9_fx_ink", "잉크 폭풍", 170, 860),
+    ("9_fx_heal", "솟아나는 샘", 1370, 1900),
+    ("9_fx_shield", "메아리 방패", 1370, 1900),
 ]
 
 TITLE_FONT = os.path.join(FONTS, "Jua-Regular.ttf")
@@ -67,8 +77,25 @@ def rounded_mask(size, radius):
     return mask
 
 
+def build_skill_strips():
+    label_font = ImageFont.truetype(TITLE_FONT, 50)
+    sheet = Image.new("RGB", (W, H), (18, 20, 36))
+    draw = ImageDraw.Draw(sheet)
+    y = 24
+    for name, label, top, bottom in SKILL_STRIPS:
+        path = os.path.join(RAW, name + ".png")
+        if not os.path.exists(path):
+            sys.exit(f"{path} 없음 — 먼저 StoreScreenshots 테스트로 게임 화면을 찍을 것")
+        draw.text((48, y + 30), label, font=label_font, fill=GOLD, anchor="lm")
+        y += 66
+        sheet.paste(Image.open(path).convert("RGB").crop((0, top, W, bottom)), (0, y))
+        y += bottom - top + 12
+    sheet.save(os.path.join(RAW, "9_skill_fx.png"))
+
+
 def main():
     check_glyphs()
+    build_skill_strips()
     title_font = ImageFont.truetype(TITLE_FONT, 92)
     sub_font = ImageFont.truetype(SUB_FONT, 46)
     os.makedirs(OUT, exist_ok=True)
