@@ -122,6 +122,90 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // #138 사용자 "아직 못 본 사람은 볼 수 있게": 영상을 못 열면 본 것으로 치지 않음 · 1.1의 예전 기록(못 열어도 남음)은 인정하지 않고 한 번 더
+        [UnityTest]
+        public IEnumerator FailedVideoIsNotSeenAndOldRecordGetsItOnceMore()
+        {
+            var session = NewSession();
+            var field = CreateField(session, intro: true);
+            yield return WaitFor(() => field.Intro != null && field.Intro.IsOpen, 2f);
+            field.Intro.FailForTest();
+            yield return WaitFor(() => field.CharacterSelect.IsOpen, 2f);
+            Assert.IsTrue(field.CharacterSelect.IsOpen, "못 열어도 게임은 이어짐");
+            Assert.IsFalse(session.Tutorials.Has(TutorialProgress.Intro), "본 것으로 치지 않음");
+            Object.Destroy(field.gameObject);
+            yield return null;
+
+            var from11 = NewSession();
+            from11.Record.RecordBattle(true, 3, 0);
+            from11.Tutorials.Mark(TutorialProgress.Field);
+            from11.Tutorials.Mark("intro_video"); // 1.1의 기록
+            from11.Hero.SetLook("knight");
+            from11.Hero.Rename("아린");
+            var again = CreateField(from11, intro: true);
+            yield return WaitFor(() => again.Intro != null && again.Intro.IsOpen, 2f);
+            Assert.IsTrue(again.Intro.IsOpen, "1.1에서 온 사람은 한 번 더");
+            ActiveButton(again.transform, "IntroSkipButton").onClick.Invoke();
+            yield return null;
+            yield return null;
+            Assert.IsTrue(from11.Tutorials.Has(TutorialProgress.Intro), "[건너뛰기]는 본 것으로");
+            Object.Destroy(again.gameObject);
+            yield return null;
+        }
+
+        // #138 설정 > [입장 영상 다시 보기]: 설정을 닫고 영상, 그동안 필드는 멈춤, 끝나면 필드로. 몇 번이든 다시 볼 수 있음
+        [UnityTest]
+        public IEnumerator SettingsCanReplayTheIntroAnyTime()
+        {
+            var session = NewSession();
+            session.Record.RecordBattle(true, 3, 0);
+            session.Tutorials.MarkAll();
+            session.Tutorials.Mark(TutorialProgress.Intro);
+            session.Hero.SetLook("knight");
+            session.Hero.Rename("아린");
+            var field = CreateField(session, intro: true);
+            yield return null;
+            yield return null;
+            Assert.IsFalse(field.Intro.IsOpen, "본 사람은 저절로 안 나옴");
+            var hud = field.transform.Find("FieldHud/SafeArea");
+            for (int i = 0; i < 2; i++)
+            {
+                FindButton(hud, "SettingsButton").onClick.Invoke();
+                FindButton(hud.Find("SettingsView"), "IntroReplayButton").onClick.Invoke();
+                Assert.IsTrue(field.Intro.IsOpen, "영상이 뜸");
+                Assert.IsFalse(hud.Find("SettingsView").gameObject.activeSelf, "설정은 닫힘");
+                Assert.IsTrue(field.IsPanelOpen, "영상 동안 필드는 멈춤");
+                ActiveButton(field.transform, "IntroSkipButton").onClick.Invoke();
+                Assert.IsFalse(field.Intro.IsOpen);
+                Assert.IsFalse(field.IsPanelOpen, "끝나면 필드");
+                yield return null;
+            }
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
+        // #138 한 프레임이 오래 걸려도(큰 음악 파일을 읽는 첫 프레임) 준비 시간을 한꺼번에 다 쓰지 않음 — 1.1에서 영상이 안 나온 이유로 보이는 것.
+        // 정말 오래 준비가 안 되면 실패로 끝나 게임은 이어짐
+        [UnityTest]
+        public IEnumerator SlowFirstFrameDoesNotEndTheVideo()
+        {
+            var holder = new GameObject("IntroHolder", typeof(RectTransform));
+            var view = IntroCinematicView.Create(holder.transform);
+            bool done = false;
+            view.Play(() => done = true);
+            view.Tick(30f);
+            Assert.IsTrue(view.IsOpen, "느린 한 프레임으로 끝나면 안 됨");
+            for (int i = 0; i < 200 && !done; i++) view.Tick(0.1f);
+            Assert.IsTrue(done, "오래 준비가 안 되면 끝남");
+            Assert.IsTrue(view.Failed);
+            view.Play(() => { });
+            Assert.IsFalse(view.Failed, "다시 틀면 처음부터");
+            view.Skip();
+            Assert.IsFalse(view.Failed, "[건너뛰기]는 실패가 아님");
+            Object.Destroy(holder);
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator NewGameChoosesLookThenWelcomeThenQuillName()
         {

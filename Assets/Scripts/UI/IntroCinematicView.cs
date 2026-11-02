@@ -41,17 +41,20 @@ namespace WordRPG.UI
 
     // 입장 영상 (#129 사용자: 새 게임을 시작하면 시네마틱 — 컷은 사용자가 Google Flow로, Figma '입장 영상 재생 화면 (#129)').
     // 검정 화면에 영상을 화면 너비에 맞춰 (위아래 검정) + 아래쪽 자막 + 오른쪽 위 [건너뛰기]. 영상이 끝나거나 건너뛰면 onDone.
-    // 영상을 못 열면(기기·테스트 환경) 잠깐 뒤 그냥 끝냄 — 게임이 멈추지 않게
+    // 영상을 못 열면(기기·테스트 환경) 잠깐 뒤 그냥 끝냄 — 게임이 멈추지 않게. 이때는 Failed — 본 것으로 치지 않음 (#138)
     public class IntroCinematicView
     {
         public const string VideoPath = "Video/intro";
         public const string CaptionsPath = "Video/intro_captions";
-        private const float PrepareTimeout = 4f;
+        private const float PrepareTimeout = 10f;
+        private const float MaxTickSeconds = 0.1f; // 한 프레임이 오래 걸려도(큰 음악 파일을 읽는 첫 프레임 등) 준비 시간을 한꺼번에 다 쓰지 않게 (#138)
+        private const float LoadingCaptionAfter = 1f;
 
         public GameObject Root { get; private set; }
         public bool IsOpen => Root != null && Root.activeSelf;
         public string Caption => caption != null ? caption.text : "";
         public bool IsVideoPlaying => player != null && player.isPlaying;
+        public bool Failed { get; private set; } // 영상을 열지 못해 끝남 ([건너뛰기]는 실패가 아님)
 
         private VideoPlayer player;
         private RawImage screen;
@@ -98,7 +101,7 @@ namespace WordRPG.UI
             view.player.errorReceived += (_, message) =>
             {
                 Debug.LogWarning($"[Intro] 영상을 열 수 없음: {message}");
-                view.Finish();
+                view.Fail();
             };
             view.Root.SetActive(false);
             return view;
@@ -108,14 +111,16 @@ namespace WordRPG.UI
         {
             onDone = done;
             finished = false;
+            Failed = false;
             elapsed = 0f;
             captions = IntroCaptions.Load();
             caption.text = "";
+            Root.transform.SetAsLastSibling(); // 설정에서 다시 볼 때도 맨 위 (#138)
             Root.SetActive(true);
             var clip = Resources.Load<VideoClip>(VideoPath);
             if (clip == null)
             {
-                Finish();
+                Fail();
                 return;
             }
             if (texture == null) texture = new RenderTexture((int)clip.width, (int)clip.height, 0);
@@ -126,14 +131,15 @@ namespace WordRPG.UI
             player.Play();
         }
 
-        // 자막은 영상 시각을 따르고, 영상이 아직 준비 중이면 아무것도 띄우지 않음. 오래 준비가 안 되면 끝냄
+        // 자막은 영상 시각을 따름. 아직 준비 중이면 잠깐 뒤 '불러오는 중', 오래 준비가 안 되면 실패로 끝냄
         public void Tick(float dt)
         {
             if (!IsOpen || finished) return;
-            elapsed += dt;
+            elapsed += Mathf.Min(dt, MaxTickSeconds);
             if (!player.isPrepared && !player.isPlaying)
             {
-                if (elapsed > PrepareTimeout) Finish();
+                if (elapsed > PrepareTimeout) Fail();
+                else if (elapsed > LoadingCaptionAfter) caption.text = "영상을 불러오는 중...";
                 return;
             }
             caption.text = captions.At((float)player.time);
@@ -141,6 +147,15 @@ namespace WordRPG.UI
         }
 
         public void Skip() => Finish();
+
+        public void FailForTest() => Fail();
+
+        private void Fail()
+        {
+            if (finished) return;
+            Failed = true;
+            Finish();
+        }
 
         private void Finish()
         {

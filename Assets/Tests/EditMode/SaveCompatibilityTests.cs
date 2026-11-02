@@ -155,7 +155,7 @@ namespace WordRPG.Tests
 
             var updater = Load(As11Save(GameSession.NewGame(HeroData())));
             Assert.AreEqual("업데이트 해주셔서 감사합니다", updater.Notices.NextUnseen().Title, "문구는 사용자가 정한 그대로");
-            Assert.AreEqual("동굴 지역이 열렸습니다!\n숲 지역에서 확인해보세요!", UpdateNotices.Cave.Message);
+            Assert.AreEqual("새로운 지역 동굴이 열렸습니다!\n숲 지역에 있는 동굴을 찾아보세요!", UpdateNotices.Cave.Message);
             updater.Notices.Mark(UpdateNotices.Cave.Id);
             updater.Tutorials.Clear();
             Assert.IsNull(updater.Notices.NextUnseen(), "튜토리얼 다시 보기로 안내가 다시 뜨지 않음");

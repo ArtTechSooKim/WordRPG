@@ -43,6 +43,14 @@ namespace WordRPG.Tests
             CollectionAssert.DoesNotContain(TutorialProgress.All, TutorialProgress.Intro, "다시 보기 목록이 아님");
         }
 
+        // #138 1.1의 영상 기록(intro_video)은 못 열어도 남았으므로 인정하지 않음 → 1.2로 업데이트하면 한 번 더
+        [Test]
+        public void OldIntroRecordDoesNotCount()
+        {
+            Assert.AreNotEqual("intro_video", TutorialProgress.Intro);
+            Assert.IsFalse(new TutorialProgress(new[] { "intro_video" }).Has(TutorialProgress.Intro));
+        }
+
         [Test]
         public void SeenTutorialsSurviveSaveAndOldSavesStartEmpty()
         {

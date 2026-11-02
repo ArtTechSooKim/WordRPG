@@ -6,7 +6,7 @@ using WordRPG.Game;
 
 namespace WordRPG.UI
 {
-    // 설정 (Figma '설정 (#37)'): 소리(배경 음악·효과음), 진동, [튜토리얼 다시 보기], [처음부터 다시 하기], 정식판, 정보.
+    // 설정 (Figma '설정 (#37)'): 소리(배경 음악·효과음), 진동, [튜토리얼 다시 보기] [입장 영상 다시 보기](#138), [처음부터 다시 하기], 정식판, 정보.
     // 정식판 칸 (#63, 앱스토어 심사 대비): 언제든 [정식판 보기](정식판 안내 창)와 [구매 복원] — 숲 입구까지 가지 않아도 살 수 있고 되찾을 수 있다.
     // 값을 바꿀 때마다 onSettingsChanged로 저장. 처음부터는 실수로 지우지 않게 확인 창을 두 번 거쳐야 onDeleteSave
     // ('설정 — 처음부터 1차/2차 확인 (#37)')
@@ -23,7 +23,8 @@ namespace WordRPG.UI
         private bool dirty; // 슬라이더로 바꾸고 아직 저장하지 않음
         private Action onDeleteSave;
         private Action onReplayTutorial;
-        private Button replayButton;
+        private Action onReplayIntro;
+        private Button replayButton, introReplayButton;
 
         // 정식판 칸 (#63)
         public class PurchaseHooks
@@ -61,13 +62,16 @@ namespace WordRPG.UI
             view.sfx.onValueChanged.AddListener(v => view.Change(s => s.SfxVolume = v, false));
             view.SaveOnRelease(view.sfx);
 
-            // 게임: 진동 + 튜토리얼 다시 보기
+            // 게임: 진동 + 튜토리얼 다시 보기 · 입장 영상 다시 보기 (두 버튼 배치는 아래 정식판 칸과 같음)
             var game = Section(root, "게임", 0.6f, 0.76f);
             Row(game, null, "진동", "틀렸을 때 짧게 떨려요", 0.43f, 0.8f);
             view.vibration = SwitchView.Create("VibrationSwitch", game, 0.84f, 0.5f, 0.965f, 0.73f);
-            view.replayButton = UiKit.MakeButton("TutorialReplayButton", game, "튜토리얼 다시 보기", Palette.Neutral, 40,
-                0.035f, 0.07f, 0.965f, 0.36f);
+            view.replayButton = UiKit.MakeButton("TutorialReplayButton", game, "튜토리얼 다시 보기", Palette.Neutral, 38,
+                0.035f, 0.07f, 0.49f, 0.36f);
             view.replayButton.onClick.AddListener(view.ReplayTutorial);
+            view.introReplayButton = UiKit.MakeButton("IntroReplayButton", game, "입장 영상 다시 보기", Palette.Neutral, 38,
+                0.51f, 0.07f, 0.965f, 0.36f);
+            view.introReplayButton.onClick.AddListener(view.ReplayIntro);
 
             // 저장: 자동 저장 안내 + 처음부터 다시 하기
             var save = Section(root, "저장", 0.43f, 0.585f);
@@ -133,9 +137,10 @@ namespace WordRPG.UI
                 FontStyle.Normal, true, 18);
         }
 
-        // replayTutorial: [튜토리얼 다시 보기]를 누르면 (없으면 버튼을 숨김). purchaseHooks: 정식판 칸 (없으면 칸을 숨김)
+        // replayTutorial: [튜토리얼 다시 보기]를 누르면 (없으면 버튼을 숨김). purchaseHooks: 정식판 칸 (없으면 칸을 숨김).
+        // replayIntro: [입장 영상 다시 보기]를 누르면 (없으면 버튼을 숨김)
         public void Show(GameSettings gameSettings, Action settingsChanged, Action deleteSave, Action replayTutorial = null,
-            PurchaseHooks purchaseHooks = null)
+            PurchaseHooks purchaseHooks = null, Action replayIntro = null)
         {
             if (purchase?.Owned != null) purchase.Owned.Changed -= RefreshPurchase;
             purchase = purchaseHooks;
@@ -148,6 +153,8 @@ namespace WordRPG.UI
             onDeleteSave = deleteSave;
             onReplayTutorial = replayTutorial;
             replayButton.gameObject.SetActive(replayTutorial != null);
+            onReplayIntro = replayIntro;
+            introReplayButton.gameObject.SetActive(replayIntro != null);
             music.SetValueWithoutNotify(settings.MusicVolume);
             sfx.SetValueWithoutNotify(settings.SfxVolume);
             vibration.Bind(settings.Vibration, on => Change(s => s.Vibration = on));
@@ -244,6 +251,13 @@ namespace WordRPG.UI
         private void ReplayTutorial()
         {
             var replay = onReplayTutorial;
+            Hide();
+            replay?.Invoke();
+        }
+
+        private void ReplayIntro()
+        {
+            var replay = onReplayIntro;
             Hide();
             replay?.Invoke();
         }

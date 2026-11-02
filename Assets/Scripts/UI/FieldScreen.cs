@@ -168,7 +168,8 @@ namespace WordRPG.UI
                                    || (companionCutscene != null && companionCutscene.IsPlaying)
                                    || (pauseTutorial != null && pauseTutorial.IsShowing)
                                    || (tabletView != null && tabletView.IsOpen)
-                                   || (stoneView != null && stoneView.IsOpen) || heroSetupRunning;
+                                   || (stoneView != null && stoneView.IsOpen) || heroSetupRunning
+                                   || (introView != null && introView.IsOpen);
         public PauseTutorial PauseTutorial => pauseTutorial;
         public bool IsPreemptRangeVisible => preemptRange != null && preemptRange.gameObject.activeSelf;
         public CompanionCutscene CompanionCutscene => companionCutscene;

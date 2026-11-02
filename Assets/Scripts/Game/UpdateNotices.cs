@@ -24,7 +24,7 @@ namespace WordRPG.Game
     {
         // 1.2: 정글 강 가운데 섬의 동굴 입구가 열림 (문구 = 사용자가 정한 그대로)
         public static readonly UpdateNotice Cave = new UpdateNotice("update_1_2_cave",
-            "업데이트 해주셔서 감사합니다", "동굴 지역이 열렸습니다!\n숲 지역에서 확인해보세요!");
+            "업데이트 해주셔서 감사합니다", "새로운 지역 동굴이 열렸습니다!\n숲 지역에 있는 동굴을 찾아보세요!");
 
         public static readonly IReadOnlyList<UpdateNotice> All = new[] { Cave };
 

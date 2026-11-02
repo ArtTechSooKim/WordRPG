@@ -522,7 +522,7 @@ namespace WordRPG.UI
             settingsView.Show(settings, saveSettings, deleteSave, ReplayTutorial, new SettingsView.PurchaseHooks
             {
                 Store = store, Owned = entitlements, OpenOffer = full != null ? () => OpenFullVersionOffer(full) : (Action)null
-            });
+            }, ReplayIntro);
         }
 
         private void OpenDex()

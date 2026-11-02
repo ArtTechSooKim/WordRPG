@@ -235,8 +235,8 @@ namespace WordRPG.Tests
             var dialog = root.Find("TitleCanvas/SafeArea/ConfirmDialog");
             Assert.IsTrue(title.IsDialogOpen, "업데이트 안내 창");
             StringAssert.Contains("업데이트 해주셔서 감사합니다", AllText(dialog));
-            StringAssert.Contains("동굴 지역이 열렸습니다!", AllText(dialog));
-            StringAssert.Contains("숲 지역에서 확인해보세요!", AllText(dialog));
+            StringAssert.Contains("새로운 지역 동굴이 열렸습니다!", AllText(dialog));
+            StringAssert.Contains("숲 지역에 있는 동굴을 찾아보세요!", AllText(dialog));
             Assert.IsFalse(FindButton(dialog, "DialogCancelButton").gameObject.activeSelf, "버튼은 [확인] 하나");
             CollectionAssert.Contains(system.Load().Data.Notices, UpdateNotices.Cave.Id, "띄우는 순간 본 것으로 저장");
 
@@ -257,6 +257,39 @@ namespace WordRPG.Tests
             yield return null;
             Assert.IsFalse(again.IsDialogOpen, "한 번 본 안내는 다시 안 뜸");
             Object.Destroy(again.gameObject);
+            yield return null;
+        }
+
+        // 입장 영상 다시 보기 (#138, 타이틀 설정): 영상이 뜨고 그동안 시작되지 않음, 끝나면 타이틀 + 본 기록 저장
+        [UnityTest]
+        public IEnumerator ReplayIntroFromTitleSettings()
+        {
+            var system = new WordRPG.Save.SaveSystem(dir);
+            var manager = StartManager();
+            manager.MarkPlaying();
+            manager.Save();
+
+            bool? started = null;
+            var title = MakeTitle(newGame => started = newGame);
+            yield return null;
+            yield return null;
+            FindButton(title.transform, "SettingsButton").onClick.Invoke();
+            FindButton(title.transform.Find("TitleCanvas/SafeArea/SettingsView"), "IntroReplayButton").onClick.Invoke();
+            Assert.IsFalse(title.IsSettingsOpen, "설정을 닫고");
+            Assert.IsTrue(title.Intro.IsOpen, "영상");
+            FindButton(title.transform, "TapToStart").onClick.Invoke();
+            Assert.IsNull(started, "영상 동안은 시작하지 않음");
+
+            title.Intro.Skip();
+            Assert.IsFalse(title.Intro.IsOpen);
+            CollectionAssert.Contains(system.Load().Data.Tutorials, TutorialProgress.Intro, "본 기록 저장");
+
+            // 영상을 못 열면: 안내 창 + 본 것으로 치지 않음
+            FindButton(title.transform, "SettingsButton").onClick.Invoke();
+            FindButton(title.transform.Find("TitleCanvas/SafeArea/SettingsView"), "IntroReplayButton").onClick.Invoke();
+            title.Intro.FailForTest();
+            Assert.IsTrue(title.IsDialogOpen, "못 열었다고 알려 줌");
+            Object.Destroy(title.gameObject);
             yield return null;
         }
 

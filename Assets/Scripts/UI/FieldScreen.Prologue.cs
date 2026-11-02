@@ -57,8 +57,7 @@ namespace WordRPG.UI
                 Sound.PlayMusic(Music.Intro);
                 introView.Play(() => done = true);
                 while (!done) yield return null;
-                session.Tutorials.Mark(TutorialProgress.Intro);
-                SaveNow();
+                MarkIntroSeen(); // 못 열었으면 다음에 다시 (#138)
             }
 
             if (session.NeedsHeroSetup) yield return ChooseLookAndName(fresh);
@@ -66,6 +65,25 @@ namespace WordRPG.UI
 
             heroSetupRunning = false;
             if (showTutorials && !session.Tutorials.Has(TutorialProgress.Field)) StartCoroutine(FieldGuide());
+        }
+
+        private void MarkIntroSeen()
+        {
+            if (introView.Failed) return;
+            session.Tutorials.Mark(TutorialProgress.Intro);
+            SaveNow();
+        }
+
+        // 설정 > [입장 영상 다시 보기] (#138 사용자: 스토리 영상을 다시 볼 수 있게) — 끝나면 필드로
+        private void ReplayIntro()
+        {
+            Sound.PlayMusic(Music.Intro);
+            introView.Play(() =>
+            {
+                Sound.PlayMusic(AreaMusic);
+                if (introView.Failed) ShowToast("영상을 열 수 없어요. 잠시 뒤에 다시 해 보세요", 3f);
+                MarkIntroSeen();
+            });
         }
 
         private IEnumerator ChooseLookAndName(bool fresh)

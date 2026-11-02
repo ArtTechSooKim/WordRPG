@@ -23,7 +23,9 @@ namespace WordRPG.Game
         public const string Goal = "field_goal";              // 첫 승리 뒤 '목표는 잊혀진 서고의 까먹대왕을 물리치는 것입니다'
         // #131 입장 영상(#129)을 본 기록 (사용자: 이미 하던 사람도 영상을 볼 수 있게) — 새 게임이든 하던 세이브든 못 본 사람은 필드에서 한 번.
         // 튜토리얼 다시 보기(Clear)로는 지우지 않음 — 다시 켤 때마다 영상이 나오지 않게 (그래서 All에도 없음)
-        public const string Intro = "intro_video";
+        // #138 사용자 "아직 못 본 사람은 볼 수 있게": 1.1의 기록(intro_video)은 영상을 못 열어도 남아서 정말 봤는지 알 수 없음 → 1.2부터 새 id.
+        // 1.1에서 온 사람은 모두 한 번 더 나옴 ([건너뛰기] 있음). 영상을 못 열면 기록하지 않음
+        public const string Intro = "intro_played";
 
         public static readonly IReadOnlyList<string> All = new[]
         {

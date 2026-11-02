@@ -111,8 +111,8 @@
    새 기능에 처음 하는 사람용 안내가 필요하면 `TutorialProgress`에 id를 더하고 그 상황에서 `GuideHints.Run` — 글은 한 줄,
    화면을 막지 않고, 손끝(Drag·Tap)·화살표로 보여 주고, 해 보면(DoneWhen) 끝 (GDD 7-1, #61).
    화면을 멈추는 설명(`PauseTutorial`)은 사용자가 원한 곳만 (지금: 정글 첫 [선제공격] #79 · 처음 시작 환영과 첫 승리 뒤 목표 #124 — `PauseTutorial.Tell`).
-   처음 시작 흐름 (#124, `FieldScreen.Prologue`): (입장 영상을 아직 못 봤으면 — 새 게임·하던 세이브 모두 한 번 #131, 본 기록 `TutorialProgress.Intro`는
-   튜토리얼 다시 보기로 안 지워짐 · 영상 #129 `IntroCinematicView` — Resources/Video/intro.mp4 + 자막표 intro_captions.json,
+   처음 시작 흐름 (#124, `FieldScreen.Prologue`): (입장 영상을 아직 못 봤으면 — 새 게임·하던 세이브 모두 한 번 #131, 본 기록 `TutorialProgress.Intro`(1.2부터 intro_played — #138)는
+   튜토리얼 다시 보기로 안 지워짐, 못 열면(`IntroCinematicView.Failed`) 기록 안 함, 설정 > [입장 영상 다시 보기] 필드·타이틀 · 영상 #129 `IntroCinematicView` — Resources/Video/intro.mp4 + 자막표 intro_captions.json,
    `python Tools/build_intro_video.py`가 Flow 컷들을 이어 만듦 — 자막은 스크립트의 CAPTIONS 표(#133 10줄), [건너뛰기]·뒤로가기) → 모습 고르기 → 환영 → 혼잣말 → 깃펜으로 떠오른 이름 → 걷기·달리기 →
    풀숲 가는 길(#133 `ShowWayToGrass`: 카메라가 가장 가까운 풀숲(`FieldReach.PathToNearest`)으로 따라가며 반투명 분신 `FieldGhost`가 잔상을 남기고 걸어 들어감 → 주인공에게 돌아옴) →
    '풀숲으로 가서 몬스터와 싸워 보세요'(알약은 스틱 위 — 주인공을 가리지 않게, 화살표는 목표 한 줄) → 첫 승리 뒤 목표.

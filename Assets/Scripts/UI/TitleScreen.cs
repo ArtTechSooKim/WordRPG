@@ -27,10 +27,12 @@ namespace WordRPG.UI
         private Text tapLabel;
         private ConfirmDialog dialog;
         private SettingsView settingsView;
+        private IntroCinematicView introView; // 설정 > [입장 영상 다시 보기] (#138)
         private readonly List<(RectTransform rt, float baseY, float phase)> floaters = new List<(RectTransform, float, float)>();
 
         public bool IsSettingsOpen => settingsView != null && settingsView.IsOpen;
         public bool IsStarted => started;
+        public IntroCinematicView Intro => introView;
 
         public void Configure(Action<bool> onStart) => startOverride = onStart;
 
@@ -64,7 +66,8 @@ namespace WordRPG.UI
         public void HandleBack()
         {
             if (dialog == null) return;
-            if (dialog.IsOpen) dialog.Hide();
+            if (introView.IsOpen) introView.Skip();
+            else if (dialog.IsOpen) dialog.Hide();
             else if (settingsView.IsOpen) settingsView.Hide();
             else if (GameManager.CanQuit)
                 dialog.Show("게임을 끝낼까요?", "다음에 켜면 이어서 할 수 있어요.", "끝내기", false, GameManager.QuitGame);
@@ -75,6 +78,7 @@ namespace WordRPG.UI
         private void Update()
         {
             if (FieldScreen.BackPressed()) HandleBack();
+            introView?.Tick(Time.unscaledDeltaTime);
             // 키보드(PC)는 Enter·Space로 시작
             var keyboard = UnityEngine.InputSystem.Keyboard.current;
             if (keyboard != null && (keyboard.enterKey.wasPressedThisFrame || keyboard.spaceKey.wasPressedThisFrame)) OnTap();
@@ -176,6 +180,7 @@ namespace WordRPG.UI
 
             dialog = ConfirmDialog.Create(root);
             settingsView = SettingsView.Create(root);
+            introView = IntroCinematicView.Create(root);
         }
 
         // 배경: 초원 타일로 그린 도트 풍경을 화면을 덮게 (도트 그대로) + 위(로고)·아래(버튼) 어둡게
@@ -289,7 +294,7 @@ namespace WordRPG.UI
         // 화면을 누르면: 저장이 있으면 이어하기, 없으면 새 게임
         private void OnTap()
         {
-            if (started || dialog.IsOpen || settingsView.IsOpen) return;
+            if (started || dialog.IsOpen || settingsView.IsOpen || introView.IsOpen) return;
             if (manager.SaveBlocked) return; // 더 새 버전 앱의 기록 — 업데이트해야 이어할 수 있음
             Begin(!manager.HasSave);
         }
@@ -305,7 +310,25 @@ namespace WordRPG.UI
             {
                 manager.Session.Tutorials.Clear();
                 Begin(!manager.HasSave);
-            }, new SettingsView.PurchaseHooks { Store = manager.Store, Owned = manager.Entitlements }); // 타이틀에서는 [구매 복원]만
+            }, new SettingsView.PurchaseHooks { Store = manager.Store, Owned = manager.Entitlements }, // 타이틀에서는 [구매 복원]만
+            ReplayIntro);
+        }
+
+        // 설정 > [입장 영상 다시 보기] (#138): 끝나면 타이틀로. 다 본 기록은 세이브에 (저장이 없으면 Save는 아무것도 안 함)
+        private void ReplayIntro()
+        {
+            Sound.PlayMusic(Music.Intro);
+            introView.Play(() =>
+            {
+                Sound.PlayMusic(Music.Title);
+                if (introView.Failed)
+                {
+                    dialog.ShowNotice("영상을 열 수 없어요", "잠시 뒤에 다시 해 보세요.");
+                    return;
+                }
+                manager.Session.Tutorials.Mark(TutorialProgress.Intro);
+                manager.Save();
+            });
         }
 
         private void Begin(bool newGame)
