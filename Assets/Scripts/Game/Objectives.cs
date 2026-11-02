@@ -107,7 +107,7 @@ namespace WordRPG.Game
         private static bool HasUndefeatedBoss(GameSession session, FieldArea area) =>
             area.Boss != null && !session.World.IsBossDefeated(area.BossId);
 
-        private static bool IsOpen(GameSession session, AreaExit exit) =>
+        internal static bool IsOpen(GameSession session, AreaExit exit) =>
             exit.OpenedByBossOf == null || session.World.IsBossDefeated(exit.OpenedByBossOf.BossId);
     }
 
@@ -120,9 +120,12 @@ namespace WordRPG.Game
         public const string Bag = "badge_bag";
         public const string Map = "badge_map";
         public const string Companion = "badge_companion"; // 가방 버튼: 동료를 처음 얻으면 ('동료' 탭이 생김, #81)
+        // 가방 버튼 (#142): 성유물을 처음 더 얻으면 / 칸이 가득 차서 못 끼운 성유물이 처음 생기면 → 열면 안내 (FieldScreen.RelicGuides)
+        public const string RelicNew = "badge_relic_new";
+        public const string RelicSwap = "badge_relic_swap";
         public const int TrainingWords = 5; // 수련은 도감 단어가 이만큼 모이면
 
-        public static readonly IReadOnlyList<string> All = new[] { Dex, Training, Bag, Map, Companion };
+        public static readonly IReadOnlyList<string> All = new[] { Dex, Training, Bag, Map, Companion, RelicNew, RelicSwap };
 
         public static bool IsUnlocked(string id, GameSession session)
         {
@@ -137,6 +140,8 @@ namespace WordRPG.Game
                     return false;
                 case Map: return session.World.ExploredAreaCount >= 2;
                 case Companion: return session.Companions.Count > 0;
+                case RelicNew: return session.Hero.Relics.Count >= 2;
+                case RelicSwap: return RelicTutorials.NewestUnequipped(session.Hero) != null;
                 default: return false;
             }
         }

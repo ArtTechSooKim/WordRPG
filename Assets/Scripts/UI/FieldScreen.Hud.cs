@@ -77,7 +77,9 @@ namespace WordRPG.UI
                     0, topY - 120f / menuHeight, 1, topY);
                 button.onClick.AddListener(entries[i].open);
                 if (badgeOf.TryGetValue(entries[i].name, out var badgeId)) AddBadge(badgeId, (RectTransform)button.transform);
-                if (entries[i].name == "BagButton") AddBadge(MenuBadges.Companion, (RectTransform)button.transform); // 같은 자리의 점 (#81)
+                if (entries[i].name == "BagButton") // 같은 자리의 점 (#81 동료, #142 성유물)
+                    foreach (var id in new[] { MenuBadges.Companion, MenuBadges.RelicNew, MenuBadges.RelicSwap })
+                        AddBadge(id, (RectTransform)button.transform);
             }
             AddBadge(MenuBadges.Map, (RectTransform)minimap.Button.transform);
 
@@ -384,6 +386,7 @@ namespace WordRPG.UI
         private void UpdateGuide()
         {
             if (!showTutorials || guide.IsShowing || fieldTutorialRunning) return;
+            if (MaybeStartAltarGuide()) return;
             if (confirmReady && !session.Tutorials.Has(TutorialProgress.Confirm))
             {
                 int before = interactions;
@@ -509,10 +512,19 @@ namespace WordRPG.UI
         private void OpenBag(BagTab tab, int slot = -1)
         {
             if (!CanOpenMenu) return;
+            bool teach = !guide.IsShowing && !fieldTutorialRunning; // 다른 안내 중이면 점을 남겨 두고 다음에
+            bool swapGuide = teach && IsBadgeVisible(MenuBadges.RelicSwap);
+            bool relicGuide = swapGuide || (teach && IsBadgeVisible(MenuBadges.RelicNew));
             ClearBadge(MenuBadges.Bag);
             ClearBadge(MenuBadges.Companion);
+            if (relicGuide)
+            {
+                ClearBadge(MenuBadges.RelicNew);
+                ClearBadge(MenuBadges.RelicSwap);
+            }
             var relic = session.Hero.SlotAt(slot);
             inventoryView.Show(session, database, tab, relic, OnTownChanged);
+            if (relicGuide) StartCoroutine(RelicBagGuide(swapGuide));
         }
 
         private void OpenSettings()

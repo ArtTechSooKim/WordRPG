@@ -131,6 +131,18 @@ namespace WordRPG.UI
             scroll.verticalNormalizedPosition = 1f; // 맨 위부터
         }
 
+        // 안내가 가리킬 곳 (#142): 지금 강화할 수 있는 첫 성유물의 버튼
+        public RectTransform FirstReadyButton
+        {
+            get
+            {
+                var relics = session.Hero.Relics;
+                for (int i = 0; i < relics.Count && i < cards.Count; i++)
+                    if (RelicUpgrade.Check(relics[i], session.Inventory) == UpgradeStatus.Ready) return (RectTransform)cards[i].Button.transform;
+                return null;
+            }
+        }
+
         public void Hide()
         {
             confirmIndex = -1;

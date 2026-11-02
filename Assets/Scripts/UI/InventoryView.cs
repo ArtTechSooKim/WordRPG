@@ -300,6 +300,8 @@ namespace WordRPG.UI
         public bool CancelRelicChoosing() => relicPage.Root.activeSelf && relicPage.CancelChoosing();
 
         public SkillLearnView LearnView => learnView;
+        public RelicPage Relics => relicPage;                                      // 안내가 가리킬 곳 (#142)
+        public RectTransform RelicsTabRect => (RectTransform)relicsTab.transform;
 
         private void SelectTab(BagTab tab) => SelectTab(tab, null);
 

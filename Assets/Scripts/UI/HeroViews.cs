@@ -20,11 +20,14 @@ namespace WordRPG.UI
         private readonly List<Cell> cells = new List<Cell>();
         private Text subtitle;
 
+        public RectTransform Rect { get; private set; }
+
         public static RelicSlotsRow Create(RectTransform parent, float minX, float minY, float maxX, float maxY, Action<int> onClick)
         {
             var row = new RelicSlotsRow();
             var panel = UiKit.RoundPanel("EquippedRelics", parent, Palette.Panel, UiKit.RadiusLg, minX, minY, maxX, maxY);
             panel.raycastTarget = false;
+            row.Rect = panel.rectTransform;
             UiKit.Display(UiKit.Label("Title", panel.transform, "장착한 성유물", 40, Palette.Gold, 0.03f, 0.5f, 0.6f, 0.9f, TextAnchor.MiddleLeft));
             row.subtitle = UiKit.OneLine(UiKit.Label("Sub", panel.transform, "", 24, Palette.TextDim, 0.03f, 0.12f, 0.6f, 0.5f,
                 TextAnchor.MiddleLeft, FontStyle.Normal, true, 16));
@@ -437,6 +440,15 @@ namespace WordRPG.UI
         }
 
         public void Hide() => Root.SetActive(false);
+
+        // 안내가 가리킬 곳 (#142)
+        public RectTransform ActionRect => (RectTransform)actionButton.transform;
+        public RectTransform SlotsRect => slotsRow.Rect;
+        public RectTransform CellRect(OwnedRelic relic)
+        {
+            int index = catalog.IndexOf(relic.Data);
+            return index >= 0 && index < cells.Count ? cells[index].Back.rectTransform : null;
+        }
 
         // 기술 칸이 바뀐 뒤 다시 그리기
         public void Refresh()

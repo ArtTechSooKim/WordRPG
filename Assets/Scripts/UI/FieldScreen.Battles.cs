@@ -90,7 +90,7 @@ namespace WordRPG.UI
                 if (area.HasDictionary) message += $"\n쉼터 받침대에 {UiKit.WithJosa(area.DictionaryName, "이", "가")} 놓였다";
                 // 이 보스가 여는 출입구가 있으면 카메라가 가서 보여 준다 → 기술 배우기 → 시작 지점으로 돌아갈지 묻기
                 var gates = database != null ? FieldArea.GatesOpenedBy(area, database.Areas) : new List<AreaGate>();
-                StartCoroutine(AfterBossVictory(message, gates, rewardItem != null && rewardItem.IsSkillDocument ? rewardItem : null));
+                StartCoroutine(WhileAfterBoss(AfterBossVictory(message, gates, rewardItem != null && rewardItem.IsSkillDocument ? rewardItem : null)));
             }
             else if (outcome == BattlePhase.Defeat)
             {
