@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: WordRPG::WordRPG.Monsters.SkillData
   skillId: raccoon_muddle_whirl
   displayName: "\uB4A4\uC8FD\uBC15\uC8FD \uC18C\uC6A9\uB3CC\uC774"
-  description: "\uB2E8\uC5B4\uB97C \uB4A4\uC8FD\uBC15\uC8FD \uC11E\uB294 \uC18C\uC6A9\uB3CC\uC774\uB97C
-    \uC77C\uC73C\uD0A8\uB2E4."
+  description: "\uD798\uC744 \uC794\uB729 \uBAA8\uC558\uB2E4\uAC00 \uB2E8\uC5B4\uB97C \uB4A4\uC8FD\uBC15\uC8FD \uC11E\uB294 \uD070 \uC18C\uC6A9\uB3CC\uC774\uB97C \uC77C\uC73C\uD0A8\uB2E4."
   kind: 0
   target: 1
-  power: 18
+  power: 250
+  chargeTurns: 1
   quizDirection: 0
   fx: 15

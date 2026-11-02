@@ -69,6 +69,10 @@ namespace WordRPG.Tests
             return (field, words);
         }
 
+        // 시험용: 몬스터를 그 칸으로 (위치는 규칙 안에서만 바뀜)
+        private static void Place(Roamer roamer, Vector2Int cell) =>
+            typeof(Roamer).GetProperty("Position").GetSetMethod(true).Invoke(roamer, new object[] { cell });
+
         private static HeroData Hero()
         {
             var strike = TestData.Skill("strike", SkillKind.Damage, SkillTarget.SingleEnemy, 40);
@@ -126,7 +130,8 @@ namespace WordRPG.Tests
             Object.Destroy(field.gameObject);
         }
 
-        // #79: 처음 [선제공격] 기회 → 화면이 멈추고 세 단계 설명 (사용자가 정한 말) → 마지막은 버튼을 직접 눌러 봐야 끝
+        // #79: 처음 [선제공격] 기회 → 화면이 멈추고 세 단계 설명 (사용자가 정한 말).
+        // #145: 시간이 완전히 멈춤 — [다음]/[확인]이나 글을 눌러야 넘어가고, 안내가 끝나기 전엔 [선제공격]이 안 눌림, 닫은 뒤에도 잠깐 몬스터가 멈춤
         [UnityTest]
         public IEnumerator FirstPreemptChancePausesWithATutorial()
         {
@@ -146,21 +151,89 @@ namespace WordRPG.Tests
             Assert.AreEqual(held, roamer.Position, "멈춘 동안 몬스터도 멈춤");
             Assert.IsTrue(field.IsPreemptAvailable, "[선제공격] 버튼은 밝게 그대로");
 
-            ActiveButton(field.transform, "TutorialNextButton").onClick.Invoke();
+            // 읽는 중에 빛나는 버튼을 눌러도 문제가 시작되지 않음 (#145 — 눌리면 안내가 떠 있는 채로 시간이 흘러 실패로 넘어갔음)
+            FindButton(field.transform, "PreemptButton").onClick.Invoke();
+            yield return null;
+            Assert.IsFalse(field.Preempt.IsOpen, "안내가 끝나야 누를 수 있음");
+            Assert.AreEqual(0, field.PauseTutorial.Step, "버튼을 눌러도 안내는 그대로");
+
+            // 글을 눌러도 다음으로 (#145)
+            FindButton(field.transform, "GuideBox").onClick.Invoke();
             yield return null;
             Assert.AreEqual("일정 거리 적과 가까워지면 선제공격을 할 수 있습니다.", field.PauseTutorial.Message);
             Assert.IsTrue(field.IsPreemptRangeVisible, "몬스터 둘레에 선제공격 범위");
             ActiveButton(field.transform, "TutorialNextButton").onClick.Invoke();
             yield return null;
-            Assert.AreEqual("버튼을 눌러보세요!", field.PauseTutorial.Message);
+            StringAssert.Contains("[선제공격] 버튼을 눌러 보세요", field.PauseTutorial.Message);
             Assert.IsFalse(field.IsPreemptRangeVisible);
-            Assert.IsNull(ActiveButton(field.transform, "TutorialNextButton"), "마지막 단계는 [다음] 없이 직접 눌러 보기");
+            var confirm = ActiveButton(field.transform, "TutorialNextButton");
+            Assert.AreEqual("확인", UiKit.LabelOf(confirm).text, "마지막은 [확인]");
+            yield return new WaitForSecondsRealtime(0.5f);
+            Assert.IsTrue(field.PauseTutorial.IsShowing, "시간이 지나도 저절로 안 넘어감");
+            Assert.IsFalse(field.IsInBattle);
 
-            FindButton(field.transform, "PreemptButton").onClick.Invoke();
+            confirm.onClick.Invoke();
             yield return WaitFor(() => !field.PauseTutorial.IsShowing, 2f);
-            Assert.IsFalse(field.PauseTutorial.IsShowing);
-            Assert.IsTrue(field.Preempt.IsOpen, "누르면 바로 QTE");
             Assert.IsTrue(session.Tutorials.Has(TutorialProgress.Preempt), "본 것으로 저장 — 다시 안 나옴");
+
+            // 닫은 뒤에도 잠깐 몬스터가 멈춰 있어 누를 틈이 있음
+            yield return new WaitForSecondsRealtime(0.5f);
+            Assert.AreEqual(held, roamer.Position, "닫은 직후 몬스터는 그대로");
+            Assert.IsFalse(field.IsInBattle);
+            Assert.IsTrue(field.IsPreemptAvailable, "이제 누를 수 있음");
+            FindButton(field.transform, "PreemptButton").onClick.Invoke();
+            yield return WaitFor(() => field.Preempt.IsOpen, 2f);
+            Assert.IsTrue(field.Preempt.IsOpen, "안내가 끝나면 눌러서 QTE");
+            Object.Destroy(field.gameObject);
+        }
+
+        // #145 사용자: 딱 붙자 그냥 전투로 넘어감 — 아직 나를 못 본 몬스터에 처음 부딪히면 전투 대신 선제공격 안내, 안내를 본 뒤로는 부딪히면 전투
+        [UnityTest]
+        public IEnumerator BumpingBeforeTheFirstPreemptShowsTheTutorialInstead()
+        {
+            var session = GameSession.NewGame(Hero(), 5);
+            foreach (var id in new[] { TutorialProgress.Field, TutorialProgress.Confirm, TutorialProgress.Grass }) session.Tutorials.Mark(id);
+            var (field, words) = Create(session, tutorials: true);
+            for (int i = 0; i < 5; i++) session.Vocabulary.Discover(words.Words[i].Id, System.DateTime.UtcNow.AddDays(-1));
+            yield return null;
+            yield return null;
+
+            // 몬스터를 바로 오른쪽으로: 어슬렁거리는 중이라 아직 [선제공격] 없음
+            var roamer = field.Roaming.Roamers[0];
+            Place(roamer, field.PlayerCell + Vector2Int.right);
+            Assert.AreEqual(RoamerState.Wandering, roamer.State);
+            yield return HoldStick(field, Direction.Right, () => field.PauseTutorial.IsShowing || field.IsInBattle, 3f);
+            Assert.IsFalse(field.IsInBattle, "처음엔 부딪혀도 바로 전투가 아님");
+            Assert.IsTrue(field.PauseTutorial.IsShowing, "대신 안내");
+            for (int i = 0; i < 3; i++)
+            {
+                field.PauseTutorial.PressNext();
+                yield return null;
+                yield return null;
+            }
+            Assert.IsFalse(field.PauseTutorial.IsShowing);
+
+            // 닫은 직후 스틱을 밀고 있어도 전투로 안 넘어감
+            yield return HoldStick(field, Direction.Right, () => field.IsInBattle, 0.3f);
+            Assert.IsFalse(field.IsInBattle, "안내 직후엔 부딪혀도 누를 틈");
+            Assert.IsTrue(field.IsPreemptAvailable);
+            Object.Destroy(field.gameObject);
+        }
+
+        // 안내를 본 사람은 부딪히면 그대로 전투 (GDD 보이는 몬스터 4번)
+        [UnityTest]
+        public IEnumerator BumpingAfterTheTutorialStartsABattle()
+        {
+            var session = GameSession.NewGame(Hero(), 5);
+            foreach (var id in new[] { TutorialProgress.Field, TutorialProgress.Confirm, TutorialProgress.Grass, TutorialProgress.Preempt }) session.Tutorials.Mark(id);
+            var (field, words) = Create(session, tutorials: true);
+            for (int i = 0; i < 5; i++) session.Vocabulary.Discover(words.Words[i].Id, System.DateTime.UtcNow.AddDays(-1));
+            yield return null;
+            yield return null;
+            var roamer = field.Roaming.Roamers[0];
+            Place(roamer, field.PlayerCell + Vector2Int.right);
+            yield return HoldStick(field, Direction.Right, () => field.IsInBattle, 3f);
+            Assert.IsTrue(field.IsInBattle, "부딪히면 전투");
             Object.Destroy(field.gameObject);
         }
 

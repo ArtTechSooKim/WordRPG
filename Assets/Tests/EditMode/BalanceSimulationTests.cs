@@ -167,6 +167,38 @@ namespace WordRPG.Tests
             Assert.Less(alone, 0.8f, $"정글 직후 레벨 혼자·정답률 60%면 쉽지 않아야 — {alone:P0}");
         }
 
+        // 헷갈너구리 (#144 사용자: 서고 보스보다 너무 약함 — 비슷하거나 더 어렵게): 보스보다 같은 만큼 높은 레벨·같은 강화로 맞붙어 비교한다
+        private static Hero LibraryBossHero(int level, int quill, int book, int lantern) =>
+            MakeHero(level, ("relic_quill", quill), ("relic_book", book), ("relic_lantern", lantern));
+
+        private static Hero ForestBossHero(int level, int wand, int whip, int book) =>
+            MakeHero(level, ("relic_wand", wand), ("relic_whip", whip), ("relic_book", book));
+
+        private static float BiggestHitShare(string speciesId, int bossLevel, Hero hero)
+        {
+            var species = Load<MonsterSpecies>($"Monsters/{speciesId}.asset");
+            var boss = new MonsterInstance(species, bossLevel);
+            return species.Skills.Where(s => s.Kind == SkillKind.Damage)
+                .Max(s => BattleFormulas.ExpectedDamage(s.Power, boss.Stats.Attack, hero.Stats.Defense)) / (float)hero.Stats.MaxHp;
+        }
+
+        [Test]
+        public void ForestBossIsAtLeastAsHardAsTheLibraryBoss()
+        {
+            var king = new[] { ("boss_forget_king", 7) };
+            var raccoon = new[] { ("boss_muddle_raccoon", 12) };
+            foreach (var (gap, a, b, c) in new[] { (3, 2, 1, 1), (5, 3, 2, 2), (7, 5, 3, 3) })
+            {
+                var (kingWin, _, _) = Many(() => LibraryBossHero(7 + gap, a, b, c), null, king, 0.8);
+                var (raccoonWin, _, _) = Many(() => ForestBossHero(12 + gap, a, b, c), null, raccoon, 0.8);
+                Assert.LessOrEqual(raccoonWin, kingWin + 0.1f, $"보스보다 {gap}레벨 위: 너구리 {raccoonWin:P0} / 대왕 {kingWin:P0}");
+                Assert.GreaterOrEqual(BiggestHitShare("boss_muddle_raccoon", 12, ForestBossHero(12 + gap, a, b, c)),
+                    BiggestHitShare("boss_forget_king", 7, LibraryBossHero(7 + gap, a, b, c)) * 0.9f, $"가장 큰 한 방이 대왕만큼 ({gap}레벨 위)");
+            }
+            Assert.Greater(BiggestHitShare("boss_muddle_raccoon", 12, MakeHero(14, ("relic_quill", 5), ("relic_lantern", 5), ("relic_book", 5))), 0.4f,
+                "+5 셋 Lv14(사용자가 쉽다고 한 상태)에도 큰 한 방은 HP의 40% 넘게");
+        }
+
         // 레벨 차이 경험치 (#88): 몬스터보다 높을수록 한 레벨에 25%씩 줄고 5%에서 멈춤
         [Test]
         public void ExpFallsOffWhenOverLeveled()
@@ -225,6 +257,34 @@ namespace WordRPG.Tests
             {
                 var (win, hp, rounds) = Many(hero, ally, enemies, acc);
                 TestContext.Out.WriteLine($"{label,-44} 정답률 {acc:P0} → 이김 {win,5:P0} · 남은 HP {hp,5:P0} · 라운드 {rounds:0.0}");
+            }
+            // 보스 앞 주인공 비교 (#144): 적의 한 대가 내 HP의 몇 %인지 · 내 가장 센 기술로 몇 대에 쓰러지는지
+            void Threat(string label, string speciesId, int level, Func<Hero> make)
+            {
+                var hero = make();
+                var species = Load<MonsterSpecies>($"Monsters/{speciesId}.asset");
+                var boss = new MonsterInstance(species, level);
+                var hits = species.Skills.Where(s => s.Kind == SkillKind.Damage)
+                    .Select(s => $"{s.DisplayName} {BattleFormulas.ExpectedDamage(s.Power, boss.Stats.Attack, hero.Stats.Defense) * 100 / hero.Stats.MaxHp}%");
+                var best = hero.Skills.Where(s => s.Kind == SkillKind.Damage).Max(s => BattleFormulas.ExpectedDamage(s.Power, hero.Stats.Attack, boss.Stats.Defense));
+                TestContext.Out.WriteLine($"{label,-40} 내 HP {hero.Stats.MaxHp} · 공 {hero.Stats.Attack} · 방 {hero.Stats.Defense} / 보스 HP {boss.Stats.MaxHp}: {string.Join(" · ", hits)} / 내 {best}씩 {Math.Ceiling((double)boss.Stats.MaxHp / best)}대");
+            }
+            var bossRows = new (string label, string id, int level, Func<Hero> hero)[]
+            {
+                ("까먹대왕 Lv7 vs Lv10 (+2·+1·+1)", "boss_forget_king", 7, () => LibraryBossHero(10, 2, 1, 1)),
+                ("까먹대왕 Lv7 vs Lv12 (+3·+2·+2)", "boss_forget_king", 7, () => LibraryBossHero(12, 3, 2, 2)),
+                ("까먹대왕 Lv7 vs Lv14 (+5·+3·+3)", "boss_forget_king", 7, () => LibraryBossHero(14, 5, 3, 3)),
+                ("헷갈너구리 Lv12 vs Lv15 (+2·+1·+1)", "boss_muddle_raccoon", 12, () => ForestBossHero(15, 2, 1, 1)),
+                ("헷갈너구리 Lv12 vs Lv17 (+3·+2·+2)", "boss_muddle_raccoon", 12, () => ForestBossHero(17, 3, 2, 2)),
+                ("헷갈너구리 Lv12 vs Lv19 (+5·+3·+3)", "boss_muddle_raccoon", 12, () => ForestBossHero(19, 5, 3, 3)),
+                ("헷갈너구리 Lv12 vs Lv14 (+5 셋 — 사용자)", "boss_muddle_raccoon", 12, () => MakeHero(14, ("relic_quill", 5), ("relic_lantern", 5), ("relic_book", 5))),
+                ("빈칸두꺼비 Lv17 vs Lv16 + 아라", "boss_blank_frog", 17, () => JungleHero(16)),
+                ("말줄임덩굴 Lv20 vs Lv19 + 아라", "boss_ellipsis_vine", 20, () => CaveHero(19)),
+            };
+            foreach (var (label, id, level, make) in bossRows)
+            {
+                Threat(label, id, level, make);
+                foreach (double acc in new[] { 0.6, 0.8 }) Row("  " + label, make, null, new[] { (id, level) }, acc);
             }
             foreach (double acc in new[] { 0.6, 0.8 })
             {

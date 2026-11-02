@@ -72,8 +72,10 @@ namespace WordRPG.EditorTools
             var spore = Skill("mushroom_spell_spore", "철자 포자", "철자를 뒤섞는 포자를 흩뿌린다.", SkillKind.Damage, SkillTarget.AllEnemies, 12, QuizDirection.EnglishToMeaning);
             var squeeze = Skill("snake_squiggle_squeeze", "꼬부랑 조이기", "꼬부랑 글씨처럼 몸을 비틀어 조인다.", SkillKind.Damage, SkillTarget.SingleEnemy, 20, QuizDirection.EnglishToMeaning);
             var peck = Skill("owl_question_peck", "물음표 쪼기", "'그게 뭐더라?' 하며 부리로 쫀다.", SkillKind.Damage, SkillTarget.SingleEnemy, 18, QuizDirection.EnglishToMeaning);
-            var muddle = Skill("raccoon_muddle_whirl", "뒤죽박죽 소용돌이", "단어를 뒤죽박죽 섞는 소용돌이를 일으킨다.", SkillKind.Damage, SkillTarget.AllEnemies, 18, QuizDirection.EnglishToMeaning);
-            var tailSlam = Skill("raccoon_tail_slam", "꼬리 후려치기", "커다란 꼬리로 힘껏 후려친다.", SkillKind.Damage, SkillTarget.SingleEnemy, 28, QuizDirection.EnglishToMeaning);
+            // 헷갈너구리 (#144 사용자: 서고 보스보다 너무 약함 — 비슷하거나 더 어렵게): 까먹대왕처럼 큰 한 방 + 힘을 모았다가 더 큰 한 방
+            var muddle = Skill("raccoon_muddle_whirl", "뒤죽박죽 소용돌이", "힘을 잔뜩 모았다가 단어를 뒤죽박죽 섞는 큰 소용돌이를 일으킨다.", SkillKind.Damage, SkillTarget.AllEnemies, 250, QuizDirection.EnglishToMeaning,
+                chargeTurns: 1);
+            var tailSlam = Skill("raccoon_tail_slam", "꼬리 후려치기", "커다란 꼬리로 힘껏 후려친다.", SkillKind.Damage, SkillTarget.SingleEnemy, 110, QuizDirection.EnglishToMeaning);
             var acornSnack = Skill("raccoon_acorn_snack", "도토리 간식", "숨겨 둔 도토리를 먹고 HP를 회복한다.", SkillKind.Heal, SkillTarget.Self, 14, QuizDirection.EnglishToMeaning);
 
             // --- 기술문서로 배우는 기술 (공부 테마). 보스·보물상자에서 문서를 얻는다. 새 기술은 앞으로 더 추가 ---
@@ -137,7 +139,7 @@ namespace WordRPG.EditorTools
                 new Color(0.85f, 0.5f, 0.25f), new MonsterStats(34, 12, 12), new MonsterStats(6, 2, 2), new[] { peck },
                 enemyExp: 13, enemyGold: 12, drops: new[] { new ItemDrop(sparkleDust, 0.4f), new ItemDrop(hardCover, 0.2f) });
             var muddleRaccoon = Monster("boss_muddle_raccoon", "헷갈너구리", "숲의 단어를 뒤죽박죽 섞어 버리는 커다란 너구리. 숲 깊은 공터에 산다.", MonsterRole.Attacker,
-                new Color(0.8f, 0.35f, 0.25f), new MonsterStats(70, 16, 14), new MonsterStats(9, 3, 2), new[] { muddle, tailSlam, acornSnack },
+                new Color(0.8f, 0.35f, 0.25f), new MonsterStats(100, 16, 14), new MonsterStats(16, 3, 2), new[] { muddle, tailSlam, acornSnack }, // HP·기술 #144
                 enemyExp: 45, enemyGold: 60,
                 drops: new[] { new ItemDrop(shinyInk, 1f, 2), new ItemDrop(hardCover, 1f, 2), new ItemDrop(sparkleDust, 1f, 2) });
 

@@ -257,6 +257,12 @@ namespace WordRPG.Field
             return best;
         }
 
+        // 나를 본 것으로 (부딪혔을 때 선제공격 안내 — #145): 이미 쫓는 중이면 그대로
+        public void Alert(Roamer roamer)
+        {
+            if (roamer.State != RoamerState.Chasing) roamer.State = RoamerState.Noticing;
+        }
+
         // 전투에서 이김 → 사라지고 얼마 뒤 다른 곳에서 새로 나타남
         public void Defeat(Roamer roamer)
         {

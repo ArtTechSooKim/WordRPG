@@ -21,11 +21,11 @@ MonoBehaviour:
   sprite: {fileID: 21300000, guid: 740dd81b9bc98fc4b8d9902f256f28b0, type: 3}
   placeholderColor: {r: 0.8, g: 0.35, b: 0.25, a: 1}
   baseStats:
-    maxHp: 70
+    maxHp: 100
     attack: 16
     defense: 14
   growthPerLevel:
-    maxHp: 9
+    maxHp: 16
     attack: 3
     defense: 2
   skills:

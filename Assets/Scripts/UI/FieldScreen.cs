@@ -400,7 +400,7 @@ namespace WordRPG.UI
             {
                 walker.Face(direction);
                 playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
-                StartRoamerBattle(bumped, null);
+                if (!BumpOpensPreempt(bumped)) StartRoamerBattle(bumped, null);
                 return;
             }
             var from = walker.Position;
