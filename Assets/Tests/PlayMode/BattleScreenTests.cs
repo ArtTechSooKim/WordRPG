@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
 using WordRPG.Battle;
@@ -444,6 +445,63 @@ namespace WordRPG.Tests
             yield return WaitFor(() => session.ComboStreak == 0, 5f);
             Assert.AreEqual(0, session.ComboStreak, "틀리면 처음부터");
 
+            Object.Destroy(screen.gameObject);
+        }
+
+        // #141 적 고르기: 엄지가 위로 오가지 않게 적 카드들이 기술 버튼 자리로 내려옴 → 고르거나 취소하면 제자리로
+        [UnityTest]
+        public IEnumerator PickingAnEnemyPullsEnemiesDownToTheThumb()
+        {
+            var strike = TestData.Skill("strike", SkillKind.Damage, SkillTarget.SingleEnemy, 40);
+            var hero = Hero(new MonsterStats(500, 30, 10), strike);
+            var tank = TestData.Species("tank", new MonsterStats(9999, 1, 50), new MonsterStats(0, 0, 0), strike);
+            var table = Table(tank);
+            Set(table, "minGroupSize", 2);
+            Set(table, "maxGroupSize", 2);
+            var screen = new GameObject("BattleScreenUnderTest").AddComponent<BattleScreen>();
+            screen.Configure(table, Words(), GameSession.NewGame(hero, 1), animScale: 0.01f);
+            yield return WaitFor(() => ActiveButton(screen.transform, "SkillButton_0") != null, 5f);
+            yield return null;
+
+            var enemy = (RectTransform)FindButton(screen.transform, "Enemy_1").transform;
+            var party = (RectTransform)screen.transform.Find("BattleCanvas/SafeArea/PartyArea");
+            float[] Span(RectTransform rect)
+            {
+                var corners = new Vector3[4];
+                rect.GetWorldCorners(corners);
+                return new[] { corners[0].y, corners[1].y };
+            }
+            float homeY = enemy.position.y, homeScale = enemy.lossyScale.y;
+            Assert.Greater(Span(enemy)[0], Span(party)[1], "평소 적은 아군 위에");
+
+            ActiveButton(screen.transform, "SkillButton_0").onClick.Invoke();
+            yield return new WaitForSecondsRealtime(0.1f);
+            var cancel = (RectTransform)ActiveButton(screen.transform, "CancelButton").transform;
+            Assert.Less(Span(enemy)[1], Span(party)[0], "적 카드는 아군 아래로 내려옴");
+            Assert.GreaterOrEqual(Span(enemy)[0], Span(cancel)[1], "[취소]를 가리지 않음");
+            Assert.Less(enemy.lossyScale.y, homeScale, "기술 버튼 자리에 맞게 줄어듦");
+
+            // 내려온 자리에서 실제로 눌림: 그 위를 막는 것이 없음
+            var hits = new List<RaycastResult>();
+            var pointer = new PointerEventData(EventSystem.current) { position = RectTransformUtility.WorldToScreenPoint(null, enemy.position) };
+            EventSystem.current.RaycastAll(pointer, hits);
+            Assert.IsNotEmpty(hits);
+            Assert.AreEqual(enemy.gameObject, hits[0].gameObject, "맨 위는 적 카드");
+
+            // 취소하면 제자리로
+            cancel.GetComponent<Button>().onClick.Invoke();
+            yield return new WaitForSecondsRealtime(0.1f);
+            Assert.AreEqual(homeY, enemy.position.y, 0.5f, "취소 → 제자리");
+            Assert.AreEqual(homeScale, enemy.lossyScale.y, 0.001f);
+
+            // 적을 고르면 제자리로 돌아가고 같은 자리에 강도 고르기
+            ActiveButton(screen.transform, "SkillButton_0").onClick.Invoke();
+            yield return new WaitForSecondsRealtime(0.1f);
+            Assert.Less(Span(enemy)[1], Span(party)[0]);
+            enemy.GetComponent<Button>().onClick.Invoke();
+            yield return new WaitForSecondsRealtime(0.1f);
+            Assert.IsNotNull(ActiveButton(screen.transform, "Intensity_0"), "다음은 강도");
+            Assert.AreEqual(homeY, enemy.position.y, 0.5f, "고른 뒤 제자리");
             Object.Destroy(screen.gameObject);
         }
 

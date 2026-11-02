@@ -187,6 +187,54 @@ namespace WordRPG.UI
                 view.SetSelectable(true, () => Commit(skill, target));
                 view.SetFrame(Palette.Info);
             }
+            if (skill.Target == SkillTarget.SingleEnemy) PullEnemiesDown();
+        }
+
+        // 적 고르기 (#141 사용자: 기술 → 적 → 강도를 고르는 동안 엄지가 아래-위-아래로 오가지 않게): 적 카드들을 기술 버튼이 있던 자리(제목과 [취소] 사이)로
+        // 끌어내렸다가, 고르거나 취소하면 제자리로 (ClearSelectable)
+        private void PullEnemiesDown()
+        {
+            if (!enemiesAway) enemyHome = enemyArea.localPosition;
+            enemiesAway = true;
+            var panel = (RectTransform)skillPanel.transform;
+            float RowY(float k) => root.InverseTransformPoint(panel.TransformPoint(0f, Mathf.Lerp(panel.rect.yMin, panel.rect.yMax, k), 0f)).y;
+            float bottom = RowY(0.175f), top = RowY(0.835f); // Layout의 기술 버튼 줄 (0.835 아래로 4줄), 맨 아래 0.155는 [취소]
+            MoveEnemies(new Vector3(enemyHome.x, (top + bottom) / 2f, enemyHome.z), Mathf.Min(1f, (top - bottom) / enemyArea.rect.height), false);
+        }
+
+        private void MoveEnemies(Vector3 to, float scale, bool home)
+        {
+            if (enemyMove != null) StopCoroutine(enemyMove);
+            enemyMove = StartCoroutine(MoveEnemiesRoutine(to, scale, home));
+        }
+
+        private IEnumerator MoveEnemiesRoutine(Vector3 to, float scale, bool home)
+        {
+            var from = enemyArea.localPosition;
+            float fromScale = enemyArea.localScale.x;
+            float duration = 0.18f * animationScale;
+            for (float t = 0f; t < duration; t += Time.unscaledDeltaTime)
+            {
+                float k = 1f - (1f - t / duration) * (1f - t / duration);
+                enemyArea.localPosition = Vector3.Lerp(from, to, k);
+                enemyArea.localScale = Vector3.one * Mathf.Lerp(fromScale, scale, k);
+                yield return null;
+            }
+            enemyArea.localPosition = to;
+            enemyArea.localScale = Vector3.one * scale;
+            if (home) enemiesAway = false;
+            enemyMove = null;
+        }
+
+        // 도중에 전투가 새로 시작되면 (연출 없이) 제자리로
+        private void ResetEnemyArea()
+        {
+            if (!enemiesAway) return;
+            if (enemyMove != null) StopCoroutine(enemyMove);
+            enemyMove = null;
+            enemyArea.localPosition = enemyHome;
+            enemyArea.localScale = Vector3.one;
+            enemiesAway = false;
         }
 
         // 기술(과 대상)이 정해짐: 주인공의 공격 기술이면 강도를 고르고, 아니면 바로 문제로
@@ -284,6 +332,7 @@ namespace WordRPG.UI
         {
             foreach (var view in viewOf.Values) view.SetSelectable(false);
             UpdateFrames();
+            if (enemiesAway) MoveEnemies(enemyHome, 1f, true);
         }
 
         private void UpdateFrames()

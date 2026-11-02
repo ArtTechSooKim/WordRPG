@@ -141,6 +141,9 @@ namespace WordRPG.UI
         private Image finisherFlash, finisherShade;
         private Text finisherStamp;
         private int enemyAreaIndex = -1; // 결정타 동안 적 칸을 어두운 막 위로 올렸다가 되돌릴 자리
+        private bool enemiesAway;        // 적 고르기로 끌어내린 뒤 아직 제자리가 아님 (#141)
+        private Vector3 enemyHome;
+        private Coroutine enemyMove;
         public int FinishersPlayed { get; private set; } // 보스 결정타 연출 횟수 (테스트용)
 
         // 연출 기록 (#119, 테스트용): 연출 한 단계(로그·떠오르는 숫자·효과·기다림·HP 갱신·콤보 글자·결정타·어둡게)마다 한 줄씩 받는다.
@@ -354,6 +357,7 @@ namespace WordRPG.UI
             fleeEvents = null;
             fleeQuizEvents = null;
 
+            ResetEnemyArea();
             foreach (var view in enemyViews) Destroy(view.Root.gameObject);
             enemyViews.Clear();
             viewOf.Clear();

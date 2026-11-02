@@ -39,6 +39,25 @@ namespace WordRPG.Tests
             Assert.IsNotNull(FieldArt.AutoTile(FieldTile.Water, FieldTheme.Library, 0), "잉크 웅덩이 물가 테두리 (#98)");
         }
 
+        // #141 숲 나무도 초원처럼 네모 바탕 없이: 나무 3가지가 각자 자동 테두리를 가짐. 변형 아틀라스가 없는 칸은 기본 아틀라스
+        [Test]
+        public void ForestTreesKeepTheirVariantsWithRoundedEdges()
+        {
+            Assert.AreEqual(2, FieldArt.VariantCount(FieldTile.Wall, FieldTheme.Forest), "나무 3가지 = 기본 + _v1·_v2");
+            var sprites = new HashSet<Sprite>();
+            for (int variant = 0; variant <= 2; variant++)
+            {
+                var sprite = FieldArt.AutoTile(FieldTile.Wall, FieldTheme.Forest, 0, variant);
+                Assert.IsNotNull(sprite, $"나무 {variant}");
+                sprites.Add(sprite);
+                Assert.AreNotSame(sprite, FieldArt.AutoTile(FieldTile.Wall, FieldTheme.Forest, 255, variant), "둘레가 막힌 칸과 트인 칸은 다른 조각");
+            }
+            Assert.AreEqual(3, sprites.Count, "나무마다 다른 그림");
+            Assert.AreSame(FieldArt.AutoTile(FieldTile.Wall, FieldTheme.Meadow, 0), FieldArt.AutoTile(FieldTile.Wall, FieldTheme.Meadow, 0, 2),
+                "변형 아틀라스가 없으면 기본 아틀라스");
+            Assert.IsNull(FieldArt.AutoTile(FieldTile.Wall, FieldTheme.Library, 0, 1), "서고 책장은 자동 테두리 없음 — 지금처럼 칸 그림");
+        }
+
         // #103 서고 바닥 안개 한 장: 풀숲을 다 덮고(구름 무늬로 짙기만 다름), 풀숲 밖으로 몇 px만 옅어짐, 늘 같은 그림. 서고만
         [Test]
         public void FogCoversGrassAsOneSheetAndFadesJustOutside()
@@ -101,7 +120,6 @@ namespace WordRPG.Tests
             Assert.AreEqual(0, FieldArt.VariantCount(FieldTile.Wall, FieldTheme.Meadow), "초원 덤불은 한 가지");
             Assert.AreEqual(0, FieldArt.VariantCount(FieldTile.Grass, FieldTheme.Meadow));
             Assert.IsNotNull(FieldArt.AutoTile(FieldTile.Wall, FieldTheme.Meadow, 0), "초원 덤불 그늘 테두리 (#100)");
-            Assert.IsNull(FieldArt.AutoTile(FieldTile.Wall, FieldTheme.Forest, 0), "숲은 그대로 (사용자 OK)");
             foreach (var theme in new[] { FieldTheme.Meadow, FieldTheme.Forest })
                 Assert.GreaterOrEqual(FieldArt.Scatter(theme, FieldTile.Lawn).Length, 5, $"{theme} 잔디 흩뿌림");
         }

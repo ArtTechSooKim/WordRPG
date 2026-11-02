@@ -504,10 +504,9 @@ def auto_atlas(pack, template, sheet, col0, row0, recolor=None):
 MEADOW_BUSH_TINT = (0.66, 0.8, 0.6)
 
 
-def meadow_wall_atlas(pack, template, bush):
-    """초원 덤불 벽 (#100 사용자: 덤불 칸 바탕이 잔디와 같은 색이라 벽·땅이 헷갈리고 바닥이 네모로 갈라져 보임):
-    흙길 조각(TilesetFloor 0,7)의 흙을 짙은 그늘 풀로 칠하면 '그늘진 덤불숲 + 잔디로 번지는 둥근 풀 테두리'가 된다. 칸마다 짙은 덤불을 위에"""
-    dark, light = (47, 77, 44), (79, 125, 62)
+def shade_wall_atlas(pack, template, col0, row0, tree, dark, light):
+    """초원 덤불·숲 나무 벽 (#100 사용자: 덤불 칸 바탕이 잔디와 같은 색이라 벽·땅이 헷갈리고 바닥이 네모로 갈라져 보임 · #141 숲도 초원처럼):
+    흙길 조각(TilesetFloor col0,row0)의 흙을 짙은 그늘 풀로 칠하면 '그늘진 덤불숲 + 땅으로 번지는 둥근 풀 테두리'가 된다. 칸마다 나무를 위에"""
 
     def shade(t):
         out = t.copy()
@@ -520,11 +519,11 @@ def meadow_wall_atlas(pack, template, bush):
                     px[x, y] = tuple(int(dark[i] + (light[i] - dark[i]) * k) for i in range(3)) + (a,)
         return out
 
-    atlas = auto_atlas(pack, template, "TilesetFloor.png", 0, 7, shade)
+    atlas = auto_atlas(pack, template, "TilesetFloor.png", col0, row0, shade)
     for mask in range(256):
         box = ((mask % 16) * 16, (mask // 16) * 16, (mask % 16) * 16 + 16, (mask // 16) * 16 + 16)
         cell = atlas.crop(box)
-        cell.alpha_composite(bush)
+        cell.alpha_composite(tree)
         atlas.paste(cell, box[:2])
     return atlas
 
@@ -808,7 +807,7 @@ def build_tiles(pack):
     }
     autos["Meadow_Floor_auto"] = auto_atlas(pack, template, "TilesetFloor.png", 0, 7)
     autos["Meadow_Water_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6)
-    autos["Meadow_Wall_auto"] = meadow_wall_atlas(pack, template, meadow_bush)
+    autos["Meadow_Wall_auto"] = shade_wall_atlas(pack, template, 0, 7, meadow_bush, (47, 77, 44), (79, 125, 62))
     library_stone = pack.tile("Interior/TilesetInteriorFloor.png", 16, 13)
     autos["Library_Water_auto"] = auto_atlas(pack, template, "TilesetWater.png", 0, 6, lambda t: library_ink_rim(t, library_stone))
     # 초원 풀숲 테두리 따기 (#102 사용자: 풀숲 바탕이 네모라 어색 — 풀잎 모양대로 테두리를)
@@ -892,6 +891,9 @@ def build_tiles(pack):
     forest_ground, forest_tree = tint(field_grass, (0.62, 0.72, 0.62)), (0.55, 0.75, 0.55)
     themes["Forest"]["Wall_v1"] = over(forest_ground, tint(nature(1, 10), forest_tree))
     themes["Forest"]["Wall_v2"] = over(forest_ground, tint(nature(0, 10), forest_tree))
+    # 숲 나무 벽 (#141 사용자: 초원처럼 누끼 따서 자연스럽게): 나무 3가지 그대로 + 짙은 그늘 바탕 + 이끼 땅으로 번지는 둥근 풀 테두리 (숲 흙길과 같은 조각)
+    for name, sprite in (("Forest_Wall_auto", nature(10, 9)), ("Forest_Wall_v1_auto", nature(1, 10)), ("Forest_Wall_v2_auto", nature(0, 10))):
+        autos[name] = shade_wall_atlas(pack, template, 11, 7, tint(sprite, forest_tree), (26, 52, 34), (48, 88, 50))
     themes["Forest"]["Grass_v1"] = over(field_grass, tint(nature(5, 11), (0.75, 0.85, 0.75)))
     themes["Forest"]["Grass_v2"] = over(field_grass, nature(4, 11).transpose(Image.FLIP_LEFT_RIGHT))
     dark_tuft = lambda c: tint(floor_detail(c, 2), (0.7, 0.85, 0.7))

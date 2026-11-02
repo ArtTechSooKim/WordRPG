@@ -35,7 +35,8 @@ namespace WordRPG.UI
                 if (kind == FieldTile.Door) tile = DoorTile(fieldArea, cell, lockedDoor(cell));
                 else if (kind == FieldTile.Bridge) tile = BridgeTile(fieldArea.Theme, done, map.IsBridgeHorizontal(cell));
                 else if (kind == FieldTile.Decor) tile = DecorTile(fieldArea.Theme, FieldDecor.Variant(map, cell));
-                else if (FieldAutotile.IsAutotiled(kind) && AutoTile(fieldArea.Theme, kind, FieldAutotile.Mask(map, cell)) is Tile auto) tile = auto;
+                else if (FieldAutotile.IsAutotiled(kind) && AutoTile(fieldArea.Theme, kind, FieldAutotile.Mask(map, cell),
+                             FieldDecor.TileVariant(cell, FieldArt.VariantCount(kind, fieldArea.Theme))) is Tile auto) tile = auto;
                 else if (!done && FieldArt.VariantCount(kind, fieldArea.Theme) > 0)
                     tile = VariantTile(fieldArea.Theme, kind, FieldDecor.TileVariant(cell, FieldArt.VariantCount(kind, fieldArea.Theme)));
                 else tile = TileFor(kind, done, fieldArea.Theme);
@@ -118,12 +119,12 @@ namespace WordRPG.UI
         }
 
         // 길·물가 자동 테두리 (그림이 없는 테마면 null → 한 칸 그림)
-        private Tile AutoTile(FieldTheme theme, FieldTile kind, int mask)
+        private Tile AutoTile(FieldTheme theme, FieldTile kind, int mask, int variant = 0)
         {
-            string key = $"{theme}_{kind}_auto_{mask}";
+            string key = $"{theme}_{kind}_auto_{mask}_{variant}";
             if (!tileCache.TryGetValue(key, out var tile))
             {
-                var sprite = FieldArt.AutoTile(kind, theme, mask);
+                var sprite = FieldArt.AutoTile(kind, theme, mask, variant);
                 tile = sprite != null ? MakeTile(sprite) : null;
                 tileCache[key] = tile;
             }

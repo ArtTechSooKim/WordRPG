@@ -153,9 +153,10 @@ namespace WordRPG.UI
         }
 
         // 자동 테두리 조각 (Tiles/{테마}_{종류}_auto.png: 16×16칸, 칸 번호 = FieldAutotile 마스크). 아틀라스가 없으면 null
-        public static Sprite AutoTile(FieldTile tile, FieldTheme theme, int mask)
+        // variant > 0 = 변형 그림의 아틀라스 ({테마}_{종류}_v{n}_auto — 숲 나무 3가지 #141). 그 변형 아틀라스가 없으면 기본 아틀라스
+        public static Sprite AutoTile(FieldTile tile, FieldTheme theme, int mask, int variant = 0)
         {
-            string key = $"{theme}_{tile}_auto";
+            string key = variant > 0 ? $"{theme}_{tile}_v{variant}_auto" : $"{theme}_{tile}_auto";
             if (!Atlases.TryGetValue(key, out var sprites))
             {
                 var texture = Resources.Load<Texture2D>(Folder + key);
@@ -163,6 +164,7 @@ namespace WordRPG.UI
                 if (sprites != null) AtlasTextures[key] = texture;
                 Atlases[key] = sprites;
             }
+            if (sprites == null && variant > 0) return AutoTile(tile, theme, mask);
             if (sprites == null || mask < 0 || mask > 255) return null;
             if (sprites[mask] == null)
             {
