@@ -210,8 +210,9 @@ namespace WordRPG.Tests
             yield return new WaitForSecondsRealtime(0.3f);
 
             // 4·5) 서고 보스 결정타 → 결산 (하나는 틀려서 오답 노트)
-            session = Session(heroData, db, 10);
+            session = Session(heroData, db, 16); // 까먹대왕이 세져서(#120) 보스 HP를 미리 깎고 주인공 HP를 채워 줌 — 승리 결산까지 찍으려고 (캡처 전용)
             session.GrantRelic(db.FindRelic("relic_quill"));
+            session.Record.MarkRegionClaimed("meadow"); // 결산의 도감 배너는 하나만
             Study(session, library.Words, 200, now);
             session.World.SetPosition("library", library.Map.Start);
             field = Field(library, session, db);
@@ -221,11 +222,17 @@ namespace WordRPG.Tests
                 "보스 출현!", library.Theme, boss: true);
             root = field.Battle.transform;
             int answers = 0, turn = 0;
-            bool shotFinisher = false;
+            bool shotFinisher = false, weakened = false;
             float finisherAt = 0f;
             for (float end = Time.realtimeSinceStartup + 180f; Time.realtimeSinceStartup < end && !field.Battle.IsResultVisible;)
             {
                 var engine = field.Battle.Engine;
+                if (!weakened && engine != null)
+                {
+                    engine.Enemies[0].Monster.TakeDamage(engine.Enemies[0].MaxHp * 6 / 10);
+                    weakened = true;
+                }
+                if (session.Hero.CurrentHp * 10 < session.Hero.Stats.MaxHp * 6) session.Hero.RestoreFully();
                 if (field.Battle.FinishersPlayed > 0)
                 {
                     if (finisherAt == 0f) finisherAt = Time.realtimeSinceStartup;
@@ -278,7 +285,8 @@ namespace WordRPG.Tests
             Private<RelicAltarView>(field, "altarView").Hide();
 
             // 7) 단어 도감 + 단어 하나 자세히
-            Study(session, meadow.Words, 110, now); // 지역마다 150개 (#76) — 다 채우기 전 모습
+            Study(session, meadow.Words, 110, now); // 초원·서고 150개 (#147) — 다 채우기 전 모습
+            session.ClaimDexRewards(new[] { meadow.Words }); // 실제로 도감을 열 때처럼 받을 보상을 먼저 받음
             Private<DexView>(field, "dexView").Show(meadow.Words, session, now);
             yield return new WaitForSecondsRealtime(0.3f);
             FindButton(field.transform, "DexRow_3").onClick.Invoke();
