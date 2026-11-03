@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace WordRPG.Game
 {
@@ -13,7 +14,14 @@ namespace WordRPG.Game
         Unavailable       // 스토어에 연결되지 않았거나 상품을 못 받아 옴
     }
 
-    // 결제 창구 (#40). 실제 기기는 UnityIapStore(애플 인앱 결제), 테스트는 가짜.
+    // 결제 안내에 나오는 계정 이름 (#149): 안드로이드 = Google, 그 밖 = Apple
+    public static class StoreLabels
+    {
+        public static string Account(RuntimePlatform platform) => platform == RuntimePlatform.Android ? "Google 계정" : "Apple 계정";
+        public static string Account() => Account(Application.platform);
+    }
+
+    // 결제 창구 (#40). 실제 기기는 UnityIapStore(앱스토어·구글플레이 인앱 결제), 테스트는 가짜.
     // 사거나 되찾으면 Entitlements에 넣은 뒤 결과를 알린다
     public interface IStore
     {

@@ -19,7 +19,7 @@ namespace WordRPG.UI
     public class PaywallView
     {
         private const float PanelWidth = 960f;
-        private const string Footer = "결제는 Apple 계정으로 진행돼요";
+        private static string Footer => $"결제는 {StoreLabels.Account()}으로 진행돼요";
 
         public GameObject Root { get; private set; }
         public bool IsOpen => Root != null && Root.activeSelf;
@@ -195,7 +195,7 @@ namespace WordRPG.UI
                 case StoreResult.Restored: return "정식판을 되찾았어요!";
                 case StoreResult.Cancelled: return "결제를 취소했어요.";
                 case StoreResult.Deferred: return "보호자 승인을 기다리고 있어요. 승인되면 자동으로 열려요.";
-                case StoreResult.NothingToRestore: return "복원할 구매 기록이 없어요. 결제한 Apple 계정으로 로그인했는지 확인해 주세요.";
+                case StoreResult.NothingToRestore: return $"복원할 구매 기록이 없어요. 결제한 {StoreLabels.Account()}으로 로그인했는지 확인해 주세요.";
                 case StoreResult.Unavailable: return "지금은 결제할 수 없어요. 인터넷 연결을 확인하고 잠시 뒤에 다시 해 주세요.";
                 default: return "결제를 완료하지 못했어요. 잠시 뒤에 다시 해 주세요.";
             }

@@ -11,7 +11,8 @@ namespace WordRPG.EditorTools
 {
     // 모바일 출시 준비: 플레이어 설정 한 번에 맞추기 + 빌드.
     //  - 아이폰(앱스토어 출시 — 2026-10-03 사용자 결정): Xcode 프로젝트를 만들어 Mac의 Xcode에서 서명·업로드. iOS Build Support 모듈 필요
-    //  - 안드로이드: 폰 테스트용 APK / 스토어용 AAB. Android Build Support 모듈 필요
+    //  - 안드로이드(구글플레이 — 2026-11-03 사용자 결정, 1.2부터 앱스토어와 같이): 폰 테스트용 APK / 스토어용 AAB. Android Build Support 모듈 필요.
+    //    AAB는 올림 열쇠로 서명 — 열쇠·비밀번호는 저장소 밖, 환경변수 WORDRPG_ANDROID_KEYS = 설정 파일 경로 (Docs/안드로이드출시방법.txt)
     // 배치모드: -executeMethod WordRPG.EditorTools.MobileBuild.BuildIos (또는 BuildAndroidApk, BuildAndroidAab)
     public static class MobileBuild
     {
@@ -48,11 +49,16 @@ namespace WordRPG.EditorTools
             if (string.IsNullOrEmpty(PlayerSettings.iOS.buildNumber) || PlayerSettings.iOS.buildNumber == "0")
                 PlayerSettings.iOS.buildNumber = "1";
 
-            // 안드로이드: 64비트(ARM64) → IL2CPP. 안드로이드 7.1(API 25) 이상, 대상 SDK는 설치된 최신
+            // 안드로이드: 64비트(ARM64) → IL2CPP. 안드로이드 7.1(API 25) 이상.
+            // 대상 API 36 = 2026-08-31부터 구글플레이 조건 — 해마다 오르니 '자동' 대신 분명히 적어 둠 (Tools/check_android_bundle.py가 확인)
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
             PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel25;
-            PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevelAuto;
+            PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevel36;
+            // 게임으로 표시: 안드로이드 16의 '큰 화면에서 세로 고정 무시'에서 빠짐 (태블릿·폴더블에서도 세로 고정)
+            PlayerSettings.Android.appCategory = "game";
+            // 뒤로 가기 키를 게임이 그대로 받음 (Escape → 각 화면 HandleBack). 켜면 API 36에서 뒤로 가기 키가 앱으로 오지 않음
+            PlayerSettings.Android.predictiveBackSupport = false;
 
             var icon = AssetDatabase.LoadAssetAtPath<Texture2D>(IconPath);
             if (icon != null) PlayerSettings.SetIcons(NamedBuildTarget.Unknown, new[] { icon }, IconKind.Any);
@@ -89,9 +95,32 @@ namespace WordRPG.EditorTools
                      "Android Build Support(OpenJDK, Android SDK & NDK Tools 포함)를 설치한 뒤 다시 해 주세요.");
                 return;
             }
+            if (!ApplyAndroidSigning(appBundle)) return;
             EditorUserBuildSettings.buildAppBundle = appBundle;
             Build(BuildTarget.Android, BuildTargetGroup.Android,
                 $"{AndroidFolder}/WordRPG-{PlayerSettings.bundleVersion}{(appBundle ? ".aab" : ".apk")}");
+        }
+
+        // 올림 열쇠로 서명. 설정 파일(storeFile=, storePassword=, keyAlias=, keyPassword=)은 저장소 밖에 두고 경로만 환경변수로 받는다.
+        // 비밀번호는 PlayerSettings 메모리에만 (ProjectSettings 파일에 저장되지 않음). AAB는 꼭 필요, APK는 없으면 임시 디버그 서명
+        private static bool ApplyAndroidSigning(bool required)
+        {
+            string path = Environment.GetEnvironmentVariable("WORDRPG_ANDROID_KEYS");
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+            {
+                PlayerSettings.Android.useCustomKeystore = false;
+                if (!required) return true;
+                Fail("구글플레이용 AAB에는 올림 열쇠가 필요해요. 환경변수 WORDRPG_ANDROID_KEYS에 설정 파일 경로를 넣어 주세요 (Docs/안드로이드출시방법.txt).");
+                return false;
+            }
+            var values = File.ReadAllLines(path).Select(line => line.Split(new[] { '=' }, 2)).Where(pair => pair.Length == 2)
+                .ToDictionary(pair => pair[0].Trim(), pair => pair[1].Trim());
+            PlayerSettings.Android.useCustomKeystore = true;
+            PlayerSettings.Android.keystoreName = values["storeFile"];
+            PlayerSettings.Android.keystorePass = values["storePassword"];
+            PlayerSettings.Android.keyaliasName = values["keyAlias"];
+            PlayerSettings.Android.keyaliasPass = values["keyPassword"];
+            return true;
         }
 
         private static void Build(BuildTarget target, BuildTargetGroup group, string location)

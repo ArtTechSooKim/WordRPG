@@ -9,7 +9,7 @@ namespace WordRPG.Game
     // 앱을 켤 때마다 스토어에서 다시 확인하고(IStore), [구매 복원]으로 다른 기기에서도 되찾는다
     public class Entitlements
     {
-        public const string FullVersion = "com.arttechsoo.wordrpg.full"; // 앱스토어 커넥트의 상품 id — 바꾸지 말 것
+        public const string FullVersion = "com.arttechsoo.wordrpg.full"; // 앱스토어 커넥트·구글플레이 콘솔의 상품 id — 바꾸지 말 것
 
         private readonly HashSet<string> owned = new HashSet<string>();
 

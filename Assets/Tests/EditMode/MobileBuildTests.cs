@@ -29,6 +29,14 @@ namespace WordRPG.Tests
                 MobileBuild.WithNoEncryption("<dict>\n    <key>A</key>\n    <true />\n  </dict>\n</plist>\n"));
         }
 
+        // 결제 안내 문구 (#149): 구글플레이에서 Apple을 말하면 안 됨 (거꾸로도)
+        [Test]
+        public void StoreAccountNameFollowsThePlatform()
+        {
+            Assert.AreEqual("Google 계정", WordRPG.Game.StoreLabels.Account(RuntimePlatform.Android));
+            Assert.AreEqual("Apple 계정", WordRPG.Game.StoreLabels.Account(RuntimePlatform.IPhonePlayer));
+        }
+
         // 앱스토어는 1024px 아이콘에 투명 채널이 있으면 받지 않는다
         [Test]
         public void AppIconIsSquare1024WithoutAlpha()

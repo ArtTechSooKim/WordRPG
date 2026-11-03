@@ -19,7 +19,7 @@ namespace WordRPG.Game
         // 테스트가 실제 세이브 파일을 건드리지 않도록 저장 폴더를 바꾸는 용도. 평소에는 null
         public static string SaveDirectoryOverride;
 
-        // 테스트용 결제 창구. 평소에는 null → 실제 기기에서는 애플 인앱 결제(UnityIapStore)
+        // 테스트용 결제 창구. 평소에는 null → 실제 기기에서는 앱스토어·구글플레이 인앱 결제(UnityIapStore)
         public static IStore StoreOverride;
 
         [SerializeField] private GameDatabase database;
@@ -126,7 +126,7 @@ namespace WordRPG.Game
             }
         }
 
-        // 애플 인앱 결제에 연결: 가격을 받아 오고, 이미 산 것(재설치·다른 기기)을 확인해 Entitlements에 넣는다
+        // 스토어 인앱 결제에 연결: 가격을 받아 오고, 이미 산 것(재설치·다른 기기)을 확인해 Entitlements에 넣는다
         private IStore ConnectStore()
         {
             var store = new UnityIapStore(Entitlements);

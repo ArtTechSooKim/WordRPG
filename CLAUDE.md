@@ -24,7 +24,7 @@
 
 - **장르**: 주인공 + 성유물 수집·강화 턴제 RPG + 영단어 학습. "공부하려고 켜는 게임"이 아니라 "게임하다 보니 단어를 외우고 있는 게임"
   (2026-10-02 사용자 결정으로 몬스터 3마리 육성 → 주인공 혼자 + 성유물. 몬스터는 적으로만)
-- **엔진**: Unity 6000.3.11f1 (2D, Built-in RP) / **플랫폼**: 모바일, **세로 고정**, **아이폰 앱스토어 출시** (2026-10-03 사용자 결정, 안드로이드는 시험용 빌드만) / **개발**: 1인
+- **엔진**: Unity 6000.3.11f1 (2D, Built-in RP) / **플랫폼**: 모바일, **세로 고정**, **아이폰 앱스토어 + 구글플레이** (2026-11-03 사용자 결정: 1.2부터 같이 출시 — `Docs/안드로이드출시방법.txt`, `Docs/구글플레이정보.md`) / **개발**: 1인
 - **핵심 루프**: 탐험 → 랜덤 조우 → 전투(기술마다 단어 문제) → 보상(경험치·재료·성유물) → 레벨업·성유물 강화(+3 각성) → 새 지역·어려운 단어
 - **현재 단계**: MVP 이후 확장 — 초원(마을)·잊혀진 서고(던전)·숲(2번째 지역, 서고 보스를 물리치면 열림), 주인공 + 성유물 8개(3칸 장착),
   적 6종 + 보스 2 (+ 1.1 메아리 정글 — 2026-10 출시, 가지 release-1.1: 숲 보스 공터 위 출입구, 적 3종 + 빈칸두꺼비, 동료 아라)
@@ -62,7 +62,7 @@
      `ConfirmDialog.ShowNotice` [확인] 하나). 새 게임은 모두 본 것으로 시작, 튜토리얼과 따로. 다음 업데이트 안내는 `UpdateNotices.All` 맨 뒤에 새 id로
    - 설정(`GameSettings`: 음량·진동·전투 강도 `BattleIntensity` #147 — 0 = 매번 고르기, 1~ = 묻지 않고 그 강도)은 세이브가 아니라 PlayerPrefs. `GameManager.Settings` / `SaveSettings()`
    - **수익화** (GDD 9-3): 산 상품(`Entitlements`, 정식판 id `com.arttechsoo.wordrpg.full` — 바꾸지 말 것)도 세이브가 아니라 PlayerPrefs.
-     결제는 `IStore`(실제 `UnityIapStore` = Unity IAP 5, 테스트는 가짜 — `GameManager.StoreOverride`/`FieldScreen.Configure`).
+     결제는 `IStore`(실제 `UnityIapStore` = Unity IAP 5 — 앱스토어·구글플레이, 상품 id 같음, 구매 복원 흐름은 스토어마다 다름 #149, 계정 이름 문구 `StoreLabels`, 테스트는 가짜 — `GameManager.StoreOverride`/`FieldScreen.Configure`).
      정식판이 필요한 지역은 FieldArea `requiresFullVersion` (숲·정글·동굴) → 입구에서 `PaywallView`, 어디서든 설정 > 정식판(보기·구매 복원).
      앱 버전(PlayerSettings.bundleVersion)은 앱스토어 버전과 같아야 함 (지금 main = **1.2 개발 중**(동굴, #110). **1.1 출시·고침은 가지 `release-1.1`**에서 빌드하고
      고친 것은 main에도 합침 — main에서 1.1을 빌드하지 말 것. 1.0 심사 코드는 태그 v1.0-build3, 1.0을 고쳐 다시 내야 하면 그 태그에서 가지를 땀). 지원·개인정보 웹 페이지 = `gh-pages` 브랜치 (작업메모)
@@ -174,7 +174,7 @@
   테스트가 정말 잡는지 의심되면 버그를 몇 개 일부러 심어 보고 되돌림 (못 잡으면 테스트를 더함)
 - **세이브·id·버전**: 테스트 통과로 끝내지 않음 — 출시된 id(wordId·itemId·relicId·areaId·companionId·상품 id)가 그대로인지 git diff로 보고,
   SaveData 필드 의미를 바꾸면 version + 변환 + 예전 세이브 불러오기 테스트 (#89 방식)
-- **결제**: 가짜 상점 테스트만으로 안전하다고 보지 않음 → 결제 코드를 바꾸면 보고서 [사용자가 직접 해야 할 일]에 TestFlight 결제·구매 복원 확인을 넣음
+- **결제**: 가짜 상점 테스트만으로 안전하다고 보지 않음 → 결제 코드를 바꾸면 보고서 [사용자가 직접 해야 할 일]에 TestFlight · 구글플레이 내부 테스트 결제·구매 복원 확인을 넣음
 - **화면·연출**: 테스트는 결과만 봄 → 바꾸기 전·후 캡처를 `_캡처/`에 남겨 비교 (사용자 확인). 전투 사건 연출은 PlayMode `BattleEventPlaybackTests`가 순서·빠짐·기다리는 횟수를 못 박음 (#119 —
   연출을 일부러 바꾸면 그 기대 순서도 같이 고치고 무엇이 왜 바뀌는지 보고. 기록 = `BattleScreen.CueRecorder`·`Sound.Recorder`, 테스트용·평소엔 null)
 - **빌드·출시 설정** (번들 ID·앱 버전·release-1.1 가지·ProjectSettings·워크플로): 사용자 확인 후
@@ -251,6 +251,7 @@ Docs/                   PRD.txt, GDD.md, 아트에셋목록.md, 아이폰출시�
 Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow 필요), zip_ios_for_mac.py (Xcode 프로젝트 → Mac용 zip, 실행 권한 유지),
                         widen_maps.py (맵의 한 칸 통로 → 두 칸), subset_fonts.py (본문 글꼴에서 한자·가나 빼기 — 앱 크기, fontTools 필요),
                         pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구), make_preempt_sfx.py (선제공격 '카칭' 소리 합성 #147),
+                        check_android_bundle.py (구글플레이에 올리기 전 AAB 검사: 대상 API·게임 표시·뒤로 가기·권한·16KB 페이지·크기 #149),
                         build_intro_video.py (입장 영상: Flow 컷 이어 붙이기·Veo 표시 잘라냄·자막표 → Resources/Video, imageio-ffmpeg 필요, #129 —
                         컷 원본은 저장소 밖 Builds/cinematic_pixellab/Videos, release-1.1 폴더에선 그 경로를 인자로),
                         cinematic_storyboard.py (입장 시네마틱 7컷 = 영화 구도 스케치 → Builds/cinematic_v2, Figma 'Cinematic (#128)' — Flow img to img로 영상, #128)
@@ -260,7 +261,7 @@ Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow
 
 에디터 메뉴: `WordRPG > Data > Import Word CSVs`, `WordRPG > Data > Create Sample Data` (없는 에셋만 생성), `WordRPG > Data > Refresh Game Database`, `WordRPG > Scenes > Create All Scenes` (타이틀·필드·전투 씬 다시 생성 + 빌드 순서), `WordRPG > Save > Delete Save Data / Open Save Folder`,
 `WordRPG > Build > Apply Mobile Settings / iOS Xcode 프로젝트 (앱스토어용, Mac에서 열기) / Android APK (폰 테스트용) / Android AAB`
-(각 플랫폼 Build Support 모듈 필요, 결과는 `Builds/iOS/`·`Builds/Android/`. 번들 ID `com.arttechsoo.wordrpg` 확정 — 바꾸지 말 것, companyName도 그대로)
+(각 플랫폼 Build Support 모듈 필요, 결과는 `Builds/iOS/`·`Builds/Android/`. AAB는 올림 열쇠 필요 — 환경변수 `WORDRPG_ANDROID_KEYS`, 순서는 `Docs/안드로이드출시방법.txt`. 번들 ID `com.arttechsoo.wordrpg` 확정 — 바꾸지 말 것, companyName도 그대로)
 
 게임 실행: `Assets/Scenes/Title.unity`를 열고 Play (Game 뷰를 세로 비율로, 예: 1080x1920). 필드부터 바로: `Field.unity`, 전투만 연습: `Battle.unity`
 
@@ -286,3 +287,4 @@ gh release create ios-build-0.1-1 Builds/WordRPG-iOS-0.1-build1.zip --prerelease
 - F: 드라이브는 소유권을 기록하지 않는 파일시스템이라 Git이 `safe.directory` 등록을 요구함 (등록 완료)
 - 상위 폴더 `F:\GameProject`는 별개 저장소(Spiritual-Warfare)이므로 거기서 git 명령 실행 주의
 - **저장소가 공개**: 애플 키(.p8)·인증서는 .gitignore로 막혀 있음. 키 번호·발급자 ID 같은 값도 저장소 문서에 적지 말 것 (GitHub 비밀값으로만)
+- **구글플레이 올림 열쇠** = `F:\_WordRPG_keys` (열쇠 파일 + 비밀번호가 든 설정 파일). 저장소 밖 — `F:\GameProject`도 별개 저장소라 그 안에 두지 말 것. 비밀번호를 화면·문서·로그에 내지 말 것

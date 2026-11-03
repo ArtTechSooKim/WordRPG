@@ -6,16 +6,20 @@ using UnityEngine.Purchasing;
 
 namespace WordRPG.Game
 {
-    // Unity IAP 5로 애플 인앱 결제 (#40). 정식판 = 한 번 사면 계속 쓰는 상품(NonConsumable).
+    // Unity IAP 5로 앱스토어·구글플레이 인앱 결제 (#40, 구글플레이 #149). 정식판 = 한 번 사면 계속 쓰는 상품(NonConsumable).
     //  - 켜자마자 스토어에 연결 → 상품(가격) 받아 오기 + 이미 산 것 확인(다른 기기에서 산 것·재설치 포함)
     //  - 결제는 두 단계: OnPurchasePending에서 Entitlements에 넣고(기기에 저장) → ConfirmPurchase. 확정 전에 꺼지면 다음에 다시 들어온다
-    //  - [구매 복원]: RestoreTransactions → 산 것이 OnPurchasePending으로 다시 들어온다
+    //  - [구매 복원]: 애플 = RestoreTransactions → 산 것이 OnPurchasePending으로 다시 들어온다.
+    //    구글 = 구매 기록을 다시 받아 결과를 알림 (Unity IAP의 RestoreTransactions는 구글에서 기록을 받기 전에 '성공'을 돌려줘서 산 사람에게 '기록 없음'이 뜸)
     public class UnityIapStore : IStore
     {
         private readonly Entitlements entitlements;
         private StoreController store;
         private Product fullVersion;
         private Action<StoreResult> buying, restoring;
+        private bool restoringByFetch; // 구글: 구매 기록을 받으면 복원 끝
+
+        private static bool IsGooglePlay => Application.platform == RuntimePlatform.Android;
 
         public UnityIapStore(Entitlements entitlements) => this.entitlements = entitlements;
 
@@ -30,10 +34,18 @@ namespace WordRPG.Game
                 // 이벤트는 Connect 전에 모두 (지난번에 확정 못 한 결제가 바로 들어올 수 있음)
                 store.OnStoreConnected += OnConnected;
                 store.OnStoreDisconnected += failure => Debug.LogWarning($"[Store] 연결 끊김: {failure.Message}");
-                store.OnProductsFetched += _ => fullVersion = store.GetProductById(Entitlements.FullVersion);
+                store.OnProductsFetched += _ =>
+                {
+                    fullVersion = store.GetProductById(Entitlements.FullVersion);
+                    if (IsGooglePlay) store.FetchPurchases(); // 구글: 상품을 받은 뒤에 (구매 기록이 상품과 이어지게)
+                };
                 store.OnProductsFetchFailed += failure => Debug.LogWarning($"[Store] 상품을 못 받아 옴: {failure.FailureReason}");
                 store.OnPurchasesFetched += OnPurchasesFetched;
-                store.OnPurchasesFetchFailed += failure => Debug.LogWarning($"[Store] 구매 기록을 못 받아 옴: {failure.Message}");
+                store.OnPurchasesFetchFailed += failure =>
+                {
+                    Debug.LogWarning($"[Store] 구매 기록을 못 받아 옴: {failure.Message}");
+                    if (restoringByFetch) FinishFetchRestore(StoreResult.Failed);
+                };
                 store.OnPurchasePending += OnPurchasePending;
                 store.OnPurchaseConfirmed += OnPurchaseConfirmed;
                 store.OnPurchaseFailed += OnPurchaseFailed;
@@ -49,13 +61,14 @@ namespace WordRPG.Game
         private void OnConnected()
         {
             store.FetchProducts(new List<ProductDefinition> { new ProductDefinition(Entitlements.FullVersion, ProductType.NonConsumable) });
-            store.FetchPurchases();
+            if (!IsGooglePlay) store.FetchPurchases();
         }
 
         // 이미 확정된 구매 (재설치·다른 기기 포함) → 정식판
         private void OnPurchasesFetched(Orders orders)
         {
             if (orders.ConfirmedOrders.Any(order => Contains(order, Entitlements.FullVersion))) entitlements.Grant(Entitlements.FullVersion);
+            if (restoringByFetch) FinishFetchRestore(entitlements.HasFullVersion ? StoreResult.Restored : StoreResult.NothingToRestore);
         }
 
         // 결제·복원·지난번 미확정 결제 → 먼저 기기에 넣고 확정
@@ -105,6 +118,12 @@ namespace WordRPG.Game
                 return;
             }
             restoring = done;
+            if (IsGooglePlay)
+            {
+                restoringByFetch = true;
+                store.FetchPurchases();
+                return;
+            }
             store.RestoreTransactions((success, error) =>
             {
                 if (!success) Debug.LogWarning($"[Store] 복원 실패: {error}");
@@ -112,6 +131,12 @@ namespace WordRPG.Game
                 if (!success) Finish(ref restoring, StoreResult.Failed);
                 else Finish(ref restoring, entitlements.HasFullVersion ? StoreResult.Restored : StoreResult.NothingToRestore);
             });
+        }
+
+        private void FinishFetchRestore(StoreResult result)
+        {
+            restoringByFetch = false;
+            Finish(ref restoring, result);
         }
 
         private static bool Contains(Order order, string productId) =>

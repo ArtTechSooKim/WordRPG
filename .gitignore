@@ -73,6 +73,11 @@ mono_crash.*
 # Builds
 *.apk
 *.aab
+# 구글플레이 올림 열쇠·서비스 계정 — 저장소에 올리면 안 됨
+*.keystore
+*.jks
+android-upload.properties
+play-service-account*.json
 *.unitypackage
 *.unitypackage.meta
 *.app
