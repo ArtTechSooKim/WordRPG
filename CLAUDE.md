@@ -287,4 +287,5 @@ gh release create ios-build-0.1-1 Builds/WordRPG-iOS-0.1-build1.zip --prerelease
 - F: 드라이브는 소유권을 기록하지 않는 파일시스템이라 Git이 `safe.directory` 등록을 요구함 (등록 완료)
 - 상위 폴더 `F:\GameProject`는 별개 저장소(Spiritual-Warfare)이므로 거기서 git 명령 실행 주의
 - **저장소가 공개**: 애플 키(.p8)·인증서는 .gitignore로 막혀 있음. 키 번호·발급자 ID 같은 값도 저장소 문서에 적지 말 것 (GitHub 비밀값으로만)
+- **라이선스 = 독점(All Rights Reserved)** (#150 사용자, 그 전 커밋은 MIT). 공개 저장소지만 사용 허락 아님. 외부 자료를 새로 넣으면 `LICENSE`의 외부 자료 목록에 더할 것
 - **구글플레이 올림 열쇠** = `F:\_WordRPG_keys` (열쇠 파일 + 비밀번호가 든 설정 파일). 저장소 밖 — `F:\GameProject`도 별개 저장소라 그 안에 두지 말 것. 비밀번호를 화면·문서·로그에 내지 말 것
