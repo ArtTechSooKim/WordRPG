@@ -54,6 +54,7 @@ LATER = {
     "bossdesert": ("round7_raw/사막보스.mp3", BOSS, {"crush": STRONG, "careful": True}),
     "desert": ("round7_raw/사막배경.mp3", FIELD, {"careful": True}),
     "oasis": ("round7_raw/오아시스.mp3", FIELD, {"careful": True, "max_start": 15.0, "min_length": 30.0}),
+    "oasis2": ("round7_raw/오아시스_2.mp3", FIELD, {"careful": True}),  # 사용자: 조금 덜 리드미컬하게 — 손북·아르페지오를 줄임 (#173)
     "snow": ("round7_raw/설원배경.mp3", FIELD, {"careful": True, "max_start": 25.0, "min_length": 28.0}),  # 앞이 조용한 곡은 반복을 뒤쪽에서 (#172)
     "battlesnow": ("round7_raw/설원전투.mp3", BATTLE, {"careful": True}),
     "sea": ("round7_raw/해저배경.mp3", FIELD, {"careful": True}),
