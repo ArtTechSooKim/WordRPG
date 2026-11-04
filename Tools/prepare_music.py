@@ -54,6 +54,8 @@ LATER = {
     "bossdesert": ("round7_raw/사막보스.mp3", BOSS, {"crush": STRONG, "careful": True}),
     "bossdesertmid": ("round11_raw/사막중간보스_A.mp3", BOSS, {"crush": STRONG, "careful": True}),  # 중간 보스곡 A·B 둘 다 씀 (#188 사용자)
     "bossdesertmid2": ("round11_raw/사막중간보스_B.mp3", BOSS, {"crush": STRONG, "careful": True, "min_start": 30.0, "max_start": 34.0, "min_length": 20.0}),  # 앞 30초가 조용해서 커진 뒤로만 반복
+    "storydesert": ("round12_raw/사막스토리_A.mp3", FIELD, {"once": True}),  # 사막 입장 영상 곡 후보 A·B (#189) — 끝맺음이 있어 반복 안 함
+    "storydesert2": ("round12_raw/사막스토리_B.mp3", FIELD, {"once": True}),
     "desert": ("round7_raw/사막배경.mp3", FIELD, {"careful": True}),
     "oasis": ("round7_raw/오아시스_2.mp3", FIELD, {"careful": True}),  # 사용자: 조금 덜 리드미컬하게, 새 곡으로 정함 (#173·#174)
     "snow": ("round7_raw/설원배경.mp3", FIELD, {"careful": True, "max_start": 25.0, "min_length": 28.0}),  # 앞이 조용한 곡은 반복을 뒤쪽에서 (#172)
@@ -197,11 +199,22 @@ def make_loop_even(x, start, end):
     return out, rho
 
 
-def process(file, target, src, speed=1.0, crush_level=None, careful=False, max_start=8.0, min_length=MIN_LENGTH, min_start=0.0):
+def process(file, target, src, speed=1.0, crush_level=None, careful=False, max_start=8.0, min_length=MIN_LENGTH, min_start=0.0, once=False):
     """원본 하나 → 반복되는 곡 (음량까지 맞춤). 돌려주는 값: 곡, 비슷한 정도, 설명"""
     x = decode(os.path.join(src, file), speed=speed)
     if crush_level:
         x = crush(x, crush_level)
+    if once:  # 끝맺음이 있는 곡(영상용, #189): 반복을 찾지 않고 앞뒤 무음만 뺌. 끝의 잦아듦은 살림
+        on = np.nonzero(np.abs(x).max(axis=1) > 10 ** (-50 / 20))[0]
+        loop = x[on[0]:on[-1] + 1].copy()
+        tail = int(0.05 * SR)
+        loop[-tail:] *= np.linspace(1, 0, tail)[:, None]
+        score, note = 0.0, "반복 없음 (끝맺음 있음)"
+        with tempfile.TemporaryDirectory() as tmp:
+            probe = os.path.join(tmp, "probe.wav")
+            write_wav(probe, loop)
+            loop = loop * 10 ** ((target - lufs(probe)) / 20)
+        return loop, score, note
     start, stop = usable_range(x)
     x = x[start:stop]
     if careful:
@@ -236,7 +249,7 @@ def make_later(src):
     folder = os.path.join(ROOT, "Builds", "music_pilot", "later")
     os.makedirs(folder, exist_ok=True)
     for name, (file, target, tweak) in LATER.items():
-        loop, score, note = process(file, target, src, tweak.get("speed", 1.0), tweak.get("crush"), tweak.get("careful", False), tweak.get("max_start", 8.0), tweak.get("min_length", MIN_LENGTH), tweak.get("min_start", 0.0))
+        loop, score, note = process(file, target, src, tweak.get("speed", 1.0), tweak.get("crush"), tweak.get("careful", False), tweak.get("max_start", 8.0), tweak.get("min_length", MIN_LENGTH), tweak.get("min_start", 0.0), tweak.get("once", False))
         path = os.path.join(folder, name + ".wav")
         write_wav(path, loop)
         two = 2 * SR
