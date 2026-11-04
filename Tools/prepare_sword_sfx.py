@@ -1,11 +1,12 @@
-"""선제공격 '카칭' 후보: 실제 칼 부딪히는 소리 다듬기 (#179 사용자: 실제로 칼이 부딪히는 소리였으면 좋겠어).
-원본 = '20 Sword Sound Effects (Attacks and Clashes)' by StarNinjas, CC0 — 칼 두 자루를 맞부딪혀 녹음
-(https://opengameart.org/content/20-sword-sound-effects-attacks-and-clashes). Builds/music_pilot/sword_clash/ 에 받아 둠 (깃 제외).
+"""선제공격 소리 후보: 칼 두 자루를 긁는 '씽' 소리 다듬기 (#180 사용자: 카칭보다는 씽 소리).
+원본 = '20 Sword Sound Effects (Attacks and Clashes)' by StarNinjas, CC0 — 칼 두 자루를 맞대고 움직여 녹음
+(https://opengameart.org/content/20-sword-sound-effects-attacks-and-clashes). 공격 10개 = Builds/music_pilot/sword_slide/ (깃 제외).
+부딪힘 10개는 Builds/music_pilot/sword_clash/에 남아 있음 (SRC·FILES를 바꾸면 같은 방법으로 다듬어짐).
 
-앞 다듬기(부딪히는 순간이 바로 들리게) → 최고 음량 맞추기 → 높은음 깎기 → 들어 올림. 깎은 뒤에 음량을 맞추면 날카로운 소리가
+앞 무음만 빼기(긁히며 커지는 앞부분은 살림) → 최고 음량 맞추기 → 높은음 깎기 → 들어 올림. 깎은 뒤에 음량을 맞추면 날카로운 소리가
 도로 커지므로 이 순서를 지킬 것 (make_skill_sfx.py와 같음).
 
-사용: python Tools/prepare_sword_sfx.py   (imageio-ffmpeg·numpy 필요) → Builds/music_pilot/sword_clash/out/{번호}.wav
+사용: python Tools/prepare_sword_sfx.py   (imageio-ffmpeg·numpy 필요) → Builds/music_pilot/sword_slide/out/{번호}.wav
 고른 파일을 Assets/Resources/Audio/Sfx/preempt.wav로 옮기면 게임에 들어감 (CC0라 깃에 올려도 됨. LICENSE 외부 자료 목록에 더할 것).
 """
 import glob
@@ -19,16 +20,17 @@ import imageio_ffmpeg
 import numpy as np
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-SRC = os.path.join(ROOT, "Builds", "music_pilot", "sword_clash")
+SRC = os.path.join(ROOT, "Builds", "music_pilot", "sword_slide")
+FILES = "sword.*.ogg"
 OUT = os.path.join(SRC, "out")
 FF = imageio_ffmpeg.get_ffmpeg_exe()
 SR = 44100
-PEAK = -5.0  # 원본은 밝기가 7~9.5kHz라 많이 깎이므로 먼저 크게 맞춤
-LIFT = 9.0  # 깎인 만큼 묻히지 않게 들어 올리는 값 — 3dB로는 앞부분이 전투곡 크기(-29dB)와 비슷해 묻힘
+PEAK = -5.0  # 원본은 밝기가 6~10kHz라 많이 깎이므로 먼저 크게 맞춤
+LIFT = 9.0  # 깎인 만큼 묻히지 않게 들어 올리는 값
 TOP = -5.0  # 들어 올려도 이 최고 음량을 넘지 않음 (지금 카칭은 -1.4)
 TONE = "highshelf=f=4000:g=-8,lowpass=f=10000"
-BEFORE_HIT = 0.03  # 부딪히는 순간 앞에 남기는 시간(초). 판정 소리와 같이 나므로 늦으면 안 됨
-LONGEST = 0.8
+FIRST_SOUND = 0.02  # 최고 크기의 이만큼(-34dB)을 넘는 곳을 첫소리로
+LONGEST = 0.9
 
 
 def decode(path):
@@ -49,8 +51,11 @@ def db(v):
 def make(path):
     x = decode(path)
     env = np.abs(x).max(axis=1)
-    start = max(0, int(env.argmax()) - int(BEFORE_HIT * SR))
-    alive = np.where(env > env.max() * 10 ** (-45 / 20))[0]
+    win = int(0.005 * SR)
+    smooth = np.convolve(env, np.ones(win) / win, mode="same")  # 잡음 한 점에 속지 않게
+    above = np.where(smooth > smooth.max() * FIRST_SOUND)[0]
+    start = max(0, above[0] - int(0.003 * SR))
+    alive = np.where(smooth > smooth.max() * 10 ** (-40 / 20))[0]
     end = min(alive[-1] + int(0.02 * SR), start + int(LONGEST * SR), len(x))
     x = x[start:end]
     x = x * 10 ** ((PEAK - db(np.abs(x).max())) / 20)
@@ -66,7 +71,7 @@ def make(path):
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
     os.makedirs(OUT, exist_ok=True)
-    for path in sorted(glob.glob(os.path.join(SRC, "sword_clash.*.ogg")), key=lambda p: int(re.search(r"\.(\d+)\.ogg", p)[1])):
+    for path in sorted(glob.glob(os.path.join(SRC, FILES)), key=lambda p: int(re.search(r"\.(\d+)\.ogg", p)[1])):
         number = re.search(r"\.(\d+)\.ogg", path)[1]
         x = make(path)
         pcm = (np.clip(x, -1, 1) * 32767).astype("<i2")
