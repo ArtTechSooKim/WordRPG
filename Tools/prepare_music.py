@@ -43,7 +43,7 @@ TRACKS = {
 # 다른 곡은 사용자가 이음새를 확인했으므로 careful을 켜지 않음 (켜면 반복 자리가 바뀜)
 LIGHT, STRONG = (8, 3, 0.45, 10000), (6, 5, 0.8, 8000)  # 8비트 가공: 비트 · 건너뛰는 표본 · 섞는 비율 · 고음 자르기 Hz. 사막 A·B는 STRONG (#165)
 TWEAKS = {
-    "battlemeadow": {"speed": 1.10, "careful": True},
+    "battlemeadow": {"speed": 1.18, "careful": True},  # 사용자가 후보 A·B·C 중 B를 고름 (#168)
 }
 
 
