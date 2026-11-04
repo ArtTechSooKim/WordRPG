@@ -61,15 +61,28 @@ function Shot({h,clip,from=0,at,dur,party=false}){
       animate={[{property:"scale",keyframes:[{at:0,value:1.07,easing:"ease-out"},{at:Math.min(0.14,dur*0.4),value:1},{at:dur-0.01,value:1.025}]}]}/>
   </frame>;
 }
-// 음악(battle.ogg 120BPM) 한 박자마다 기술 하나, 마지막 낙뢰만 두 박자 — 글 없이 연출만 보이게. 1 = 파티 쪽 화면(회복·보호막)
+// 음악(battle.ogg 120BPM)에 맞춤: 공격 4분할 2장 → 회복 → 보호막, 각 두 박자. 글은 한 줄만
 const BEAT=0.4992,REEL_AT=5.5;
-const REEL=[["ara_pebble",0],["quill_ink_storm",0],["whip_thorn_storm",0],["gem_letter_shower",0],["doc_highlight_sweep",0],["lamp_firefly_swarm",0],["leaf_world_breath",1],["gourd_spring",1],["grail_blessing",1],["flute_echo_wall",1],["tortoise_encyclo_wall",1],["hourglass_rewind",1],["seed_period_grove",1],["wand_thunder_spell",0]];
+// [기술, 시작 프레임] — 시작 프레임을 달리해 맞는 순간이 왼쪽 위 → 오른쪽 아래로 번짐 (기술은 대개 10번째 프레임에 맞음)
+const GRIDS=[[["quill_ink_storm",9],["gem_letter_shower",6],["whip_thorn_storm",3],["ara_pebble",0]],
+  [["doc_highlight_sweep",9],["lamp_firefly_swarm",6],["doc_finish_sentence",3],["wand_thunder_spell",0]]];
+const SOLO=["gourd_spring","tortoise_encyclo_wall"];
+// 4분할 한 칸: 왼쪽 몬스터 카드 쪽을 크게. 영상은 칸마다 따로 (Tools/ad_motion/cut_cells.sh — 같은 파일을 동시에 틀면 같은 프레임이 나옴)
+function Cell({h,x,y,at,dur,w=535,hh=590}){
+  return <frame x={x} y={y} width={w} height={hh} layout="none" origin="center" clip={true} radius={22} at={at} duration={dur}
+    motion={{enter:{from:{scale:0.86},duration:0.16,easing:{kind:"overshoot",amount:1.6}}}}>
+    <media file={h} x={-182} y={-135} width={1350} height={2933} fit="fill"/>
+    <rect x={0} y={0} width={w} height={hh} radius={22} fill="#FFFFFF00" strokeColor={GOLD} strokeWidth={8}/>
+  </frame>;
+}
 export default async ({project})=>{
   const p=await project({size:"1080x1920",fps:30,background:NAVY});
   const A=n=>p.add("assets/"+n);
   const quiz=await A("2_quiz.jpg"),fin=await A("4_finisher.jpg"),cave=await A("8_cave.jpg"),field=await A("1_field.jpg"),sum=await A("5_summary.jpg"),reel=await A("skills_reel.mp4"),icon=await A("icon.png");
   const b1=await A("boss_forget_king.png"),b2=await A("boss_muddle_raccoon.png"),b3=await A("boss_blank_frog.png"),b4=await A("boss_ellipsis_vine.png");
-  const LATE=6.54,T=18+LATE;
+  const cells={};
+  for(const g of GRIDS)for(const [clip] of g)cells[clip]=await A("cell_"+clip+".mp4");
+  const LATE=3.04,T=18+LATE;
   let kids=[];
   const add=(...n)=>kids.push(...n.flat());
   // 1 문제 도전 0~3.6
@@ -87,24 +100,26 @@ export default async ({project})=>{
   add(<Flash key="f2" at={4.05} o={0.5}/>,...Burst({cx:255,cy:960,at:4.05,seed:31,spread:520}));
   add(<Flash key="f3" at={4.88} c={GOLD} o={0.45}/>,...Burst({cx:255,cy:960,at:4.88,seed:32,spread:560,colors:[RED,GOLD,WHITE]}));
   add(<Stamp key="a3" s="3초 안에 맞히면" cx={540} cy={1505} size={56} at={4.9} dur={0.58} from={1.2}/>,<Stamp key="a2" s="크리티컬 1.5배!" cx={540} cy={1610} size={110} color={RED} at={4.92} dur={0.56} rot={-6}/>);
-  add(Wipe({at:5.28,seed:22}));
-  // 2-2 기술 나열 — 실제 연출을 박자에 맞춰. 글은 한 줄만 (사용자: 기술 이름만 읽게 됨)
+  add(Wipe({at:5.16,seed:22}));
+  // 2-2 전투 구간 — 실제 연출만. 공격 4분할 2장 → 회복 → 보호막 (사용자: 기술을 줄이자, 공격은 4분할)
   {
     let c=REEL_AT;
-    REEL.forEach(([clip,k],i)=>{
-      const last=i===REEL.length-1,d=last?BEAT*2:BEAT;
-      add(<Shot key={"r"+i} h={reel} clip={clip} from={last?6:9} at={c} dur={d} party={k>0}/>);
-      add(k>0?<rect key={"rt"+i} x={0} y={0} width={W} height={668} at={c} duration={d} fill={{kind:"linear",angle:180,stops:[{offset:0,color:NAVY,opacity:1},{offset:0.92,color:NAVY,opacity:1},{offset:1,color:NAVY,opacity:0}]}}/>:<Scrim key={"rt"+i} at={c} dur={d} h={470}/>); // 파티 쪽은 전투 로그를 완전히 가림
-      c+=d;
+    GRIDS.forEach((g,n)=>{
+      g.forEach(([clip],i)=>add(<Cell key={`q${n}-${i}`} h={cells[clip]} x={i%2?545:0} y={i<2?400:1000} at={c} dur={BEAT*2}/>));
+      if(n>0)add(<Flash key={"qf"+n} at={c} o={0.3} d={0.12}/>);
+      c+=BEAT*2;
+    });
+    SOLO.forEach((clip,i)=>{
+      add(<Shot key={"so"+i} h={reel} clip={clip} from={9} at={c} dur={BEAT*2} party={true}/>);
+      add(<rect key={"som"+i} x={0} y={0} width={W} height={668} at={c} duration={BEAT*2} fill={{kind:"linear",angle:180,stops:[{offset:0,color:NAVY,opacity:1},{offset:0.92,color:NAVY,opacity:1},{offset:1,color:NAVY,opacity:0}]}}/>);
+      add(<Flash key={"sof"+i} at={c} o={0.3} d={0.12}/>);
+      c+=BEAT*2;
     });
     const len=c-REEL_AT;
-    add(<Scrim key="srb" at={REEL_AT} dur={len} top={false} h={380}/>);
     add(<frame key="rhead" x={0} y={130} width={W} height={240} layout="none" origin="center" at={REEL_AT} duration={len}
       animate={[{property:"scale",repeat:Math.floor(len/BEAT)-1,keyframes:[{at:0,value:1.1,easing:"ease-out"},{at:0.16,value:1},{at:BEAT-0.02,value:1},{at:BEAT,value:1.1}]}]}>
       <Stamp s="신나는 전투!" cx={540} cy={120} size={140} color={GOLD} at={0} dur={len-0.02}/>
     </frame>);
-    const last=c-BEAT*2;
-    add(<Flash key="rfl" at={last+3/30} o={0.85}/>,...Burst({cx:255,cy:960,at:last+3/30,seed:34,n:44,spread:760,colors:[GOLD,WHITE,"#7CC0FF"]}));
     add(Wipe({at:c-0.22,seed:26}));
   }
   const early=kids; kids=[];

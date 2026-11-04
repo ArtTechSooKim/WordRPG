@@ -15,7 +15,7 @@ import imageio_ffmpeg
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SFX = os.path.join(ROOT, "Assets", "Resources", "Audio", "Sfx")
 MUSIC = os.path.join(ROOT, "Assets", "Resources", "Audio", "Music", "battle.ogg")
-LATE = 6.54  # 기술 나열 뒤 장면이 밀린 시간 (edit.jsx LATE)
+LATE = 3.04  # 기술 나열 뒤 장면이 밀린 시간 (edit.jsx LATE)
 T = 18.0 + LATE
 
 # 앞 장면: 문제 도전 → 정답 → 공격
