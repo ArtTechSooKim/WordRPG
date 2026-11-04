@@ -62,7 +62,7 @@ function Shot({h,clip,from=0,at,dur,party=false}){
   </frame>;
 }
 // 음악(battle.ogg 120BPM)에 맞춤: 공격 4분할 2장 → 회복 → 보호막, 각 두 박자. 글은 한 줄만
-const BEAT=0.4992,REEL_AT=5.5;
+const BEAT=0.4992,REEL_AT=4.0;
 // [기술, 시작 프레임] — 시작 프레임을 달리해 맞는 순간이 왼쪽 위 → 오른쪽 아래로 번짐 (기술은 대개 10번째 프레임에 맞음)
 const GRIDS=[[["quill_ink_storm",9],["gem_letter_shower",6],["whip_thorn_storm",3],["ara_pebble",0]],
   [["doc_highlight_sweep",9],["lamp_firefly_swarm",6],["doc_finish_sentence",3],["wand_thunder_spell",0]]];
@@ -76,81 +76,89 @@ function Cell({h,x,y,at,dur,w=535,hh=590}){
   </frame>;
 }
 // 제목 한 줄: 박자마다 톡톡 (읽을 글은 이것만)
-function BeatHead({s,at,len,color=GOLD}){
+function BeatHead({s,at,len,color=GOLD,size=140}){
+  const keys=[],n=Math.floor(len/BEAT+0.001);
+  for(let i=0;i<n;i++){keys.push({at:i*BEAT,value:1.1,easing:"ease-out"},{at:i*BEAT+0.16,value:1});if(i<n-1)keys.push({at:(i+1)*BEAT-0.02,value:1});}
   return <frame x={0} y={130} width={W} height={240} layout="none" origin="center" at={at} duration={len}
-    animate={[{property:"scale",repeat:Math.floor(len/BEAT+0.001)-1,keyframes:[{at:0,value:1.1,easing:"ease-out"},{at:0.16,value:1},{at:BEAT-0.02,value:1},{at:BEAT,value:1.1}]}]}>
-    <Stamp s={s} cx={540} cy={120} size={140} color={color} at={0} dur={len-0.02}/>
+    animate={[{property:"scale",keyframes:keys}]}>
+    <Stamp s={s} cx={540} cy={120} size={size} color={color} at={0} dur={len-0.02}/>
   </frame>;
 }
 // 필드 장면: z=1.3이면 주인공이 가운데 위쪽, 위 HUD는 제목 뒤로·스틱은 화면 밖 / z=1이면 선제공격 창이 다 들어옴
-function FieldShot({h,at,dur,z=1.3,y=-462}){
+function FieldShot({h,at,dur,z=1.3,y=-462,from=0}){
   return <frame x={0} y={0} width={W} height={H} layout="none" clip={true} at={at} duration={dur}>
-    <media file={h} x={(W-W*z)/2} y={y} width={W*z} height={2346*z} fit="fill"
+    <media file={h} x={(W-W*z)/2} y={y} width={W*z} height={2346*z} fit="fill" trimStart={from}
       animate={[{property:"scale",keyframes:[{at:0,value:1.05,easing:"ease-out"},{at:0.14,value:1},{at:dur-0.01,value:1}]}]}/>
   </frame>;
 }
 export default async ({project})=>{
   const p=await project({size:"1080x1920",fps:30,background:NAVY});
   const A=n=>p.add("assets/"+n);
-  const quiz=await A("2_quiz.jpg"),fin=await A("4_finisher.jpg"),cave=await A("8_cave.jpg"),field=await A("1_field.jpg"),sum=await A("5_summary.jpg"),reel=await A("skills_reel.mp4"),icon=await A("icon.png");
+  const qz=await A("real_quiz.mp4"),fn=await A("real_finisher.mp4"),ch=await A("real_chest.mp4"),reel=await A("skills_reel.mp4"),icon=await A("icon.png");
   const b1=await A("boss_forget_king.png"),b2=await A("boss_muddle_raccoon.png"),b3=await A("boss_blank_frog.png"),b4=await A("boss_ellipsis_vine.png");
-  const advWalk=await A("adv_walk.mp4"),advRaft=await A("adv_raft.mp4"),advCave=await A("adv_cave.mp4"),advPreempt=await A("adv_preempt.mp4");
+  const advRaft=await A("adv_raft.mp4"),advCave=await A("adv_cave.mp4"),advPreempt=await A("adv_preempt.mp4");
   const cells={};
   for(const g of GRIDS)for(const [clip] of g)cells[clip]=await A("cell_"+clip+".mp4");
-  const LATE=3.04,LATE2=5.88,T=18+LATE2;
+  const LATE=1.55,LATE2=5.39,T=18+LATE2;
   let kids=[];
   const add=(...n)=>kids.push(...n.flat());
-  // 1 문제 도전 0~3.6
-  add(<Game key="g1" h={quiz} at={0} dur={3.75} y={-680} zoom={[1,1]}/>,<Scrim key="s1" at={0} dur={3.75} h={560}/>,<Scrim key="s1b" at={0} dur={3.75} top={false} h={330}/>);
-  add(<Stamp key="h1" s="3초 안에" cx={540} cy={235} size={150} color={GOLD} at={0.05} dur={2.68}/>,<Stamp key="h2" s="맞혀 보세요!" cx={540} cy={395} size={118} at={0.28} dur={2.45} from={1.8}/>);
-  add(<frame key="ring" x={765} y={530} width={210} height={210} layout="none" origin="center" at={0.4} duration={2.33} motion={{enter:{from:{scale:0},duration:0.16,easing:{kind:"overshoot",amount:2}},exit:{to:{scale:0,opacity:0},duration:0.1,anchor:"end"}}}><rect x={0} y={0} width={210} height={210} radius={105} fill={NAVY} strokeColor={GOLD} strokeWidth={12}/></frame>);
-  [["3",0.5],["2",1.25],["1",2.0]].forEach(([s,t])=>add(<Stamp key={"d"+s} s={s} cx={870} cy={635} w={210} size={124} color={s==="1"?RED:WHITE} sw={10} at={t} dur={0.72} from={1.7}/>));
-  add(<rect key="ok" x={29} y={1246} width={1022} height={121} radius={18} fill={GREEN} at={2.75} duration={0.95} animate={[{property:"opacity",from:0.38,to:0.38,duration:0.9}]}/>,<rect key="okb" x={29} y={1246} width={1022} height={121} radius={18} fill="#FFFFFF00" strokeColor="#FFFFFF" strokeWidth={10} at={2.75} duration={0.95} animate={[{property:"scale",keyframes:[{at:0,value:1.07,easing:"ease-out"},{at:0.16,value:1},{at:0.9,value:1}]}]}/>);
-  add(<Flash key="f1" at={2.75}/>,...Burst({cx:540,cy:1306,at:2.75,seed:11,colors:[GREEN,WHITE,GOLD]}));
-  add(<Stamp key="ok1" s="정답!" cx={540} cy={250} size={190} color={GREEN} at={2.75} dur={0.95}/>,<Stamp key="ok2" s="stage = 무대, 단계" cx={540} cy={430} size={74} at={2.87} dur={0.83} from={1.3}/>);
-  add(Wipe({at:3.5,seed:21}));
-  // 2 공격 3.75~5.5 — 실제 연출 (크리티컬)
-  add(<Shot key="g2a" h={reel} clip="hero_swing" at={3.75} dur={0.93}/>,<Shot key="g2b" h={reel} clip="doc_finish_sentence" from={4} at={4.68} dur={0.82}/>,<Scrim key="s2" at={3.75} dur={1.75} h={470}/>,<Scrim key="s2b" at={3.75} dur={1.75} top={false} h={380}/>);
-  add(<Stamp key="a1" s="맞히면, 공격!" cx={540} cy={250} size={124} color={GOLD} at={3.85} dur={1.62}/>);
-  add(<Flash key="f2" at={4.05} o={0.5}/>,...Burst({cx:255,cy:960,at:4.05,seed:31,spread:520}));
-  add(<Flash key="f3" at={4.88} c={GOLD} o={0.45}/>,...Burst({cx:255,cy:960,at:4.88,seed:32,spread:560,colors:[RED,GOLD,WHITE]}));
-  add(<Stamp key="a3" s="3초 안에 맞히면" cx={540} cy={1505} size={56} at={4.9} dur={0.58} from={1.2}/>,<Stamp key="a2" s="크리티컬 1.5배!" cx={540} cy={1610} size={110} color={RED} at={4.92} dur={0.56} rot={-6}/>);
-  add(Wipe({at:5.16,seed:22}));
-  // 2-2 전투 구간 — 실제 연출만. 공격 4분할 2장 → 회복 → 보호막 (사용자: 기술을 줄이자, 공격은 4분할)
+  // 1 문제 도전 0~3 — 실제 전투, 크리티컬 찬스 줄이 타들어 감. 2.21초에 정답 (크리티컬 3초 안), 초록 칸은 게임 화면 그대로
+  add(<FieldShot key="g1" h={qz} at={0} dur={3.0} z={1} y={-680}/>,<Scrim key="s1" at={0} dur={3.0} h={560}/>,<Scrim key="s1b" at={0} dur={3.0} top={false} h={330}/>);
+  add(<Stamp key="h1" s="3초 안에" cx={540} cy={235} size={150} color={GOLD} at={0.05} dur={2.12}/>,<Stamp key="h2" s="맞혀 보세요!" cx={540} cy={395} size={118} at={0.28} dur={1.89} from={1.8}/>);
+  add(<frame key="ring" x={765} y={530} width={210} height={210} layout="none" origin="center" at={0.2} duration={1.97} motion={{enter:{from:{scale:0},duration:0.16,easing:{kind:"overshoot",amount:2}},exit:{to:{scale:0,opacity:0},duration:0.1,anchor:"end"}}}><rect x={0} y={0} width={210} height={210} radius={105} fill={NAVY} strokeColor={GOLD} strokeWidth={12}/></frame>);
+  [["3",0.3],["2",0.9],["1",1.5]].forEach(([s,t])=>add(<Stamp key={"d"+s} s={s} cx={870} cy={635} w={210} size={124} color={s==="1"?RED:WHITE} sw={10} at={t} dur={0.62} from={1.7}/>));
+  add(<Flash key="f1" at={2.21} o={0.5}/>,...Burst({cx:540,cy:1171,at:2.21,seed:11,colors:[GREEN,WHITE,GOLD]}));
+  add(<Stamp key="ok1" s="정답!" cx={540} cy={250} size={190} color={GREEN} at={2.21} dur={0.79}/>,<Stamp key="ok2" s="potential = 잠재력, 가능성" cx={540} cy={430} size={66} at={2.33} dur={0.67} from={1.3}/>);
+  add(Wipe({at:2.75,seed:21}));
+  // 2 공격 3~4 — 같은 전투의 다음 장면 (실제 크리티컬)
+  add(<FieldShot key="g2" h={qz} from={3.6} at={3.0} dur={1.0} z={1.6} y={216}/>,<Scrim key="s2" at={3.0} dur={1.0} h={470}/>,<Scrim key="s2b" at={3.0} dur={1.0} top={false} h={380}/>);
+  add(<Stamp key="a1" s="맞히면, 공격!" cx={540} cy={250} size={124} color={GOLD} at={3.05} dur={0.93}/>);
+  add(<Flash key="f3" at={3.47} c={GOLD} o={0.45}/>,...Burst({cx:255,cy:960,at:3.47,seed:32,spread:560,colors:[RED,GOLD,WHITE]}));
+  add(<Stamp key="a3" s="3초 안에 맞히면" cx={540} cy={1505} size={56} at={3.47} dur={0.5} from={1.2}/>,<Stamp key="a2" s="크리티컬 1.5배!" cx={540} cy={1610} size={110} color={RED} at={3.49} dur={0.48} rot={-6}/>);
+  add(Wipe({at:3.66,seed:22}));
+  // 2-2 전투 구간 — 공격 4분할 → 회복·보호막 → 공격 4분할, 글은 짧게 나눠서 (사용자: 신나는 전투가 너무 김)
   {
     let c=REEL_AT;
-    GRIDS.forEach((g,n)=>{
+    const grid=(g,n)=>{
       g.forEach(([clip],i)=>add(<Cell key={`q${n}-${i}`} h={cells[clip]} x={i%2?545:0} y={i<2?400:1000} at={c} dur={BEAT*2}/>));
       if(n>0)add(<Flash key={"qf"+n} at={c} o={0.3} d={0.12}/>);
       c+=BEAT*2;
-    });
-    SOLO.forEach((clip,i)=>{
+    };
+    const solo=(clip,i)=>{
       add(<Shot key={"so"+i} h={reel} clip={clip} from={9} at={c} dur={BEAT*2} party={true}/>);
       add(<rect key={"som"+i} x={0} y={0} width={W} height={668} at={c} duration={BEAT*2} fill={{kind:"linear",angle:180,stops:[{offset:0,color:NAVY,opacity:1},{offset:0.92,color:NAVY,opacity:1},{offset:1,color:NAVY,opacity:0}]}}/>);
       add(<Flash key={"sof"+i} at={c} o={0.3} d={0.12}/>);
       c+=BEAT*2;
-    });
-    const len=c-REEL_AT;
-    add(<BeatHead key="rhead" s="신나는 전투!" at={REEL_AT} len={len}/>);
+    };
+    grid(GRIDS[0],0);
+    const h1=c;
+    solo(SOLO[0],0); solo(SOLO[1],1);
+    const h2=c;
+    grid(GRIDS[1],1);
+    add(<BeatHead key="rh0" s="신나는 전투!" at={REEL_AT} len={h1-REEL_AT}/>,<BeatHead key="rh1" s="다양한 스킬로" at={h1} len={h2-h1} size={124}/>,<BeatHead key="rh2" s="적을 무찔러보세요!" at={h2} len={c-h2} size={104}/>);
     add(Wipe({at:c-0.22,seed:26}));
   }
   const early=kids; kids=[];
-  // 3 콤보 6.45~9.2
-  add(<Game key="g3" h={fin} at={6.45} dur={3.05} y={140} hits={[7.95]} zoom={[1.0,1.05]}/>,<Scrim key="s3" at={6.45} dur={2.9} h={500}/>);
-  add(<Stamp key="c0" s="맞힐수록 더 세게!" cx={540} cy={215} size={106} at={6.55} dur={2.75} color={WHITE}/>);
-  const combo=[[1,6.8],[2,7.0],[3,7.18],[4,7.34],[5,7.48],[6,7.6],[7,7.72]];
-  combo.forEach(([n,t],i)=>{const end=i<combo.length-1?combo[i+1][1]:9.3;add(<Stamp key={"c"+n} s={`콤보 ${n}`} cx={540} cy={1235} size={110+n*10} color={n>=6?RED:n>=4?"#FF9A3D":GOLD} at={t} dur={end-t} from={1.45}/>);});
-  add(<Flash key="f4" at={7.95} o={0.9}/>,...Burst({cx:540,cy:760,at:7.95,seed:41,n:44,spread:760,colors:[GOLD,RED,WHITE]}));
-  add(Wipe({at:9.22,seed:23}));
-  // 4 모험 — 실제 게임 화면 (사용자: 아라랑 정글, 뗏목, 선제공격). 묶음 시간 9.45 = 음악 박자 위
+  // 3 결정타 — 실제 보스전 (7 연속 정답 → 쓰러뜨림). 묶음 시간 7.45 + LATE = 9.0 = 음악 박자, 쿵 소리는 여기만
+  add(<FieldShot key="g3" h={fn} from={1.866} at={6.45} dur={BEAT*6} z={1} y={40}/>,<Scrim key="s3" at={6.45} dur={BEAT*6} h={300}/>);
+  add(<Stamp key="c0" s="맞힐수록 더 세게!" cx={540} cy={215} size={106} at={6.5} dur={0.9} color={WHITE}/>);
+  add(...Burst({cx:540,cy:560,at:7.448,seed:41,n:44,spread:760,colors:[GOLD,RED,WHITE]}));
+  add(Wipe({at:6.45+BEAT*6-0.22,seed:23}));
+  // 4 모험 — 실제 게임 화면 (사용자: 숲 풀숲을 걷다가 상자, 뗏목, 선제공격). 묶음 시간 9.45 = 음악 박자 위
   {
     const A0=9.45; let c=A0;
-    add(<FieldShot key="adv1" h={advWalk} at={c} dur={BEAT*3}/>); c+=BEAT*3;
-    add(<Flash key="adf1" at={c} o={0.3} d={0.12}/>,<FieldShot key="adv2" h={advRaft} at={c} dur={BEAT*3}/>); c+=BEAT*3;
-    add(<Flash key="adf2" at={c} o={0.3} d={0.12}/>,<FieldShot key="adv3" h={advCave} at={c} dur={BEAT*2}/>); c+=BEAT*2;
-    add(<rect key="adsc" x={0} y={0} width={W} height={470} at={A0} duration={c-A0} fill={{kind:"linear",angle:180,stops:[{offset:0,color:NAVY,opacity:0.98},{offset:0.88,color:NAVY,opacity:0.98},{offset:1,color:NAVY,opacity:0}]}}/>,<BeatHead key="adh" s="신나는 모험!" at={A0} len={c-A0} color="#7BF29A"/>);
-    add(<Flash key="adf3" at={c} o={0.3} d={0.12}/>,<FieldShot key="adv4" h={advPreempt} at={c} dur={BEAT*3} z={1} y={-250}/>); c+=BEAT*3;
-    add(Wipe({at:c-0.22,seed:24}));
+    add(<FieldShot key="adv1" h={ch} from={0.24} at={c} dur={BEAT*5}/>);
+    add(...Burst({cx:769,cy:750,at:c+1.483,seed:51,n:30,spread:420,colors:[GOLD,WHITE]})); // 상자가 열리는 순간 (음악 박자 위)
+    const c1=c+BEAT*5;
+    add(<Flash key="adf1" at={c1} o={0.3} d={0.12}/>,<FieldShot key="adv2" h={advRaft} at={c1} dur={BEAT*3}/>);
+    const c2=c1+BEAT*3;
+    add(<Flash key="adf2" at={c2} o={0.3} d={0.12}/>,<FieldShot key="adv3" h={advCave} at={c2} dur={BEAT*2}/>);
+    const c3=c2+BEAT*2;
+    add(<rect key="adsc" x={0} y={0} width={W} height={470} at={A0} duration={c3-A0} fill={{kind:"linear",angle:180,stops:[{offset:0,color:NAVY,opacity:0.98},{offset:0.88,color:NAVY,opacity:0.98},{offset:1,color:NAVY,opacity:0}]}}/>);
+    const MINT="#7BF29A";
+    add(<BeatHead key="adh0" s="신나는 모험!" at={A0} len={c1-A0} color={MINT}/>,<BeatHead key="adh1" s="강을 건너고" at={c1} len={c2-c1} color={MINT} size={124}/>,<BeatHead key="adh2" s="어둠을 밝혀요" at={c2} len={c3-c2} color={MINT} size={124}/>);
+    add(<Flash key="adf3" at={c3} o={0.3} d={0.12}/>,<FieldShot key="adv4" h={advPreempt} at={c3} dur={BEAT*3} z={1} y={-250}/>);
+    add(Wipe({at:c3+BEAT*3-0.22,seed:24}));
   }
   const mid=kids; kids=[];
   // 5 보스 12.1~14.5
@@ -169,5 +177,5 @@ export default async ({project})=>{
   add(<Stamp key="e3" s="교육과정 필수 어휘로 싸우는 RPG" cx={540} cy={1105} size={46} color={DIM} sw={8} at={15.4} dur={2.59} from={1.1}/>);
   add(<Pill key="e4" s="앱스토어에서 무료로 시작" cy={1265} at={15.6} dur={2.39} w={860} h={132} size={66} from={1200}/>);
   add(<Stamp key="e5" s="숲 지역부터 정식판 (앱 내 구매)" cx={540} cy={1395} size={38} color={DIM} sw={6} at={15.8} dur={2.19} from={1}/>);
-  p.compose(<frame width={W} height={H} layout="none">{early}<frame x={0} y={0} width={W} height={H} layout="none" at={LATE} duration={15.3}>{mid}</frame><frame x={0} y={0} width={W} height={H} layout="none" at={LATE2} duration={18}>{kids}</frame></frame>,{at:0,dur:T,name:"ad"});
+  p.compose(<frame width={W} height={H} layout="none">{early}<frame x={0} y={0} width={W} height={H} layout="none" at={LATE} duration={16.3}>{mid}</frame><frame x={0} y={0} width={W} height={H} layout="none" at={LATE2} duration={18}>{kids}</frame></frame>,{at:0,dur:T,name:"ad"});
 };

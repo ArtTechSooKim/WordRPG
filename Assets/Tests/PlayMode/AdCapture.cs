@@ -220,6 +220,263 @@ namespace WordRPG.Tests
             Object.Destroy(advCam.gameObject);
         }
 
+        // ---- 실제 시간 그대로 찍기 (#159): 픽셀만 메모리에 받아 두고 장면이 끝난 뒤 저장 → 게임이 거의 제 속도로 돎 (문제 줄이 타는 속도 그대로)
+        // Builds/ad/real/{장면}/f0000.jpg + times.txt(프레임마다 시각) + ../marks.txt — Tools/ad_motion/pack_real.py가 시각대로 30fps 영상으로
+        private static string RealOut => Path.Combine(Application.dataPath, "..", "Builds", "ad", "real");
+        private readonly List<byte[]> rawFrames = new List<byte[]>();
+        private readonly List<float> rawTimes = new List<float>();
+        private float clipStart;
+
+        private void BeginClip()
+        {
+            rawFrames.Clear();
+            rawTimes.Clear();
+            clipStart = Time.realtimeSinceStartup;
+        }
+
+        private float ClipTime => Time.realtimeSinceStartup - clipStart;
+
+        private void Grab()
+        {
+            CanvasesToCamera(advCam);
+            Canvas.ForceUpdateCanvases();
+            advCam.Render();
+            RenderTexture.active = advRt;
+            advTex.ReadPixels(new Rect(0, 0, W, H), 0, 0);
+            RenderTexture.active = null;
+            rawFrames.Add(advTex.GetRawTextureData());
+            rawTimes.Add(ClipTime);
+        }
+
+        private void FlushClip(string name)
+        {
+            string dir = Path.Combine(RealOut, name);
+            Directory.CreateDirectory(dir);
+            var times = new StringBuilder();
+            for (int i = 0; i < rawFrames.Count; i++)
+            {
+                advTex.LoadRawTextureData(rawFrames[i]);
+                advTex.Apply(false);
+                File.WriteAllBytes(Path.Combine(dir, $"f{i:0000}.jpg"), advTex.EncodeToJPG(93));
+                times.AppendLine(rawTimes[i].ToString("F4", System.Globalization.CultureInfo.InvariantCulture));
+            }
+            File.WriteAllText(Path.Combine(dir, "times.txt"), times.ToString());
+            float length = rawTimes.Count > 0 ? rawTimes[rawTimes.Count - 1] : 0f;
+            marks.AppendLine($"{name}\tframes={rawFrames.Count}\tseconds={length:F2}\tfps={(length > 0 ? rawFrames.Count / length : 0):F1}");
+            rawFrames.Clear();
+            rawTimes.Clear();
+            GC.Collect();
+        }
+
+        private void Mark(string name, string what) => marks.AppendLine($"{name}\t{what}\tt={ClipTime:F3}");
+
+        // 기술을 고르고 문제가 나올 때까지 (찍지 않음). 정답 수를 쌓을 때도 씀
+        private static void ChooseSkill(BattleScreen battle)
+        {
+            var root = battle.transform;
+            var intensity = ActiveButton(root, "Intensity_0");
+            var target = ActiveButton(root, "Enemy_0");
+            if (intensity != null) intensity.onClick.Invoke();
+            else if (target != null && ActiveButton(root, "CancelButton") != null) target.onClick.Invoke();
+            else ActiveButton(root, "SkillButton_0")?.onClick.Invoke();
+        }
+
+        private static void StudyAll(GameSession session, Words.WordDatabase words)
+        {
+            var rules = new Words.MasteryRules();
+            var when = DateTime.UtcNow.AddDays(-200);
+            for (int i = 0; i < words.Words.Count; i++)
+            {
+                session.Vocabulary.Discover(words.Words[i].Id, when);
+                session.Vocabulary.RecordAnswer(words.Words[i].Id, true, when, rules);
+            }
+        }
+
+        [UnityTest]
+        [Timeout(1200000)]
+        public IEnumerator RealClips()
+        {
+            var db = AssetDatabase.LoadAssetAtPath<GameDatabase>("Assets/Data/GameDatabase.asset");
+            var heroData = AssetDatabase.LoadAssetAtPath<HeroData>("Assets/Data/Hero/hero.asset");
+            if (Directory.Exists(RealOut)) Directory.Delete(RealOut, true);
+            Directory.CreateDirectory(RealOut);
+            advCam = new GameObject("Main Camera", typeof(Camera)) { tag = "MainCamera" }.GetComponent<Camera>();
+            advCam.clearFlags = CameraClearFlags.SolidColor;
+            advCam.backgroundColor = Color.black;
+            advRt = new RenderTexture(W, H, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+            advCam.targetTexture = advRt;
+            advTex = new Texture2D(W, H, TextureFormat.RGB24, false);
+            marks = new StringBuilder();
+            var sfx = new StringBuilder();
+            string clip = "";
+            Sound.Recorder = (s, _) => sfx.AppendLine($"{clip}\t{ClipTime:F3}\t{s.ToString().ToLowerInvariant()}");
+
+            // 1) 숲의 풀숲을 걸어 상자 열기 (이 장면에서만 풀숲 조우를 끔 — 복사본 지역)
+            {
+                clip = "chest";
+                var forest = Object.Instantiate(db.FindArea("forest")).Set("encounterRate", 0f);
+                Assert.AreEqual(CellAt(forest, 38, 5), forest.Map.Start, "맵 줄 번호와 칸이 맞아야 함");
+                var session = AdventureSession(db, heroData, "forest", CellAt(forest, 37, 30));
+                var field = OpenField(forest, session, db);
+                yield return new WaitForSecondsRealtime(0.5f);
+                CanvasesToCamera(advCam);
+                yield return null;
+                var data = PressStick(field, Direction.Up);
+                BeginClip();
+                int topY = CellAt(forest, 31, 30).y;
+                for (float end = Time.realtimeSinceStartup + 6f; field.PlayerCell.y < topY && Time.realtimeSinceStartup < end;)
+                {
+                    yield return null;
+                    Grab();
+                }
+                data.position = field.Stick.ScreenPointFor((Vector2)Direction.Right.ToOffset() * 0.6f);
+                ExecuteEvents.Execute(field.Stick.gameObject, data, ExecuteEvents.dragHandler);
+                for (float end = Time.realtimeSinceStartup + 4f; field.PlayerCell.x < 32 && Time.realtimeSinceStartup < end;)
+                {
+                    yield return null;
+                    Grab();
+                }
+                ExecuteEvents.Execute(field.Stick.gameObject, data, ExecuteEvents.pointerUpHandler);
+                for (float end = Time.realtimeSinceStartup + 1f; field.IsMoving && Time.realtimeSinceStartup < end;)
+                {
+                    yield return null;
+                    Grab();
+                }
+                Mark(clip, $"arrived cell={field.PlayerCell} facing={field.Facing}");
+                for (int i = 0; i < 4; i++) { yield return null; Grab(); }
+                FindButton(field.transform, "Pad_Confirm").onClick.Invoke();
+                Mark(clip, "confirm");
+                for (float end = Time.realtimeSinceStartup + 2.6f; Time.realtimeSinceStartup < end;)
+                {
+                    yield return null;
+                    Grab();
+                }
+                FlushClip(clip);
+                Object.Destroy(field.gameObject);
+                yield return null;
+                yield return null;
+            }
+
+            // 2) 첫 문제: 줄이 타는 동안 기다렸다가 정답 → 휘두르기 (초원, 주인공 혼자 — 앱스토어 그림과 같은 배치)
+            {
+                clip = "quiz";
+                var meadow = db.FindArea("meadow");
+                var session = GameSession.NewGame(heroData, 10);
+                foreach (var id in new[] { TutorialProgress.Field, TutorialProgress.Confirm, TutorialProgress.Grass, TutorialProgress.Skill,
+                             TutorialProgress.Intensity, TutorialProgress.NewWord, TutorialProgress.Quiz, TutorialProgress.Potion })
+                    session.Tutorials.Mark(id);
+                for (int i = 0; i < 6; i++) session.Record.RecordBattle(true, 3, 0);
+                StudyAll(session, meadow.Words);
+                session.World.SetPosition("meadow", new Vector2Int(22, 25));
+                var field = OpenField(meadow, session, db);
+                yield return new WaitForSecondsRealtime(0.5f);
+                field.Battle.BeginBattle(new List<MonsterInstance> { new MonsterInstance(db.FindMonster("ink_slime"), 13), new MonsterInstance(db.FindMonster("scribble_bat"), 13) },
+                    meadow.Words, _ => { }, null, meadow.Theme);
+                var battle = field.Battle;
+                yield return WaitFor(() => battle.Engine != null && battle.Engine.Phase == BattlePhase.ChoosingSkill, 20f);
+                yield return new WaitForSecondsRealtime(0.4f);
+                for (float end = Time.realtimeSinceStartup + 10f; battle.Engine.Phase != BattlePhase.AnsweringQuiz && Time.realtimeSinceStartup < end;)
+                {
+                    ChooseSkill(battle);
+                    yield return new WaitForSecondsRealtime(0.1f);
+                }
+                Assert.AreEqual(BattlePhase.AnsweringQuiz, battle.Engine.Phase, "문제가 나와야 함");
+                // 적 고르기에 내려간 적 카드가 제자리로 돌아온 뒤에 카메라 캔버스로 (적 카드 이동은 화면 좌표라 도중에 바꾸면 사라짐)
+                yield return new WaitForSecondsRealtime(0.35f);
+                CanvasesToCamera(advCam);
+                yield return null;
+                BeginClip();
+                var question = battle.Engine.CurrentQuestion;
+                Mark(clip, $"question word={question.Word.English} meaning={question.Word.Meaning} correct={question.CorrectIndex}");
+                for (float end = Time.realtimeSinceStartup + 2.2f; Time.realtimeSinceStartup < end;) // 크리티컬은 문제가 나오고 3초 안 (찍기 전 0.4초 포함)
+                {
+                    yield return null;
+                    Grab();
+                }
+                ActiveButton(battle.transform, $"Choice_{question.CorrectIndex}").onClick.Invoke();
+                Mark(clip, "answered");
+                for (float end = Time.realtimeSinceStartup + 2.6f; Time.realtimeSinceStartup < end;)
+                {
+                    yield return null;
+                    Grab();
+                }
+                FlushClip(clip);
+                Object.Destroy(field.gameObject);
+                yield return null;
+                yield return null;
+            }
+
+            // 3) 보스 결정타: 정답을 쌓아 콤보를 올린 뒤 보스 HP를 깎아 마지막 한 방 (콤보는 실제 값)
+            {
+                clip = "finisher";
+                var library = db.FindArea("library");
+                var session = GameSession.NewGame(heroData, 16);
+                foreach (var id in new[] { TutorialProgress.Field, TutorialProgress.Confirm, TutorialProgress.Grass, TutorialProgress.Skill,
+                             TutorialProgress.Intensity, TutorialProgress.NewWord, TutorialProgress.Quiz, TutorialProgress.Potion })
+                    session.Tutorials.Mark(id);
+                for (int i = 0; i < 6; i++) session.Record.RecordBattle(true, 3, 0);
+                StudyAll(session, library.Words);
+                session.World.SetPosition("library", library.Map.Start);
+                var field = OpenField(library, session, db);
+                yield return new WaitForSecondsRealtime(0.5f);
+                var boss = library.Boss;
+                field.Battle.BeginBattle(new List<MonsterInstance> { new MonsterInstance(boss.Species, boss.Level) }, library.Words, _ => { }, "보스 출현!", library.Theme, boss: true);
+                var battle = field.Battle;
+                const BindingFlags any = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
+                bool capturing = false;
+                float stopAt = float.MaxValue;
+                for (float end = Time.realtimeSinceStartup + 150f; Time.realtimeSinceStartup < end;)
+                {
+                    var engine = battle.Engine;
+                    if (session.Hero.CurrentHp * 2 < session.Hero.Stats.MaxHp) session.Hero.RestoreFully();
+                    if (!capturing && engine != null && engine.Enemies[0].Hp * 2 < engine.Enemies[0].MaxHp) engine.Enemies[0].Combatant.Heal(engine.Enemies[0].MaxHp); // 콤보가 쌓이기 전에 쓰러지지 않게
+                    if (engine != null && engine.Phase == BattlePhase.AnsweringQuiz && engine.CurrentQuestion != null)
+                    {
+                        if (engine.Streak >= 6 && !capturing)
+                        {
+                            var foe = engine.Enemies[0];
+                            foe.Monster.TakeDamage(Mathf.Max(0, foe.Hp - 12)); // 다음 한 방이면 쓰러지게 (찍기 전용)
+                            typeof(BattleScreen).GetMethod("SyncAll", any)?.Invoke(battle, null); // HP 줄도 그 값으로
+                            CanvasesToCamera(advCam);
+                            capturing = true;
+                            BeginClip();
+                            Mark(clip, $"streak={engine.Streak} word={engine.CurrentQuestion.Word.English}");
+                            for (float wait = Time.realtimeSinceStartup + 0.5f; Time.realtimeSinceStartup < wait;)
+                            {
+                                yield return null;
+                                Grab();
+                            }
+                            Mark(clip, "answered");
+                        }
+                        ActiveButton(battle.transform, $"Choice_{engine.CurrentQuestion.CorrectIndex}")?.onClick.Invoke();
+                    }
+                    else if (engine != null && engine.Phase == BattlePhase.ChoosingSkill && !capturing) ChooseSkill(battle);
+                    if (capturing)
+                    {
+                        if (battle.FinishersPlayed > 0 && stopAt == float.MaxValue)
+                        {
+                            stopAt = Time.realtimeSinceStartup + 2.6f;
+                            Mark(clip, "finisher");
+                        }
+                        if (Time.realtimeSinceStartup > stopAt || battle.IsResultVisible || ClipTime > 9f) break;
+                    }
+                    yield return null;
+                    if (capturing) Grab();
+                }
+                Assert.IsTrue(capturing, "콤보를 쌓지 못함");
+                FlushClip(clip);
+                Object.Destroy(field.gameObject);
+            }
+
+            Sound.Recorder = null;
+            File.WriteAllText(Path.Combine(RealOut, "marks.txt"), marks.ToString());
+            File.WriteAllText(Path.Combine(RealOut, "sfx.txt"), sfx.ToString());
+            advCam.targetTexture = null;
+            Object.Destroy(advRt);
+            Object.Destroy(advTex);
+            Object.Destroy(advCam.gameObject);
+        }
+
         private static IEnumerator Then(IEnumerator routine, Action done)
         {
             yield return routine;
