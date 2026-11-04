@@ -254,7 +254,7 @@ Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow
                         widen_maps.py (맵의 한 칸 통로 → 두 칸), subset_fonts.py (본문 글꼴에서 한자·가나 빼기 — 앱 크기, fontTools 필요),
                         pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구), make_preempt_sfx.py (선제공격 '카칭' 소리 합성 #147), make_skill_sfx.py (기술마다 다른 소리: 팩 소리 겹치기 #164),
                         check_android_bundle.py (구글플레이에 올리기 전 AAB 검사: 대상 API·게임 표시·뒤로 가기·권한·16KB 페이지·크기 #149),
-                        prepare_short_sounds.py (짧은 곡·카칭 다듬기: 빠르기 올리기·앞 무음 자르기·음량·높은음 깎기, 카칭 = 지금 소리 + 칼빛 → Builds/music_pilot/short, #177·#178),
+                        prepare_sword_sfx.py (카칭 후보: CC0 실제 칼 소리 다듬기 → Builds/music_pilot/sword_clash/out, #179),
                         prepare_music.py (받은 곡 → 게임용: 끝 무음 빼기·반복 이음새 찾아 겹치기·음량 맞추기 → Licensed 폴더, `--later` = 아직 안 쓰는 2.0 곡을 Builds로, imageio-ffmpeg·numpy 필요 #166·#172),
                         build_intro_video.py (입장 영상: Flow 컷 이어 붙이기·Veo 표시 잘라냄·자막표 → Resources/Video, imageio-ffmpeg 필요, #129 —
                         컷 원본은 저장소 밖 Builds/cinematic_pixellab/Videos, release-1.1 폴더에선 그 경로를 인자로),
