@@ -57,69 +57,63 @@ const START={hero_swing:0,doc_finish_sentence:28,ara_pebble:69,wand_thunder_spel
 // 몬스터 줄 또는 파티 줄을 크게 (1.6배). party = 회복·보호막
 function Shot({h,clip,from=0,at,dur,party=false}){
   return <frame x={0} y={0} width={W} height={H} layout="none" clip={true} at={at} duration={dur}>
-    <media file={h} x={-324} y={party?-1228:90} width={1728} height={3754} fit="fill" trimStart={(START[clip]+from)/30}
+    <media file={h} x={-324} y={party?-1168:216} width={1728} height={3754} fit="fill" trimStart={(START[clip]+from)/30}
       animate={[{property:"scale",keyframes:[{at:0,value:1.07,easing:"ease-out"},{at:Math.min(0.14,dur*0.4),value:1},{at:dur-0.01,value:1.025}]}]}/>
   </frame>;
 }
-// [기술, 이름, 길이, 종류 0공격 1회복 2보호막] — 뒤로 갈수록 빨라짐, 마지막은 낙뢰
-const REEL=[["ara_pebble","돌팔매",.65,0],["quill_ink_storm","잉크 폭풍",.62,0],["whip_thorn_storm","가시덩굴 폭풍",.58,0],["gem_letter_shower","글자 소나기",.55,0],["doc_highlight_sweep","형광펜 긋기",.52,0],["lamp_firefly_swarm","반딧불 떼",.5,0],
-  ["leaf_world_breath","세계수의 숨결",.48,1],["gourd_spring","솟아나는 샘",.46,1],["grail_blessing","기억의 축복",.44,1],
-  ["flute_echo_wall","겹메아리 방벽",.42,2],["tortoise_encyclo_wall","백과 방벽",.42,2],["hourglass_rewind","되감은 시간",.42,2],["seed_period_grove","마침표 울타리",.42,2],["wand_thunder_spell","낙뢰 주문",.75,0]];
-const REEL_AT=5.62, KIND=[GOLD,"#7BF29A","#7CC0FF"], HEAD=["공격 기술마다 다른 연출","회복도 전부 달라요","보호막까지!"];
+// 음악(battle.ogg 120BPM) 한 박자마다 기술 하나, 마지막 낙뢰만 두 박자 — 글 없이 연출만 보이게. 1 = 파티 쪽 화면(회복·보호막)
+const BEAT=0.4992,REEL_AT=5.5;
+const REEL=[["ara_pebble",0],["quill_ink_storm",0],["whip_thorn_storm",0],["gem_letter_shower",0],["doc_highlight_sweep",0],["lamp_firefly_swarm",0],["leaf_world_breath",1],["gourd_spring",1],["grail_blessing",1],["flute_echo_wall",1],["tortoise_encyclo_wall",1],["hourglass_rewind",1],["seed_period_grove",1],["wand_thunder_spell",0]];
 export default async ({project})=>{
   const p=await project({size:"1080x1920",fps:30,background:NAVY});
   const A=n=>p.add("assets/"+n);
   const quiz=await A("2_quiz.jpg"),fin=await A("4_finisher.jpg"),cave=await A("8_cave.jpg"),field=await A("1_field.jpg"),sum=await A("5_summary.jpg"),reel=await A("skills_reel.mp4"),icon=await A("icon.png");
   const b1=await A("boss_forget_king.png"),b2=await A("boss_muddle_raccoon.png"),b3=await A("boss_blank_frog.png"),b4=await A("boss_ellipsis_vine.png");
-  const LATE=6.4,T=18+LATE;
+  const LATE=6.54,T=18+LATE;
   let kids=[];
   const add=(...n)=>kids.push(...n.flat());
   // 1 문제 도전 0~3.6
-  add(<Game key="g1" h={quiz} at={0} dur={3.75} y={-680}/>,<Scrim key="s1" at={0} dur={3.75} h={560}/>,<Scrim key="s1b" at={0} dur={3.75} top={false} h={330}/>);
-  add(<Stamp key="h1" s="3초 안에" cx={540} cy={235} size={150} color={GOLD} at={0.05} dur={2.5}/>,<Stamp key="h2" s="맞혀 보세요!" cx={540} cy={395} size={118} at={0.28} dur={2.27} from={1.8}/>);
-  add(<frame key="ring" x={765} y={530} width={210} height={210} layout="none" origin="center" at={0.5} duration={2.1} motion={{enter:{from:{scale:0},duration:0.16,easing:{kind:"overshoot",amount:2}},exit:{to:{scale:0,opacity:0},duration:0.1,anchor:"end"}}}><rect x={0} y={0} width={210} height={210} radius={105} fill={NAVY} strokeColor={GOLD} strokeWidth={12}/></frame>);
-  [["3",0.6],["2",1.27],["1",1.94]].forEach(([s,t])=>add(<Stamp key={"d"+s} s={s} cx={870} cy={635} w={210} size={124} color={s==="1"?RED:WHITE} sw={10} at={t} dur={0.65} from={1.7}/>));
-  add(<rect key="ok" x={28} y={1272} width={1024} height={122} radius={18} fill={GREEN} at={2.62} duration={1.05} animate={[{property:"opacity",from:0.38,to:0.38,duration:1}]}/>,<rect key="okb" x={28} y={1272} width={1024} height={122} radius={18} fill="#FFFFFF00" strokeColor="#FFFFFF" strokeWidth={10} at={2.62} duration={1.05} animate={[{property:"scale",keyframes:[{at:0,value:1.09,easing:"ease-out"},{at:0.18,value:1},{at:1,value:1}]}]}/>);
-  add(<Flash key="f1" at={2.62}/>,...Burst({cx:540,cy:1333,at:2.62,seed:11,colors:[GREEN,WHITE,GOLD]}));
-  add(<Stamp key="ok1" s="정답!" cx={540} cy={250} size={190} color={GREEN} at={2.62} dur={1.05}/>,<Stamp key="ok2" s="stage = 무대, 단계" cx={540} cy={430} size={74} at={2.74} dur={0.93} from={1.3}/>);
+  add(<Game key="g1" h={quiz} at={0} dur={3.75} y={-680} zoom={[1,1]}/>,<Scrim key="s1" at={0} dur={3.75} h={560}/>,<Scrim key="s1b" at={0} dur={3.75} top={false} h={330}/>);
+  add(<Stamp key="h1" s="3초 안에" cx={540} cy={235} size={150} color={GOLD} at={0.05} dur={2.68}/>,<Stamp key="h2" s="맞혀 보세요!" cx={540} cy={395} size={118} at={0.28} dur={2.45} from={1.8}/>);
+  add(<frame key="ring" x={765} y={530} width={210} height={210} layout="none" origin="center" at={0.4} duration={2.33} motion={{enter:{from:{scale:0},duration:0.16,easing:{kind:"overshoot",amount:2}},exit:{to:{scale:0,opacity:0},duration:0.1,anchor:"end"}}}><rect x={0} y={0} width={210} height={210} radius={105} fill={NAVY} strokeColor={GOLD} strokeWidth={12}/></frame>);
+  [["3",0.5],["2",1.25],["1",2.0]].forEach(([s,t])=>add(<Stamp key={"d"+s} s={s} cx={870} cy={635} w={210} size={124} color={s==="1"?RED:WHITE} sw={10} at={t} dur={0.72} from={1.7}/>));
+  add(<rect key="ok" x={29} y={1246} width={1022} height={121} radius={18} fill={GREEN} at={2.75} duration={0.95} animate={[{property:"opacity",from:0.38,to:0.38,duration:0.9}]}/>,<rect key="okb" x={29} y={1246} width={1022} height={121} radius={18} fill="#FFFFFF00" strokeColor="#FFFFFF" strokeWidth={10} at={2.75} duration={0.95} animate={[{property:"scale",keyframes:[{at:0,value:1.07,easing:"ease-out"},{at:0.16,value:1},{at:0.9,value:1}]}]}/>);
+  add(<Flash key="f1" at={2.75}/>,...Burst({cx:540,cy:1306,at:2.75,seed:11,colors:[GREEN,WHITE,GOLD]}));
+  add(<Stamp key="ok1" s="정답!" cx={540} cy={250} size={190} color={GREEN} at={2.75} dur={0.95}/>,<Stamp key="ok2" s="stage = 무대, 단계" cx={540} cy={430} size={74} at={2.87} dur={0.83} from={1.3}/>);
   add(Wipe({at:3.5,seed:21}));
-  // 2 공격 3.75~5.6 — 실제 연출 (크리티컬)
-  add(<Shot key="g2a" h={reel} clip="hero_swing" at={3.75} dur={0.93}/>,<Shot key="g2b" h={reel} clip="doc_finish_sentence" from={4} at={4.68} dur={0.94}/>,<Scrim key="s2" at={3.75} dur={1.87} h={430}/>,<Scrim key="s2b" at={3.75} dur={1.87} top={false} h={540}/>);
-  add(<Stamp key="a1" s="맞히면, 공격!" cx={540} cy={205} size={124} color={GOLD} at={3.85} dur={1.72}/>);
-  add(<Flash key="f2" at={4.05} o={0.5}/>,...Burst({cx:255,cy:834,at:4.05,seed:31,spread:520}));
-  add(<Flash key="f3" at={4.88} c={GOLD} o={0.45}/>,...Burst({cx:255,cy:834,at:4.88,seed:32,spread:560,colors:[RED,GOLD,WHITE]}),...Burst({cx:815,cy:834,at:5.28,seed:33,spread:560,colors:[RED,GOLD,WHITE]}));
-  add(<Stamp key="a2" s="크리티컬 1.5배!" cx={540} cy={1480} size={118} color={RED} at={4.9} dur={0.67} rot={-6}/>,<Stamp key="a3" s="3초 안에 맞히면" cx={540} cy={1612} size={60} at={4.95} dur={0.62} from={1.2}/>);
-  add(Wipe({at:5.4,seed:22}));
-  // 2-2 기술 나열 5.62~12.85 — 실제 연출을 빠르게 (순서: 그림 → 어둡게 → 글자)
+  // 2 공격 3.75~5.5 — 실제 연출 (크리티컬)
+  add(<Shot key="g2a" h={reel} clip="hero_swing" at={3.75} dur={0.93}/>,<Shot key="g2b" h={reel} clip="doc_finish_sentence" from={4} at={4.68} dur={0.82}/>,<Scrim key="s2" at={3.75} dur={1.75} h={470}/>,<Scrim key="s2b" at={3.75} dur={1.75} top={false} h={380}/>);
+  add(<Stamp key="a1" s="맞히면, 공격!" cx={540} cy={250} size={124} color={GOLD} at={3.85} dur={1.62}/>);
+  add(<Flash key="f2" at={4.05} o={0.5}/>,...Burst({cx:255,cy:960,at:4.05,seed:31,spread:520}));
+  add(<Flash key="f3" at={4.88} c={GOLD} o={0.45}/>,...Burst({cx:255,cy:960,at:4.88,seed:32,spread:560,colors:[RED,GOLD,WHITE]}));
+  add(<Stamp key="a3" s="3초 안에 맞히면" cx={540} cy={1505} size={56} at={4.9} dur={0.58} from={1.2}/>,<Stamp key="a2" s="크리티컬 1.5배!" cx={540} cy={1610} size={110} color={RED} at={4.92} dur={0.56} rot={-6}/>);
+  add(Wipe({at:5.28,seed:22}));
+  // 2-2 기술 나열 — 실제 연출을 박자에 맞춰. 글은 한 줄만 (사용자: 기술 이름만 읽게 됨)
   {
     let c=REEL_AT;
-    REEL.forEach(([clip,name,d,k],i)=>{
-      add(<Shot key={"r"+i} h={reel} clip={clip} from={i===REEL.length-1?5:6} at={c} dur={d} party={k>0}/>);
-      add(<Scrim key={"rt"+i} at={c} dur={d} h={k>0?660:400}/>);
+    REEL.forEach(([clip,k],i)=>{
+      const last=i===REEL.length-1,d=last?BEAT*2:BEAT;
+      add(<Shot key={"r"+i} h={reel} clip={clip} from={last?6:9} at={c} dur={d} party={k>0}/>);
+      add(k>0?<rect key={"rt"+i} x={0} y={0} width={W} height={668} at={c} duration={d} fill={{kind:"linear",angle:180,stops:[{offset:0,color:NAVY,opacity:1},{offset:0.92,color:NAVY,opacity:1},{offset:1,color:NAVY,opacity:0}]}}/>:<Scrim key={"rt"+i} at={c} dur={d} h={470}/>); // 파티 쪽은 전투 로그를 완전히 가림
       c+=d;
     });
-    add(<Scrim key="srb" at={REEL_AT} dur={c-REEL_AT} top={false} h={540}/>);
-    let nc=REEL_AT;
-    REEL.forEach(([clip,name,d,k],i)=>{
-      add(<Stamp key={"rn"+i} s={name} cx={540} cy={k>0?1400:1490} size={104} color={KIND[k]} at={nc} dur={d} from={1.5}/>);
-      nc+=d;
-    });
-    let hc=REEL_AT;
-    [0,1,2].forEach(k=>{const n=REEL.filter((r,i)=>r[3]===k&&i<REEL.length-1);const d=n.reduce((a,r)=>a+r[2],0);
-      add(<Stamp key={"rh"+k} s={HEAD[k]} cx={540} cy={205} size={84} at={hc} dur={d}/>);
-      if(k>0)add(<Flash key={"rf"+k} at={hc} o={0.45} d={0.14}/>);
-      hc+=d;});
-    const last=c-0.75;
-    add(<Flash key="rfl" at={last+0.13} o={0.85}/>,...Burst({cx:255,cy:834,at:last+0.13,seed:34,n:44,spread:760,colors:[GOLD,WHITE,"#7CC0FF"]}));
+    const len=c-REEL_AT;
+    add(<Scrim key="srb" at={REEL_AT} dur={len} top={false} h={380}/>);
+    add(<frame key="rhead" x={0} y={130} width={W} height={240} layout="none" origin="center" at={REEL_AT} duration={len}
+      animate={[{property:"scale",repeat:Math.floor(len/BEAT)-1,keyframes:[{at:0,value:1.1,easing:"ease-out"},{at:0.16,value:1},{at:BEAT-0.02,value:1},{at:BEAT,value:1.1}]}]}>
+      <Stamp s="신나는 전투!" cx={540} cy={120} size={140} color={GOLD} at={0} dur={len-0.02}/>
+    </frame>);
+    const last=c-BEAT*2;
+    add(<Flash key="rfl" at={last+3/30} o={0.85}/>,...Burst({cx:255,cy:960,at:last+3/30,seed:34,n:44,spread:760,colors:[GOLD,WHITE,"#7CC0FF"]}));
     add(Wipe({at:c-0.22,seed:26}));
   }
   const early=kids; kids=[];
   // 3 콤보 6.45~9.2
-  add(<Game key="g3" h={fin} at={6.45} dur={2.9} y={140} hits={[8.12]} zoom={[1.0,1.05]}/>,<Scrim key="s3" at={6.45} dur={2.9} h={500}/>);
+  add(<Game key="g3" h={fin} at={6.45} dur={2.9} y={140} hits={[7.95]} zoom={[1.0,1.05]}/>,<Scrim key="s3" at={6.45} dur={2.9} h={500}/>);
   add(<Stamp key="c0" s="맞힐수록 더 세게!" cx={540} cy={215} size={106} at={6.55} dur={2.6} color={WHITE}/>);
   const combo=[[1,6.8],[2,7.0],[3,7.18],[4,7.34],[5,7.48],[6,7.6],[7,7.72]];
   combo.forEach(([n,t],i)=>{const end=i<combo.length-1?combo[i+1][1]:9.15;add(<Stamp key={"c"+n} s={`콤보 ${n}`} cx={540} cy={1235} size={110+n*10} color={n>=6?RED:n>=4?"#FF9A3D":GOLD} at={t} dur={end-t} from={1.45}/>);});
-  add(<Flash key="f4" at={8.12} o={0.9}/>,...Burst({cx:540,cy:760,at:8.12,seed:41,n:44,spread:760,colors:[GOLD,RED,WHITE]}));
+  add(<Flash key="f4" at={7.95} o={0.9}/>,...Burst({cx:540,cy:760,at:7.95,seed:41,n:44,spread:760,colors:[GOLD,RED,WHITE]}));
   add(Wipe({at:9.0,seed:23}));
   // 4 몽타주 9.25~11.9
   add(<Game key="g4" h={field} at={9.25} dur={0.9} y={-120} zoom={[1.0,1.06]}/>,<Pill key="p4" s="넓은 맵을 탐험하고" cy={300} at={9.3} dur={0.85}/>);
