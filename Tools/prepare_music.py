@@ -56,6 +56,7 @@ LATER = {
     "bossdesertmid2": ("round11_raw/사막중간보스_B.mp3", BOSS, {"crush": STRONG, "careful": True, "min_start": 30.0, "max_start": 34.0, "min_length": 20.0}),  # 앞 30초가 조용해서 커진 뒤로만 반복
     "storydesert": ("round12_raw/사막스토리_A.mp3", FIELD, {"once": True}),  # 사막 입장 영상 곡 후보 A·B (#189) — 끝맺음이 있어 반복 안 함
     "storydesert2": ("round12_raw/사막스토리_B.mp3", FIELD, {"once": True}),
+    "storydesert3": ("round12_raw/사막스토리_C.mp3", FIELD, {"once": True}),  # 사용자: 입장 영상 곡을 참고 (#189)
     "desert": ("round7_raw/사막배경.mp3", FIELD, {"careful": True}),
     "oasis": ("round7_raw/오아시스_2.mp3", FIELD, {"careful": True}),  # 사용자: 조금 덜 리드미컬하게, 새 곡으로 정함 (#173·#174)
     "snow": ("round7_raw/설원배경.mp3", FIELD, {"careful": True, "max_start": 25.0, "min_length": 28.0}),  # 앞이 조용한 곡은 반복을 뒤쪽에서 (#172)
