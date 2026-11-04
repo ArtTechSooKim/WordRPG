@@ -2,6 +2,34 @@
 // 배경은 앱스토어 스크린샷을 임시로 씀 → 사용자 녹화 영상을 받으면 Game()의 그림을 영상으로 바꾸고 시간을 맞춤
 const NAVY="#121424", PANEL="#21263D", GOLD="#FFD140", WHITE="#F6F7FF", GREEN="#40BF66", RED="#FF5A52", OUTLINE="#0B0C18", DIM="#A6B3D1";
 const W=1080,H=1920;
+// 맞는 순간의 흔들림: hits = [{t 초, a 세기(px), s 길이 배율}] → 빠르게 줄어드는 떨림. 글자는 흔들지 않음 (읽히게)
+function Shake(hits,dur){
+  if(!hits.length)return [];
+  const P=[[0,1,0.7],[0.03,-0.85,-0.55],[0.07,0.6,0.5],[0.11,-0.4,-0.3],[0.15,0.22,0.18],[0.2,0,0]];
+  const kx=[{at:0,value:0}],ky=[{at:0,value:0}],end=dur-0.01,hs=[...hits].sort((a,b)=>a.t-b.t);
+  hs.forEach((h,i)=>{
+    const next=i+1<hs.length?hs[i+1].t:end,s=h.s||1;
+    if(h.t>kx[kx.length-1].at+0.012){kx.push({at:h.t-0.006,value:kx[kx.length-1].value});ky.push({at:h.t-0.006,value:ky[ky.length-1].value});}
+    P.forEach(([o,x,y])=>{const at=h.t+o*s;if(at>=next||at>end)return;
+      if(at<=kx[kx.length-1].at){if(at===0){kx[0].value=x*h.a;ky[0].value=y*h.a;}return;}
+      kx.push({at,value:x*h.a});ky.push({at,value:y*h.a});});
+  });
+  if(kx[kx.length-1].at<end){kx.push({at:end,value:0});ky.push({at:end,value:0});}
+  return [{property:"offsetX",keyframes:kx},{property:"offsetY",keyframes:ky}];
+}
+// 튀어오름: list = [{t 초, p 배율}] → 커졌다가 돌아옴
+function Punch(list,dur){
+  const keys=[{at:0,value:1}],end=dur-0.01,ps=[...list].sort((a,b)=>a.t-b.t);
+  ps.forEach((h,i)=>{
+    const next=i+1<ps.length?ps[i+1].t:end;
+    if(h.t>0&&h.t<=keys[keys.length-1].at)return; // 같은 시각이면 먼저 것만
+    if(h.t<=0)keys[0]={at:0,value:h.p,easing:"ease-out"};
+    else{if(h.t>keys[keys.length-1].at+0.012)keys.push({at:h.t-0.006,value:1});keys.push({at:h.t,value:h.p,easing:"ease-out"});}
+    const back=h.t+0.16;if(back<next&&back<end)keys.push({at:back,value:1});
+  });
+  if(keys[keys.length-1].at<end)keys.push({at:end,value:1});
+  return keys;
+}
 function rng(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
 function Stamp({s,cx,cy,size=120,color=WHITE,at,dur,w=1040,rot=0,from=2.1,sw}){
   const h=Math.round(size*1.5), stroke=sw??Math.max(10,Math.round(size*0.15));
@@ -55,23 +83,26 @@ function BossCard({h,name,x,y,at,dur,rot,w=470,hh=520}){
 // 기술 연출 영상(Tools/ad_motion/pack_skill_clips.py) 안의 시작 프레임
 const START={hero_swing:0,doc_finish_sentence:28,ara_pebble:69,wand_thunder_spell:99,quill_ink_storm:128,gem_letter_shower:164,doc_highlight_sweep:205,whip_thorn_storm:246,lamp_firefly_swarm:286,leaf_world_breath:328,grail_blessing:358,gourd_spring:387,flute_echo_wall:427,tortoise_encyclo_wall:467,hourglass_rewind:508,seed_period_grove:550};
 // 몬스터 줄 또는 파티 줄을 크게 (1.6배). party = 회복·보호막
-function Shot({h,clip,from=0,at,dur,party=false}){
+function Shot({h,clip,from=0,at,dur,party=false,hits=[]}){
   return <frame x={0} y={0} width={W} height={H} layout="none" clip={true} at={at} duration={dur}>
     <media file={h} x={-324} y={party?-1168:216} width={1728} height={3754} fit="fill" trimStart={(START[clip]+from)/30}
-      animate={[{property:"scale",keyframes:[{at:0,value:1.07,easing:"ease-out"},{at:Math.min(0.14,dur*0.4),value:1},{at:dur-0.01,value:1.025}]}]}/>
+      animate={[...Shake(hits,dur),{property:"scale",keyframes:Punch([{t:0,p:1.07},...hits.map(h=>({t:h.t,p:1+h.a/400}))],dur)}]}/>
   </frame>;
 }
 // 음악(battle.ogg 120BPM)에 맞춤: 공격 4분할 2장 → 회복 → 보호막, 각 두 박자. 글은 한 줄만
 const BEAT=0.4992,REEL_AT=4.0;
 // [기술, 시작 프레임] — 시작 프레임을 달리해 맞는 순간이 왼쪽 위 → 오른쪽 아래로 번짐 (기술은 대개 10번째 프레임에 맞음)
-const GRIDS=[[["quill_ink_storm",9],["gem_letter_shower",6],["whip_thorn_storm",3],["ara_pebble",0]],
-  [["doc_highlight_sweep",9],["lamp_firefly_swarm",6],["doc_finish_sentence",3],["wand_thunder_spell",0]]];
+// [기술, 시작 프레임, 맞는 프레임(칸 영상 기준)]
+const GRIDS=[[["quill_ink_storm",9,[1,7]],["gem_letter_shower",6,[4,16]],["whip_thorn_storm",3,[7,18]],["ara_pebble",0,[10]]],
+  [["doc_highlight_sweep",9,[0,12]],["lamp_firefly_swarm",6,[4,16]],["doc_finish_sentence",3,[7,19]],["wand_thunder_spell",0,[9]]]];
+// 큰 한 방은 네 칸이 같이 흔들림
+const GRID_BIG=[[{t:10/30,a:12}],[{t:7/30,a:14},{t:9/30,a:18}]];
 const SOLO=["gourd_spring","tortoise_encyclo_wall"];
 // 4분할 한 칸: 왼쪽 몬스터 카드 쪽을 크게. 영상은 칸마다 따로 (Tools/ad_motion/cut_cells.sh — 같은 파일을 동시에 틀면 같은 프레임이 나옴)
-function Cell({h,x,y,at,dur,w=535,hh=590}){
+function Cell({h,x,y,at,dur,w=535,hh=590,hits=[]}){
   return <frame x={x} y={y} width={w} height={hh} layout="none" origin="center" clip={true} radius={22} at={at} duration={dur}
     motion={{enter:{from:{scale:0.86},duration:0.16,easing:{kind:"overshoot",amount:1.6}}}}>
-    <media file={h} x={-182} y={-135} width={1350} height={2933} fit="fill"/>
+    <media file={h} x={-182} y={-135} width={1350} height={2933} fit="fill" animate={[...Shake(hits,dur),{property:"scale",keyframes:Punch(hits.map(h=>({t:h.t,p:1+h.a/500})),dur)}]}/>
     <rect x={0} y={0} width={w} height={hh} radius={22} fill="#FFFFFF00" strokeColor={GOLD} strokeWidth={8}/>
   </frame>;
 }
@@ -85,12 +116,14 @@ function BeatHead({s,at,len,color=GOLD,size=140}){
   </frame>;
 }
 // 필드 장면: z=1.3이면 주인공이 가운데 위쪽, 위 HUD는 제목 뒤로·스틱은 화면 밖 / z=1이면 선제공격 창이 다 들어옴
-function FieldShot({h,at,dur,z=1.3,y=-462,from=0}){
+function FieldShot({h,at,dur,z=1.3,y=-462,from=0,hits=[],punches=[{t:0,p:1.05}],push=0,extra=[]}){
+  const a=[...Shake(hits,dur),{property:"scale",keyframes:Punch(punches,dur)},...extra];
+  if(push)a.push({property:"scale",from:1,to:1+push,duration:dur-0.01,easing:"linear"});
   return <frame x={0} y={0} width={W} height={H} layout="none" clip={true} at={at} duration={dur}>
-    <media file={h} x={(W-W*z)/2} y={y} width={W*z} height={2346*z} fit="fill" trimStart={from}
-      animate={[{property:"scale",keyframes:[{at:0,value:1.05,easing:"ease-out"},{at:0.14,value:1},{at:dur-0.01,value:1}]}]}/>
+    <media file={h} x={(W-W*z)/2} y={y} width={W*z} height={2346*z} fit="fill" trimStart={from} animate={a}/>
   </frame>;
 }
+const beats=(dur,p=1.012)=>{const o=[];for(let i=1;i*BEAT<dur-0.1;i++)o.push({t:i*BEAT,p});return o;};
 export default async ({project})=>{
   const p=await project({size:"1080x1920",fps:30,background:NAVY});
   const A=n=>p.add("assets/"+n);
@@ -103,7 +136,7 @@ export default async ({project})=>{
   let kids=[];
   const add=(...n)=>kids.push(...n.flat());
   // 1 문제 도전 0~3 — 실제 전투, 크리티컬 찬스 줄이 타들어 감. 2.21초에 정답 (크리티컬 3초 안), 초록 칸은 게임 화면 그대로
-  add(<FieldShot key="g1" h={qz} at={0} dur={3.0} z={1} y={-680}/>,<Scrim key="s1" at={0} dur={3.0} h={560}/>,<Scrim key="s1b" at={0} dur={3.0} top={false} h={330}/>);
+  add(<FieldShot key="g1" h={qz} at={0} dur={3.0} z={1.03} y={-735} hits={[{t:2.21,a:14}]} punches={[{t:0.3,p:1.012},{t:0.9,p:1.016},{t:1.5,p:1.02},{t:2.21,p:1.035}]}/>,<Scrim key="s1" at={0} dur={3.0} h={560}/>,<Scrim key="s1b" at={0} dur={3.0} top={false} h={330}/>);
   add(<Stamp key="h1" s="3초 안에" cx={540} cy={235} size={150} color={GOLD} at={0.05} dur={2.12}/>,<Stamp key="h2" s="맞혀 보세요!" cx={540} cy={395} size={118} at={0.28} dur={1.89} from={1.8}/>);
   add(<frame key="ring" x={765} y={530} width={210} height={210} layout="none" origin="center" at={0.2} duration={1.97} motion={{enter:{from:{scale:0},duration:0.16,easing:{kind:"overshoot",amount:2}},exit:{to:{scale:0,opacity:0},duration:0.1,anchor:"end"}}}><rect x={0} y={0} width={210} height={210} radius={105} fill={NAVY} strokeColor={GOLD} strokeWidth={12}/></frame>);
   [["3",0.3],["2",0.9],["1",1.5]].forEach(([s,t])=>add(<Stamp key={"d"+s} s={s} cx={870} cy={635} w={210} size={124} color={s==="1"?RED:WHITE} sw={10} at={t} dur={0.62} from={1.7}/>));
@@ -111,7 +144,7 @@ export default async ({project})=>{
   add(<Stamp key="ok1" s="정답!" cx={540} cy={250} size={190} color={GREEN} at={2.21} dur={0.79}/>,<Stamp key="ok2" s="potential = 잠재력, 가능성" cx={540} cy={430} size={66} at={2.33} dur={0.67} from={1.3}/>);
   add(Wipe({at:2.75,seed:21}));
   // 2 공격 3~4 — 같은 전투의 다음 장면 (실제 크리티컬)
-  add(<FieldShot key="g2" h={qz} from={3.6} at={3.0} dur={1.0} z={1.6} y={216}/>,<Scrim key="s2" at={3.0} dur={1.0} h={470}/>,<Scrim key="s2b" at={3.0} dur={1.0} top={false} h={380}/>);
+  add(<FieldShot key="g2" h={qz} from={3.6} at={3.0} dur={1.0} z={1.6} y={216} hits={[{t:0.47,a:46,s:1.2}]} punches={[{t:0,p:1.05},{t:0.47,p:1.08}]}/>,<Scrim key="s2" at={3.0} dur={1.0} h={470}/>,<Scrim key="s2b" at={3.0} dur={1.0} top={false} h={380}/>);
   add(<Stamp key="a1" s="맞히면, 공격!" cx={540} cy={250} size={124} color={GOLD} at={3.05} dur={0.93}/>);
   add(<Flash key="f3" at={3.47} c={GOLD} o={0.45}/>,...Burst({cx:255,cy:960,at:3.47,seed:32,spread:560,colors:[RED,GOLD,WHITE]}));
   add(<Stamp key="a3" s="3초 안에 맞히면" cx={540} cy={1505} size={56} at={3.47} dur={0.5} from={1.2}/>,<Stamp key="a2" s="크리티컬 1.5배!" cx={540} cy={1610} size={110} color={RED} at={3.49} dur={0.48} rot={-6}/>);
@@ -120,12 +153,13 @@ export default async ({project})=>{
   {
     let c=REEL_AT;
     const grid=(g,n)=>{
-      g.forEach(([clip],i)=>add(<Cell key={`q${n}-${i}`} h={cells[clip]} x={i%2?545:0} y={i<2?400:1000} at={c} dur={BEAT*2}/>));
+      g.forEach(([clip,,fs],i)=>add(<Cell key={`q${n}-${i}`} h={cells[clip]} x={i%2?545:0} y={i<2?400:1000} at={c} dur={BEAT*2} hits={[...fs.map(f=>({t:f/30,a:26})),...GRID_BIG[n]]}/>));
       if(n>0)add(<Flash key={"qf"+n} at={c} o={0.3} d={0.12}/>);
       c+=BEAT*2;
     };
     const solo=(clip,i)=>{
-      add(<Shot key={"so"+i} h={reel} clip={clip} from={9} at={c} dur={BEAT*2} party={true}/>);
+      const a=i===0?10:20; // 회복은 부드럽게, 보호막은 탕
+      add(<Shot key={"so"+i} h={reel} clip={clip} from={9} at={c} dur={BEAT*2} party={true} hits={[{t:1/30,a},{t:12/30,a}]}/>);
       add(<rect key={"som"+i} x={0} y={0} width={W} height={668} at={c} duration={BEAT*2} fill={{kind:"linear",angle:180,stops:[{offset:0,color:NAVY,opacity:1},{offset:0.92,color:NAVY,opacity:1},{offset:1,color:NAVY,opacity:0}]}}/>);
       add(<Flash key={"sof"+i} at={c} o={0.3} d={0.12}/>);
       c+=BEAT*2;
@@ -140,30 +174,32 @@ export default async ({project})=>{
   }
   const early=kids; kids=[];
   // 3 결정타 — 실제 보스전 (7 연속 정답 → 쓰러뜨림). 묶음 시간 7.45 + LATE = 9.0 = 음악 박자, 쿵 소리는 여기만
-  add(<FieldShot key="g3" h={fn} from={1.866} at={6.45} dur={BEAT*6} z={1} y={40}/>,<Scrim key="s3" at={6.45} dur={BEAT*6} h={300}/>);
+  add(<FieldShot key="g3" h={fn} from={1.866} at={6.45} dur={BEAT*6} z={1.08} y={-4} hits={[{t:0.05,a:12},{t:0.998,a:52,s:1.5},{t:1.35,a:24},{t:1.7,a:14},{t:2.56,a:10}]} punches={[{t:0,p:1.05},{t:0.998,p:1.09},{t:1.35,p:1.03}]}/>,<Scrim key="s3" at={6.45} dur={BEAT*6} h={300}/>);
   add(<Stamp key="c0" s="맞힐수록 더 세게!" cx={540} cy={215} size={106} at={6.5} dur={0.9} color={WHITE}/>);
   add(...Burst({cx:540,cy:560,at:7.448,seed:41,n:44,spread:760,colors:[GOLD,RED,WHITE]}));
   add(Wipe({at:6.45+BEAT*6-0.22,seed:23}));
   // 4 모험 — 실제 게임 화면 (사용자: 숲 풀숲을 걷다가 상자, 뗏목, 선제공격). 묶음 시간 9.45 = 음악 박자 위
   {
     const A0=9.45; let c=A0;
-    add(<FieldShot key="adv1" h={ch} from={0.24} at={c} dur={BEAT*5}/>);
+    add(<FieldShot key="adv1" h={ch} from={0.24} at={c} dur={BEAT*5} push={0.05} hits={[{t:1.483,a:16}]} punches={[{t:0,p:1.05},...beats(BEAT*5).filter(b=>Math.abs(b.t-1.483)>0.1),{t:1.483,p:1.05}]}/>);
     add(...Burst({cx:769,cy:750,at:c+1.483,seed:51,n:30,spread:420,colors:[GOLD,WHITE]})); // 상자가 열리는 순간 (음악 박자 위)
     const c1=c+BEAT*5;
-    add(<Flash key="adf1" at={c1} o={0.3} d={0.12}/>,<FieldShot key="adv2" h={advRaft} at={c1} dur={BEAT*3}/>);
+    add(<Flash key="adf1" at={c1} o={0.3} d={0.12}/>,<FieldShot key="adv2" h={advRaft} at={c1} dur={BEAT*3} push={0.04} hits={[{t:0.6,a:14}]} punches={[{t:0,p:1.05},{t:0.6,p:1.03},{t:BEAT*2,p:1.012}]}
+      extra={[{property:"rotation",keyframes:[{at:0,value:0},{at:0.6,value:0,easing:"ease-in-out"},{at:0.82,value:1,easing:"ease-in-out"},{at:1.1,value:-1,easing:"ease-in-out"},{at:1.38,value:0.8,easing:"ease-in-out"},{at:BEAT*3-0.01,value:0}]},
+        {property:"offsetY",keyframes:[{at:0,value:0},{at:0.6,value:0,easing:"ease-in-out"},{at:0.85,value:12,easing:"ease-in-out"},{at:1.15,value:-10,easing:"ease-in-out"},{at:BEAT*3-0.01,value:0}]}]}/>);
     const c2=c1+BEAT*3;
-    add(<Flash key="adf2" at={c2} o={0.3} d={0.12}/>,<FieldShot key="adv3" h={advCave} at={c2} dur={BEAT*2}/>);
+    add(<Flash key="adf2" at={c2} o={0.3} d={0.12}/>,<FieldShot key="adv3" h={advCave} at={c2} dur={BEAT*2} push={0.05} punches={[{t:0,p:1.05},{t:BEAT,p:1.014}]}/>);
     const c3=c2+BEAT*2;
     add(<rect key="adsc" x={0} y={0} width={W} height={470} at={A0} duration={c3-A0} fill={{kind:"linear",angle:180,stops:[{offset:0,color:NAVY,opacity:0.98},{offset:0.88,color:NAVY,opacity:0.98},{offset:1,color:NAVY,opacity:0}]}}/>);
     const MINT="#7BF29A";
     add(<BeatHead key="adh0" s="신나는 모험!" at={A0} len={c1-A0} color={MINT}/>,<BeatHead key="adh1" s="강을 건너고" at={c1} len={c2-c1} color={MINT} size={124}/>,<BeatHead key="adh2" s="어둠을 밝혀요" at={c2} len={c3-c2} color={MINT} size={124}/>);
-    add(<Flash key="adf3" at={c3} o={0.3} d={0.12}/>,<FieldShot key="adv4" h={advPreempt} at={c3} dur={BEAT*3} z={1} y={-250}/>);
+    add(<Flash key="adf3" at={c3} o={0.3} d={0.12}/>,<FieldShot key="adv4" h={advPreempt} at={c3} dur={BEAT*3} z={1.03} y={-265} hits={[{t:0.167,a:14},{t:0.9,a:22,s:1.2}]} punches={[{t:0,p:1.04},{t:0.167,p:1.03},{t:0.9,p:1.05}]}/>);
     add(Wipe({at:c3+BEAT*3-0.22,seed:24}));
   }
   const mid=kids; kids=[];
   // 5 보스 12.1~14.5
   add(<rect key="bg5" x={0} y={0} width={W} height={H} fill={{kind:"radial",stops:[{offset:0,color:"#2B3158"},{offset:1,color:NAVY}]}} at={12.1} duration={2.55}/>);
-  add(<Stamp key="b0" s="단어를 노리는 보스들" cx={540} cy={330} size={98} color={GOLD} at={12.15} dur={2.45}/>);
+  add(<Stamp key="b0" s="단어로 보스를 물리쳐요!" cx={540} cy={330} size={88} color={GOLD} at={12.15} dur={2.45}/>);
   add(<BossCard key="b1" h={b1} name="까먹대왕" x={50} y={470} at={12.6} dur={2.0} rot={-8}/>,<BossCard key="b2" h={b2} name="헷갈너구리" x={560} y={470} at={12.85} dur={1.75} rot={8}/>,<BossCard key="b3" h={b3} name="빈칸두꺼비" x={50} y={1020} at={13.1} dur={1.5} rot={8}/>,<BossCard key="b4" h={b4} name="말줄임덩굴" x={560} y={1020} at={13.35} dur={1.25} rot={-8}/>);
   add(Wipe({at:14.42,seed:25}));
   // 6 엔드 카드 14.65~18
@@ -177,5 +213,5 @@ export default async ({project})=>{
   add(<Stamp key="e3" s="교육과정 필수 어휘로 싸우는 RPG" cx={540} cy={1105} size={46} color={DIM} sw={8} at={15.4} dur={2.59} from={1.1}/>);
   add(<Pill key="e4" s="앱스토어에서 무료로 시작" cy={1265} at={15.6} dur={2.39} w={860} h={132} size={66} from={1200}/>);
   add(<Stamp key="e5" s="숲 지역부터 정식판 (앱 내 구매)" cx={540} cy={1395} size={38} color={DIM} sw={6} at={15.8} dur={2.19} from={1}/>);
-  p.compose(<frame width={W} height={H} layout="none">{early}<frame x={0} y={0} width={W} height={H} layout="none" at={LATE} duration={16.3}>{mid}</frame><frame x={0} y={0} width={W} height={H} layout="none" at={LATE2} duration={18}>{kids}</frame></frame>,{at:0,dur:T,name:"ad"});
+  p.compose(<frame width={W} height={H} layout="none">{early}<frame x={0} y={0} width={W} height={H} layout="none" at={LATE} duration={16.3}>{mid}</frame><frame x={0} y={0} width={W} height={H} layout="none" at={LATE2} duration={18} animate={Shake([{t:12.6,a:14},{t:12.85,a:16},{t:13.1,a:18},{t:13.35,a:26,s:1.3},{t:14.85,a:18,s:1.2},{t:15.0,a:10},{t:15.6,a:8}],18)}>{kids}</frame></frame>,{at:0,dur:T,name:"ad"});
 };
