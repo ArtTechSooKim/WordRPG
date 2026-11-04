@@ -53,14 +53,16 @@ LATER = {
     "battledesert2": ("desert_battle_B_v2.5.mp3", BATTLE, {"crush": STRONG, "careful": True}),
     "bossdesert": ("round7_raw/사막보스.mp3", BOSS, {"crush": STRONG, "careful": True}),
     "desert": ("round7_raw/사막배경.mp3", FIELD, {"careful": True}),
-    "oasis": ("round7_raw/오아시스.mp3", FIELD, {"careful": True, "max_start": 15.0, "min_length": 30.0}),
-    "oasis2": ("round7_raw/오아시스_2.mp3", FIELD, {"careful": True}),  # 사용자: 조금 덜 리드미컬하게 — 손북·아르페지오를 줄임 (#173)
+    "oasis": ("round7_raw/오아시스_2.mp3", FIELD, {"careful": True}),  # 사용자: 조금 덜 리드미컬하게, 새 곡으로 정함 (#173·#174)
     "snow": ("round7_raw/설원배경.mp3", FIELD, {"careful": True, "max_start": 25.0, "min_length": 28.0}),  # 앞이 조용한 곡은 반복을 뒤쪽에서 (#172)
     "battlesnow": ("round7_raw/설원전투.mp3", BATTLE, {"careful": True}),
+    "bosssnow": ("round8_raw/설원보스.mp3", BOSS, {"careful": True}),  # 그 지역 전투곡과 같은 풍 (#174)
     "sea": ("round7_raw/해저배경.mp3", FIELD, {"careful": True}),
     "battlesea": ("round7_raw/해저전투.mp3", BATTLE, {"careful": True, "max_start": 34.0, "min_length": 20.0}),
+    "bosssea": ("round8_raw/해저보스.mp3", BOSS, {"careful": True}),
     "temple": ("round7_raw/신전배경.mp3", FIELD, {"careful": True, "max_start": 25.0, "min_length": 28.0}),
     "battletemple": ("round7_raw/신전전투.mp3", BATTLE, {"careful": True}),
+    "bosstemple": ("round8_raw/신전보스.mp3", BOSS, {"careful": True}),
     "battlespare": ("round6_raw/03_숲전투_3.mp3", BATTLE, {"careful": True}),  # 사용자가 나중에 쓰기로 함 (#171)
 }
 TWEAKS = {
