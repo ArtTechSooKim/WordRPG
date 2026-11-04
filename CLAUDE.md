@@ -64,7 +64,7 @@
    - **수익화** (GDD 9-3): 산 상품(`Entitlements`, 정식판 id `com.arttechsoo.wordrpg.full` — 바꾸지 말 것)도 세이브가 아니라 PlayerPrefs.
      결제는 `IStore`(실제 `UnityIapStore` = Unity IAP 5 — 앱스토어·구글플레이, 상품 id 같음, 구매 복원 흐름은 스토어마다 다름 #149, 계정 이름 문구 `StoreLabels`, 테스트는 가짜 — `GameManager.StoreOverride`/`FieldScreen.Configure`).
      정식판이 필요한 지역은 FieldArea `requiresFullVersion` (숲·정글·동굴) → 입구에서 `PaywallView`, 어디서든 설정 > 정식판(보기·구매 복원).
-     앱 버전(PlayerSettings.bundleVersion)은 앱스토어 버전과 같아야 함 (지금 main = **1.2**(심사에 낸 코드 = 태그 v1.2-build3, 다음 버전을 main에서 시작하기 전에 그 태그에서 `release-1.2` 가지를 뜰 것). **1.1 출시·고침은 가지 `release-1.1`**에서 빌드하고
+     앱 버전(PlayerSettings.bundleVersion)은 앱스토어 버전과 같아야 함 (지금 main = **1.3 준비 중**, 앱 버전 숫자는 아직 1.2 — 내기 전에 올릴 것. **1.2 고침은 가지 `release-1.2`**(태그 v1.2-build3에서 뜸 #164)에서. **1.1 출시·고침은 가지 `release-1.1`**에서 빌드하고
      고친 것은 main에도 합침 — main에서 1.1을 빌드하지 말 것. 1.0 심사 코드는 태그 v1.0-build3, 1.0을 고쳐 다시 내야 하면 그 태그에서 가지를 땀). 지원·개인정보 웹 페이지 = `gh-pages` 브랜치 (작업메모)
    - 새 단어장은 regionId·regionName·도감 보상 `rewards`(`DexReward` 한 줄 = 보상 id·이름·징표(종류 Keepsake)·골드·wordsNeeded(0 = 다 채웠을 때)·storyOrder(징표 진열장 순서) — #147. 보상 id는 세이브에 적히니 출시 뒤 바꾸지 말 것)를 지정해야 함 (RegionDataTests가 검사)
    - 수련용 허수아비는 MonsterSpecies `trainingDummy`(맞아도 HP 그대로, 기술 없음) — 게임에 하나, 출현표에 넣지 말 것 (TrainingTests)
@@ -139,7 +139,8 @@
     - 필드 타일 `FieldArt`(Tiles/{테마}_{종류}[_done].png — 같은 종류 변형 _v1·_v2…가 있으면 칸 위치로 섞음 `FieldDecor.TileVariant` #98, 예: 서고 책장·바랜 종이), 주인공 `PlayerArt`(4방향×걷기 4프레임 시트를 코드로 자름, 달리기 = 걷기 + 점프 행 `GetRun`). 없으면 `PlaceholderArt`
     - `Assets/Resources/Art/` 그림은 가져올 때 16px = 1칸, Point 필터 (`UiAssetImporter`)
     - 소리: `Sound.PlayMusic(Music.X)` / `Sound.Play(Sfx.X)`, 파일 = `Resources/Audio/Music|Sfx/{열거형 소문자}`. 음량은 설정을 따름.
-      `UiKit.AddButton`/`MakeButton`은 누르면 딸깍 소리 (`clickSound: false`로 끔). 새 소리를 쓰면 열거형 + 스크립트 표에 같이 추가 (AudioArtTests가 검사). 선제공격 '카칭'(preempt)만 팩에 없어 `Tools/make_preempt_sfx.py`로 합성 (#147)
+      `UiKit.AddButton`/`MakeButton`은 누르면 딸깍 소리 (`clickSound: false`로 끔). 새 소리를 쓰면 열거형 + 스크립트 표에 같이 추가 (AudioArtTests가 검사). 선제공격 '카칭'(preempt)만 팩에 없어 `Tools/make_preempt_sfx.py`로 합성 (#147).
+      기술마다 다른 소리 (#164): 표 `SkillLooks` Sound 칸 → `Sfx.Skill*`, 파일은 `python Tools/make_skill_sfx.py`(팩 소리 겹치기, 표가 스크립트 안). 맞는 순간 재생, 크리티컬이면 크리티컬 소리를 겹침. 새 연출 종류는 소리도 따로 (SkillLooksTests)
     - **유료 라이선스 소리(Envato Elements)**: `Resources/Audio/Licensed/{같은 이름}.wav`에 두면 팩 소리보다 먼저 쓰임. 이 폴더·받은 원본(`*-utc/`)·
       라이선스 증명서는 .gitignore — 공개 저장소에 올리면 재배포라 안 됨. 저장소엔 팩 소리가 대신 있음 (지금: newword, 작업메모 #66). 음악도 같은 방식 (#133)
     - 전투: 효과 `BattleFx`(Fx 열거형 = Art/NinjaAdventure/Fx/{소문자}.png 정사각 프레임 시트), 배경은 지역 타일(`BattleScreen.SetBackdrop`).
@@ -250,11 +251,11 @@ Docs/                   PRD.txt, GDD.md, 아트에셋목록.md, 아이폰출시�
 .github/workflows/      ios-testflight.yml (GitHub Mac 서버에서 서명·TestFlight 업로드)
 Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow 필요), zip_ios_for_mac.py (Xcode 프로젝트 → Mac용 zip, 실행 권한 유지),
                         widen_maps.py (맵의 한 칸 통로 → 두 칸), subset_fonts.py (본문 글꼴에서 한자·가나 빼기 — 앱 크기, fontTools 필요),
-                        pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구), make_preempt_sfx.py (선제공격 '카칭' 소리 합성 #147),
+                        pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구), make_preempt_sfx.py (선제공격 '카칭' 소리 합성 #147), make_skill_sfx.py (기술마다 다른 소리: 팩 소리 겹치기 #164),
                         check_android_bundle.py (구글플레이에 올리기 전 AAB 검사: 대상 API·게임 표시·뒤로 가기·권한·16KB 페이지·크기 #149),
                         build_intro_video.py (입장 영상: Flow 컷 이어 붙이기·Veo 표시 잘라냄·자막표 → Resources/Video, imageio-ffmpeg 필요, #129 —
                         컷 원본은 저장소 밖 Builds/cinematic_pixellab/Videos, release-1.1 폴더에선 그 경로를 인자로),
-                        ad_motion/ (광고 영상: edit.jsx = Higgsedit 모션그래픽, pack_skill_clips.py·pack_adventure.py·pack_real.py = PlayMode AdCapture로 찍은 기술 연출·모험·실제 시간 장면 묶기, cut_cells.sh = 4분할 칸 자르기, mix_audio.py = 팩 소리 넣기, make_landscape.py = 가로판 — 작업메모 #154·#155·#157~#161),
+                        ad_motion/ (광고 영상: edit.jsx = Higgsedit 모션그래픽, pack_skill_clips.py·pack_adventure.py·pack_real.py = PlayMode AdCapture로 찍은 기술 연출·모험·실제 시간 장면 묶기, cut_cells.sh = 4분할 칸 자르기, mix_audio.py = 팩 소리 넣기, make_landscape.py = 가로판, skill_sound_preview.py = 기술 소리 미리보기 영상(#164) — 작업메모 #154·#155·#157~#161),
                         cinematic_storyboard.py (입장 시네마틱 7컷 = 영화 구도 스케치 → Builds/cinematic_v2, Figma 'Cinematic (#128)' — Flow img to img로 영상, #128)
 ```
 

@@ -40,6 +40,17 @@ namespace WordRPG.Tests
             ("cave", FieldTheme.Cave, new[] { "ink_newt", "blink_ghost" }, new[] { "tortoise_encyclo_wall", "hourglass_rewind", "seed_period_grove" }),
         };
 
+        // 기술 소리 미리보기 (#164): 연출 종류마다 기술 하나 → Builds/ad/skill_sounds, 묶기 = python Tools/ad_motion/skill_sound_preview.py
+        private static string SoundOut => Path.Combine(Application.dataPath, "..", "Builds", "ad", "skill_sounds");
+        private static readonly (string area, FieldTheme theme, string[] enemies, string[] skills)[] SoundGroups =
+        {
+            ("forest", FieldTheme.Forest, new[] { "tangle_spider", "chew_larva" }, new[] {
+                "hero_swing", "bat_scratch", "raccoon_tail_slam", "wand_thunder_spell", "quill_ink_storm", "kappa_plate_splash", "whip_thorn_storm",
+                "frog_tongue_lash", "ara_pebble", "lamp_firefly_swarm", "gem_letter_shower", "doc_highlight_sweep", "frog_blank_croak", "spider_tangle_web", "raccoon_muddle_whirl" }),
+            ("jungle", FieldTheme.Jungle, new[] { "tail_lizard", "batchim_kappa" }, new[] {
+                "grail_blessing", "leaf_world_breath", "gourd_spring", "boss_memory_drain", "flute_echo_wall", "tortoise_encyclo_wall", "hourglass_rewind", "seed_period_grove" }),
+        };
+
         private static SkillData Skill(string id) => AssetDatabase.LoadAssetAtPath<SkillData>($"Assets/Data/Skills/{id}.asset");
 
         // ---- 모험 장면 (#158): 정글에서 아라와 걷기 · 뗏목 · 동굴 · 선제공격 → Builds/ad/adventure/{장면}/f0000.jpg + marks.txt
@@ -484,13 +495,13 @@ namespace WordRPG.Tests
         }
 
         // 기술의 대상대로 사건을 만듦. 숫자는 위력에 맞춘 표시용 (엔진을 돌리지 않음)
-        private static BattleEvent[] Events(SkillData skill, BattleUnit hero, BattleUnit ara, BattleUnit a, BattleUnit b)
+        private static BattleEvent[] Events(SkillData skill, BattleUnit hero, BattleUnit ara, BattleUnit a, BattleUnit b, bool allowCrit = true)
         {
             var actor = skill.SkillId.StartsWith("ara_") ? ara : hero;
             var list = new List<BattleEvent> { BattleEvent.SkillUsed(actor, skill) };
             int amount = Mathf.RoundToInt(skill.Power * 1.5f);
             // 크리티컬 폭발이 기술 고유의 연출을 가리므로, '크리티컬' 장면에 쓰는 두 기술만
-            bool crit = skill.SkillId == "hero_swing" || skill.SkillId == "doc_finish_sentence";
+            bool crit = allowCrit && (skill.SkillId == "hero_swing" || skill.SkillId == "doc_finish_sentence");
             switch (skill.Kind)
             {
                 case SkillKind.Heal:
@@ -511,12 +522,18 @@ namespace WordRPG.Tests
 
         [UnityTest]
         [Timeout(1200000)]
-        public IEnumerator SkillReel()
+        public IEnumerator SkillReel() => CaptureSkills(Out, Groups, true);
+
+        [UnityTest]
+        [Timeout(1200000)]
+        public IEnumerator SkillSoundReel() => CaptureSkills(SoundOut, SoundGroups, false);
+
+        private IEnumerator CaptureSkills(string outDir, (string area, FieldTheme theme, string[] enemies, string[] skills)[] groups, bool allowCrit)
         {
             var db = AssetDatabase.LoadAssetAtPath<GameDatabase>("Assets/Data/GameDatabase.asset");
             var heroData = AssetDatabase.LoadAssetAtPath<HeroData>("Assets/Data/Hero/hero.asset");
-            if (Directory.Exists(Out)) Directory.Delete(Out, true);
-            Directory.CreateDirectory(Out);
+            if (Directory.Exists(outDir)) Directory.Delete(outDir, true);
+            Directory.CreateDirectory(outDir);
 
             var cam = new GameObject("Main Camera", typeof(Camera)) { tag = "MainCamera" }.GetComponent<Camera>();
             cam.clearFlags = CameraClearFlags.SolidColor;
@@ -534,11 +551,12 @@ namespace WordRPG.Tests
 
             const BindingFlags any = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
             var sfxLog = new StringBuilder();
+            var nameLog = new StringBuilder(); // 묶을 때 붙일 이름표: 기술 이름 · 연출 종류
             int frameNow = 0, clip = 0;
             string clipName = "";
             Sound.Recorder = (sfx, _) => sfxLog.AppendLine($"{clipName}\t{frameNow}\t{sfx.ToString().ToLowerInvariant()}");
 
-            foreach (var (areaId, theme, enemies, skills) in Groups)
+            foreach (var (areaId, theme, enemies, skills) in groups)
             {
                 var area = db.FindArea(areaId);
                 session.RestoreHero(); // 지난 전투의 표시용 피해가 쌓여 쓰러지지 않게
@@ -578,13 +596,14 @@ namespace WordRPG.Tests
                     var skill = Skill(id);
                     Assert.IsNotNull(skill, id);
                     clipName = $"{clip:00}_{id}";
-                    string dir = Path.Combine(Out, clipName);
+                    string dir = Path.Combine(outDir, clipName);
                     Directory.CreateDirectory(dir);
+                    nameLog.AppendLine($"{clipName}\t{skill.DisplayName}\t{skill.Fx}");
                     clip++;
                     frameNow = 0;
                     Time.captureDeltaTime = 1f / Fps;
                     bool done = false;
-                    battle.StartCoroutine(Then(battle.PlayEventsForTest(Events(skill, hero, ara, a, b)), () => done = true));
+                    battle.StartCoroutine(Then(battle.PlayEventsForTest(Events(skill, hero, ara, a, b, allowCrit)), () => done = true));
                     int tail = 0;
                     float deltaSeen = 0f;
                     for (int n = 0; n < MaxFrames && tail < 8; n++)
@@ -613,7 +632,8 @@ namespace WordRPG.Tests
                 yield return null;
             }
             Sound.Recorder = null;
-            File.WriteAllText(Path.Combine(Out, "sfx.txt"), sfxLog.ToString());
+            File.WriteAllText(Path.Combine(outDir, "sfx.txt"), sfxLog.ToString());
+            File.WriteAllText(Path.Combine(outDir, "names.txt"), nameLog.ToString());
             cam.targetTexture = null;
             Object.Destroy(rt);
             Object.Destroy(tex);

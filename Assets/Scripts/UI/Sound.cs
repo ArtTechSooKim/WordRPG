@@ -10,7 +10,11 @@ namespace WordRPG.UI
     {
         Click, Correct, Wrong, Hit, Critical, Heal, Shield, Fail, Faint, Encounter,
         Victory, Defeat, LevelUp, NewWord, Coin, Fountain, EvolveLight, Evolve, DexComplete, Door,
-        GateOpen, Combo, Respawn, Flee, Preempt
+        GateOpen, Combo, Respawn, Flee, Preempt,
+        // 기술마다 다른 소리 (#164 — 표 SkillLooks, 파일은 Tools/make_skill_sfx.py가 만듦)
+        SkillSlash, SkillClaw, SkillHeavy, SkillThunder, SkillInk, SkillWater, SkillPlant, SkillWhip, SkillRock, SkillLight,
+        SkillLetters, SkillHighlight, SkillSound, SkillSpore, SkillSwirl, SkillHealLeaf, SkillHealWater, SkillDrain,
+        SkillGuardEcho, SkillGuardBook, SkillGuardTime, SkillGuardSeed
     }
 
     // 배경 음악·효과음 (Ninja Adventure 팩 → Resources/Audio/Music·Sfx, 파일 이름 = 열거형 이름 소문자).

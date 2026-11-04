@@ -17,7 +17,7 @@ namespace WordRPG.UI
     }
 
     // 기술 연출 한 줄: 몸짓 · 맞은 카드 위 효과(색·크기) · 날아가는 그림 · 화면 번쩍 · 흔들림 · 특수 연출 ·
-    // 빛 색(시전 마법진·회복 빛·보호막 막) · 회복 때 솟는 알갱이
+    // 빛 색(시전 마법진·회복 빛·보호막 막) · 회복 때 솟는 알갱이 · 소리
     public sealed class SkillLook
     {
         public SkillMotion Motion = SkillMotion.None;
@@ -30,6 +30,7 @@ namespace WordRPG.UI
         public SkillExtra Extra = SkillExtra.None;
         public Color Glow = Color.white;
         public Fx? Particle;              // 회복 알갱이 (null = 물방울)
+        public Sfx Sound = Sfx.Hit;       // 맞는 순간의 소리 (#164 — 피해·회복·보호막 사건, 파일은 Tools/make_skill_sfx.py)
     }
 
     // 기술 연출 표 (#137 사용자: "기술마다 다른 효과 · 회복과 보호막이 더 역동적으로" — Figma '기술 연출 (#137)').
@@ -44,44 +45,44 @@ namespace WordRPG.UI
 
         private static readonly Dictionary<SkillFx, SkillLook> Table = new Dictionary<SkillFx, SkillLook>
         {
-            [SkillFx.Slash] = new SkillLook { Motion = SkillMotion.Lunge, Hit = Fx.Slash, Shake = 6f },
-            [SkillFx.Claw] = new SkillLook { Motion = SkillMotion.Lunge, Hit = Fx.Claw, Shake = 6f },
-            [SkillFx.Heavy] = new SkillLook { Motion = SkillMotion.Lunge, Hit = Fx.SlashDouble, HitScale = 1.35f, Shake = 14f,
+            [SkillFx.Slash] = new SkillLook { Sound = Sfx.SkillSlash, Motion = SkillMotion.Lunge, Hit = Fx.Slash, Shake = 6f },
+            [SkillFx.Claw] = new SkillLook { Sound = Sfx.SkillClaw, Motion = SkillMotion.Lunge, Hit = Fx.Claw, Shake = 6f },
+            [SkillFx.Heavy] = new SkillLook { Sound = Sfx.SkillHeavy, Motion = SkillMotion.Lunge, Hit = Fx.SlashDouble, HitScale = 1.35f, Shake = 14f,
                 Flash = new Color(1f, 1f, 1f, 0.05f) },
-            [SkillFx.Thunder] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.Thunder, HitScale = 1.3f, Shake = 10f,
+            [SkillFx.Thunder] = new SkillLook { Sound = Sfx.SkillThunder, Motion = SkillMotion.Cast, Hit = Fx.Thunder, HitScale = 1.3f, Shake = 10f,
                 Flash = new Color(1f, 0.95f, 0.7f, 0.08f), Glow = new Color(1f, 0.85f, 0.4f) },
-            [SkillFx.Ink] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.Water, Tint = InkPurple, HitScale = 1.1f, Shake = 4f,
+            [SkillFx.Ink] = new SkillLook { Sound = Sfx.SkillInk, Motion = SkillMotion.Cast, Hit = Fx.Water, Tint = InkPurple, HitScale = 1.1f, Shake = 4f,
                 Glow = new Color(0.6f, 0.5f, 1f) },
-            [SkillFx.Water] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.Water, HitScale = 1.1f, Shake = 4f, Glow = ShieldBlue },
-            [SkillFx.Plant] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.Plant, HitScale = 1.2f, Shake = 5f, Glow = HealGreen },
-            [SkillFx.Whip] = new SkillLook { Motion = SkillMotion.Lunge, Hit = Fx.SlashCurved, Tint = new Color(1f, 0.6f, 0.72f), Shake = 6f },
-            [SkillFx.Rock] = new SkillLook { Motion = SkillMotion.None, Hit = Fx.Rock, HitScale = 1.1f, Projectile = Fx.RockFly, Shake = 8f },
-            [SkillFx.Light] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.Boost, Tint = new Color(1f, 0.92f, 0.55f), HitScale = 1.2f,
+            [SkillFx.Water] = new SkillLook { Sound = Sfx.SkillWater, Motion = SkillMotion.Cast, Hit = Fx.Water, HitScale = 1.1f, Shake = 4f, Glow = ShieldBlue },
+            [SkillFx.Plant] = new SkillLook { Sound = Sfx.SkillPlant, Motion = SkillMotion.Cast, Hit = Fx.Plant, HitScale = 1.2f, Shake = 5f, Glow = HealGreen },
+            [SkillFx.Whip] = new SkillLook { Sound = Sfx.SkillWhip, Motion = SkillMotion.Lunge, Hit = Fx.SlashCurved, Tint = new Color(1f, 0.6f, 0.72f), Shake = 6f },
+            [SkillFx.Rock] = new SkillLook { Sound = Sfx.SkillRock, Motion = SkillMotion.None, Hit = Fx.Rock, HitScale = 1.1f, Projectile = Fx.RockFly, Shake = 8f },
+            [SkillFx.Light] = new SkillLook { Sound = Sfx.SkillLight, Motion = SkillMotion.Cast, Hit = Fx.Boost, Tint = new Color(1f, 0.92f, 0.55f), HitScale = 1.2f,
                 Flash = new Color(1f, 0.95f, 0.75f, 0.05f), Glow = new Color(1f, 0.9f, 0.5f) },
-            [SkillFx.Letters] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.Boost, Tint = new Color(1f, 0.85f, 0.4f), Shake = 5f,
+            [SkillFx.Letters] = new SkillLook { Sound = Sfx.SkillLetters, Motion = SkillMotion.Cast, Hit = Fx.Boost, Tint = new Color(1f, 0.85f, 0.4f), Shake = 5f,
                 Extra = SkillExtra.Letters, Glow = new Color(1f, 0.85f, 0.4f) },
-            [SkillFx.Highlight] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.SlashCurved, Tint = Neon, HitScale = 1.2f, Shake = 4f,
+            [SkillFx.Highlight] = new SkillLook { Sound = Sfx.SkillHighlight, Motion = SkillMotion.Cast, Hit = Fx.SlashCurved, Tint = Neon, HitScale = 1.2f, Shake = 4f,
                 Extra = SkillExtra.Highlight, Glow = Neon },
-            [SkillFx.Sound] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.Ring, Tint = new Color(0.55f, 0.95f, 0.8f), Shake = 6f,
+            [SkillFx.Sound] = new SkillLook { Sound = Sfx.SkillSound, Motion = SkillMotion.Cast, Hit = Fx.Ring, Tint = new Color(0.55f, 0.95f, 0.8f), Shake = 6f,
                 Extra = SkillExtra.Rings, Glow = new Color(0.55f, 0.95f, 0.8f) },
-            [SkillFx.Spore] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.SmokeRing, Tint = new Color(0.8f, 0.65f, 1f), HitScale = 1.3f,
+            [SkillFx.Spore] = new SkillLook { Sound = Sfx.SkillSpore, Motion = SkillMotion.Cast, Hit = Fx.SmokeRing, Tint = new Color(0.8f, 0.65f, 1f), HitScale = 1.3f,
                 Shake = 3f, Glow = new Color(0.8f, 0.65f, 1f) },
-            [SkillFx.Swirl] = new SkillLook { Motion = SkillMotion.Lunge, Hit = Fx.Spirit, Tint = new Color(0.82f, 0.62f, 1f), HitScale = 1.2f,
+            [SkillFx.Swirl] = new SkillLook { Sound = Sfx.SkillSwirl, Motion = SkillMotion.Lunge, Hit = Fx.Spirit, Tint = new Color(0.82f, 0.62f, 1f), HitScale = 1.2f,
                 Shake = 6f },
             // 회복: 발밑 마법진 + 빛기둥 + 솟는 알갱이 + 카드가 빛남 + HP 막대가 차오름 (Hit = 카드 위에 더하는 효과)
-            [SkillFx.HealLight] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.Heal, Glow = new Color(0.7f, 1f, 0.55f), Particle = Fx.Spark },
-            [SkillFx.HealLeaf] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.Heal, Glow = HealGreen, Particle = Fx.Leaf },
-            [SkillFx.HealWater] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.WaterPillar, Glow = new Color(0.5f, 0.95f, 1f) },
-            [SkillFx.Drain] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.Spirit, Tint = new Color(0.8f, 0.5f, 1f),
+            [SkillFx.HealLight] = new SkillLook { Sound = Sfx.Heal, Motion = SkillMotion.Cast, Hit = Fx.Heal, Glow = new Color(0.7f, 1f, 0.55f), Particle = Fx.Spark },
+            [SkillFx.HealLeaf] = new SkillLook { Sound = Sfx.SkillHealLeaf, Motion = SkillMotion.Cast, Hit = Fx.Heal, Glow = HealGreen, Particle = Fx.Leaf },
+            [SkillFx.HealWater] = new SkillLook { Sound = Sfx.SkillHealWater, Motion = SkillMotion.Cast, Hit = Fx.WaterPillar, Glow = new Color(0.5f, 0.95f, 1f) },
+            [SkillFx.Drain] = new SkillLook { Sound = Sfx.SkillDrain, Motion = SkillMotion.Cast, Hit = Fx.Spirit, Tint = new Color(0.8f, 0.5f, 1f),
                 Glow = new Color(0.8f, 0.5f, 1f), Particle = Fx.Spark },
             // 보호막: 막이 튕기며 덮음 + 효과 그림 (Glow = 막·남은 동안 테두리 색)
-            [SkillFx.GuardBubble] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.Shield, Glow = ShieldBlue },
-            [SkillFx.GuardEcho] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.Ring, Tint = new Color(0.55f, 0.95f, 0.85f),
+            [SkillFx.GuardBubble] = new SkillLook { Sound = Sfx.Shield, Motion = SkillMotion.Cast, Hit = Fx.Shield, Glow = ShieldBlue },
+            [SkillFx.GuardEcho] = new SkillLook { Sound = Sfx.SkillGuardEcho, Motion = SkillMotion.Cast, Hit = Fx.Ring, Tint = new Color(0.55f, 0.95f, 0.85f),
                 Extra = SkillExtra.Rings, Glow = new Color(0.55f, 0.95f, 0.85f) },
-            [SkillFx.GuardBook] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.ShieldGold, Glow = new Color(1f, 0.85f, 0.45f) },
-            [SkillFx.GuardTime] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.Spirit, Tint = new Color(1f, 0.95f, 0.8f),
+            [SkillFx.GuardBook] = new SkillLook { Sound = Sfx.SkillGuardBook, Motion = SkillMotion.Cast, Hit = Fx.ShieldGold, Glow = new Color(1f, 0.85f, 0.45f) },
+            [SkillFx.GuardTime] = new SkillLook { Sound = Sfx.SkillGuardTime, Motion = SkillMotion.Cast, Hit = Fx.Spirit, Tint = new Color(1f, 0.95f, 0.8f),
                 Glow = new Color(0.95f, 0.92f, 0.75f) },
-            [SkillFx.GuardSeed] = new SkillLook { Motion = SkillMotion.Cast, Hit = Fx.Circle, Tint = HealGreen, Glow = HealGreen },
+            [SkillFx.GuardSeed] = new SkillLook { Sound = Sfx.SkillGuardSeed, Motion = SkillMotion.Cast, Hit = Fx.Circle, Tint = HealGreen, Glow = HealGreen },
         };
 
         public static bool Has(SkillFx fx) => fx == SkillFx.Auto || Table.ContainsKey(fx);

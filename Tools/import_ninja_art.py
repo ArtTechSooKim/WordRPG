@@ -165,6 +165,7 @@ MUSIC = {
     "heroselect": "Audio/Musics/20 - Good Time.ogg",  # 캐릭터 고르기
 }
 # preempt.wav(선제공격 '카칭')는 팩에 없어서 Tools/make_preempt_sfx.py가 만듦 (#147) — 이 표에 넣지 말 것
+# skill*.wav(기술마다 다른 소리)는 팩 소리를 겹쳐 Tools/make_skill_sfx.py가 만듦 (#164) — 이 표에 넣지 말 것
 SFX = {
     "click": "Audio/Sounds/Menu/Move2.wav",  # 가벼운 찰칵 (0.04초)
     "correct": "Audio/Sounds/Bonus/Bonus.wav",

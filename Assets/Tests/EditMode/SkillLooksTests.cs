@@ -32,6 +32,22 @@ namespace WordRPG.Tests
                 Assert.IsNotNull(BattleFx.Frames(fx), $"Fx/{fx.ToString().ToLowerInvariant()}.png");
         }
 
+        // 기술 연출 종류마다 자기 소리 (#164 사용자: "모든 스킬 이펙트에 사운드도 따로") — 파일이 있는지는 AudioArtTests,
+        // 기본 '맞는 소리'는 기술이 없는 피해에만
+        [Test]
+        public void EveryKindOfLookHasItsOwnSound()
+        {
+            var seen = new System.Collections.Generic.Dictionary<WordRPG.UI.Sfx, SkillFx>();
+            foreach (SkillFx fx in Enum.GetValues(typeof(SkillFx)))
+            {
+                if (fx == SkillFx.Auto) continue;
+                var sound = SkillLooks.Of(fx).Sound;
+                Assert.AreNotEqual(WordRPG.UI.Sfx.Hit, sound, $"{fx}: 소리가 정해지지 않음 (SkillLooks Sound 칸)");
+                Assert.IsFalse(seen.ContainsKey(sound), $"{fx}와 {(seen.ContainsKey(sound) ? seen[sound].ToString() : "")}가 같은 소리 {sound}");
+                seen[sound] = fx;
+            }
+        }
+
         [Test]
         public void AutoFollowsTheKindOfSkillAndTheSide()
         {

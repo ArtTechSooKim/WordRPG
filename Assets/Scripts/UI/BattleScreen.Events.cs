@@ -101,6 +101,14 @@ namespace WordRPG.UI
             return 0.5f;
         }
 
+        // 맞는 소리 (#164): 막아 내면 막는 소리, 아니면 기술마다 다른 소리 + 크리티컬이면 크리티컬 소리를 겹침. 기술이 없는 피해는 기본 소리
+        private void PlayHitSound(BattleEvent e)
+        {
+            if (e.Amount <= 0) { Sound.Play(Sfx.Shield); return; }
+            Sound.Play(e.Skill != null ? SkillLooks.Of(e.Skill, e.Actor == null || e.Actor.IsPlayerSide).Sound : Sfx.Hit);
+            if (e.IsCritical) Sound.Play(Sfx.Critical);
+        }
+
         // 강도를 올려 쓴 기술(×1.2 등)은 배율 글자 + 크리티컬 소리, 조금 더 기다림. 쓰는 카드의 몸짓·날아가는 그림 (#137)
         private float ShowSkillUsed(BattleEvent e)
         {
@@ -137,7 +145,7 @@ namespace WordRPG.UI
             }
             Sync(e.Target);
             string dmgText = e.Amount > 0 ? $"-{e.Amount}" : "막음!";
-            Sound.Play(e.Amount <= 0 ? Sfx.Shield : e.IsCritical ? Sfx.Critical : Sfx.Hit);
+            PlayHitSound(e);
             PlayHit(e, shieldBroke);
             // 콤보 중인 아군 공격은 숫자가 단계만큼 더 크게
             int boost = e.Actor != null && e.Actor.IsPlayerSide ? comboStep * 5 : 0;
@@ -158,7 +166,7 @@ namespace WordRPG.UI
 
         private float ShowItemUsed(BattleEvent e)
         {
-            ShowRecovery(e.Target, e.Amount, SkillLooks.Of(SkillFx.HealLight));
+            ShowRecovery(e.Target, e.Amount, SkillLooks.Of(SkillFx.HealLight)); // 상처약 = 빛 회복과 같은 모습·소리
             Log($"{UiKit.WithJosa(e.Item.DisplayName, "을", "를")} 썼다! HP +{e.Amount}");
             return 0.6f;
         }
@@ -170,7 +178,7 @@ namespace WordRPG.UI
             shown[target] = (h.hp + amount, h.shield);
             Sync(target);
             Float(target, $"+{amount}", Palette.Good, 60, pop: true);
-            Sound.Play(Sfx.Heal);
+            Sound.Play(look.Sound);
             PlayRecovery(target, h.hp, look);
         }
 
@@ -183,7 +191,7 @@ namespace WordRPG.UI
             PlayShield(e.Target, look); // 테두리 색을 먼저 정하고 Sync가 테두리를 켬
             Sync(e.Target);
             Float(e.Target, $"보호막 +{e.Amount}", Palette.Info, 40);
-            Sound.Play(Sfx.Shield);
+            Sound.Play(look.Sound);
             PlayFx(e.Target, look.Hit, 1f, 1f, look.Tint);
             Log($"{e.Target.DisplayName} 보호막 +{e.Amount}");
             return 0.6f;
