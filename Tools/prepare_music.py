@@ -52,7 +52,7 @@ LATER = {
     "battledesert": ("desert_battle_A_v2.mp3", BATTLE, {"crush": STRONG, "careful": True}),  # 사막 전투는 A·B 번갈아, 사용자가 '강하게'를 고름 (#165)
     "battledesert2": ("desert_battle_B_v2.5.mp3", BATTLE, {"crush": STRONG, "careful": True}),
     "bossdesert": ("round7_raw/사막보스.mp3", BOSS, {"crush": STRONG, "careful": True}),
-    "bossdesertmid": ("round11_raw/사막중간보스_A.mp3", BOSS, {"crush": STRONG, "careful": True}),  # 중간 보스 후보 A·B (#187) — 사용자가 고르면 하나만 남김
+    "bossdesertmid": ("round11_raw/사막중간보스_A.mp3", BOSS, {"crush": STRONG, "careful": True}),  # 중간 보스곡 A·B 둘 다 씀 (#188 사용자)
     "bossdesertmid2": ("round11_raw/사막중간보스_B.mp3", BOSS, {"crush": STRONG, "careful": True, "min_start": 30.0, "max_start": 34.0, "min_length": 20.0}),  # 앞 30초가 조용해서 커진 뒤로만 반복
     "desert": ("round7_raw/사막배경.mp3", FIELD, {"careful": True}),
     "oasis": ("round7_raw/오아시스_2.mp3", FIELD, {"careful": True}),  # 사용자: 조금 덜 리드미컬하게, 새 곡으로 정함 (#173·#174)
