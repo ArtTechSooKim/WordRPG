@@ -2,6 +2,8 @@
 
     python Tools/prepare_music.py [원본 폴더, 기본 Builds/music_pilot]   (pip install imageio-ffmpeg numpy)
 
+    python Tools/prepare_music.py --later   → 아직 안 쓰는 곡(LATER 표)을 Builds/music_pilot/later/에 (앱에 안 들어감)
+
 결과 = Assets/Resources/Audio/Licensed/{이름}.wav (Unity가 가져올 때 Vorbis로 압축, 이 폴더는 깃 제외 — 백업 필요) +
 Builds/music_pilot/이음새_확인.mp3 (곡마다 끝 6초 + 처음 6초를 이어 붙임, 표 순서대로)
 표에 없는 곡은 게임에 넣지 않음: Resources 폴더는 전부 앱에 들어가므로 아직 안 쓰는 곡(사막 등)은 두지 말 것
@@ -22,6 +24,7 @@ OUT = os.path.join(ROOT, "Assets", "Resources", "Audio", "Licensed")
 SEAMS = os.path.join(ROOT, "Builds", "music_pilot", "이음새_확인.mp3")
 FF = imageio_ffmpeg.get_ffmpeg_exe()
 SR = 44100
+FIELD = -19.0  # 2.0 지역 배경곡. 지금 지역 음악은 -13~-23 (#172)
 BATTLE, BOSS = -21.0, -20.0  # 음량(LUFS). #166에 -19·-18로 올렸더니 기술 소리가 묻혀서 낮춤 (#167 사용자). 지역 음악은 -13~-23
 FADE = 0.4         # 반복 이음새를 겹치는 길이(초)
 MIN_LENGTH = 35.0  # 이음새를 찾을 때 곡이 이보다 짧아지지 않게(초)
@@ -43,6 +46,22 @@ TRACKS = {
 # 곡을 손본 것 (#167 사용자: 초원은 이음새가 튀고, 지금보다 덜 평온하게) — speed = 빠르기(음도 같이 올라감) · crush = 8비트 가공 · careful = 이음새를 더 꼼꼼히 찾음
 # 다른 곡은 사용자가 이음새를 확인했으므로 careful을 켜지 않음 (켜면 반복 자리가 바뀜)
 LIGHT, STRONG = (8, 3, 0.45, 10000), (6, 5, 0.8, 8000)  # 8비트 가공: 비트 · 건너뛰는 표본 · 섞는 비율 · 고음 자르기 Hz. 사막 A·B는 STRONG (#165)
+# 2.0 곡 (#172 사용자: 같은 방식으로) — 아직 안 쓰는 곡. 지역(테마)을 만들 때 TRACKS로 옮기고 Music 열거형·테마 표에 더함.
+# Resources에 두면 앱에 들어가서 크기만 늘어나므로 여기 따로 둠. 이름 = (원본, 음량, 손보기)
+LATER = {
+    "battledesert": ("desert_battle_A_v2.mp3", BATTLE, {"crush": STRONG, "careful": True}),  # 사막 전투는 A·B 번갈아, 사용자가 '강하게'를 고름 (#165)
+    "battledesert2": ("desert_battle_B_v2.5.mp3", BATTLE, {"crush": STRONG, "careful": True}),
+    "bossdesert": ("round7_raw/사막보스.mp3", BOSS, {"crush": STRONG, "careful": True}),
+    "desert": ("round7_raw/사막배경.mp3", FIELD, {"careful": True}),
+    "oasis": ("round7_raw/오아시스.mp3", FIELD, {"careful": True, "max_start": 15.0, "min_length": 30.0}),
+    "snow": ("round7_raw/설원배경.mp3", FIELD, {"careful": True, "max_start": 25.0, "min_length": 28.0}),  # 앞이 조용한 곡은 반복을 뒤쪽에서 (#172)
+    "battlesnow": ("round7_raw/설원전투.mp3", BATTLE, {"careful": True}),
+    "sea": ("round7_raw/해저배경.mp3", FIELD, {"careful": True}),
+    "battlesea": ("round7_raw/해저전투.mp3", BATTLE, {"careful": True, "max_start": 34.0, "min_length": 20.0}),
+    "temple": ("round7_raw/신전배경.mp3", FIELD, {"careful": True, "max_start": 25.0, "min_length": 28.0}),
+    "battletemple": ("round7_raw/신전전투.mp3", BATTLE, {"careful": True}),
+    "battlespare": ("round6_raw/03_숲전투_3.mp3", BATTLE, {"careful": True}),  # 사용자가 나중에 쓰기로 함 (#171)
+}
 TWEAKS = {
     "battlemeadow": {"speed": 1.18, "careful": True},  # 사용자가 후보 A·B·C 중 B를 고름 (#168)
     "battleforest": {"careful": True},
@@ -123,13 +142,13 @@ def crush(x, level):
     return np.frombuffer(raw, dtype=np.float32).reshape(-1, 2).copy()
 
 
-def find_loop_careful(x, max_start=8.0):
+def find_loop_careful(x, max_start=8.0, min_length=MIN_LENGTH):
     """시작 자리도 함께 찾고(앞의 도입을 건너뜀), 음량·대역이 다른 자리는 점수를 깎음 (find_loop는 모양만 봐서 음량이 달라도 높게 나옴)"""
     rate = 11025
     mono = np.interp(np.arange(0, len(x), SR / rate), np.arange(len(x)), x.mean(axis=1))
     f, fps = features(mono, rate)
     length = int(COMPARE * fps)
-    ends = np.arange(int(MIN_LENGTH * fps), len(f) - length)
+    ends = np.arange(int(min_length * fps), len(f) - length)
     parts = np.stack([f[e:e + length] for e in ends])
     means = parts.mean(axis=1)
     norm = (parts - parts.mean(axis=(1, 2), keepdims=True)) / (parts.std(axis=(1, 2), keepdims=True) + 1e-9)
@@ -140,7 +159,7 @@ def find_loop_careful(x, max_start=8.0):
         scores = (norm * h).mean(axis=(1, 2))
         # 대역별 음량 차이 1dB마다 0.05점 깎음 (로그 값 × 8.686 = dB)
         scores = scores - 0.05 * 8.686 * np.abs(means - head.mean(axis=0)).mean(axis=1)
-        scores = np.where(ends >= s + int(MIN_LENGTH * fps), scores, -9.0)
+        scores = np.where(ends >= s + int(min_length * fps), scores, -9.0)
         for i in np.argsort(scores)[-3:]:
             candidates.append((float(scores[i]), s, int(ends[i])))
     # 점수가 높은 후보를 파형까지 맞춰 보고, 겹치는 구간이 실제로 닮고 음량이 같은 자리를 고름
@@ -173,7 +192,7 @@ def make_loop_even(x, start, end):
     return out, rho
 
 
-def process(file, target, src, speed=1.0, crush_level=None, careful=False):
+def process(file, target, src, speed=1.0, crush_level=None, careful=False, max_start=8.0, min_length=MIN_LENGTH):
     """원본 하나 → 반복되는 곡 (음량까지 맞춤). 돌려주는 값: 곡, 비슷한 정도, 설명"""
     x = decode(os.path.join(src, file), speed=speed)
     if crush_level:
@@ -181,7 +200,7 @@ def process(file, target, src, speed=1.0, crush_level=None, careful=False):
     start, stop = usable_range(x)
     x = x[start:stop]
     if careful:
-        s, end, score = find_loop_careful(x)
+        s, end, score = find_loop_careful(x, max_start, min_length)
         loop, rho = make_loop_even(x, s, end)
         note = f"시작 {s / SR:.2f}초 · 겹침 닮은 정도 {rho:.2f}"
     else:
@@ -208,8 +227,25 @@ def write_wav(path, x):
         w.writeframes(pcm.tobytes())
 
 
+def make_later(src):
+    folder = os.path.join(ROOT, "Builds", "music_pilot", "later")
+    os.makedirs(folder, exist_ok=True)
+    for name, (file, target, tweak) in LATER.items():
+        loop, score, note = process(file, target, src, tweak.get("speed", 1.0), tweak.get("crush"), tweak.get("careful", False), tweak.get("max_start", 8.0), tweak.get("min_length", MIN_LENGTH))
+        path = os.path.join(folder, name + ".wav")
+        write_wav(path, loop)
+        two = 2 * SR
+        print(f"{name:14s} {len(loop) / SR:5.1f}초  비슷함 {score:.2f}  음량 {lufs(path):.1f} LUFS  최고 {20 * np.log10(np.abs(loop).max()):5.1f}dB  "
+              f"끝/처음 2초 {rms_db(loop[-two:]):5.1f}/{rms_db(loop[:two]):5.1f}dB  {note}")
+
+
 if __name__ == "__main__":
-    src = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, "Builds", "music_pilot")
+    later = "--later" in sys.argv
+    args = [a for a in sys.argv[1:] if a != "--later"]
+    src = args[0] if args else os.path.join(ROOT, "Builds", "music_pilot")
+    if later:
+        make_later(src)
+        sys.exit(0)
     os.makedirs(OUT, exist_ok=True)
     seams = []
     gap = np.zeros((SR, 2), dtype=np.float32)
