@@ -1,6 +1,6 @@
 """기술 소리 미리보기 영상 (#164): AdCapture.SkillSoundReel이 찍은 프레임 + 게임이 실제로 낸 소리 기록 → 이름표 달린 영상 한 편.
 
-    python Tools/ad_motion/skill_sound_preview.py [초당 장수, 기본 19]   (pip install imageio-ffmpeg pillow)
+    python Tools/ad_motion/skill_sound_preview.py [초당 장수, 기본 19] [배경에 깔 곡 파일]   (pip install imageio-ffmpeg pillow)
 
 Builds/ad/skill_sounds/{번호}_{기술 id}/f0000.jpg + sfx.txt + names.txt → Builds/ad/skill_sounds_preview.mp4
 프레임이 실제로는 초당 19장쯤 찍혀서 그 속도로 묶어야 실제 게임 속도에 가깝다. 소리는 찍은 프레임 번호에 맞춰 놓는다 (배경 음악 없음 — 효과음만 잘 듣게).
@@ -25,6 +25,8 @@ FF = imageio_ffmpeg.get_ffmpeg_exe()
 FPS = float(sys.argv[1]) if len(sys.argv) > 1 else 19.0
 GAP = 12  # 기술 사이 쉬는 프레임 (마지막 장을 더 보여 줌)
 SFX_VOLUME = 0.5  # GameSettings.DefaultSfxVolume
+MUSIC_VOLUME = 0.45  # GameSettings.DefaultMusicVolume 0.75 × Sound.MusicBase 0.6 — 곡을 깔면 게임과 같은 비율
+MUSIC = sys.argv[2] if len(sys.argv) > 2 else None
 W, H = 720, 1564
 
 
@@ -75,7 +77,14 @@ with tempfile.TemporaryDirectory() as tmp:
         args += ["-i", os.path.join(SFX, name + ".wav")]
         parts.append(f"[{i}:a]aformat=sample_rates=44100:channel_layouts=stereo,adelay={int(at * 1000)}:all=1[s{i}]")
     mix = "".join(f"[s{i}]" for i in range(len(hits)))
-    graph = ";".join(parts) + f";{mix}amix=inputs={len(hits)}:duration=longest:normalize=0,apad,atrim=0:{total:.3f},volume={SFX_VOLUME}[out]"
+    tail = f"volume={SFX_VOLUME}[sv]"
+    if MUSIC:
+        args += ["-stream_loop", "-1", "-i", MUSIC]
+        tail += (f";[{len(hits)}:a]aformat=sample_rates=44100:channel_layouts=stereo,atrim=0:{total:.3f},volume={MUSIC_VOLUME}[mv]"
+                 ";[sv][mv]amix=inputs=2:duration=longest:normalize=0[out]")
+    else:
+        tail += ";[sv]anull[out]"
+    graph = ";".join(parts) + f";{mix}amix=inputs={len(hits)}:duration=longest:normalize=0,apad,atrim=0:{total:.3f},{tail}"
     graph_path = os.path.join(tmp, "audio.txt")
     with open(graph_path, "w", encoding="utf-8") as f:
         f.write(graph)

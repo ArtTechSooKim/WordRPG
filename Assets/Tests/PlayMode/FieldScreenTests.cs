@@ -96,6 +96,7 @@ namespace WordRPG.Tests
             Assert.IsFalse(field.IsInBattle, "길에서는 조우하지 않음");
             yield return HoldStick(field, Direction.Up, () => field.IsMoving);
             yield return WaitFor(() => field.Battle.IsRunning);
+            Assert.AreEqual(Music.BattleMeadow, Sound.CurrentMusic, "그 지역의 전투곡 (#166)");
             Assert.IsTrue(field.Battle.IsRunning, "풀숲에 들어서면 전투");
 
             // 4) 전투 승리 → '계속 탐험' → 같은 자리로 복귀

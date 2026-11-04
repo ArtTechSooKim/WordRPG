@@ -22,7 +22,7 @@ namespace WordRPG.UI
         {
             transitioning = true;
             Sound.Play(Sfx.Encounter);
-            Sound.PlayMusic(boss ? Music.Boss : Music.Battle);
+            Sound.PlayBattleMusic(area.Theme, boss);
             flash.gameObject.SetActive(true);
             float duration = 0.4f * animationScale;
             for (float t = 0; t < duration; t += Time.unscaledDeltaTime)
@@ -330,7 +330,7 @@ namespace WordRPG.UI
             }
             inBattle = true;
             HideToast();
-            Sound.PlayMusic(Music.Battle);
+            Sound.PlayBattleMusic(area.Theme);
             battle.BeginTraining(dummy, TrainingBooks(), area.Words, mode, OnTrainingFinished, area.Theme);
         }
 

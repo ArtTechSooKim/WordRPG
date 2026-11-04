@@ -26,6 +26,49 @@ namespace WordRPG.Tests
             }
         }
 
+        // 지역마다 자기 전투곡 (#164·#166 사용자: 지역 컨셉에 맞게) — 다른 지역과 겹치지 않고, 파일이 없을 때 대신 틀 곡이 있음
+        [Test]
+        public void EveryThemeHasItsOwnBattleMusic()
+        {
+            var used = new HashSet<Music>();
+            foreach (var look in ThemeLooks.All)
+            {
+                Assert.Greater(look.BattleMusic.Length, 0, $"{look.Theme}: 전투곡");
+                foreach (var track in look.BattleMusic)
+                {
+                    Assert.IsTrue(used.Add(track), $"{track}을(를) 두 지역이 같이 씀");
+                    Assert.AreEqual(Music.Battle, Sound.FallbackOf(track), $"{look.Theme}: {track} — 이름이 Battle로 시작해야 대신 틀 곡이 있음");
+                }
+            }
+        }
+
+        // 보스가 있는 지역은 보스곡도 따로 (#164 사용자: 보스들은 특별히 다른 곡)
+        [Test]
+        public void EveryAreaWithABossHasItsOwnBossMusic()
+        {
+            int bosses = 0;
+            foreach (var guid in UnityEditor.AssetDatabase.FindAssets("t:FieldArea", new[] { "Assets/Data" }))
+            {
+                var area = UnityEditor.AssetDatabase.LoadAssetAtPath<FieldArea>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid));
+                if (area.Boss == null) continue;
+                bosses++;
+                var track = ThemeLooks.Of(area.Theme).BossMusic;
+                Assert.AreNotEqual(Music.Boss, track, $"{area.name}: 공용 보스곡을 씀");
+                Assert.AreEqual(Music.Boss, Sound.FallbackOf(track), $"{area.name}: {track} — 이름이 Boss로 시작해야 대신 틀 곡이 있음");
+            }
+            Assert.GreaterOrEqual(bosses, 4);
+        }
+
+        [Test]
+        public void BattleTracksTakeTurnsAndBossUsesItsOwn()
+        {
+            var look = new ThemeLook(FieldTheme.Meadow, Music.Meadow, new[] { Music.BattleMeadow, Music.BattleCave }, Music.BossCave, Color.black, FieldTile.Grass);
+            Assert.AreEqual(Music.BattleMeadow, look.BattleTrack(false, 0));
+            Assert.AreEqual(Music.BattleCave, look.BattleTrack(false, 1));
+            Assert.AreEqual(Music.BattleMeadow, look.BattleTrack(false, 2), "번갈아");
+            Assert.AreEqual(Music.BossCave, look.BattleTrack(true, 1));
+        }
+
         [Test]
         public void EveryThemeHasMinimapAndDustRows()
         {

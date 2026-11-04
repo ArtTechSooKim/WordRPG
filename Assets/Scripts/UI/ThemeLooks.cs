@@ -23,36 +23,43 @@ namespace WordRPG.UI
     {
         public FieldTheme Theme { get; }
         public Music Music { get; }           // 필드 배경 음악
+        public Music[] BattleMusic { get; }   // 전투곡 — 여러 개면 전투마다 번갈아 (#166)
+        public Music BossMusic { get; }       // 보스곡 — 그 지역 전투곡과 비슷한 풍에 보스답게 (#165 사용자)
         public Color Outside { get; }         // 맵 밖(카메라 배경) 색
         public FieldTile BattleFloor { get; } // 전투 배경 바닥 칸 (벽은 늘 그 테마의 Wall 그림)
         public FogLook? Fog { get; }          // 몬스터 칸을 덮는 바닥 안개 (없으면 null — FieldFog)
         public bool Dark { get; }             // 어두운 지역 (FieldDarkness — 빛 규칙 CaveLight)
 
-        public ThemeLook(FieldTheme theme, Music music, Color outside, FieldTile battleFloor, FogLook? fog = null, bool dark = false)
+        public ThemeLook(FieldTheme theme, Music music, Music[] battleMusic, Music bossMusic, Color outside, FieldTile battleFloor, FogLook? fog = null, bool dark = false)
         {
             Theme = theme;
             Music = music;
+            BattleMusic = battleMusic;
+            BossMusic = bossMusic;
             Outside = outside;
             BattleFloor = battleFloor;
             Fog = fog;
             Dark = dark;
         }
+
+        // turn = 지금까지 시작한 전투 수
+        public Music BattleTrack(bool boss, int turn) => boss ? BossMusic : BattleMusic[turn % BattleMusic.Length];
     }
 
     // 테마 표 (#118): 테마마다 한 줄. 예전엔 음악·맵 밖 색·전투 배경·안개·어둠을 다섯 곳이 저마다 테마를 갈라 적었음.
     // 칸마다 다른 색은 칸 종류 표라 따로 둔다: 미니맵 색 = MinimapArt, 먼지 색 = FieldArt.DustColor.
-    // 새 테마 (예: 2.0 사막): FieldTheme 맨 뒤 → 여기 한 줄 → MinimapArt·DustColor 표 한 줄씩 → 그림 Tiles/{테마}_{종류}.png · 음악 파일
+    // 새 테마 (예: 2.0 사막): FieldTheme 맨 뒤 → 여기 한 줄 → MinimapArt·DustColor 표 한 줄씩 → 그림 Tiles/{테마}_{종류}.png · 음악 파일(배경·전투·보스, Music 맨 뒤)
     //   (빠지면 ThemeTableTests·AudioArtTests가 잡음 — 표에 없으면 초원 모습으로 조용히 보이던 것)
     public static class ThemeLooks
     {
         private static readonly ThemeLook[] Table =
         {
-            new ThemeLook(FieldTheme.Meadow, Music.Meadow, new Color(0.10f, 0.22f, 0.12f), FieldTile.Grass),
-            new ThemeLook(FieldTheme.Library, Music.Library, new Color(0.12f, 0.08f, 0.06f), FieldTile.Floor, // 서고 전투 바닥 = 돌바닥
+            new ThemeLook(FieldTheme.Meadow, Music.Meadow, new[] { Music.BattleMeadow }, Music.Boss, new Color(0.10f, 0.22f, 0.12f), FieldTile.Grass), // 초원엔 보스가 없음
+            new ThemeLook(FieldTheme.Library, Music.Library, new[] { Music.BattleLibrary }, Music.BossLibrary, new Color(0.12f, 0.08f, 0.06f), FieldTile.Floor, // 서고 전투 바닥 = 돌바닥
                 fog: new FogLook(new Color32(206, 218, 232, 255), new Color32(150, 168, 192, 255), 0.5f)),   // 옅은 푸른 회색 바닥 안개 (#103)
-            new ThemeLook(FieldTheme.Forest, Music.Forest, new Color(0.05f, 0.14f, 0.08f), FieldTile.Grass),   // 숲 전투 바닥 = 고사리
-            new ThemeLook(FieldTheme.Jungle, Music.Jungle, new Color(0.03f, 0.12f, 0.07f), FieldTile.Grass),
-            new ThemeLook(FieldTheme.Cave, Music.Cave, new Color(0.02f, 0.02f, 0.04f), FieldTile.Grass, dark: true), // 맵 밖은 캄캄 (#112)
+            new ThemeLook(FieldTheme.Forest, Music.Forest, new[] { Music.BattleForest }, Music.BossForest, new Color(0.05f, 0.14f, 0.08f), FieldTile.Grass),   // 숲 전투 바닥 = 고사리
+            new ThemeLook(FieldTheme.Jungle, Music.Jungle, new[] { Music.BattleJungle }, Music.BossJungle, new Color(0.03f, 0.12f, 0.07f), FieldTile.Grass),
+            new ThemeLook(FieldTheme.Cave, Music.Cave, new[] { Music.BattleCave }, Music.BossCave, new Color(0.02f, 0.02f, 0.04f), FieldTile.Grass, dark: true), // 맵 밖은 캄캄 (#112)
         };
 
         private static readonly Dictionary<FieldTheme, ThemeLook> ByTheme = Build();

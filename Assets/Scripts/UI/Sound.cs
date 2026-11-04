@@ -1,10 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
+using WordRPG.Field;
 using WordRPG.Game;
 
 namespace WordRPG.UI
 {
-    public enum Music { None, Title, Meadow, Library, Battle, Boss, Forest, Jungle, Cave, Intro, HeroSelect }
+    public enum Music
+    {
+        None, Title, Meadow, Library, Battle, Boss, Forest, Jungle, Cave, Intro, HeroSelect,
+        // 지역마다 다른 전투곡·보스곡 (#166 — 어느 지역이 어느 곡인지는 테마 표 ThemeLooks). 파일은 Licensed 폴더에만 있음(깃 제외) →
+        // 없으면 Battle·Boss로 대신 남 (Sound.FallbackOf). 이름은 Battle…·Boss…로 시작할 것. 곡 다듬기 = Tools/prepare_music.py
+        BattleMeadow, BattleLibrary, BattleForest, BattleJungle, BattleCave, BossLibrary, BossForest, BossJungle, BossCave
+    }
 
     public enum Sfx
     {
@@ -32,6 +39,7 @@ namespace WordRPG.UI
         private static readonly Dictionary<string, AudioClip> Clips = new Dictionary<string, AudioClip>();
         private static float resumeAt = -1f; // 징글이 끝나 음악을 다시 틀 시각 (-1 = 멈춘 음악 없음)
         private static bool fadingIn;
+        private static int battlesStarted; // 지역에 전투곡이 여러 개면 전투마다 번갈아 (#166)
 
         public static Music CurrentMusic => current;
         public static bool IsMusicPausedForJingle => resumeAt >= 0f;
@@ -49,6 +57,19 @@ namespace WordRPG.UI
             if (music != null && !fadingIn) music.volume = MusicVolume;
         }
 
+        // 전투에 들어갈 때 (#166): 그 지역의 전투곡 또는 보스곡
+        public static void PlayBattleMusic(FieldTheme theme, bool boss = false) =>
+            PlayMusic(ThemeLooks.Of(theme).BattleTrack(boss, boss ? 0 : battlesStarted++));
+
+        // 파일이 Licensed 폴더에만 있는 곡을 못 찾으면 대신 틀 곡 (새로 받은 저장소 등). None = 대신 틀 곡 없음(팩에 있는 곡)
+        public static Music FallbackOf(Music track)
+        {
+            string name = track.ToString();
+            if (track != Music.Battle && name.StartsWith("Battle")) return Music.Battle;
+            if (track != Music.Boss && name.StartsWith("Boss")) return Music.Boss;
+            return Music.None;
+        }
+
         // 같은 곡이면 이어서, 다른 곡이면 처음부터. None = 멈춤
         public static void PlayMusic(Music track)
         {
@@ -56,7 +77,7 @@ namespace WordRPG.UI
             current = track;
             resumeAt = -1f;
             fadingIn = false;
-            var clip = track == Music.None ? null : LoadFirst("Music", track.ToString().ToLowerInvariant());
+            var clip = track == Music.None ? null : LoadMusic(track);
             music.Stop();
             music.clip = clip;
             music.volume = MusicVolume;
@@ -138,6 +159,13 @@ namespace WordRPG.UI
         // 찾는 순서: 라이선스 폴더 → 팩 폴더
         public static string[] CandidatePaths(string folder, string name) =>
             new[] { "Audio/Licensed/" + name, $"Audio/{folder}/" + name };
+
+        private static AudioClip LoadMusic(Music track)
+        {
+            var clip = LoadFirst("Music", track.ToString().ToLowerInvariant());
+            var fallback = FallbackOf(track);
+            return clip == null && fallback != Music.None ? LoadFirst("Music", fallback.ToString().ToLowerInvariant()) : clip;
+        }
 
         private static AudioClip LoadSfx(Sfx effect) => LoadFirst("Sfx", effect.ToString().ToLowerInvariant());
 

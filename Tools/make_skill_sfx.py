@@ -25,22 +25,22 @@ FF = imageio_ffmpeg.get_ffmpeg_exe()
 
 SLASH, HIT, MAGIC, ELEMENT, BONUS, ALERT, BOUNCE = "Whoosh & Slash", "Hit & Impact", "Magic & Skill", "Elemental", "Bonus", "Alert", "Jump & Bounce"
 PEAK = -7.0  # 팩 소리들의 최고 음량과 같게
-TONE = "highshelf=f=1800:g=-10,lowpass=f=5500"  # 2kHz 위(귀가 가장 예민한 곳)를 깎음 — #165
+TONE = "highshelf=f=1500:g=-12,lowpass=f=4600"  # 2kHz 근처 위(귀가 가장 예민한 곳)를 깎음 — #165, #166 사용자: 1.2배 더 (깎는 양 ×1.2, 주파수 ÷1.2)
 
 SOUNDS = {
     # 공격: 베는 소리 + 맞는 소리
     "skillslash": ([(SLASH, "Slash", 0, 0), (HIT, "Hit1", -8, 30)], 0, PEAK),
-    "skillclaw": ([(SLASH, "Slash3", 0, 0), (HIT, "Hit9", -8, 20)], 4500, PEAK),
+    "skillclaw": ([(SLASH, "Slash3", 0, 0), (HIT, "Hit9", -8, 20)], 3750, PEAK),
     "skillheavy": ([(HIT, "Impact5", 0, 0), (HIT, "Hit3", -6, 0)], 0, -5.0),
     "skillthunder": ([(ELEMENT, "Explosion4", 0, 0), (ELEMENT, "Fireball", -8, 0)], 0, -5.0),
     "skillink": ([(ELEMENT, "Water4", 0, 0), (ELEMENT, "Bubble2", -8, 40)], 0, PEAK),
     "skillwater": ([(ELEMENT, "Water1", 0, 0), (ELEMENT, "WaterDrop", -8, 120)], 0, PEAK),
-    "skillplant": ([(ELEMENT, "Grass", 10, 0), (SLASH, "Slash", -6, 0)], 4500, PEAK),
-    "skillwhip": ([(SLASH, "Slash5", 0, 0), (HIT, "Hit9", -6, 50)], 4500, PEAK),
+    "skillplant": ([(ELEMENT, "Grass", 10, 0), (SLASH, "Slash", -6, 0)], 3750, PEAK),
+    "skillwhip": ([(SLASH, "Slash5", 0, 0), (HIT, "Hit9", -6, 50)], 3750, PEAK),
     "skillrock": ([(HIT, "Hit7", 0, 0), (HIT, "Impact2", -6, 0)], 0, PEAK),
     "skilllight": ([(MAGIC, "Magic2", 0, 0), (BONUS, "Coin3", -12, 60)], 0, PEAK),
     "skillletters": ([(BONUS, "Coin2", 0, 0), (BONUS, "Coin2", -4, 100), (BONUS, "Coin2", -8, 200)], 0, PEAK),  # 글자가 쏟아짐
-    "skillhighlight": ([(SLASH, "Slash4", 0, 0), (ALERT, "Alert6", -10, 0)], 4500, PEAK),
+    "skillhighlight": ([(SLASH, "Slash4", 0, 0), (ALERT, "Alert6", -10, 0)], 3750, PEAK),
     "skillsound": ([(ALERT, "Alert2", 0, 0), (ALERT, "Alert2", -6, 130), (ALERT, "Alert2", -12, 260)], 0, PEAK),  # 소리 고리 세 겹
     "skillspore": ([(SLASH, "Whoosh", 6, 0), (ELEMENT, "Bubble2", -8, 40)], 0, PEAK),
     "skillswirl": ([(MAGIC, "Fx", 0, 0)], 0, PEAK),

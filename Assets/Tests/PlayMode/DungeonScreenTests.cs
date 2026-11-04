@@ -125,7 +125,7 @@ namespace WordRPG.Tests
             var crown = TestData.Relic("relic_grail", TestData.Skill("recall", SkillKind.Heal, SkillTarget.Self, 16),
                 new MonsterStats(20, 0, 2)).Set("displayName", "기억의 성배");
             var area = Area("lair", "보스 방", "#####\n#.B.#\n#.P.#\n#####", hero)
-                .Set("boss", new BossEncounter(king, 3, crown));
+                .Set("boss", new BossEncounter(king, 3, crown)).Set("theme", FieldTheme.Forest);
             var session = GameSession.NewGame(Player(), 1);
             var field = CreateField(area, session);
             yield return null;
@@ -142,6 +142,7 @@ namespace WordRPG.Tests
             Assert.AreSame(king, field.Battle.Engine.Enemies[0].Monster.Species);
             Assert.AreEqual(3, field.Battle.Engine.Enemies[0].Monster.Level);
             StringAssert.Contains("보스 출현", AllText(field.Battle));
+            Assert.AreEqual(Music.BossForest, Sound.CurrentMusic, "그 지역의 보스곡 (#166)");
 
             yield return PlayUntilResult(field.Battle, answerCorrectly: true);
             // 보스를 쓰러뜨린 한 방은 결정타 연출 (#41), 결산에 물리친 보스 이름

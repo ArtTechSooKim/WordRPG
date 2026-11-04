@@ -16,7 +16,9 @@ namespace WordRPG.Tests
             foreach (Music track in Enum.GetValues(typeof(Music)))
             {
                 if (track == Music.None) continue;
-                string path = "Audio/Music/" + track.ToString().ToLowerInvariant();
+                // 지역 전투곡·보스곡은 Licensed 폴더에만 있음(깃 제외) → 없을 때 대신 틀 곡이 저장소에 있어야 함 (#166)
+                var inRepo = Sound.FallbackOf(track) != Music.None ? Sound.FallbackOf(track) : track;
+                string path = "Audio/Music/" + inRepo.ToString().ToLowerInvariant();
                 Assert.IsNotNull(Resources.Load<AudioClip>(path), $"Resources/{path} 없음");
             }
         }
@@ -28,6 +30,22 @@ namespace WordRPG.Tests
             {
                 string path = "Audio/Sfx/" + effect.ToString().ToLowerInvariant();
                 Assert.IsNotNull(Resources.Load<AudioClip>(path), $"Resources/{path} 없음");
+            }
+        }
+
+        // 지역 전투곡·보스곡 (#166): 이 컴퓨터에 Licensed 파일이 있으면 음악으로 제대로 가져왔는지 (없으면 대신 틀 곡이 나므로 통과).
+        // 효과음처럼 가져오면 곡 하나가 통째로 메모리에 올라가고 모노가 됨
+        [Test]
+        public void LicensedBattleMusicIsStreamedInStereoWhenPresent()
+        {
+            foreach (Music track in Enum.GetValues(typeof(Music)))
+            {
+                if (Sound.FallbackOf(track) == Music.None) continue;
+                var clip = Resources.Load<AudioClip>("Audio/Licensed/" + track.ToString().ToLowerInvariant());
+                if (clip == null) continue;
+                Assert.AreEqual(AudioClipLoadType.Streaming, clip.loadType, $"{track}: 스트리밍");
+                Assert.AreEqual(2, clip.channels, $"{track}: 스테레오");
+                Assert.Greater(clip.length, 30f, $"{track}: 길이");
             }
         }
 
@@ -67,6 +85,8 @@ namespace WordRPG.Tests
             Assert.IsTrue(UiAssetImporter.IsMusic("Assets/Resources/Audio/Music/meadow.ogg"));
             Assert.IsTrue(UiAssetImporter.IsMusic("Assets/Resources/Audio/Licensed/intro.wav"), "입장 영상 곡");
             Assert.IsTrue(UiAssetImporter.IsMusic("Assets/Resources/Audio/Licensed/HeroSelect.mp3"), "대소문자·확장자 상관없음");
+            Assert.IsTrue(UiAssetImporter.IsMusic("Assets/Resources/Audio/Licensed/battleforest.wav"), "지역 전투곡 (#166)");
+            Assert.IsTrue(UiAssetImporter.IsMusic("Assets/Resources/Audio/Licensed/bosscave.wav"), "지역 보스곡 (#166)");
             Assert.IsFalse(UiAssetImporter.IsMusic("Assets/Resources/Audio/Licensed/newword.wav"), "효과음");
             Assert.IsFalse(UiAssetImporter.IsMusic("Assets/Resources/Audio/Sfx/click.wav"));
         }
