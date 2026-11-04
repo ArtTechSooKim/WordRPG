@@ -47,7 +47,7 @@ namespace WordRPG.EditorTools
             importer.wrapMode = TextureWrapMode.Clamp;
         }
 
-        // 소리: 음악은 스트리밍(메모리 절약), 효과음은 미리 풀어 두고 모노로 (바로 재생)
+        // 소리: 음악·환경음은 스트리밍(메모리 절약), 효과음은 미리 풀어 두고 모노로 (바로 재생)
         private void OnPreprocessAudio()
         {
             if (!assetPath.StartsWith("Assets/Resources/Audio/")) return;
@@ -65,7 +65,7 @@ namespace WordRPG.EditorTools
         // (#133 사용자가 찾은 입장 영상 곡 Licensed/intro.wav — 효과음처럼 모노·통째로 메모리에 올리지 않게)
         public static bool IsMusic(string assetPath)
         {
-            if (assetPath.StartsWith("Assets/Resources/Audio/Music/")) return true;
+            if (assetPath.StartsWith("Assets/Resources/Audio/Music/") || assetPath.StartsWith("Assets/Resources/Audio/Ambience/")) return true;
             if (!assetPath.StartsWith("Assets/Resources/Audio/Licensed/")) return false;
             string name = Path.GetFileNameWithoutExtension(assetPath);
             foreach (Music track in Enum.GetValues(typeof(Music)))

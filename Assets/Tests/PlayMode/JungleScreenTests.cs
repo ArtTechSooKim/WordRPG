@@ -265,6 +265,41 @@ namespace WordRPG.Tests
             "#P::::#~~~~#\n" +
             "############";
 
+        // 환경음 (#193): 정글 소리 → 뗏목을 타면 강물 → 전투곡이 나오면 멈춤 → 돌아오면 다시 → 화면을 없애면 멈춤
+        [UnityTest]
+        public IEnumerator AmbienceFollowsTheRaftAndTheBattleMusic()
+        {
+            var potion = TestData.Item("potion").Set("displayName", "상처약");
+            var area = Area(RiverMap, null, 3, new ChestContent(potion, 2));
+            var field = Field(area, Session(area, 0));
+            yield return null;
+            Sound.PlayMusic(Music.Jungle);
+            yield return null;
+            Assert.AreEqual(Ambience.Jungle, Sound.WantedAmbience, "지역 BGM과 함께");
+            yield return WaitFor(() => Sound.PlayingAmbience == Ambience.Jungle, 1f);
+            Assert.AreEqual(Ambience.Jungle, Sound.PlayingAmbience, "실제로 재생");
+
+            yield return HoldStick(field, Direction.Up, () => field.PlayerCell.y >= 2);
+            yield return HoldStick(field, Direction.Right, () => field.PlayerCell.x >= 8);
+            Assert.IsTrue(field.IsRafting);
+            yield return null;
+            Assert.AreEqual(Ambience.Raft, Sound.WantedAmbience, "뗏목 → 강물");
+            yield return WaitFor(() => Sound.PlayingAmbience == Ambience.Raft, 2f);
+            Assert.AreEqual(Ambience.Raft, Sound.PlayingAmbience, "줄어든 뒤 강물로 바뀜");
+
+            Sound.PlayBattleMusic(FieldTheme.Jungle);
+            yield return null;
+            Assert.AreEqual(Ambience.None, Sound.WantedAmbience, "전투곡이 나오면 멈춤");
+            Sound.PlayMusic(Music.Jungle);
+            yield return null;
+            Assert.AreEqual(Ambience.Raft, Sound.WantedAmbience, "돌아오면 다시");
+
+            UnityEngine.Object.Destroy(field.gameObject);
+            yield return null;
+            Assert.AreEqual(Ambience.None, Sound.WantedAmbience, "화면이 없어지면 멈춤");
+            Sound.PlayMusic(Music.None);
+        }
+
         [UnityTest]
         public IEnumerator StreamSpeedsYouUpAndTheRaftSailsTheRiver()
         {

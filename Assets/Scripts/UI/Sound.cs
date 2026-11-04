@@ -24,6 +24,13 @@ namespace WordRPG.UI
         SkillGuardEcho, SkillGuardBook, SkillGuardTime, SkillGuardSeed, SkillHealLight
     }
 
+    // 지역 환경음 (#193): BGM 밑에 깔리는 소리. 어느 지역이 어느 소리인지는 테마 표 ThemeLooks.
+    // 파일 = Resources/Audio/Ambience/{소문자}, 다듬기 = Tools/prepare_ambience.py (팩 + CC0 녹음). 초원은 없음 (사용자)
+    public enum Ambience
+    {
+        None, Library, Forest, Jungle, Cave, Raft
+    }
+
     // 배경 음악·효과음 (Ninja Adventure 팩 → Resources/Audio/Music·Sfx, 파일 이름 = 열거형 이름 소문자).
     // 유료 라이선스 소리(Envato Elements 등)는 Resources/Audio/Licensed/{같은 이름} — 있으면 그걸 먼저 쓴다 (음악도 #133).
     // 그 폴더는 공개 저장소에 올리지 않으므로(재배포 금지) 새로 받은 저장소에서는 팩 소리로 대신 난다 (#66)
@@ -32,9 +39,12 @@ namespace WordRPG.UI
     {
         private const float MusicBase = 0.6f;    // 음악은 효과음보다 조금 작게
         private const float MusicFadeIn = 0.6f;  // 징글이 끝난 뒤 음악이 다시 커지는 시간(초)
+        private const float AmbienceBase = 0.6f; // 효과음 설정 × 0.6 — 파일 음량과 합쳐 BGM보다 약 11dB 작게 들림 (#193)
+        private const float AmbienceFade = 0.8f; // 환경음이 커지고 줄어드는 시간(초)
 
-        private static AudioSource music, effects, pitched;
+        private static AudioSource music, effects, pitched, ambience;
         private static Music current = Music.None;
+        private static Ambience wantedAmbience = Ambience.None, playingAmbience = Ambience.None;
         private static GameSettings settingsOverride;
         private static readonly Dictionary<string, AudioClip> Clips = new Dictionary<string, AudioClip>();
         private static float resumeAt = -1f; // 징글이 끝나 음악을 다시 틀 시각 (-1 = 멈춘 음악 없음)
@@ -43,12 +53,15 @@ namespace WordRPG.UI
 
         public static Music CurrentMusic => current;
         public static bool IsMusicPausedForJingle => resumeAt >= 0f;
+        public static Ambience WantedAmbience => wantedAmbience;
+        public static Ambience PlayingAmbience => playingAmbience;
 
         private static GameSettings Settings =>
             settingsOverride ?? (GameManager.Instance != null ? GameManager.Instance.Settings : null);
 
         private static float MusicVolume => (Settings?.MusicVolume ?? GameSettings.DefaultMusicVolume) * MusicBase;
         private static float SfxVolume => Settings?.SfxVolume ?? GameSettings.DefaultSfxVolume;
+        private static float AmbienceVolume => SfxVolume * AmbienceBase;
 
         // 설정 화면에서 음량을 바꾸면 바로 반영
         public static void ApplyVolumes(GameSettings settings)
@@ -82,6 +95,18 @@ namespace WordRPG.UI
             music.clip = clip;
             music.volume = MusicVolume;
             if (clip != null) music.Play();
+        }
+
+        // 환경음 (#193): 바꾸면 줄어든 뒤 새 소리가 커진다. 같은 소리면 아무 일도 없어서 매 프레임 불러도 됨
+        public static void SetAmbience(Ambience wanted)
+        {
+            if (!Application.isPlaying) return;
+            if (wanted == Ambience.None && ambience == null) // 끌 것이 없음 — 앱을 끄는 중에 소리 오브젝트를 새로 만들지 않게
+            {
+                wantedAmbience = wanted;
+                return;
+            }
+            if (Ensure()) wantedAmbience = wanted;
         }
 
         // 소리 기록 (#119, 테스트용): 효과음을 낼 때마다 (효과음, 음높이 — 1 = 기본). 평소엔 null
@@ -123,6 +148,7 @@ namespace WordRPG.UI
         private static void Tick()
         {
             if (music == null) return;
+            TickAmbience();
             if (resumeAt >= 0f && Time.unscaledTime >= resumeAt)
             {
                 resumeAt = -1f;
@@ -137,9 +163,26 @@ namespace WordRPG.UI
             }
         }
 
+        private static void TickAmbience()
+        {
+            float step = Mathf.Max(AmbienceVolume, 0.01f) * Time.unscaledDeltaTime / AmbienceFade;
+            if (playingAmbience == wantedAmbience)
+            {
+                if (ambience.clip != null) ambience.volume = Mathf.MoveTowards(ambience.volume, AmbienceVolume, step);
+                return;
+            }
+            ambience.volume = Mathf.MoveTowards(ambience.volume, 0f, step);
+            if (ambience.volume > 0f && ambience.clip != null) return;
+            playingAmbience = wantedAmbience;
+            ambience.Stop();
+            ambience.clip = wantedAmbience == Ambience.None ? null : Load("Audio/Ambience/" + wantedAmbience.ToString().ToLowerInvariant());
+            ambience.volume = 0f;
+            if (ambience.clip != null) ambience.Play();
+        }
+
         private static bool Ensure()
         {
-            if (music != null && effects != null && pitched != null) return true;
+            if (music != null && effects != null && pitched != null && ambience != null) return true;
             var go = new GameObject("Sound");
             Object.DontDestroyOnLoad(go);
             music = go.AddComponent<AudioSource>();
@@ -149,8 +192,12 @@ namespace WordRPG.UI
             effects.playOnAwake = false;
             pitched = go.AddComponent<AudioSource>();
             pitched.playOnAwake = false;
+            ambience = go.AddComponent<AudioSource>();
+            ambience.loop = true;
+            ambience.playOnAwake = false;
             go.AddComponent<SoundClock>().OnTick = Tick;
             current = Music.None;
+            wantedAmbience = playingAmbience = Ambience.None;
             resumeAt = -1f;
             fadingIn = false;
             return true;

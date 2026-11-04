@@ -314,6 +314,8 @@ namespace WordRPG.UI
             return true;
         }
 
+        private void OnDestroy() => Sound.SetAmbience(Ambience.None); // 타이틀로 나가면 환경음도 멈춤 (소리 오브젝트는 씬이 바뀌어도 남음)
+
         private void Update()
         {
             if (!initialized) return;
@@ -339,6 +341,7 @@ namespace WordRPG.UI
             tabletView.Tick(Time.unscaledDeltaTime);
             stoneView.Tick(Time.unscaledDeltaTime);
             UpdateRaft();
+            Sound.SetAmbience(ThemeLooks.AmbienceNow(area.Theme, walker.Rafting, Sound.CurrentMusic == AreaMusic));
 
             if (inBattle || transitioning || IsPanelOpen)
             {

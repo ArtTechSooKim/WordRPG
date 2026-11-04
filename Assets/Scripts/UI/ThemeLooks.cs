@@ -29,8 +29,9 @@ namespace WordRPG.UI
         public FieldTile BattleFloor { get; } // 전투 배경 바닥 칸 (벽은 늘 그 테마의 Wall 그림)
         public FogLook? Fog { get; }          // 몬스터 칸을 덮는 바닥 안개 (없으면 null — FieldFog)
         public bool Dark { get; }             // 어두운 지역 (FieldDarkness — 빛 규칙 CaveLight)
+        public Ambience Ambience { get; }     // BGM 밑에 깔리는 환경음 (#193)
 
-        public ThemeLook(FieldTheme theme, Music music, Music[] battleMusic, Music bossMusic, Color outside, FieldTile battleFloor, FogLook? fog = null, bool dark = false)
+        public ThemeLook(FieldTheme theme, Music music, Music[] battleMusic, Music bossMusic, Color outside, FieldTile battleFloor, FogLook? fog = null, bool dark = false, Ambience ambience = Ambience.None)
         {
             Theme = theme;
             Music = music;
@@ -40,6 +41,7 @@ namespace WordRPG.UI
             BattleFloor = battleFloor;
             Fog = fog;
             Dark = dark;
+            Ambience = ambience;
         }
 
         // turn = 지금까지 시작한 전투 수
@@ -56,10 +58,10 @@ namespace WordRPG.UI
         {
             new ThemeLook(FieldTheme.Meadow, Music.Meadow, new[] { Music.BattleMeadow }, Music.Boss, new Color(0.10f, 0.22f, 0.12f), FieldTile.Grass), // 초원엔 보스가 없음
             new ThemeLook(FieldTheme.Library, Music.Library, new[] { Music.BattleLibrary }, Music.BossLibrary, new Color(0.12f, 0.08f, 0.06f), FieldTile.Floor, // 서고 전투 바닥 = 돌바닥
-                fog: new FogLook(new Color32(206, 218, 232, 255), new Color32(150, 168, 192, 255), 0.5f)),   // 옅은 푸른 회색 바닥 안개 (#103)
-            new ThemeLook(FieldTheme.Forest, Music.Forest, new[] { Music.BattleForest }, Music.BossForest, new Color(0.05f, 0.14f, 0.08f), FieldTile.Grass),   // 숲 전투 바닥 = 고사리
-            new ThemeLook(FieldTheme.Jungle, Music.Jungle, new[] { Music.BattleJungle }, Music.BossJungle, new Color(0.03f, 0.12f, 0.07f), FieldTile.Grass),
-            new ThemeLook(FieldTheme.Cave, Music.Cave, new[] { Music.BattleCave, Music.BattleCave2 }, Music.BossCave, new Color(0.02f, 0.02f, 0.04f), FieldTile.Grass, dark: true), // 맵 밖은 캄캄 (#112)
+                fog: new FogLook(new Color32(206, 218, 232, 255), new Color32(150, 168, 192, 255), 0.5f), ambience: Ambience.Library),   // 옅은 푸른 회색 바닥 안개 (#103)
+            new ThemeLook(FieldTheme.Forest, Music.Forest, new[] { Music.BattleForest }, Music.BossForest, new Color(0.05f, 0.14f, 0.08f), FieldTile.Grass, ambience: Ambience.Forest),   // 숲 전투 바닥 = 고사리
+            new ThemeLook(FieldTheme.Jungle, Music.Jungle, new[] { Music.BattleJungle }, Music.BossJungle, new Color(0.03f, 0.12f, 0.07f), FieldTile.Grass, ambience: Ambience.Jungle),
+            new ThemeLook(FieldTheme.Cave, Music.Cave, new[] { Music.BattleCave, Music.BattleCave2 }, Music.BossCave, new Color(0.02f, 0.02f, 0.04f), FieldTile.Grass, dark: true, ambience: Ambience.Cave), // 맵 밖은 캄캄 (#112)
         };
 
         private static readonly Dictionary<FieldTheme, ThemeLook> ByTheme = Build();
@@ -70,6 +72,10 @@ namespace WordRPG.UI
         public static ThemeLook Of(FieldTheme theme) => ByTheme.TryGetValue(theme, out var look) ? look : ByTheme[FieldTheme.Meadow];
 
         public static bool Has(FieldTheme theme) => ByTheme.ContainsKey(theme);
+
+        // 지금 깔 환경음 (#193): 지역 BGM이 나올 때만 (전투·입장 영상·캐릭터 고르기엔 없음 — 전투엔 기술 소리가 묻히지 않게 #167), 뗏목을 타면 강물
+        public static Ambience AmbienceNow(FieldTheme theme, bool rafting, bool areaMusicPlaying) =>
+            !areaMusicPlaying ? Ambience.None : rafting ? Ambience.Raft : Of(theme).Ambience;
 
         private static Dictionary<FieldTheme, ThemeLook> Build()
         {

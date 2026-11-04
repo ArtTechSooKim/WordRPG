@@ -33,6 +33,22 @@ namespace WordRPG.Tests
             }
         }
 
+        // 환경음 (#193): 파일이 저장소에 있고(CC0), 음악처럼 스트리밍·스테레오로 가져옴
+        [Test]
+        public void EveryAmbienceHasAStreamedStereoClip()
+        {
+            foreach (Ambience sound in Enum.GetValues(typeof(Ambience)))
+            {
+                if (sound == Ambience.None) continue;
+                string path = "Audio/Ambience/" + sound.ToString().ToLowerInvariant();
+                var clip = Resources.Load<AudioClip>(path);
+                Assert.IsNotNull(clip, $"Resources/{path} 없음");
+                Assert.AreEqual(AudioClipLoadType.Streaming, clip.loadType, $"{sound}: 스트리밍");
+                Assert.AreEqual(2, clip.channels, $"{sound}: 스테레오");
+                Assert.Greater(clip.length, 10f, $"{sound}: 길이 — 너무 짧으면 반복이 티 남");
+            }
+        }
+
         // 지역 전투곡·보스곡 (#166): 이 컴퓨터에 Licensed 파일이 있으면 음악으로 제대로 가져왔는지 (없으면 대신 틀 곡이 나므로 통과).
         // 효과음처럼 가져오면 곡 하나가 통째로 메모리에 올라가고 모노가 됨
         [Test]
