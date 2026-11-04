@@ -31,9 +31,10 @@ COMPARE = 4.0      # 이음새 뒤와 곡 처음을 비교하는 길이(초)
 TRACKS = {
     "battlemeadow": ("round3_raw/01_초원전투_1.mp3", BATTLE),
     "battlelibrary": ("round3_raw/02_서고전투_2.mp3", BATTLE),
-    "battleforest": ("round3_raw/03_숲전투_1.mp3", BATTLE),
+    "battleforest": ("round6_raw/03_숲전투_4.mp3", BATTLE),  # 처음 고른 03_숲전투_1은 너무 통통 튐 (#170·#171 사용자). 03_숲전투_3은 나중에 쓸 곡
     "battlejungle": ("round2_raw/04_정글_전투.mp3", BATTLE),
     "battlecave": ("round2_raw/03_숲_전투.mp3", BATTLE),  # 처음 숲 곡으로 만들었는데 사용자가 동굴에 어울린다고 함 (#165)
+    "battlecave2": ("round2_raw/05_동굴_전투.mp3", BATTLE),  # 동굴은 두 곡을 번갈아 (#171 사용자)
     "bosslibrary": ("round4_raw/06_서고보스_까먹대왕.mp3", BOSS),
     "bossforest": ("round4_raw/07_숲보스_헷갈너구리.mp3", BOSS),
     "bossjungle": ("round2_raw/08_정글보스_빈칸두꺼비.mp3", BOSS),
@@ -44,6 +45,8 @@ TRACKS = {
 LIGHT, STRONG = (8, 3, 0.45, 10000), (6, 5, 0.8, 8000)  # 8비트 가공: 비트 · 건너뛰는 표본 · 섞는 비율 · 고음 자르기 Hz. 사막 A·B는 STRONG (#165)
 TWEAKS = {
     "battlemeadow": {"speed": 1.18, "careful": True},  # 사용자가 후보 A·B·C 중 B를 고름 (#168)
+    "battleforest": {"careful": True},
+    "battlecave2": {"careful": True},
 }
 
 

@@ -10,7 +10,7 @@ namespace WordRPG.UI
         None, Title, Meadow, Library, Battle, Boss, Forest, Jungle, Cave, Intro, HeroSelect,
         // 지역마다 다른 전투곡·보스곡 (#166 — 어느 지역이 어느 곡인지는 테마 표 ThemeLooks). 파일은 Licensed 폴더에만 있음(깃 제외) →
         // 없으면 Battle·Boss로 대신 남 (Sound.FallbackOf). 이름은 Battle…·Boss…로 시작할 것. 곡 다듬기 = Tools/prepare_music.py
-        BattleMeadow, BattleLibrary, BattleForest, BattleJungle, BattleCave, BossLibrary, BossForest, BossJungle, BossCave
+        BattleMeadow, BattleLibrary, BattleForest, BattleJungle, BattleCave, BossLibrary, BossForest, BossJungle, BossCave, BattleCave2
     }
 
     public enum Sfx

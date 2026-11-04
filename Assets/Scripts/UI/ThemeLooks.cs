@@ -59,7 +59,7 @@ namespace WordRPG.UI
                 fog: new FogLook(new Color32(206, 218, 232, 255), new Color32(150, 168, 192, 255), 0.5f)),   // 옅은 푸른 회색 바닥 안개 (#103)
             new ThemeLook(FieldTheme.Forest, Music.Forest, new[] { Music.BattleForest }, Music.BossForest, new Color(0.05f, 0.14f, 0.08f), FieldTile.Grass),   // 숲 전투 바닥 = 고사리
             new ThemeLook(FieldTheme.Jungle, Music.Jungle, new[] { Music.BattleJungle }, Music.BossJungle, new Color(0.03f, 0.12f, 0.07f), FieldTile.Grass),
-            new ThemeLook(FieldTheme.Cave, Music.Cave, new[] { Music.BattleCave }, Music.BossCave, new Color(0.02f, 0.02f, 0.04f), FieldTile.Grass, dark: true), // 맵 밖은 캄캄 (#112)
+            new ThemeLook(FieldTheme.Cave, Music.Cave, new[] { Music.BattleCave, Music.BattleCave2 }, Music.BossCave, new Color(0.02f, 0.02f, 0.04f), FieldTile.Grass, dark: true), // 맵 밖은 캄캄 (#112)
         };
 
         private static readonly Dictionary<FieldTheme, ThemeLook> ByTheme = Build();

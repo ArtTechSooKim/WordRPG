@@ -67,6 +67,7 @@ namespace WordRPG.Tests
             Assert.AreEqual(Music.BattleCave, look.BattleTrack(false, 1));
             Assert.AreEqual(Music.BattleMeadow, look.BattleTrack(false, 2), "번갈아");
             Assert.AreEqual(Music.BossCave, look.BattleTrack(true, 1));
+            CollectionAssert.AreEqual(new[] { Music.BattleCave, Music.BattleCave2 }, ThemeLooks.Of(FieldTheme.Cave).BattleMusic, "동굴은 두 곡을 번갈아 (#171 사용자)");
         }
 
         [Test]
