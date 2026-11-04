@@ -258,7 +258,7 @@ Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow
                         build_intro_video.py (입장 영상: Flow 컷 이어 붙이기·Veo 표시 잘라냄·자막표 → Resources/Video, imageio-ffmpeg 필요, #129 —
                         컷 원본은 저장소 밖 Builds/cinematic_pixellab/Videos, release-1.1 폴더에선 그 경로를 인자로),
                         ad_motion/ (광고 영상: edit.jsx = Higgsedit 모션그래픽, pack_skill_clips.py·pack_adventure.py·pack_real.py = PlayMode AdCapture로 찍은 기술 연출·모험·실제 시간 장면 묶기, cut_cells.sh = 4분할 칸 자르기, mix_audio.py = 팩 소리 넣기, make_landscape.py = 가로판, skill_sound_preview.py = 기술 소리 미리보기 영상(#164) — 작업메모 #154·#155·#157~#161),
-                        cinematic_storyboard.py (입장 시네마틱 7컷 = 영화 구도 스케치 → Builds/cinematic_v2, Figma 'Cinematic (#128)' — Flow img to img로 영상, #128)
+                        pixelize_stills.py (영상용 그림을 입장 영상 컷과 같은 도트로: 224×400·48색 → 1080×1920, #187), cinematic_storyboard.py (입장 시네마틱 7컷 = 영화 구도 스케치 → Builds/cinematic_v2, Figma 'Cinematic (#128)' — Flow img to img로 영상, #128)
 ```
 
 ## 명령어

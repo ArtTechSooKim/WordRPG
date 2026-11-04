@@ -52,6 +52,8 @@ LATER = {
     "battledesert": ("desert_battle_A_v2.mp3", BATTLE, {"crush": STRONG, "careful": True}),  # 사막 전투는 A·B 번갈아, 사용자가 '강하게'를 고름 (#165)
     "battledesert2": ("desert_battle_B_v2.5.mp3", BATTLE, {"crush": STRONG, "careful": True}),
     "bossdesert": ("round7_raw/사막보스.mp3", BOSS, {"crush": STRONG, "careful": True}),
+    "bossdesertmid": ("round11_raw/사막중간보스_A.mp3", BOSS, {"crush": STRONG, "careful": True}),  # 중간 보스 후보 A·B (#187) — 사용자가 고르면 하나만 남김
+    "bossdesertmid2": ("round11_raw/사막중간보스_B.mp3", BOSS, {"crush": STRONG, "careful": True, "min_start": 30.0, "max_start": 34.0, "min_length": 20.0}),  # 앞 30초가 조용해서 커진 뒤로만 반복
     "desert": ("round7_raw/사막배경.mp3", FIELD, {"careful": True}),
     "oasis": ("round7_raw/오아시스_2.mp3", FIELD, {"careful": True}),  # 사용자: 조금 덜 리드미컬하게, 새 곡으로 정함 (#173·#174)
     "snow": ("round7_raw/설원배경.mp3", FIELD, {"careful": True, "max_start": 25.0, "min_length": 28.0}),  # 앞이 조용한 곡은 반복을 뒤쪽에서 (#172)
@@ -145,7 +147,7 @@ def crush(x, level):
     return np.frombuffer(raw, dtype=np.float32).reshape(-1, 2).copy()
 
 
-def find_loop_careful(x, max_start=8.0, min_length=MIN_LENGTH):
+def find_loop_careful(x, max_start=8.0, min_length=MIN_LENGTH, min_start=0.0):
     """시작 자리도 함께 찾고(앞의 도입을 건너뜀), 음량·대역이 다른 자리는 점수를 깎음 (find_loop는 모양만 봐서 음량이 달라도 높게 나옴)"""
     rate = 11025
     mono = np.interp(np.arange(0, len(x), SR / rate), np.arange(len(x)), x.mean(axis=1))
@@ -156,7 +158,7 @@ def find_loop_careful(x, max_start=8.0, min_length=MIN_LENGTH):
     means = parts.mean(axis=1)
     norm = (parts - parts.mean(axis=(1, 2), keepdims=True)) / (parts.std(axis=(1, 2), keepdims=True) + 1e-9)
     candidates = []
-    for s in range(0, int(max_start * fps), 5):
+    for s in range(int(min_start * fps), int(max_start * fps), 5):
         head = f[s:s + length]
         h = (head - head.mean()) / (head.std() + 1e-9)
         scores = (norm * h).mean(axis=(1, 2))
@@ -195,7 +197,7 @@ def make_loop_even(x, start, end):
     return out, rho
 
 
-def process(file, target, src, speed=1.0, crush_level=None, careful=False, max_start=8.0, min_length=MIN_LENGTH):
+def process(file, target, src, speed=1.0, crush_level=None, careful=False, max_start=8.0, min_length=MIN_LENGTH, min_start=0.0):
     """원본 하나 → 반복되는 곡 (음량까지 맞춤). 돌려주는 값: 곡, 비슷한 정도, 설명"""
     x = decode(os.path.join(src, file), speed=speed)
     if crush_level:
@@ -203,7 +205,7 @@ def process(file, target, src, speed=1.0, crush_level=None, careful=False, max_s
     start, stop = usable_range(x)
     x = x[start:stop]
     if careful:
-        s, end, score = find_loop_careful(x, max_start, min_length)
+        s, end, score = find_loop_careful(x, max_start, min_length, min_start)
         loop, rho = make_loop_even(x, s, end)
         note = f"시작 {s / SR:.2f}초 · 겹침 닮은 정도 {rho:.2f}"
     else:
@@ -234,7 +236,7 @@ def make_later(src):
     folder = os.path.join(ROOT, "Builds", "music_pilot", "later")
     os.makedirs(folder, exist_ok=True)
     for name, (file, target, tweak) in LATER.items():
-        loop, score, note = process(file, target, src, tweak.get("speed", 1.0), tweak.get("crush"), tweak.get("careful", False), tweak.get("max_start", 8.0), tweak.get("min_length", MIN_LENGTH))
+        loop, score, note = process(file, target, src, tweak.get("speed", 1.0), tweak.get("crush"), tweak.get("careful", False), tweak.get("max_start", 8.0), tweak.get("min_length", MIN_LENGTH), tweak.get("min_start", 0.0))
         path = os.path.join(folder, name + ".wav")
         write_wav(path, loop)
         two = 2 * SR
