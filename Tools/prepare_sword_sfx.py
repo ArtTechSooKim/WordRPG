@@ -12,7 +12,6 @@
 import glob
 import os
 import re
-import shutil
 import subprocess
 import sys
 import wave
@@ -32,17 +31,6 @@ TOP = -5.0  # 들어 올려도 이 최고 음량을 넘지 않음 (지금 카칭
 TONE = "highshelf=f=4000:g=-8,lowpass=f=10000"
 FIRST_SOUND = 0.02  # 최고 크기의 이만큼(-34dB)을 넘는 곳을 첫소리로
 LONGEST = 0.9
-
-# 씽 + 지금 카칭 조합 (#181 사용자: 씽 10을 지금 소리와 조합해 보고 싶어). 이름 = (씽 번호, 지금 소리 dB, 씽 dB, 지금 소리를 늦추는 시간(초))
-# 지금 카칭 원본은 make_preempt_sfx.py가 만든 소리. Sfx/preempt.wav를 바꿔도 다시 합칠 수 있게 처음 한 번 복사해 둠
-NOW_PREEMPT = os.path.join(ROOT, "Assets", "Resources", "Audio", "Sfx", "preempt.wav")
-NOW_COPY = os.path.join(SRC, "now_preempt_original.wav")
-MIX_TOP = -1.4  # 지금 카칭의 최고 음량을 넘지 않음
-MIXES = {
-    "mix_together": ("10", -3.0, 2.0, 0.0),  # 같이 시작, 비슷한 크기
-    "mix_shing": ("10", -7.0, 4.0, 0.0),  # 같이 시작, 씽이 더 큼
-    "mix_landing": ("10", -3.0, 2.0, 0.24),  # 씽이 먼저 긁히고 가장 커질 때(0.24초) 카칭이 떨어짐
-}
 
 
 def decode(path):
@@ -90,28 +78,9 @@ def save(name, x):
     print(f"{name:>12}  {len(x) / SR:4.2f}초  최고 {db(np.abs(x).max()):5.1f}dB  평균 {db(np.sqrt(np.mean(x ** 2))):5.1f}dB")
 
 
-def mix(shing, now_db, shing_db, now_delay):
-    now = decode(NOW_COPY) * 10 ** (now_db / 20)
-    moved = shing * 10 ** (shing_db / 20)
-    start = int(now_delay * SR)
-    x = np.zeros((max(len(moved), start + len(now)), 2), dtype=np.float32)
-    x[:len(moved)] += moved
-    x[start:start + len(now)] += now
-    x = x * 10 ** (min(0.0, MIX_TOP - db(np.abs(x).max())) / 20)
-    fade = min(int(0.04 * SR), len(x))
-    x[-fade:] *= np.linspace(1, 0, fade)[:, None]
-    return x
-
-
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
     os.makedirs(OUT, exist_ok=True)
-    if not os.path.exists(NOW_COPY):
-        shutil.copyfile(NOW_PREEMPT, NOW_COPY)
-    made = {}
     for path in sorted(glob.glob(os.path.join(SRC, FILES)), key=lambda p: int(re.search(r"\.(\d+)\.ogg", p)[1])):
         number = re.search(r"\.(\d+)\.ogg", path)[1]
-        made[number] = make(path)
-        save(number, made[number])
-    for name, (number, now_db, shing_db, now_delay) in MIXES.items():
-        save(name, mix(made[number], now_db, shing_db, now_delay))
+        save(number, make(path))
