@@ -254,7 +254,7 @@ Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow
                         check_android_bundle.py (구글플레이에 올리기 전 AAB 검사: 대상 API·게임 표시·뒤로 가기·권한·16KB 페이지·크기 #149),
                         build_intro_video.py (입장 영상: Flow 컷 이어 붙이기·Veo 표시 잘라냄·자막표 → Resources/Video, imageio-ffmpeg 필요, #129 —
                         컷 원본은 저장소 밖 Builds/cinematic_pixellab/Videos, release-1.1 폴더에선 그 경로를 인자로),
-                        ad_motion/ (광고 영상: edit.jsx = Higgsedit 모션그래픽, pack_skill_clips.py = PlayMode AdCapture로 찍은 기술 연출 묶기, mix_audio.py = 팩 소리 넣기 — 작업메모 #154·#155),
+                        ad_motion/ (광고 영상: edit.jsx = Higgsedit 모션그래픽, pack_skill_clips.py·pack_adventure.py = PlayMode AdCapture로 찍은 기술 연출·모험 장면 묶기, cut_cells.sh = 4분할 칸 자르기, mix_audio.py = 팩 소리 넣기 — 작업메모 #154·#155·#157·#158),
                         cinematic_storyboard.py (입장 시네마틱 7컷 = 영화 구도 스케치 → Builds/cinematic_v2, Figma 'Cinematic (#128)' — Flow img to img로 영상, #128)
 ```
 

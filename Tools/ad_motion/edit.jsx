@@ -75,14 +75,29 @@ function Cell({h,x,y,at,dur,w=535,hh=590}){
     <rect x={0} y={0} width={w} height={hh} radius={22} fill="#FFFFFF00" strokeColor={GOLD} strokeWidth={8}/>
   </frame>;
 }
+// 제목 한 줄: 박자마다 톡톡 (읽을 글은 이것만)
+function BeatHead({s,at,len,color=GOLD}){
+  return <frame x={0} y={130} width={W} height={240} layout="none" origin="center" at={at} duration={len}
+    animate={[{property:"scale",repeat:Math.floor(len/BEAT+0.001)-1,keyframes:[{at:0,value:1.1,easing:"ease-out"},{at:0.16,value:1},{at:BEAT-0.02,value:1},{at:BEAT,value:1.1}]}]}>
+    <Stamp s={s} cx={540} cy={120} size={140} color={color} at={0} dur={len-0.02}/>
+  </frame>;
+}
+// 필드 장면: z=1.3이면 주인공이 가운데 위쪽, 위 HUD는 제목 뒤로·스틱은 화면 밖 / z=1이면 선제공격 창이 다 들어옴
+function FieldShot({h,at,dur,z=1.3,y=-462}){
+  return <frame x={0} y={0} width={W} height={H} layout="none" clip={true} at={at} duration={dur}>
+    <media file={h} x={(W-W*z)/2} y={y} width={W*z} height={2346*z} fit="fill"
+      animate={[{property:"scale",keyframes:[{at:0,value:1.05,easing:"ease-out"},{at:0.14,value:1},{at:dur-0.01,value:1}]}]}/>
+  </frame>;
+}
 export default async ({project})=>{
   const p=await project({size:"1080x1920",fps:30,background:NAVY});
   const A=n=>p.add("assets/"+n);
   const quiz=await A("2_quiz.jpg"),fin=await A("4_finisher.jpg"),cave=await A("8_cave.jpg"),field=await A("1_field.jpg"),sum=await A("5_summary.jpg"),reel=await A("skills_reel.mp4"),icon=await A("icon.png");
   const b1=await A("boss_forget_king.png"),b2=await A("boss_muddle_raccoon.png"),b3=await A("boss_blank_frog.png"),b4=await A("boss_ellipsis_vine.png");
+  const advWalk=await A("adv_walk.mp4"),advRaft=await A("adv_raft.mp4"),advCave=await A("adv_cave.mp4"),advPreempt=await A("adv_preempt.mp4");
   const cells={};
   for(const g of GRIDS)for(const [clip] of g)cells[clip]=await A("cell_"+clip+".mp4");
-  const LATE=3.04,T=18+LATE;
+  const LATE=3.04,LATE2=5.88,T=18+LATE2;
   let kids=[];
   const add=(...n)=>kids.push(...n.flat());
   // 1 문제 도전 0~3.6
@@ -116,29 +131,32 @@ export default async ({project})=>{
       c+=BEAT*2;
     });
     const len=c-REEL_AT;
-    add(<frame key="rhead" x={0} y={130} width={W} height={240} layout="none" origin="center" at={REEL_AT} duration={len}
-      animate={[{property:"scale",repeat:Math.floor(len/BEAT)-1,keyframes:[{at:0,value:1.1,easing:"ease-out"},{at:0.16,value:1},{at:BEAT-0.02,value:1},{at:BEAT,value:1.1}]}]}>
-      <Stamp s="신나는 전투!" cx={540} cy={120} size={140} color={GOLD} at={0} dur={len-0.02}/>
-    </frame>);
+    add(<BeatHead key="rhead" s="신나는 전투!" at={REEL_AT} len={len}/>);
     add(Wipe({at:c-0.22,seed:26}));
   }
   const early=kids; kids=[];
   // 3 콤보 6.45~9.2
-  add(<Game key="g3" h={fin} at={6.45} dur={2.9} y={140} hits={[7.95]} zoom={[1.0,1.05]}/>,<Scrim key="s3" at={6.45} dur={2.9} h={500}/>);
-  add(<Stamp key="c0" s="맞힐수록 더 세게!" cx={540} cy={215} size={106} at={6.55} dur={2.6} color={WHITE}/>);
+  add(<Game key="g3" h={fin} at={6.45} dur={3.05} y={140} hits={[7.95]} zoom={[1.0,1.05]}/>,<Scrim key="s3" at={6.45} dur={2.9} h={500}/>);
+  add(<Stamp key="c0" s="맞힐수록 더 세게!" cx={540} cy={215} size={106} at={6.55} dur={2.75} color={WHITE}/>);
   const combo=[[1,6.8],[2,7.0],[3,7.18],[4,7.34],[5,7.48],[6,7.6],[7,7.72]];
-  combo.forEach(([n,t],i)=>{const end=i<combo.length-1?combo[i+1][1]:9.15;add(<Stamp key={"c"+n} s={`콤보 ${n}`} cx={540} cy={1235} size={110+n*10} color={n>=6?RED:n>=4?"#FF9A3D":GOLD} at={t} dur={end-t} from={1.45}/>);});
+  combo.forEach(([n,t],i)=>{const end=i<combo.length-1?combo[i+1][1]:9.3;add(<Stamp key={"c"+n} s={`콤보 ${n}`} cx={540} cy={1235} size={110+n*10} color={n>=6?RED:n>=4?"#FF9A3D":GOLD} at={t} dur={end-t} from={1.45}/>);});
   add(<Flash key="f4" at={7.95} o={0.9}/>,...Burst({cx:540,cy:760,at:7.95,seed:41,n:44,spread:760,colors:[GOLD,RED,WHITE]}));
-  add(Wipe({at:9.0,seed:23}));
-  // 4 몽타주 9.25~11.9
-  add(<Game key="g4" h={field} at={9.25} dur={0.9} y={-120} zoom={[1.0,1.06]}/>,<Pill key="p4" s="넓은 맵을 탐험하고" cy={300} at={9.3} dur={0.85}/>);
-  add(<Flash key="f5" at={10.15} o={0.6}/>,<Game key="g5" h={cave} at={10.15} dur={0.9} y={-120} zoom={[1.06,1.0]}/>,<Pill key="p5" s="어두운 동굴을 밝히고" cy={300} at={10.2} dur={0.85} bg={WHITE}/>);
-  add(<Flash key="f6" at={11.05} o={0.6}/>,<Game key="g6" h={sum} at={11.05} dur={1.0} y={-60} zoom={[1.0,1.04]}/>,<Pill key="p6" s="틀린 단어는 곧 다시 나와요" cy={300} at={11.1} dur={0.95} w={940} size={58} color={WHITE} bg={RED}/>);
-  add(Wipe({at:11.85,seed:24}));
+  add(Wipe({at:9.22,seed:23}));
+  // 4 모험 — 실제 게임 화면 (사용자: 아라랑 정글, 뗏목, 선제공격). 묶음 시간 9.45 = 음악 박자 위
+  {
+    const A0=9.45; let c=A0;
+    add(<FieldShot key="adv1" h={advWalk} at={c} dur={BEAT*3}/>); c+=BEAT*3;
+    add(<Flash key="adf1" at={c} o={0.3} d={0.12}/>,<FieldShot key="adv2" h={advRaft} at={c} dur={BEAT*3}/>); c+=BEAT*3;
+    add(<Flash key="adf2" at={c} o={0.3} d={0.12}/>,<FieldShot key="adv3" h={advCave} at={c} dur={BEAT*2}/>); c+=BEAT*2;
+    add(<rect key="adsc" x={0} y={0} width={W} height={470} at={A0} duration={c-A0} fill={{kind:"linear",angle:180,stops:[{offset:0,color:NAVY,opacity:0.98},{offset:0.88,color:NAVY,opacity:0.98},{offset:1,color:NAVY,opacity:0}]}}/>,<BeatHead key="adh" s="신나는 모험!" at={A0} len={c-A0} color="#7BF29A"/>);
+    add(<Flash key="adf3" at={c} o={0.3} d={0.12}/>,<FieldShot key="adv4" h={advPreempt} at={c} dur={BEAT*3} z={1} y={-250}/>); c+=BEAT*3;
+    add(Wipe({at:c-0.22,seed:24}));
+  }
+  const mid=kids; kids=[];
   // 5 보스 12.1~14.5
   add(<rect key="bg5" x={0} y={0} width={W} height={H} fill={{kind:"radial",stops:[{offset:0,color:"#2B3158"},{offset:1,color:NAVY}]}} at={12.1} duration={2.55}/>);
   add(<Stamp key="b0" s="단어를 노리는 보스들" cx={540} cy={330} size={98} color={GOLD} at={12.15} dur={2.45}/>);
-  add(<BossCard key="b1" h={b1} name="까먹대왕" x={50} y={470} at={12.45} dur={2.15} rot={-8}/>,<BossCard key="b2" h={b2} name="헷갈너구리" x={560} y={470} at={12.75} dur={1.85} rot={8}/>,<BossCard key="b3" h={b3} name="빈칸두꺼비" x={50} y={1020} at={13.05} dur={1.55} rot={8}/>,<BossCard key="b4" h={b4} name="말줄임덩굴" x={560} y={1020} at={13.35} dur={1.25} rot={-8}/>);
+  add(<BossCard key="b1" h={b1} name="까먹대왕" x={50} y={470} at={12.6} dur={2.0} rot={-8}/>,<BossCard key="b2" h={b2} name="헷갈너구리" x={560} y={470} at={12.85} dur={1.75} rot={8}/>,<BossCard key="b3" h={b3} name="빈칸두꺼비" x={50} y={1020} at={13.1} dur={1.5} rot={8}/>,<BossCard key="b4" h={b4} name="말줄임덩굴" x={560} y={1020} at={13.35} dur={1.25} rot={-8}/>);
   add(Wipe({at:14.42,seed:25}));
   // 6 엔드 카드 14.65~18
   const r=rng(99);
@@ -151,5 +169,5 @@ export default async ({project})=>{
   add(<Stamp key="e3" s="교육과정 필수 어휘로 싸우는 RPG" cx={540} cy={1105} size={46} color={DIM} sw={8} at={15.4} dur={2.59} from={1.1}/>);
   add(<Pill key="e4" s="앱스토어에서 무료로 시작" cy={1265} at={15.6} dur={2.39} w={860} h={132} size={66} from={1200}/>);
   add(<Stamp key="e5" s="숲 지역부터 정식판 (앱 내 구매)" cx={540} cy={1395} size={38} color={DIM} sw={6} at={15.8} dur={2.19} from={1}/>);
-  p.compose(<frame width={W} height={H} layout="none">{early}<frame x={0} y={0} width={W} height={H} layout="none" at={LATE} duration={18}>{kids}</frame></frame>,{at:0,dur:T,name:"ad"});
+  p.compose(<frame width={W} height={H} layout="none">{early}<frame x={0} y={0} width={W} height={H} layout="none" at={LATE} duration={15.3}>{mid}</frame><frame x={0} y={0} width={W} height={H} layout="none" at={LATE2} duration={18}>{kids}</frame></frame>,{at:0,dur:T,name:"ad"});
 };
