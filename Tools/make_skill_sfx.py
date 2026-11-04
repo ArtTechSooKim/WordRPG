@@ -9,6 +9,7 @@
 GuardBubble은 원래 있던 shield 소리를 그대로 씀 (막음과 같은 소리, 지금 이 연출을 쓰는 기술은 없음).
 #165 사용자: "전체적으로 하이를 깎으면 좋겠어, 귀가 너무 아파" → 모든 소리에 TONE을 씀. 순서가 중요: 최고 음량을 맞춘 '다음에' 깎는다
 (깎은 뒤에 맞추면 날카로운 소리만 도로 커져서 효과가 없음). 더 깎으려면 TONE 숫자만 바꿔 다시 돌리면 됨.
+#167 사용자: "스킬 이펙트가 BGM에 많이 묻힘" → 깎은 뒤 LIFT_MAX까지 들어 올림 + 곡 음량을 낮춤(Tools/prepare_music.py).
 """
 import os
 import re
@@ -25,22 +26,23 @@ FF = imageio_ffmpeg.get_ffmpeg_exe()
 
 SLASH, HIT, MAGIC, ELEMENT, BONUS, ALERT, BOUNCE = "Whoosh & Slash", "Hit & Impact", "Magic & Skill", "Elemental", "Bonus", "Alert", "Jump & Bounce"
 PEAK = -7.0  # 팩 소리들의 최고 음량과 같게
-TONE = "highshelf=f=1500:g=-12,lowpass=f=4600"  # 2kHz 근처 위(귀가 가장 예민한 곳)를 깎음 — #165, #166 사용자: 1.2배 더 (깎는 양 ×1.2, 주파수 ÷1.2)
+TONE = "highshelf=f=1800:g=-10,lowpass=f=5500"  # 2kHz 위(귀가 가장 예민한 곳)를 깎음 — #165. #166에 1.2배 더 깎았더니 음악에 묻혀서 되돌림 (#167 사용자)
+LIFT_MAX = 3.0  # 깎아서 작아진 소리를 최고 음량까지 되돌리되 이만큼(dB)까지만 — 더 올리면 날카로운 소리가 도로 커짐 (#167)
 
 SOUNDS = {
     # 공격: 베는 소리 + 맞는 소리
     "skillslash": ([(SLASH, "Slash", 0, 0), (HIT, "Hit1", -8, 30)], 0, PEAK),
-    "skillclaw": ([(SLASH, "Slash3", 0, 0), (HIT, "Hit9", -8, 20)], 3750, PEAK),
+    "skillclaw": ([(SLASH, "Slash3", 0, 0), (HIT, "Hit9", -8, 20)], 4500, PEAK),
     "skillheavy": ([(HIT, "Impact5", 0, 0), (HIT, "Hit3", -6, 0)], 0, -5.0),
     "skillthunder": ([(ELEMENT, "Explosion4", 0, 0), (ELEMENT, "Fireball", -8, 0)], 0, -5.0),
     "skillink": ([(ELEMENT, "Water4", 0, 0), (ELEMENT, "Bubble2", -8, 40)], 0, PEAK),
     "skillwater": ([(ELEMENT, "Water1", 0, 0), (ELEMENT, "WaterDrop", -8, 120)], 0, PEAK),
-    "skillplant": ([(ELEMENT, "Grass", 10, 0), (SLASH, "Slash", -6, 0)], 3750, PEAK),
-    "skillwhip": ([(SLASH, "Slash5", 0, 0), (HIT, "Hit9", -6, 50)], 3750, PEAK),
+    "skillplant": ([(ELEMENT, "Grass", 10, 0), (SLASH, "Slash", -6, 0)], 4500, PEAK),
+    "skillwhip": ([(SLASH, "Slash5", 0, 0), (HIT, "Hit9", -6, 50)], 4500, PEAK),
     "skillrock": ([(HIT, "Hit7", 0, 0), (HIT, "Impact2", -6, 0)], 0, PEAK),
     "skilllight": ([(MAGIC, "Magic2", 0, 0), (BONUS, "Coin3", -12, 60)], 0, PEAK),
     "skillletters": ([(BONUS, "Coin2", 0, 0), (BONUS, "Coin2", -4, 100), (BONUS, "Coin2", -8, 200)], 0, PEAK),  # 글자가 쏟아짐
-    "skillhighlight": ([(SLASH, "Slash4", 0, 0), (ALERT, "Alert6", -10, 0)], 3750, PEAK),
+    "skillhighlight": ([(SLASH, "Slash4", 0, 0), (ALERT, "Alert6", -10, 0)], 4500, PEAK),
     "skillsound": ([(ALERT, "Alert2", 0, 0), (ALERT, "Alert2", -6, 130), (ALERT, "Alert2", -12, 260)], 0, PEAK),  # 소리 고리 세 겹
     "skillspore": ([(SLASH, "Whoosh", 6, 0), (ELEMENT, "Bubble2", -8, 40)], 0, PEAK),
     "skillswirl": ([(MAGIC, "Fx", 0, 0)], 0, PEAK),
@@ -78,7 +80,9 @@ def build(name, layers, cut, peak, sounds):
     log = render(",volumedetect", ["-f", "null", "-"])
     found = float(re.search(r"max_volume: (-?[\d.]+) dB", log).group(1))
     path = os.path.join(OUT, name + ".wav")
-    render(f",volume={peak - found:.2f}dB,{TONE}", [path])
+    chain = f",volume={peak - found:.2f}dB,{TONE}"
+    after = float(re.search(r"max_volume: (-?[\d.]+) dB", render(chain + ",volumedetect", ["-f", "null", "-"])).group(1))
+    render(chain + f",volume={max(0.0, min(LIFT_MAX, peak - after)):.2f}dB", [path])
     return path
 
 

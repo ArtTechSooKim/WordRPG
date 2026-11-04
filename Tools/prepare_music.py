@@ -22,7 +22,7 @@ OUT = os.path.join(ROOT, "Assets", "Resources", "Audio", "Licensed")
 SEAMS = os.path.join(ROOT, "Builds", "music_pilot", "이음새_확인.mp3")
 FF = imageio_ffmpeg.get_ffmpeg_exe()
 SR = 44100
-BATTLE, BOSS = -19.0, -18.0  # 음량(LUFS). 지금 지역 음악이 -13~-23이라 전투에 들어갈 때 소리가 푹 꺼지지 않게. 사용자가 듣고 바꿀 수 있음
+BATTLE, BOSS = -21.0, -20.0  # 음량(LUFS). #166에 -19·-18로 올렸더니 기술 소리가 묻혀서 낮춤 (#167 사용자). 지역 음악은 -13~-23
 FADE = 0.4         # 반복 이음새를 겹치는 길이(초)
 MIN_LENGTH = 35.0  # 이음새를 찾을 때 곡이 이보다 짧아지지 않게(초)
 COMPARE = 4.0      # 이음새 뒤와 곡 처음을 비교하는 길이(초)
@@ -39,10 +39,17 @@ TRACKS = {
     "bossjungle": ("round2_raw/08_정글보스_빈칸두꺼비.mp3", BOSS),
     "bosscave": ("round2_raw/09_동굴보스_말줄임덩굴.mp3", BOSS),
 }
+# 곡을 손본 것 (#167 사용자: 초원은 이음새가 튀고, 지금보다 덜 평온하게) — speed = 빠르기(음도 같이 올라감) · crush = 8비트 가공 · careful = 이음새를 더 꼼꼼히 찾음
+# 다른 곡은 사용자가 이음새를 확인했으므로 careful을 켜지 않음 (켜면 반복 자리가 바뀜)
+LIGHT, STRONG = (8, 3, 0.45, 10000), (6, 5, 0.8, 8000)  # 8비트 가공: 비트 · 건너뛰는 표본 · 섞는 비율 · 고음 자르기 Hz. 사막 A·B는 STRONG (#165)
+TWEAKS = {
+    "battlemeadow": {"speed": 1.10, "careful": True},
+}
 
 
-def decode(path, rate=SR, channels=2):
-    raw = subprocess.run([FF, "-nostdin", "-v", "error", "-i", path, "-f", "f32le", "-ac", str(channels), "-ar", str(rate), "-"], capture_output=True, check=True).stdout
+def decode(path, rate=SR, channels=2, speed=1.0):
+    speedup = ["-af", f"asetrate={int(SR * speed)},aresample={SR}"] if speed != 1.0 else []
+    raw = subprocess.run([FF, "-nostdin", "-v", "error", "-i", path] + speedup + ["-f", "f32le", "-ac", str(channels), "-ar", str(rate), "-"], capture_output=True, check=True).stdout
     x = np.frombuffer(raw, dtype=np.float32)
     return x.reshape(-1, channels).copy() if channels > 1 else x.copy()
 
@@ -103,6 +110,87 @@ def make_loop(x, end):
     return out
 
 
+def crush(x, level):
+    bits, hold, mix, cut = level
+    q = 2 ** (bits - 1)
+    y = np.round(x[(np.arange(len(x)) // hold) * hold] * q) / q
+    y = mix * y + (1 - mix) * x
+    pcm = (np.clip(y, -1, 1) * 32767).astype(np.int16).tobytes()
+    raw = subprocess.run([FF, "-nostdin", "-v", "error", "-f", "s16le", "-ar", str(SR), "-ac", "2", "-i", "-", "-af", f"lowpass=f={cut}", "-f", "f32le", "-"], input=pcm, capture_output=True, check=True).stdout
+    return np.frombuffer(raw, dtype=np.float32).reshape(-1, 2).copy()
+
+
+def find_loop_careful(x, max_start=8.0):
+    """시작 자리도 함께 찾고(앞의 도입을 건너뜀), 음량·대역이 다른 자리는 점수를 깎음 (find_loop는 모양만 봐서 음량이 달라도 높게 나옴)"""
+    rate = 11025
+    mono = np.interp(np.arange(0, len(x), SR / rate), np.arange(len(x)), x.mean(axis=1))
+    f, fps = features(mono, rate)
+    length = int(COMPARE * fps)
+    ends = np.arange(int(MIN_LENGTH * fps), len(f) - length)
+    parts = np.stack([f[e:e + length] for e in ends])
+    means = parts.mean(axis=1)
+    norm = (parts - parts.mean(axis=(1, 2), keepdims=True)) / (parts.std(axis=(1, 2), keepdims=True) + 1e-9)
+    candidates = []
+    for s in range(0, int(max_start * fps), 5):
+        head = f[s:s + length]
+        h = (head - head.mean()) / (head.std() + 1e-9)
+        scores = (norm * h).mean(axis=(1, 2))
+        # 대역별 음량 차이 1dB마다 0.05점 깎음 (로그 값 × 8.686 = dB)
+        scores = scores - 0.05 * 8.686 * np.abs(means - head.mean(axis=0)).mean(axis=1)
+        scores = np.where(ends >= s + int(MIN_LENGTH * fps), scores, -9.0)
+        for i in np.argsort(scores)[-3:]:
+            candidates.append((float(scores[i]), s, int(ends[i])))
+    # 점수가 높은 후보를 파형까지 맞춰 보고, 겹치는 구간이 실제로 닮고 음량이 같은 자리를 고름
+    best = None
+    fade, half = int(FADE * SR), SR // 2
+    for score, s, e in sorted(candidates, reverse=True)[:24]:
+        start, coarse = int(s / fps * SR), int(e / fps * SR)
+        n, spread = SR, int(0.03 * SR)
+        a = x[start:start + n].mean(axis=1)
+        b = x[max(coarse - spread, 0):coarse + n + spread].mean(axis=1)
+        end = max(coarse - spread, 0) + int(np.argmax(np.correlate(b, a, "valid")))
+        u, v = x[start:start + fade], x[end:end + fade]
+        rho = float((u * v).sum() / (np.sqrt((u ** 2).sum() * (v ** 2).sum()) + 1e-9))
+        gap = abs(rms_db(x[start:start + half]) - rms_db(x[end:end + half]))
+        total = score + 0.3 * rho - 0.05 * gap
+        if best is None or total > best[0]:
+            best = (total, start, end, score)
+    return best[1], best[2], best[3]
+
+
+def make_loop_even(x, start, end):
+    """겹치는 두 구간이 닮았으면 합이 커지므로(같은 소리면 +3dB) 닮은 정도만큼 줄여 음량을 일정하게 (#167 초원 이음새가 튄 원인)"""
+    fade = int(FADE * SR)
+    t = np.linspace(0, 1, fade, endpoint=False)[:, None]
+    u, v = x[start:start + fade], x[end:end + fade]
+    rho = float((u * v).sum() / (np.sqrt((u ** 2).sum() * (v ** 2).sum()) + 1e-9))
+    a, b = np.sqrt(t), np.sqrt(1 - t)
+    out = x[start:end].copy()
+    out[:fade] = (u * a + v * b) / np.sqrt(1 + 2 * rho * a * b)
+    return out, rho
+
+
+def process(file, target, src, speed=1.0, crush_level=None, careful=False):
+    """원본 하나 → 반복되는 곡 (음량까지 맞춤). 돌려주는 값: 곡, 비슷한 정도, 설명"""
+    x = decode(os.path.join(src, file), speed=speed)
+    if crush_level:
+        x = crush(x, crush_level)
+    start, stop = usable_range(x)
+    x = x[start:stop]
+    if careful:
+        s, end, score = find_loop_careful(x)
+        loop, rho = make_loop_even(x, s, end)
+        note = f"시작 {s / SR:.2f}초 · 겹침 닮은 정도 {rho:.2f}"
+    else:
+        end, score = find_loop(x)
+        loop, note = make_loop(x, end), ""
+    with tempfile.TemporaryDirectory() as tmp:
+        probe = os.path.join(tmp, "probe.wav")
+        write_wav(probe, loop)
+        loop = loop * 10 ** ((target - lufs(probe)) / 20)
+    return loop, score, note
+
+
 def lufs(path):
     log = subprocess.run([FF, "-nostdin", "-hide_banner", "-i", path, "-af", "ebur128", "-f", "null", "-"], capture_output=True, text=True, encoding="utf-8", errors="replace").stderr
     return float(re.findall(r"I:\s+(-?[\d.]+) LUFS", log)[-1])
@@ -124,15 +212,8 @@ if __name__ == "__main__":
     gap = np.zeros((SR, 2), dtype=np.float32)
     with tempfile.TemporaryDirectory() as tmp:
         for name, (file, target) in TRACKS.items():
-            x = decode(os.path.join(src, file))
-            start, stop = usable_range(x)
-            x = x[start:stop]
-            end, score = find_loop(x)
-            loop = make_loop(x, end)
-            probe = os.path.join(tmp, "probe.wav")
-            write_wav(probe, loop)
-            gain = 10 ** ((target - lufs(probe)) / 20)
-            loop = loop * gain
+            tweak = TWEAKS.get(name, {})
+            loop, score, note = process(file, target, src, tweak.get("speed", 1.0), tweak.get("crush"), tweak.get("careful", False))
             path = os.path.join(OUT, name + ".wav")
             write_wav(path, loop)
             six = 6 * SR
@@ -140,7 +221,7 @@ if __name__ == "__main__":
             jump = np.abs(loop[-1] - loop[0]).max()
             half = SR // 2
             print(f"{name:14s} {len(loop) / SR:5.1f}초  비슷함 {score:.2f}  음량 {lufs(path):.1f} LUFS  최고 {20 * np.log10(np.abs(loop).max()):5.1f}dB  "
-                  f"이음새 앞뒤 {rms_db(loop[-half:]):5.1f}/{rms_db(loop[:half]):5.1f}dB  끝-처음 차이 {jump:.3f}  {os.path.getsize(path) // (1024 * 1024)}MB")
+                  f"이음새 앞뒤 {rms_db(loop[-half:]):5.1f}/{rms_db(loop[:half]):5.1f}dB  끝-처음 차이 {jump:.3f}  {os.path.getsize(path) // (1024 * 1024)}MB  {note}")
         whole = os.path.join(tmp, "seams.wav")
         write_wav(whole, np.concatenate(seams))
         subprocess.run([FF, "-nostdin", "-y", "-v", "error", "-i", whole, "-c:a", "libmp3lame", "-b:a", "192k", SEAMS], check=True)
