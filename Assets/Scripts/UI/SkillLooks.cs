@@ -70,7 +70,7 @@ namespace WordRPG.UI
             [SkillFx.Swirl] = new SkillLook { Sound = Sfx.SkillSwirl, Motion = SkillMotion.Lunge, Hit = Fx.Spirit, Tint = new Color(0.82f, 0.62f, 1f), HitScale = 1.2f,
                 Shake = 6f },
             // 회복: 발밑 마법진 + 빛기둥 + 솟는 알갱이 + 카드가 빛남 + HP 막대가 차오름 (Hit = 카드 위에 더하는 효과)
-            [SkillFx.HealLight] = new SkillLook { Sound = Sfx.Heal, Motion = SkillMotion.Cast, Hit = Fx.Heal, Glow = new Color(0.7f, 1f, 0.55f), Particle = Fx.Spark },
+            [SkillFx.HealLight] = new SkillLook { Sound = Sfx.SkillHealLight, Motion = SkillMotion.Cast, Hit = Fx.Heal, Glow = new Color(0.7f, 1f, 0.55f), Particle = Fx.Spark },
             [SkillFx.HealLeaf] = new SkillLook { Sound = Sfx.SkillHealLeaf, Motion = SkillMotion.Cast, Hit = Fx.Heal, Glow = HealGreen, Particle = Fx.Leaf },
             [SkillFx.HealWater] = new SkillLook { Sound = Sfx.SkillHealWater, Motion = SkillMotion.Cast, Hit = Fx.WaterPillar, Glow = new Color(0.5f, 0.95f, 1f) },
             [SkillFx.Drain] = new SkillLook { Sound = Sfx.SkillDrain, Motion = SkillMotion.Cast, Hit = Fx.Spirit, Tint = new Color(0.8f, 0.5f, 1f),

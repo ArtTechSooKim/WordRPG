@@ -2,11 +2,13 @@
 
     python Tools/make_skill_sfx.py [팩 경로]   (pip install imageio-ffmpeg)
 
-표 한 줄 = 소리 이름(Sfx 열거형을 소문자로): 겹칠 소리들((팩 Sounds 아래 파일, 크기 dB, 늦게 ms)) + 고음 자르기 Hz(0 = 안 함) + 최고 음량 dB.
+표 한 줄 = 소리 이름(Sfx 열거형을 소문자로): 겹칠 소리들((팩 Sounds 아래 파일, 크기 dB, 늦게 ms)) + 고음을 더 자르기 Hz(0 = TONE만) + 최고 음량 dB.
 결과 = Assets/Resources/Audio/Sfx/skill*.wav (모노, 끝의 무음은 잘라냄). 숫자를 바꿔 다시 돌리면 됨.
 쓰는 곳 = 표 SkillLooks의 Sound 칸 — 새 기술 연출 종류를 더하면 여기 한 줄 + Sfx 열거형 맨 뒤 + SkillLooks 한 줄 (SkillLooksTests·AudioArtTests가 잡음).
 더 좋은 소리를 받으면 Resources/Audio/Licensed/{같은 이름}.wav에 두면 먼저 쓰임.
-HealLight·GuardBubble은 원래 있던 heal·shield 소리를 그대로 씀 (상처약·막음과 같은 소리)
+GuardBubble은 원래 있던 shield 소리를 그대로 씀 (막음과 같은 소리, 지금 이 연출을 쓰는 기술은 없음).
+#165 사용자: "전체적으로 하이를 깎으면 좋겠어, 귀가 너무 아파" → 모든 소리에 TONE을 씀. 순서가 중요: 최고 음량을 맞춘 '다음에' 깎는다
+(깎은 뒤에 맞추면 날카로운 소리만 도로 커져서 효과가 없음). 더 깎으려면 TONE 숫자만 바꿔 다시 돌리면 됨.
 """
 import os
 import re
@@ -23,25 +25,27 @@ FF = imageio_ffmpeg.get_ffmpeg_exe()
 
 SLASH, HIT, MAGIC, ELEMENT, BONUS, ALERT, BOUNCE = "Whoosh & Slash", "Hit & Impact", "Magic & Skill", "Elemental", "Bonus", "Alert", "Jump & Bounce"
 PEAK = -7.0  # 팩 소리들의 최고 음량과 같게
+TONE = "highshelf=f=1800:g=-10,lowpass=f=5500"  # 2kHz 위(귀가 가장 예민한 곳)를 깎음 — #165
 
 SOUNDS = {
     # 공격: 베는 소리 + 맞는 소리
     "skillslash": ([(SLASH, "Slash", 0, 0), (HIT, "Hit1", -8, 30)], 0, PEAK),
-    "skillclaw": ([(SLASH, "Slash3", 0, 0), (HIT, "Hit9", -8, 20)], 6000, PEAK),
+    "skillclaw": ([(SLASH, "Slash3", 0, 0), (HIT, "Hit9", -8, 20)], 4500, PEAK),
     "skillheavy": ([(HIT, "Impact5", 0, 0), (HIT, "Hit3", -6, 0)], 0, -5.0),
-    "skillthunder": ([(ELEMENT, "Explosion4", 0, 0), (ELEMENT, "Fireball", -8, 0)], 9000, -5.0),
+    "skillthunder": ([(ELEMENT, "Explosion4", 0, 0), (ELEMENT, "Fireball", -8, 0)], 0, -5.0),
     "skillink": ([(ELEMENT, "Water4", 0, 0), (ELEMENT, "Bubble2", -8, 40)], 0, PEAK),
     "skillwater": ([(ELEMENT, "Water1", 0, 0), (ELEMENT, "WaterDrop", -8, 120)], 0, PEAK),
-    "skillplant": ([(ELEMENT, "Grass", 10, 0), (SLASH, "Slash", -6, 0)], 7000, PEAK),
-    "skillwhip": ([(SLASH, "Slash5", 0, 0), (HIT, "Hit9", -6, 50)], 6500, PEAK),
+    "skillplant": ([(ELEMENT, "Grass", 10, 0), (SLASH, "Slash", -6, 0)], 4500, PEAK),
+    "skillwhip": ([(SLASH, "Slash5", 0, 0), (HIT, "Hit9", -6, 50)], 4500, PEAK),
     "skillrock": ([(HIT, "Hit7", 0, 0), (HIT, "Impact2", -6, 0)], 0, PEAK),
-    "skilllight": ([(MAGIC, "Magic2", 0, 0), (BONUS, "Coin3", -12, 60)], 8000, PEAK),
+    "skilllight": ([(MAGIC, "Magic2", 0, 0), (BONUS, "Coin3", -12, 60)], 0, PEAK),
     "skillletters": ([(BONUS, "Coin2", 0, 0), (BONUS, "Coin2", -4, 100), (BONUS, "Coin2", -8, 200)], 0, PEAK),  # 글자가 쏟아짐
-    "skillhighlight": ([(SLASH, "Slash4", 0, 0), (ALERT, "Alert6", -10, 0)], 6500, PEAK),
+    "skillhighlight": ([(SLASH, "Slash4", 0, 0), (ALERT, "Alert6", -10, 0)], 4500, PEAK),
     "skillsound": ([(ALERT, "Alert2", 0, 0), (ALERT, "Alert2", -6, 130), (ALERT, "Alert2", -12, 260)], 0, PEAK),  # 소리 고리 세 겹
     "skillspore": ([(SLASH, "Whoosh", 6, 0), (ELEMENT, "Bubble2", -8, 40)], 0, PEAK),
     "skillswirl": ([(MAGIC, "Fx", 0, 0)], 0, PEAK),
     # 회복
+    "skillheallight": ([(MAGIC, "Heal", 0, 0)], 0, PEAK),
     "skillhealleaf": ([(MAGIC, "Heal2", 0, 0), (ELEMENT, "Grass", 4, 40)], 0, PEAK),
     "skillhealwater": ([(ELEMENT, "Water9", -2, 0), (MAGIC, "Heal", -6, 60)], 0, PEAK),
     "skilldrain": ([(MAGIC, "Magic5", 0, 0)], 0, PEAK),
@@ -70,11 +74,11 @@ def build(name, layers, cut, peak, sounds):
         return subprocess.run([FF, "-nostdin", "-y", "-hide_banner"] + args + ["-filter_complex", full, "-map", "[out]", "-c:a", "pcm_s16le"] + target,
                               capture_output=True, text=True, encoding="utf-8", errors="replace", check=True).stderr
 
-    # 한 번 재서 최고 음량을 맞춤
+    # 한 번 재서 최고 음량을 맞춘 뒤 고음을 깎음 (TONE 설명 참고)
     log = render(",volumedetect", ["-f", "null", "-"])
     found = float(re.search(r"max_volume: (-?[\d.]+) dB", log).group(1))
     path = os.path.join(OUT, name + ".wav")
-    render(f",volume={peak - found:.2f}dB", [path])
+    render(f",volume={peak - found:.2f}dB,{TONE}", [path])
     return path
 
 

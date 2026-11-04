@@ -3,7 +3,8 @@
     python Tools/ad_motion/skill_sound_preview.py [초당 장수, 기본 19]   (pip install imageio-ffmpeg pillow)
 
 Builds/ad/skill_sounds/{번호}_{기술 id}/f0000.jpg + sfx.txt + names.txt → Builds/ad/skill_sounds_preview.mp4
-프레임이 실제로는 초당 19장쯤 찍혀서 그 속도로 묶어야 실제 게임 속도에 가깝다. 소리는 찍은 프레임 번호에 맞춰 놓는다 (배경 음악 없음 — 효과음만 잘 듣게)
+프레임이 실제로는 초당 19장쯤 찍혀서 그 속도로 묶어야 실제 게임 속도에 가깝다. 소리는 찍은 프레임 번호에 맞춰 놓는다 (배경 음악 없음 — 효과음만 잘 듣게).
+음량은 게임의 효과음 기본값(GameSettings.DefaultSfxVolume)과 같게 — #165 전에는 2배 크게 나왔음
 """
 import glob
 import os
@@ -23,6 +24,7 @@ FONT = os.path.join(ROOT, "Assets", "Resources", "UI", "Fonts", "Jua-Regular.ttf
 FF = imageio_ffmpeg.get_ffmpeg_exe()
 FPS = float(sys.argv[1]) if len(sys.argv) > 1 else 19.0
 GAP = 12  # 기술 사이 쉬는 프레임 (마지막 장을 더 보여 줌)
+SFX_VOLUME = 0.5  # GameSettings.DefaultSfxVolume
 W, H = 720, 1564
 
 
@@ -73,7 +75,7 @@ with tempfile.TemporaryDirectory() as tmp:
         args += ["-i", os.path.join(SFX, name + ".wav")]
         parts.append(f"[{i}:a]aformat=sample_rates=44100:channel_layouts=stereo,adelay={int(at * 1000)}:all=1[s{i}]")
     mix = "".join(f"[s{i}]" for i in range(len(hits)))
-    graph = ";".join(parts) + f";{mix}amix=inputs={len(hits)}:duration=longest:normalize=0,apad,atrim=0:{total:.3f},alimiter=limit=0.9[out]"
+    graph = ";".join(parts) + f";{mix}amix=inputs={len(hits)}:duration=longest:normalize=0,apad,atrim=0:{total:.3f},volume={SFX_VOLUME}[out]"
     graph_path = os.path.join(tmp, "audio.txt")
     with open(graph_path, "w", encoding="utf-8") as f:
         f.write(graph)

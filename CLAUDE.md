@@ -140,7 +140,7 @@
     - `Assets/Resources/Art/` 그림은 가져올 때 16px = 1칸, Point 필터 (`UiAssetImporter`)
     - 소리: `Sound.PlayMusic(Music.X)` / `Sound.Play(Sfx.X)`, 파일 = `Resources/Audio/Music|Sfx/{열거형 소문자}`. 음량은 설정을 따름.
       `UiKit.AddButton`/`MakeButton`은 누르면 딸깍 소리 (`clickSound: false`로 끔). 새 소리를 쓰면 열거형 + 스크립트 표에 같이 추가 (AudioArtTests가 검사). 선제공격 '카칭'(preempt)만 팩에 없어 `Tools/make_preempt_sfx.py`로 합성 (#147).
-      기술마다 다른 소리 (#164): 표 `SkillLooks` Sound 칸 → `Sfx.Skill*`, 파일은 `python Tools/make_skill_sfx.py`(팩 소리 겹치기, 표가 스크립트 안). 맞는 순간 재생, 크리티컬이면 크리티컬 소리를 겹침. 새 연출 종류는 소리도 따로 (SkillLooksTests)
+      기술마다 다른 소리 (#164): 표 `SkillLooks` Sound 칸 → `Sfx.Skill*`, 파일은 `python Tools/make_skill_sfx.py`(팩 소리 겹치기, 표가 스크립트 안). 맞는 순간 재생, 크리티컬이면 크리티컬 소리를 겹침. 새 연출 종류는 소리도 따로 (SkillLooksTests). 높은음은 스크립트의 TONE으로 깎음 (#165 사용자: 귀가 아픔 — 최고 음량을 맞춘 뒤에 깎을 것)
     - **유료 라이선스 소리(Envato Elements)**: `Resources/Audio/Licensed/{같은 이름}.wav`에 두면 팩 소리보다 먼저 쓰임. 이 폴더·받은 원본(`*-utc/`)·
       라이선스 증명서는 .gitignore — 공개 저장소에 올리면 재배포라 안 됨. 저장소엔 팩 소리가 대신 있음 (지금: newword, 작업메모 #66). 음악도 같은 방식 (#133)
     - 전투: 효과 `BattleFx`(Fx 열거형 = Art/NinjaAdventure/Fx/{소문자}.png 정사각 프레임 시트), 배경은 지역 타일(`BattleScreen.SetBackdrop`).

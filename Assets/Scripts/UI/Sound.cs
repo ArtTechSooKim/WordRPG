@@ -14,7 +14,7 @@ namespace WordRPG.UI
         // 기술마다 다른 소리 (#164 — 표 SkillLooks, 파일은 Tools/make_skill_sfx.py가 만듦)
         SkillSlash, SkillClaw, SkillHeavy, SkillThunder, SkillInk, SkillWater, SkillPlant, SkillWhip, SkillRock, SkillLight,
         SkillLetters, SkillHighlight, SkillSound, SkillSpore, SkillSwirl, SkillHealLeaf, SkillHealWater, SkillDrain,
-        SkillGuardEcho, SkillGuardBook, SkillGuardTime, SkillGuardSeed
+        SkillGuardEcho, SkillGuardBook, SkillGuardTime, SkillGuardSeed, SkillHealLight
     }
 
     // 배경 음악·효과음 (Ninja Adventure 팩 → Resources/Audio/Music·Sfx, 파일 이름 = 열거형 이름 소문자).
