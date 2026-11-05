@@ -6,7 +6,8 @@
   heading  = 그 줄부터 시작하는 묶음의 제목 (비어 있으면 앞 묶음이 이어짐)
 
   python Tools/journal_lines.py            검사만
-  python Tools/journal_lines.py --apply    검사를 통과하면 CSV의 example·example_meaning·story·story_heading을 채움
+  python Tools/journal_lines.py --text     검사를 통과하면 글만 Docs/GameStory/누군가의기록_글.txt로
+  python Tools/journal_lines.py --apply    검사를 통과하면 CSV의 example·example_meaning·story·story_heading을 채움 (글 파일도 같이)
 
 한 곳이라도 문제가 있으면 아무 파일도 쓰지 않는다.
 """
@@ -18,7 +19,9 @@ from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8")
 ROOT = Path(__file__).resolve().parent.parent
 TSV = ROOT / "Docs" / "GameStory" / "누군가의기록_문장.tsv"
+TEXT = ROOT / "Docs" / "GameStory" / "누군가의기록_글.txt"
 BOOKS = {"diary": "tier1_common", "survival": "tier2_advanced"}
+DOCUMENTS = [("diary", "누군가의 일기 (초원·서고)"), ("survival", "누군가의 생존일지 (숲·정글·동굴)"), ("plain", "기록에 안 들어가는 예문")]
 MAX_ENGLISH = 64
 MAX_KOREAN = 34
 ENGLISH = re.compile(r"^[A-Za-z ,.?!':;-]+$")
@@ -33,6 +36,21 @@ def read_book(name):
     text = raw.decode("utf-8-sig")
     rows = list(csv.DictReader(text.splitlines()))
     return path, rows, bom, crlf
+
+
+def write_text(lines):
+    """글만 읽을 수 있게 일반 텍스트로 (사용자 요청 #202)"""
+    out = []
+    for key, title in DOCUMENTS:
+        part = [line for line in lines if line["document"] == key]
+        out += ["=" * 60, f" {title} ({len(part)}줄)", "=" * 60, ""]
+        for line in part:
+            if line["heading"]:
+                out += [f"[{line['heading']}]", ""]
+            out += [line["english"], line["korean"], ""]
+        out.append("")
+    TEXT.write_text("\n".join(out).rstrip() + "\n", encoding="utf-8", newline="\r\n")
+    print("글", TEXT.name)
 
 
 def main():
@@ -78,6 +96,8 @@ def main():
         print(" ", problem)
     if problems:
         return 1
+    if apply or "--text" in sys.argv:
+        write_text(lines)
     if not apply:
         return 0
 
