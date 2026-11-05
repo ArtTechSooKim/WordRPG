@@ -217,6 +217,27 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // 1.2 세이브(동굴 안내를 이미 봄)는 1.3 안내만 (#213)
+        [UnityTest]
+        public IEnumerator A12SaveOnlySeesTheNewNotice()
+        {
+            var system = new WordRPG.Save.SaveSystem(dir);
+            system.Save(GameSession.NewGame(hero).ToSaveData(System.DateTime.UtcNow).WithNotices(new[] { UpdateNotices.Cave.Id }));
+
+            StartManager();
+            var title = MakeTitle(_ => { });
+            yield return null;
+            yield return null;
+            var dialog = title.transform.Find("TitleCanvas/SafeArea/ConfirmDialog");
+            Assert.IsTrue(title.IsDialogOpen);
+            StringAssert.Contains("말을 잃어 가는 사람들이 나타났습니다!", AllText(dialog));
+            StringAssert.DoesNotContain("동굴", AllText(dialog));
+            FindButton(dialog, "DialogConfirmButton").onClick.Invoke();
+            Assert.IsFalse(title.IsDialogOpen, "새 안내 하나로 끝");
+            Object.Destroy(title.gameObject);
+            yield return null;
+        }
+
         // 업데이트 안내 (#115): 예전 세이브(본 안내 칸이 없음 = 업데이트한 사람)로 켜면 타이틀에 한 번 — 사용자가 정한 문구, [확인] 하나.
         // 띄우는 순간 본 것으로 저장돼 다음에 켜면 안 뜸. 새 게임으로 시작한 사람에겐 안 뜸 (다른 테스트의 세이브가 그 경우)
         [UnityTest]
@@ -242,6 +263,12 @@ namespace WordRPG.Tests
 
             FindButton(root, "TapToStart").onClick.Invoke();
             Assert.IsNull(started, "안내 창이 떠 있는 동안은 시작하지 않음");
+            FindButton(dialog, "DialogConfirmButton").onClick.Invoke();
+            Assert.IsTrue(title.IsDialogOpen, "더 오래된 세이브는 이어서 1.3 안내 (#213)");
+            StringAssert.Contains("말을 잃어 가는 사람들이 나타났습니다!", AllText(dialog));
+            CollectionAssert.Contains(system.Load().Data.Notices, UpdateNotices.People.Id);
+            FindButton(root, "TapToStart").onClick.Invoke();
+            Assert.IsNull(started, "두 번째 안내가 떠 있는 동안에도 시작하지 않음");
             FindButton(dialog, "DialogConfirmButton").onClick.Invoke();
             Assert.IsFalse(title.IsDialogOpen);
             FindButton(root, "TapToStart").onClick.Invoke();

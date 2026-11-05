@@ -157,9 +157,27 @@ namespace WordRPG.Tests
             Assert.AreEqual("업데이트 해주셔서 감사합니다", updater.Notices.NextUnseen().Title, "문구는 사용자가 정한 그대로");
             Assert.AreEqual("새로운 지역 동굴이 열렸습니다!\n숲 지역에 있는 동굴을 찾아보세요!", UpdateNotices.Cave.Message);
             updater.Notices.Mark(UpdateNotices.Cave.Id);
+            Assert.AreSame(UpdateNotices.People, updater.Notices.NextUnseen(), "동굴 안내 다음에 1.3 안내");
+            updater.Notices.Mark(UpdateNotices.People.Id);
             updater.Tutorials.Clear();
             Assert.IsNull(updater.Notices.NextUnseen(), "튜토리얼 다시 보기로 안내가 다시 뜨지 않음");
             Assert.IsNull(Load(JsonUtility.ToJson(updater.ToSaveData(Now))).Notices.NextUnseen(), "본 기록은 세이브에");
+        }
+
+        // 1.3 안내 (#213): 1.2에서 동굴 안내를 본 사람은 새 안내만. 출시된 id는 그대로, 이스터에그(누군가의 기록)는 안내에 쓰지 않음
+        [Test]
+        public void A12PlayerOnlyGetsTheNewNoticeAndItKeepsTheEasterEggSecret()
+        {
+            var data = GameSession.NewGame(HeroData()).ToSaveData(Now).WithNotices(new[] { "update_1_2_cave" });
+            var loaded = GameSession.FromSaveData(data, Database(), HeroData());
+            Assert.AreSame(UpdateNotices.People, loaded.Notices.NextUnseen());
+            loaded.Notices.Mark(UpdateNotices.People.Id);
+            Assert.IsNull(loaded.Notices.NextUnseen());
+
+            Assert.AreEqual("update_1_2_cave", UpdateNotices.Cave.Id, "출시된 id는 바꾸지 않음");
+            foreach (var notice in UpdateNotices.All)
+                foreach (var secret in new[] { "기록", "일기", "생존일지" })
+                    StringAssert.DoesNotContain(secret, notice.Title + notice.Message);
         }
     }
 }

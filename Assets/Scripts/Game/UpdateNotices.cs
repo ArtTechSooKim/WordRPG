@@ -26,7 +26,11 @@ namespace WordRPG.Game
         public static readonly UpdateNotice Cave = new UpdateNotice("update_1_2_cave",
             "업데이트 해주셔서 감사합니다", "새로운 지역 동굴이 열렸습니다!\n숲 지역에 있는 동굴을 찾아보세요!");
 
-        public static readonly IReadOnlyList<UpdateNotice> All = new[] { Cave };
+        // 1.3: 말을 잃어 가는 사람들 (#213, 사용자: 짧게). 누군가의 기록은 이스터에그라 쓰지 않음, AI 곡은 권리 답에 따라 빠질 수 있어 쓰지 않음
+        public static readonly UpdateNotice People = new UpdateNotice("update_1_3_people",
+            "업데이트 해주셔서 감사합니다", "말을 잃어 가는 사람들이 나타났습니다!\n만나면 말을 걸어 보세요!");
+
+        public static readonly IReadOnlyList<UpdateNotice> All = new[] { Cave, People };
 
         private readonly HashSet<string> seen = new HashSet<string>();
 
