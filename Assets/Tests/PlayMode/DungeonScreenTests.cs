@@ -115,6 +115,48 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // 보스 대사 (#207): 전투 기록 칸에 보스·주인공 한 줄씩, 이긴 뒤 머리 위에 글, 다시 찾아가도 그 글
+        [UnityTest]
+        public IEnumerator BossSpeaksAndLeavesALineToReadAgain()
+        {
+            var hero = Hero();
+            var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var king = TestData.Species("king", new MonsterStats(40, 1, 50), new MonsterStats(0, 0, 0), bite)
+                .Set("displayName", "까먹대왕").Set("expReward", 10);
+            var boss = new BossEncounter(king, 3).Set("bossLine", "잊어버리면 아플 일도 없어!")
+                .Set("heroLine", "기억을 돌려줘!").Set("afterLine", "책 속의 글자가 돌아왔다.");
+            var area = Area("lair", "보스 방", "#####\n#.B.#\n#.P.#\n#####", hero).Set("boss", boss).Set("theme", FieldTheme.Forest);
+            var session = GameSession.NewGame(Player(), 1);
+            var field = CreateField(area, session);
+            yield return null;
+            yield return null;
+
+            yield return FaceStick(field, Direction.Up);
+            yield return PressConfirm(field);
+            yield return WaitFor(() => field.Battle.IsRunning);
+            string log = AllText(field.Battle);
+            StringAssert.Contains("까먹대왕: \"잊어버리면 아플 일도 없어!\"", log);
+            StringAssert.Contains($"{session.Hero.DisplayName}: \"기억을 돌려줘!\"", log);
+
+            yield return PlayUntilResult(field.Battle, answerCorrectly: true);
+            FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
+            yield return WaitFor(() => !field.IsInBattle);
+            yield return WaitFor(() => field.Bubble.ShowsText);
+            StringAssert.Contains("책 속의 글자가 돌아왔다", field.Bubble.Text, "이긴 뒤 머리 위에");
+
+            // 보스가 있던 자리를 밟으면 다시 나옴 (전에 이긴 사람도 읽을 수 있음)
+            yield return new WaitForSecondsRealtime(0.5f);
+            field.Bubble.Hide();
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
+            yield return WaitFor(() => !field.IsMoving);
+            Assert.AreEqual(new Vector2Int(2, 2), field.PlayerCell);
+            Assert.IsTrue(field.Bubble.ShowsText, "보스 자리에서 글이 보임");
+            StringAssert.Contains("책 속의 글자가 돌아왔다", field.Bubble.Text);
+
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator BossIsFoughtOnceAndRemembered()
         {

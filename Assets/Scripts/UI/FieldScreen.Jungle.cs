@@ -99,7 +99,7 @@ namespace WordRPG.UI
         {
             if (Ruins.IsTabletSolved(area, session.World, cell))
             {
-                bubble.Say("이미 빈칸을 채운 석판이다.", 2.5f);
+                bubble.Say("이미 빈칸을 채운 석판이다.\n귀퉁이에 글이 남아 있다.\n\"말을 모두 되찾는 것이 언제나 옳은 일은 아니다.\"", 4.5f); // 스토리 3장의 단서 (#207)
                 return;
             }
             var books = Preemptive.QuizBooks(area.Words != null ? area.Words.Words : null,

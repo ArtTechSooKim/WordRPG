@@ -607,6 +607,12 @@ namespace WordRPG.UI
                 bubble.Say("뗏목이 묶여 있다.\n물 쪽으로 가면 탈 수 있을 것 같다", 3.5f);
                 bubbleKeepUntil = Time.unscaledTime + 1.5f;
             }
+            // 보스가 있던 자리를 밟으면 승리 뒤 글을 다시 (#207 — 전에 이긴 사람도 읽을 수 있게)
+            if (tile == FieldTile.Boss && area.Boss != null && area.Boss.AfterLine.Length > 0 && session.World.IsBossDefeated(area.BossId))
+            {
+                bubble.Say(area.Boss.AfterLine, BossAfterLineSeconds);
+                bubbleKeepUntil = Time.unscaledTime + 1.5f;
+            }
             if (tile == FieldTile.Door)
             {
                 var exit = area.GetExit(walker.Position);

@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: WordRPG::WordRPG.Heroes.RelicData
   relicId: relic_quill
   displayName: "\uAE43\uD39C"
-  description: "\uD39C\uCD09\uC774\uAC00 \uB0A8\uAE34 \uAE43\uD39C. \uC789\uD06C\uB97C
-    \uBFCC\uB824 \uC801\uC744 \uD55C\uAEBC\uBC88\uC5D0 \uACF5\uACA9\uD55C\uB2E4."
+  description: "\uD39C\uCD09\uC774\uAC00 \uB0A8\uAE34 \uAE43\uD39C. \uC190\uC5D0
+    \uC950\uBA74 \uC78A\uACE0 \uC788\uB358 \uBB38\uC7A5\uC758 \uCCAB \uAE00\uC790\uAC00
+    \uB5A0\uC624\uB978\uB2E4."
   role: 0
   icon: {fileID: 0}
   placeholderColor: {r: 0.25, g: 0.45, b: 0.95, a: 1}

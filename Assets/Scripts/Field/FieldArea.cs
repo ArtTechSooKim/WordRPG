@@ -82,11 +82,20 @@ namespace WordRPG.Field
         [SerializeField] private RelicData rewardRelic;
         [Tooltip("처음 쓰러뜨리면 주는 아이템 — 기술문서 등 (없으면 비워 둠)")]
         [SerializeField] private ItemData rewardItem;
+        [Tooltip("전투를 시작할 때 보스가 하는 말 (#207)")]
+        [SerializeField] private string bossLine;
+        [Tooltip("이어서 주인공이 하는 말")]
+        [SerializeField] private string heroLine;
+        [Tooltip("이긴 뒤 주인공 머리 위에 나오는 글. 다시 찾아가 [확인]해도 나옴")]
+        [SerializeField] private string afterLine;
 
         public MonsterSpecies Species => species;
         public int Level => level;
         public RelicData RewardRelic => rewardRelic;
         public ItemData RewardItem => rewardItem;
+        public string BossLine => bossLine ?? "";
+        public string HeroLine => heroLine ?? "";
+        public string AfterLine => afterLine ?? "";
 
         private BossEncounter() { } // Unity 직렬화용
 

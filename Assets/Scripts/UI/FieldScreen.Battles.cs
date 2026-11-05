@@ -116,6 +116,12 @@ namespace WordRPG.UI
                 ShowToast(message, 4.5f);
                 yield return WaitUnscaled(2.5f); // 받은 성유물·사전 소식을 먼저 읽게
             }
+            string afterLine = bossArea.Boss.AfterLine; // 되찾은 것 + 다음 단서 한 줄 (#207)
+            if (afterLine.Length > 0 && area == bossArea)
+            {
+                bubble.Say(afterLine, BossAfterLineSeconds);
+                yield return WaitUnscaled(BossAfterLineSeconds);
+            }
             if (document != null && !session.Hero.Knows(document))
             {
                 OfferDocument(document);
@@ -128,6 +134,7 @@ namespace WordRPG.UI
         }
 
         private const string BossDefeatedTitle = "보스를 물리쳤다!";
+        private const float BossAfterLineSeconds = 4.5f; // 승리 뒤 글이 머리 위에 머무는 시간
 
         // 시작 지점으로: 어두워짐 + 문 소리 → 시작 지점에 정면으로 서서 밝아짐
         private IEnumerator ReturnToStart()

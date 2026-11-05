@@ -152,6 +152,13 @@ MonoBehaviour:
     level: 12
     rewardRelic: {fileID: 11400000, guid: 1b7f999bdd3edb8409ff80aa0c65e454, type: 2}
     rewardItem: {fileID: 11400000, guid: 06a736217507a204db83f20e3d6dcb23, type: 2}
+    bossLine: "\uC774\uCABD\uC774 \uB9DE\uB098? \uC800\uCABD\uC774 \uB9DE\uB098?
+      \uB098\uB3C4 \uBAA8\uB974\uACA0\uC5B4!"
+    heroLine: "\uAE38\uC744 \uD5F7\uAC08\uB9AC\uB294 \uAC74 \uAD1C\uCC2E\uC544. \uB2E4\uC2DC
+      \uD655\uC778\uD558\uBA74 \uB3FC."
+    afterLine: "\uC774\uC815\uD45C\uAC00 \uC81C\uC790\uB9AC\uB97C \uCC3E\uC558\uB2E4.\n\uC232
+      \uAE4A\uC740 \uACF3\uC5D0\uC11C \uC624\uB798\uB41C \uBA54\uC544\uB9AC\uAC00
+      \uB4E4\uB9B0\uB2E4."
   bossKey: {fileID: 11400000, guid: f7d1bd7717ac67f4bb0ce50b193977b0, type: 2}
   bossGateWords: 40
   shrineCompanion: {fileID: 0}

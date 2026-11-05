@@ -60,6 +60,7 @@
      이름 뒤 조사는 꼭 `UiKit.WithJosa` (플레이어가 지은 이름이라 받침이 정해져 있지 않음)
    - 업데이트 안내 (#115): `UpdateNotices`(세이브 칸 notices) — 예전 세이브로 켠 사람(= 업데이트한 사람)만 타이틀에서 한 번 (`TitleScreen.ShowUpdateNotice`,
      `ConfirmDialog.ShowNotice` [확인] 하나). 새 게임은 모두 본 것으로 시작, 튜토리얼과 따로. 다음 업데이트 안내는 `UpdateNotices.All` 맨 뒤에 새 id로
+   - 보스 대사 (#207): BossEncounter `bossLine`·`heroLine`·`afterLine` (`SampleDataBuilder.SetBossLines`, 규칙 `BossLines.Intro`). 새 보스를 만들면 셋 다 필요 (BossLinesTests). 글 기준 = 스토리 문서
    - 누군가의 기록 (#201, 이스터에그 — 설계 `Docs/GameStory/누군가의기록_설계.md`): 단어장마다 기록 하나 (WordDatabase `journal`, ItemKind.Journal). 상자에서 얻어 도감에서 연다 (`DexView` → `JournalView`).
      규칙 `Journals`: 세이브 칸 없음 — 얻었는지는 소지품, 읽히는 줄은 찾은 단어. **목표·보상·빨간 점·안내·진행 숫자를 넣지 말 것, 새 단어 순서도 바꾸지 말 것** (사용자: 스트레스 받지 않게).
      문장 = 단어 CSV example·story·story_heading ← 원문 TSV, `python Tools/journal_lines.py --apply` (사용자 검수본 #204 — 문장을 함부로 다시 쓰지 말 것). 못 찾은 줄은 글자 대신 그림 `Resources/UI/Journal/smudge.png` (줄은 곧게 — 사용자)

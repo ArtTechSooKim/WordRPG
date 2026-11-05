@@ -15,7 +15,8 @@ MonoBehaviour:
   relicId: relic_leaf
   displayName: "\uC138\uACC4\uC218 \uC78E"
   description: "\uD5F7\uAC08\uB108\uAD6C\uB9AC\uAC00 \uD488\uACE0 \uC788\uB358 \uC138\uACC4\uC218\uC758
-    \uC78E. \uC232\uC758 \uC0DD\uBA85\uB825\uC774 \uB2F4\uACA8 \uC788\uB2E4."
+    \uC78E. \uC544\uC9C1 \uAC00 \uBCF4\uC9C0 \uC54A\uC740 \uB545\uC758 \uC724\uACFD\uC774
+    \uD76C\uBBF8\uD558\uAC8C \uBE44\uCE5C\uB2E4."
   role: 2
   icon: {fileID: 0}
   placeholderColor: {r: 0.45, g: 0.8, b: 0.35, a: 1}

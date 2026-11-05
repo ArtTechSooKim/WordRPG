@@ -195,7 +195,7 @@ namespace WordRPG.UI
                 return;
             }
             var enemies = new List<MonsterInstance> { new MonsterInstance(boss.Species, boss.Level) };
-            StartCoroutine(Encounter(enemies, $"보스 출현! {name} Lv{boss.Level} — 정답으로 맞서라!", true));
+            StartCoroutine(Encounter(enemies, BossLines.Intro(boss, session.Hero.DisplayName), true));
         }
 
         // 강화·구매·장착 직후 저장하고 HUD(주인공·성유물·골드) 갱신

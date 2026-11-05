@@ -107,9 +107,9 @@ namespace WordRPG.EditorTools
                 new Color(0.75f, 0.55f, 0.4f), ItemKind.SkillDocument, taughtSkill: pencilcaseGuard);
 
             // --- 성유물 (예전 아군 몬스터 3마리 → 깃펜·백과사전·등불, 그리고 새로 찾는 마법 지팡이·기억의 성배) ---
-            var quill = Relic("relic_quill", "깃펜", "펜촉이가 남긴 깃펜. 잉크를 뿌려 적을 한꺼번에 공격한다.", MonsterRole.Attacker,
+            var quill = Relic("relic_quill", "깃펜", "펜촉이가 남긴 깃펜. 손에 쥐면 잊고 있던 문장의 첫 글자가 떠오른다.", MonsterRole.Attacker,
                 new Color(0.25f, 0.45f, 0.95f), inkSplash, inkStorm, new MonsterStats(0, 4, 0), new MonsterStats(0, 2, 0), shinyInk);
-            var book = Relic("relic_book", "백과사전", "책껍질이 지고 다니던 두꺼운 사전. 펼치면 단단한 방패가 된다.", MonsterRole.Defender,
+            var book = Relic("relic_book", "백과사전", "책껍질이 지고 다니던 두꺼운 사전. 몇 페이지는 누군가 뜯어 갔다.", MonsterRole.Defender,
                 new Color(0.6f, 0.4f, 0.2f), bookShield, encycloWall, new MonsterStats(10, 0, 4), new MonsterStats(4, 0, 1), hardCover);
             var lantern = Relic("relic_lantern", "등불", "등불이가 남긴 작은 등불. 은은한 불빛 아래 잠깐 눈을 붙이면 기운이 돌아온다.", MonsterRole.Supporter,
                 new Color(1f, 0.85f, 0.3f), healingLight, wisdomLight, new MonsterStats(15, 0, 0), new MonsterStats(5, 0, 0), sparkleDust);
@@ -122,7 +122,7 @@ namespace WordRPG.EditorTools
                 new Color(0.35f, 0.65f, 0.3f), vineLash, thornStorm, new MonsterStats(0, 6, 0), new MonsterStats(0, 2, 0), shinyInk);
             var hourglass = Relic("relic_hourglass", "시간의 모래시계", "뒤집으면 잠깐 시간이 멈추는 모래시계. 버섯 공터 깊은 곳에 묻혀 있었다.", MonsterRole.Defender,
                 new Color(0.85f, 0.65f, 0.35f), timePause, timeRewind, new MonsterStats(15, 0, 5), new MonsterStats(5, 0, 2), hardCover);
-            var leaf = Relic("relic_leaf", "세계수 잎", "헷갈너구리가 품고 있던 세계수의 잎. 숲의 생명력이 담겨 있다.", MonsterRole.Supporter,
+            var leaf = Relic("relic_leaf", "세계수 잎", "헷갈너구리가 품고 있던 세계수의 잎. 아직 가 보지 않은 땅의 윤곽이 희미하게 비친다.", MonsterRole.Supporter,
                 new Color(0.45f, 0.8f, 0.35f), sproutHeal, worldBreath, new MonsterStats(30, 2, 2), new MonsterStats(6, 1, 1), sparkleDust);
 
             // --- 주인공: 혼자 싸운다. 시작 성유물은 깃펜 하나 ---
@@ -458,6 +458,22 @@ namespace WordRPG.EditorTools
             UpgradeMapIf(libraryPath, LibraryMap, "C"); // 보스 문 앞 일기 상자 (#200)
             InsertChestIf(libraryPath, 5, 1, diaryJournal); // 상자는 맵의 위→아래 순서라 그 자리에 끼움. 있던 상자 내용물은 그대로
             InsertChestIf(forestPath, 6, 5, survivalJournal);
+            // 보스 대사 (#207, 스토리 문서 5장)
+            SetBossLines(libraryPath, "잊어버리면… 아플 일도 없어!", "기억을 돌려줘! 아픈 기억도 우리 것이야.",
+                "책 속의 글자가 돌아왔다.\n하지만 몇 페이지는 누군가 일부러 뜯어냈다.");
+            SetBossLines(forestPath, "이쪽이 맞나? 저쪽이 맞나? 나도 모르겠어!", "길을 헷갈리는 건 괜찮아. 다시 확인하면 돼.",
+                "이정표가 제자리를 찾았다.\n숲 깊은 곳에서 오래된 메아리가 들린다.");
+            SetBossLines(junglePath, "내가 삼키면 아무도 잊지 않아. 아무도 틀리지 않아!", "빈칸은 끝이 아니야. 다시 채울 수 있어.",
+                "정글에 메아리가 돌아왔다.");
+            SetBossLines(cavePath, "끝을 말하지 마… 끝나면 다시 아파질 테니까…", "끝맺는다고 모든 것이 사라지는 건 아니야.",
+                "마지막 문장이 완성됐다.\n'사막 아래의 첫 기록'이라는 말이 적혀 있다.");
+            // 성유물 설명에 이야기 단서 (#207, 스토리 문서 7장). 설명을 사람이 고쳤으면 건드리지 않음
+            SetRelicDescriptionIf("relic_quill", "펜촉이가 남긴 깃펜. 잉크를 뿌려 적을 한꺼번에 공격한다.",
+                "펜촉이가 남긴 깃펜. 손에 쥐면 잊고 있던 문장의 첫 글자가 떠오른다.");
+            SetRelicDescriptionIf("relic_book", "책껍질이 지고 다니던 두꺼운 사전. 펼치면 단단한 방패가 된다.",
+                "책껍질이 지고 다니던 두꺼운 사전. 몇 페이지는 누군가 뜯어 갔다.");
+            SetRelicDescriptionIf("relic_leaf", "헷갈너구리가 품고 있던 세계수의 잎. 숲의 생명력이 담겨 있다.",
+                "헷갈너구리가 품고 있던 세계수의 잎. 아직 가 보지 않은 땅의 윤곽이 희미하게 비친다.");
             SetExitDoorIf(meadowPath, 1, 0, 1);         // 그래서 숲의 초원 출입구는 0번 → 1번
             SetExitDoorIf(forestPath, 0, 0, 1);         // 정글의 'O'(위쪽)가 출입구가 되어 정글의 숲 출입구는 0번 → 1번 (#115)
             SetExitsIfMismatch(meadowPath, (libraryPath, 0, null), (forestPath, 1, libraryPath));
@@ -895,6 +911,30 @@ namespace WordRPG.EditorTools
         }
 
         // 원본 맵에 새 칸(added 글자들)이 생겼을 때: 에셋의 맵이 그 칸만 빼고 원본과 같으면 원본으로 바꾼다 (#80 숲의 정글 출입구 D)
+        // 보스 대사 (#207)
+        private static void SetBossLines(string areaPath, string bossLine, string heroLine, string afterLine)
+        {
+            var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);
+            if (area == null) return;
+            var so = new SerializedObject(area);
+            var boss = Prop(so, "boss");
+            boss.FindPropertyRelative("bossLine").stringValue = bossLine;
+            boss.FindPropertyRelative("heroLine").stringValue = heroLine;
+            boss.FindPropertyRelative("afterLine").stringValue = afterLine;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void SetRelicDescriptionIf(string relicId, string from, string to)
+        {
+            var relic = AssetDatabase.LoadAssetAtPath<RelicData>($"{Root}/Relics/{relicId}.asset");
+            if (relic == null) return;
+            var so = new SerializedObject(relic);
+            var description = Prop(so, "description");
+            if (description.stringValue != from) return;
+            description.stringValue = to;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         // 이미 있는 지역에 상자를 더했을 때 (#200): 내용물 수가 예전 그대로면 맵 순서 자리에 끼운다
         private static void InsertChestIf(string areaPath, int oldCount, int index, ItemData item)
         {

@@ -15,7 +15,8 @@ MonoBehaviour:
   relicId: relic_book
   displayName: "\uBC31\uACFC\uC0AC\uC804"
   description: "\uCC45\uAECD\uC9C8\uC774 \uC9C0\uACE0 \uB2E4\uB2C8\uB358 \uB450\uAEBC\uC6B4
-    \uC0AC\uC804. \uD3BC\uCE58\uBA74 \uB2E8\uB2E8\uD55C \uBC29\uD328\uAC00 \uB41C\uB2E4."
+    \uC0AC\uC804. \uBA87 \uD398\uC774\uC9C0\uB294 \uB204\uAD70\uAC00 \uB72F\uC5B4
+    \uAC14\uB2E4."
   role: 1
   icon: {fileID: 0}
   placeholderColor: {r: 0.6, g: 0.4, b: 0.2, a: 1}
