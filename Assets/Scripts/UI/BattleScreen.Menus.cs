@@ -305,7 +305,7 @@ namespace WordRPG.UI
         // 뒤로가기: 도감이 열려 있으면 닫고, 대상·강도·아이템을 고르는 중이면 [취소]와 같음. 전투에서 도망치기는 없다
         public void HandleBack()
         {
-            if (dexView != null && dexView.IsOpen) dexView.Hide();
+            if (dexView != null && dexView.IsOpen) dexView.Back();
             else if (cancelButton != null && cancelButton.gameObject.activeInHierarchy) OnCancelTargeting();
         }
 

@@ -97,7 +97,7 @@ MonoBehaviour:
 
     ######:::::######..............,,,##
 
-    ###################,,,,,,,,,,,,,,,##
+    ########C##########,,,,,,,,,,,,,,,##
 
     ###################,,#,,,,#,,,,,,C##
 
@@ -132,6 +132,10 @@ MonoBehaviour:
     count: 0
     gold: 60
     relic: {fileID: 11400000, guid: 32a554c15e5393343bba57e9ec78dd36, type: 2}
+  - item: {fileID: 11400000, guid: c8fe83c5587070442976072e0cbb9051, type: 2}
+    count: 1
+    gold: 0
+    relic: {fileID: 0}
   - item: {fileID: 0}
     count: 0
     gold: 150

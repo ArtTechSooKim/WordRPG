@@ -421,6 +421,7 @@ namespace WordRPG.UI
             if (item.IsHealingItem) ShowPotion(item);
             else if (item.IsEffectItem) ShowEffectPotion(item);
             else if (item.IsSkillDocument) ShowDocument(item);
+            else if (item.IsJournal) SetUsage(UiKit.Icon("dex"), "도감에서 펼쳐 볼 수 있어요", null, Palette.TextDim);
             else ShowUsage(item);
         }
 

@@ -29,7 +29,7 @@ MonoBehaviour:
 
     ####C########.........############
 
-    ####,,,#########GGG###############
+    ####,,,#########GGG#########C#####
 
     ####,,,,,,,,,,,,,,,,,,,,,,,,,,####
 
@@ -117,11 +117,16 @@ MonoBehaviour:
   encounterRate: 0.14
   minStepsBetweenEncounters: 4
   encounterStyle: 0
+  waterEncounters: {fileID: 0}
   shop: {fileID: 0}
   chests:
   - item: {fileID: 0}
     count: 0
     gold: 120
+    relic: {fileID: 0}
+  - item: {fileID: 11400000, guid: d3ca025eed4f773429009a74ee4c26d4, type: 2}
+    count: 1
+    gold: 0
     relic: {fileID: 0}
   - item: {fileID: 0}
     count: 0
@@ -150,5 +155,8 @@ MonoBehaviour:
     rewardItem: {fileID: 11400000, guid: 4185a811547fb65468699483f65b7fdf, type: 2}
   bossKey: {fileID: 11400000, guid: e2d52f7fbc559d2459414dddf06ac7b5, type: 2}
   bossGateWords: 40
+  shrineCompanion: {fileID: 0}
+  shrineWords: 60
+  glowStoneRelic: {fileID: 0}
   requiresFullVersion: 0
   dictionaryName: "\uC11C\uACE0\uC758 \uC0AC\uC804"

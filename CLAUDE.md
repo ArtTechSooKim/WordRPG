@@ -60,6 +60,9 @@
      이름 뒤 조사는 꼭 `UiKit.WithJosa` (플레이어가 지은 이름이라 받침이 정해져 있지 않음)
    - 업데이트 안내 (#115): `UpdateNotices`(세이브 칸 notices) — 예전 세이브로 켠 사람(= 업데이트한 사람)만 타이틀에서 한 번 (`TitleScreen.ShowUpdateNotice`,
      `ConfirmDialog.ShowNotice` [확인] 하나). 새 게임은 모두 본 것으로 시작, 튜토리얼과 따로. 다음 업데이트 안내는 `UpdateNotices.All` 맨 뒤에 새 id로
+   - 누군가의 기록 (#201, 이스터에그 — 설계 `Docs/GameStory/누군가의기록_설계.md`): 단어장마다 기록 하나 (WordDatabase `journal`, ItemKind.Journal). 상자에서 얻어 도감에서 연다 (`DexView` → `JournalView`).
+     규칙 `Journals`: 세이브 칸 없음 — 얻었는지는 소지품, 읽히는 줄은 찾은 단어. **목표·보상·빨간 점·안내·진행 숫자를 넣지 말 것, 새 단어 순서도 바꾸지 말 것** (사용자: 스트레스 받지 않게).
+     문장 = 단어 CSV example·story·story_heading ← 원문 TSV, `python Tools/journal_lines.py --apply`. 못 찾은 줄은 글자 대신 그림 `Resources/UI/Journal/smudge.png` (줄은 곧게 — 사용자)
    - 설정(`GameSettings`: 음량·진동·전투 강도 `BattleIntensity` #147 — 0 = 매번 고르기, 1~ = 묻지 않고 그 강도)은 세이브가 아니라 PlayerPrefs. `GameManager.Settings` / `SaveSettings()`
    - **수익화** (GDD 9-3): 산 상품(`Entitlements`, 정식판 id `com.arttechsoo.wordrpg.full` — 바꾸지 말 것)도 세이브가 아니라 PlayerPrefs.
      결제는 `IStore`(실제 `UnityIapStore` = Unity IAP 5 — 앱스토어·구글플레이, 상품 id 같음, 구매 복원 흐름은 스토어마다 다름 #149, 계정 이름 문구 `StoreLabels`, 테스트는 가짜 — `GameManager.StoreOverride`/`FieldScreen.Configure`).
@@ -210,13 +213,13 @@ Assets/
                         Ruins(유적: 석판 T 4개 + 정글 단어 60개 → 제단 A에서 동료) · Levers(레버 Y → 덩굴 다리 H) · CellState(칸의 끝난 모습·지나갈 수 있음) — #80,
                         TabletQuiz(석판 3문제: 틀리면 벌점 없이 다시, 숙련도는 처음 답만 — #81), GlowStones(글자 반딧돌: 밝힘·밝힌 수·모두 밝힌 보상 — #112·#115),
                         UpdateNotices(업데이트 안내: 업데이트한 사람만 타이틀에서 한 번 — #115), PotionEffects(효과 물약이 남긴 효과 — #146),
-                        RelicTutorials(성유물 안내 규칙: 언제 · 가장 가까운 제단과 그 앞 칸 — #142)
+                        RelicTutorials(성유물 안내 규칙: 언제 · 가장 가까운 제단과 그 앞 칸 — #142), Journals(누군가의 기록 규칙 — #201)
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
     UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투 + 보스 결정타 연출 + 전투 결산, 단독 연습 모드도 있음)
                         — 둘 다 partial로 나눔 (#93): FieldScreen.cs(상태·이동·입력) + .Places([확인] 장소)·.Jungle(정글 기믹)·.Battles(조우·전투 뒤·수련)·
                         .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴)·.Cave(동굴 어둠·반딧돌 #112)·.RelicGuides(성유물 바꾸기·제단 안내 #142) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout·.Events(사건 연출: 사건 종류마다 Show… 함수 — #119)·.SkillFx(기술 연출: 몸짓·회복·보호막·특수 — #137).
                         새 기능은 맞는 파일에, 기능 묶음이 커지면 새 partial 파일로,
-                        DexView(도감), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기),
+                        DexView(도감) + JournalView(누군가의 기록 #201), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기),
                         InventoryView(소지품: 주인공·성유물·아이템(넘치면 스크롤, 놓는 순서 `ItemData.BagOrder` #147)·징표) + HeroViews(HeroInfoPage·RelicPage·RelicSlotsRow·SkillRowView),
                         HeroSetupViews(처음 시작: CharacterSelectView 모습 8명 · NameEntryView 이름 — #124) · IntroCinematicView(입장 영상 + 자막 + [건너뛰기] — #129),
                         SettingsView(설정) + ConfirmDialog(확인 창 · ShowNotice = [확인] 하나), SwitchView, GateCutscene(보스가 연 길을 보여 주는 연출),
@@ -255,6 +258,7 @@ Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow
                         widen_maps.py (맵의 한 칸 통로 → 두 칸), subset_fonts.py (본문 글꼴에서 한자·가나 빼기 — 앱 크기, fontTools 필요),
                         pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구), make_preempt_sfx.py (선제공격 '카칭' 소리 합성 #147), make_skill_sfx.py (기술마다 다른 소리: 팩 소리 겹치기 #164),
                         check_android_bundle.py (구글플레이에 올리기 전 AAB 검사: 대상 API·게임 표시·뒤로 가기·권한·16KB 페이지·크기 #149),
+                        journal_lines.py (누군가의 기록 문장 검사·CSV에 넣기 #201), make_journal_smudge.py (못 찾은 줄의 필기 그림 #201),
                         prepare_ambience.py (지역 환경음: 팩·CC0 녹음 다듬기 → Resources/Audio/Ambience + BGM과 섞은 미리듣기, #193), prepare_music.py (받은 곡 → 게임용: 끝 무음 빼기·반복 이음새 찾아 겹치기·음량 맞추기 → Licensed 폴더, `--later` = 아직 안 쓰는 2.0 곡을 Builds로, imageio-ffmpeg·numpy 필요 #166·#172),
                         build_intro_video.py (입장 영상: Flow 컷 이어 붙이기·Veo 표시 잘라냄·자막표 → Resources/Video, imageio-ffmpeg 필요, #129 —
                         컷 원본은 저장소 밖 Builds/cinematic_pixellab/Videos, release-1.1 폴더에선 그 경로를 인자로),

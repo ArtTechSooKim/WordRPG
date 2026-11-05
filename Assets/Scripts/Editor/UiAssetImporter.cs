@@ -27,6 +27,18 @@ namespace WordRPG.EditorTools
                 return;
             }
 
+            // 누군가의 기록의 일그러진 필기 (#200): 줄마다 잘라 쓰는 큰 그림 한 장 → 스프라이트 아님, 밉맵 없음
+            if (assetPath.StartsWith("Assets/Resources/UI/Journal/"))
+            {
+                var sheet = (TextureImporter)assetImporter;
+                sheet.textureType = TextureImporterType.Default;
+                sheet.mipmapEnabled = false;
+                sheet.alphaIsTransparency = true;
+                sheet.wrapMode = TextureWrapMode.Clamp;
+                sheet.textureCompression = TextureImporterCompression.Compressed;
+                return;
+            }
+
             bool icon = assetPath.StartsWith("Assets/Resources/UI/Icons/");
             bool pixelArt = assetPath.StartsWith("Assets/Resources/Art/");
             if (!icon && !pixelArt) return;

@@ -51,6 +51,8 @@ namespace WordRPG.Words
         [SerializeField] private string regionName; // 도감에 보이는 이름. 예: "초원·서고"
         [Tooltip("발견한 단어 수에 닿을 때마다 받는 보상 (적은 수부터). 지역 특색에 맞는 징표 + 골드")]
         [SerializeField] private List<DexReward> rewards = new List<DexReward>();
+        [Tooltip("이 단어장의 누군가의 기록 (#200, 종류 Journal). 상자에서 얻으면 도감에서 열림")]
+        [SerializeField] private ItemData journal;
 
         [SerializeField] private List<WordEntry> words = new List<WordEntry>();
 
@@ -58,6 +60,7 @@ namespace WordRPG.Words
         public string RegionId => regionId;
         public string RegionName => regionName;
         public IReadOnlyList<DexReward> Rewards => rewards;
+        public ItemData Journal => journal;
         public IReadOnlyList<WordEntry> Words => words;
 
         // 샘플 데이터 생성 전용. 런타임에서는 호출하지 않는다

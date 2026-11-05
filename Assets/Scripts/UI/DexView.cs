@@ -20,6 +20,9 @@ namespace WordRPG.UI
         private RectTransform progressFill, content;
         private ScrollRect scroll;
         private readonly List<GameObject> rows = new List<GameObject>();
+        private Button journalButton;       // 누군가의 기록 (#200): 그 단어장의 기록을 얻은 뒤에만 보임
+        private RectTransform closeRect;
+        private JournalView journalView;
 
         private WordDatabase region;
         private GameSession session;
@@ -56,6 +59,12 @@ namespace WordRPG.UI
             var close = UiKit.MakeButton("DexCloseButton", rootRect, "닫기", Palette.Neutral, 44,
                 0.05f, 0.012f, 0.95f, 0.092f);
             close.onClick.AddListener(view.Hide);
+            view.closeRect = (RectTransform)close.transform;
+            view.journalButton = UiKit.MakeButton("DexJournalButton", rootRect, "", Palette.Button, 40,
+                0.05f, 0.012f, 0.49f, 0.092f);
+            view.journalButton.onClick.AddListener(view.OpenJournal);
+            view.journalButton.gameObject.SetActive(false);
+            view.journalView = JournalView.Create(parent); // 도감 다음에 만들어 도감 위에 그림
 
             view.Root.SetActive(false);
             return view;
@@ -103,9 +112,30 @@ namespace WordRPG.UI
             Refresh();
             content.anchoredPosition = Vector2.zero;
             detailText.text = "단어를 눌러 자세히 보세요";
+
+            bool hasJournal = Journals.Has(region, session.Inventory);
+            journalButton.gameObject.SetActive(hasJournal);
+            if (hasJournal) UiKit.LabelOf(journalButton).text = region.Journal.DisplayName;
+            closeRect.anchorMin = new Vector2(hasJournal ? 0.51f : 0.05f, closeRect.anchorMin.y);
         }
 
-        public void Hide() => Root.SetActive(false);
+        public void Hide()
+        {
+            journalView.Hide();
+            Root.SetActive(false);
+        }
+
+        // 뒤로가기: 기록이 열려 있으면 기록만 닫는다
+        public void Back()
+        {
+            if (journalView.IsOpen) journalView.Hide();
+            else Hide();
+        }
+
+        public bool IsJournalOpen => journalView.IsOpen;
+        public JournalView Journal => journalView;
+
+        private void OpenJournal() => journalView.Show(region, session);
 
         private void Refresh()
         {

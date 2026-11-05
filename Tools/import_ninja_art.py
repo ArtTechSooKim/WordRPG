@@ -98,6 +98,9 @@ ITEMS = {
     "skilldoc_fill_blank": "Items/Scroll/ScrollEmpty.png", # 기술문서: 빈칸 채우기 (빈칸두꺼비) — 빈 두루마리
     # 1.2 어두운 밀림 동굴 (#115)
     "glow_moss": "Items/Resource/Grass.png",               # 빛이끼 (동굴 성유물 강화 재료) — 청록으로 물들임
+    # 누군가의 기록 (#200) — 책 그림에 색을 입힘
+    "journal_diary": "Items/Object/Book.png",
+    "journal_survival": "Items/Object/Book.png",
     "cave_key": "Items/Treasure/SilverKey.png",            # 동굴 열쇠 — 푸른 수정빛으로 물들임
     "keepsake_cave": "Items/Resource/GemYellow.png",       # 반딧불 책갈피 (동굴 도감 완성 징표)
     "skilldoc_finish_sentence": "Items/Scroll/Scroll.png", # 기술문서: 문장 끝맺기 (말줄임덩굴)
@@ -107,6 +110,8 @@ ITEM_TINTS = {
     "jungle_key": (0.75, 1.0, 0.62),
     "glow_moss": (0.55, 1.0, 1.6),
     "cave_key": (0.78, 0.92, 1.12),
+    "journal_diary": (0.85, 0.62, 0.7),
+    "journal_survival": (0.72, 0.9, 0.48),
 }
 # 직접 손본 도트 아이템 (#96): 처음 넣은 매끈한 256px 아이콘(초원 재료 3개 + 초원 징표)이 다른 도트 아이템과 그림체가 달라
 # 팩 그림을 고쳐 쓰거나(색 바꾸기·반짝임) 팩과 같은 색·외곽선으로 그림. 함수는 아래 build_item_* (copy_relics_and_items에서 저장)

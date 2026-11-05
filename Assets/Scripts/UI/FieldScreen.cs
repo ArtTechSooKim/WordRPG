@@ -541,7 +541,7 @@ namespace WordRPG.UI
                 if (!inventoryView.CancelRelicChoosing()) inventoryView.Hide(); // 바꿀 칸 고르기 중이면 그것만 취소 (#91)
             }
             else if (shopView.IsOpen) shopView.Hide();
-            else if (dexView.IsOpen) dexView.Hide();
+            else if (dexView.IsOpen) dexView.Back();
             else if (trainingView.IsOpen) trainingView.Hide();
             else if (settingsView.IsOpen) settingsView.Hide();
             else if (mapView.IsOpen) mapView.Hide();

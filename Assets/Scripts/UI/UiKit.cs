@@ -33,6 +33,14 @@ namespace WordRPG.UI
         public static readonly Color Evolve = new Color(0.75f, 0.45f, 0.1f);
         public static readonly Color Confirm = new Color(0.85f, 0.25f, 0.25f);
         public static readonly Color OnAccent = Background;
+        // 누군가의 기록의 종이 (#200, Figma color/journal/*)
+        public static readonly Color Paper = new Color(0.914f, 0.863f, 0.753f);
+        public static readonly Color PaperText = new Color(0.227f, 0.173f, 0.11f);
+        public static readonly Color PaperDim = new Color(0.427f, 0.353f, 0.259f);
+        public static readonly Color PaperWord = new Color(0.604f, 0.29f, 0.071f);
+        public static readonly Color PaperHeading = new Color(0.478f, 0.184f, 0.063f);
+        public static readonly Color PaperLine = new Color(0.812f, 0.741f, 0.596f);
+        public static readonly Color PaperSmudge = new Color(0.227f, 0.173f, 0.11f, 0.85f);
         public static readonly Color MasteryLearning = new Color(0.2f, 0.28f, 0.45f);
         public static readonly Color MasteryReviewing = new Color(0.2f, 0.38f, 0.5f);
         public static readonly Color MasteryProficient = new Color(0.2f, 0.5f, 0.42f);

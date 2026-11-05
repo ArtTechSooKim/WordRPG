@@ -27,6 +27,14 @@ namespace WordRPG.EditorTools
             var hardCover = Item("hard_cover", "단단한 표지", "백과사전·기억의 성배를 강화하는 두꺼운 가죽 표지.", new Color(0.55f, 0.35f, 0.2f));
             var sparkleDust = Item("sparkle_dust", "반짝 가루", "등불·마법 지팡이를 강화하는 빛나는 가루.", new Color(1f, 0.9f, 0.4f));
 
+            // --- 누군가의 기록 (#200): 상자에서 얻어 도감에서 읽음. 단어를 찾을수록 일그러진 줄이 선명해짐 ---
+            var diaryJournal = Item("journal_diary", "누군가의 일기",
+                "누군가 서고에 남기고 간 일기. 모르는 단어가 있는 줄은 글자가 일그러져 읽을 수 없다.",
+                new Color(0.55f, 0.32f, 0.2f), ItemKind.Journal);
+            var survivalJournal = Item("journal_survival", "누군가의 생존일지",
+                "누군가 숲에 남기고 간 생존일지. 진흙투성이다. 모르는 단어가 있는 줄은 글자가 일그러져 읽을 수 없다.",
+                new Color(0.4f, 0.45f, 0.22f), ItemKind.Journal);
+
             // --- 상처약 (상점에서 판매, 필드·전투에서 사용) ---
             var potion = Item("potion", "상처약", "상처에 바르면 HP를 40 회복한다. 필드·전투에서 쓸 수 있다.",
                 new Color(0.9f, 0.35f, 0.3f), ItemKind.Consumable, 40);
@@ -176,6 +184,7 @@ namespace WordRPG.EditorTools
             ConfigureRegion(CommonWords, "common", "초원·서고",
                 new DexReward("meadow", "초원", meadowKeepsake, 500, 75, 1),
                 new DexReward("library", "잊혀진 서고", libraryKeepsake, 600, 0, 2));
+            SetJournal(CommonWords, diaryJournal);
             // (#62) 서고도 자기 단어장: 교육과정 기본 어휘 중·고 공통 중 어려운 600
 
             // --- 필드: 초원. 보물상자는 맵의 C를 위→아래, 왼→오른 순으로 대응 (강화 재료·성유물을 얻는 곳) ---
@@ -197,6 +206,7 @@ namespace WordRPG.EditorTools
             Area("library", "잊혀진 서고", LibraryMap, dungeonEncounters,
                 AssetDatabase.LoadAssetAtPath<WordDatabase>(CommonWords),
                 new ChestContent(null, 0, 120),          // 보스 앞 회랑 왼쪽 구석
+                new ChestContent(diaryJournal, 1),       // 보스 문 앞 회랑 오른쪽 벽감 — 누군가의 일기 (#200)
                 new ChestContent(null, 0, 100, lantern), // 서쪽 열람실
                 new ChestContent(null, 0, 80, wand),     // 동쪽 잉크 서고
                 new ChestContent(largePotion, 1),        // 샘의 방 옆 벽감
@@ -219,6 +229,7 @@ namespace WordRPG.EditorTools
                 new ChestContent(shinyInk, 3),           // 개울 건너 징검다리
                 new ChestContent(sparkleDust, 3),        // 늪 한가운데
                 new ChestContent(null, 0, 60, hourglass),// 버섯 공터 — 시간의 모래시계
+                new ChestContent(survivalJournal, 1),    // 야영지 아래 틈 — 누군가의 생존일지 (#200)
                 new ChestContent(null, 0, 150));         // 버섯 공터 아래 구석
             var forestShop = ShopAsset("forest_shop", "숲속 쉼터 가게", forestPotions);
             AssignShopIfEmpty("Assets/Data/Areas/forest.asset", forestShop);
@@ -398,6 +409,7 @@ namespace WordRPG.EditorTools
                 new DexReward("forest", "숲", forestKeepsake, 700, 100, 3),
                 new DexReward("jungle", "메아리 정글", jungleKeepsake, 800, 200, 4),
                 new DexReward("cave", "어두운 밀림 동굴", caveKeepsake, 900, 0, 5));
+            SetJournal(AdvancedWords, survivalJournal);
             const string cavePath = "Assets/Data/Areas/cave.asset";
             // 보물상자 10개 (맵의 C를 위→아래, 왼→오른 순). 성유물은 반딧돌을 모두 밝힌 보상(반딧돌 등잔)과 보스(마침표 씨앗)
             Area("cave", "어두운 밀림 동굴", CaveMap, caveEncounters,
@@ -442,7 +454,10 @@ namespace WordRPG.EditorTools
             //     정글 0 = 동굴(강 가운데 섬의 'O', 1.2 — 처음부터 열림, #115), 정글 1 = 숲 ---
             const string meadowPath = "Assets/Data/Areas/meadow.asset", libraryPath = "Assets/Data/Areas/library.asset",
                 forestPath = "Assets/Data/Areas/forest.asset";
-            UpgradeMapIf(forestPath, ForestMap, "D"); // 숲 보스 공터 위쪽에 정글 출입구가 생김 (#80)
+            UpgradeMapIf(forestPath, ForestMap, "DC"); // 숲 보스 공터 위쪽에 정글 출입구가 생김 (#80), 야영지 아래 일지 상자 (#200)
+            UpgradeMapIf(libraryPath, LibraryMap, "C"); // 보스 문 앞 일기 상자 (#200)
+            InsertChestIf(libraryPath, 5, 1, diaryJournal); // 상자는 맵의 위→아래 순서라 그 자리에 끼움. 있던 상자 내용물은 그대로
+            InsertChestIf(forestPath, 6, 5, survivalJournal);
             SetExitDoorIf(meadowPath, 1, 0, 1);         // 그래서 숲의 초원 출입구는 0번 → 1번
             SetExitDoorIf(forestPath, 0, 0, 1);         // 정글의 'O'(위쪽)가 출입구가 되어 정글의 숲 출입구는 0번 → 1번 (#115)
             SetExitsIfMismatch(meadowPath, (libraryPath, 0, null), (forestPath, 1, libraryPath));
@@ -566,7 +581,7 @@ namespace WordRPG.EditorTools
                 "############.~:::::::~.###########\n" +
                 "############...........###########\n" +
                 "####C########.........############\n" +
-                "####,,,#########GGG###############\n" +
+                "####,,,#########GGG#########C#####\n" +
                 "####,,,,,,,,,,,,,,,,,,,,,,,,,,####\n" +
                 "####,,,,,,##,,,,,,,,,,##,,,,,,####\n" +
                 "####,,,,,,,,,,,,,,,,,,,,,,,,,,####\n" +
@@ -653,7 +668,7 @@ namespace WordRPG.EditorTools
                 "D..::P......::##..#,,,,#,,#,,#,,,,##\n" +
                 "####::::L::::###...,,,,,,,,,,,,,,###\n" +
                 "######:::::######..............,,,##\n" +
-                "###################,,,,,,,,,,,,,,,##\n" +
+                "########C##########,,,,,,,,,,,,,,,##\n" +
                 "###################,,#,,,,#,,,,,,C##\n" +
                 "####################################\n";
 
@@ -880,6 +895,33 @@ namespace WordRPG.EditorTools
         }
 
         // 원본 맵에 새 칸(added 글자들)이 생겼을 때: 에셋의 맵이 그 칸만 빼고 원본과 같으면 원본으로 바꾼다 (#80 숲의 정글 출입구 D)
+        // 이미 있는 지역에 상자를 더했을 때 (#200): 내용물 수가 예전 그대로면 맵 순서 자리에 끼운다
+        private static void InsertChestIf(string areaPath, int oldCount, int index, ItemData item)
+        {
+            var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);
+            if (area == null) return;
+            var so = new SerializedObject(area);
+            var chests = Prop(so, "chests");
+            if (chests.arraySize != oldCount) return;
+            chests.InsertArrayElementAtIndex(index);
+            var chest = chests.GetArrayElementAtIndex(index);
+            chest.FindPropertyRelative("item").objectReferenceValue = item;
+            chest.FindPropertyRelative("count").intValue = 1;
+            chest.FindPropertyRelative("gold").intValue = 0;
+            chest.FindPropertyRelative("relic").objectReferenceValue = null;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // 단어장에 누군가의 기록 연결 (#200)
+        private static void SetJournal(string wordBookPath, ItemData journal)
+        {
+            var book = AssetDatabase.LoadAssetAtPath<WordDatabase>(wordBookPath);
+            if (book == null) return;
+            var so = new SerializedObject(book);
+            Prop(so, "journal").objectReferenceValue = journal;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         private static void UpgradeMapIf(string areaPath, string map, string added)
         {
             var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);
