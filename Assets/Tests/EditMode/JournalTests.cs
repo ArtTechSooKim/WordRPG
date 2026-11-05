@@ -107,7 +107,8 @@ namespace WordRPG.Tests
                 Assert.IsNotEmpty(word.Example, $"{word.Id}: 예문");
                 Assert.IsNotEmpty(word.ExampleMeaning, $"{word.Id}: 해석");
                 Assert.GreaterOrEqual(Journals.WordSpan(word.Example, word.English).start, 0, $"{word.Id}: 예문에 단어가 그대로 ({word.Example})");
-                Assert.IsFalse(Regex.IsMatch(word.Example, @"\b(he|she|his|her|him)\b", RegexOptions.IgnoreCase), $"{word.Id}: 성별 대명사 ({word.Example})");
+                if (word.Story > 0) // 기록의 인물은 대명사로 성별을 정하지 않음. 예문만 있는 줄은 상관없음
+                    Assert.IsFalse(Regex.IsMatch(word.Example, @"\b(he|she|his|her|him)\b", RegexOptions.IgnoreCase), $"{word.Id}: 성별 대명사 ({word.Example})");
             }
         }
 

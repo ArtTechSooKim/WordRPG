@@ -40,9 +40,10 @@ MonoBehaviour:
     english: abuse
     meaning: "\uB0A8\uC6A9, \uD559\uB300"
     partOfSpeech: n
-    example: The mule says this trip is animal abuse. I agree.
-    exampleMeaning: "\uB178\uC0C8\uB294 \uC774 \uC5EC\uD589\uC774 \uB3D9\uBB3C \uD559\uB300\uB77C\uACE0
-      \uD55C\uB2E4. \uB098\uB3C4 \uB3D9\uC758\uD55C\uB2E4."
+    example: The mule says this trip is animal abuse. I have to agree.
+    exampleMeaning: "\uB178\uC0C8\uB294 \uC774\uBC88 \uC5EC\uD589\uC774 \uB3D9\uBB3C
+      \uD559\uB300\uB77C\uACE0 \uC8FC\uC7A5\uD55C\uB2E4. \uB098\uB3C4 \uC778\uC815\uD560
+      \uC218\uBC16\uC5D0 \uC5C6\uB2E4."
     story: 85
     storyHeading: 
   - id: academy
@@ -75,9 +76,9 @@ MonoBehaviour:
     english: acquisition
     meaning: "\uC2B5\uB4DD, \uC778\uC218"
     partOfSpeech: n
-    example: My latest acquisition is a spoon with no handle.
-    exampleMeaning: "\uCD5C\uADFC \uC2B5\uB4DD\uD488\uC740 \uC190\uC7A1\uC774 \uC5C6\uB294
-      \uC21F\uAC00\uB77D\uC774\uB2E4."
+    example: My latest acquisition is a spoon without a handle.
+    exampleMeaning: "\uB0B4\uAC00 \uCD5C\uADFC\uC5D0 \uC5BB\uC740 \uBB3C\uAC74\uC740
+      \uC190\uC7A1\uC774\uAC00 \uC5C6\uB294 \uC21F\uAC00\uB77D\uC774\uB2E4."
     story: 249
     storyHeading: 
   - id: agency
@@ -110,9 +111,9 @@ MonoBehaviour:
     english: alert
     meaning: "\uACBD\uACC4\uD558\uB294, \uAE30\uBBFC\uD55C"
     partOfSpeech: adj
-    example: 'Stay alert: the toad swallows whatever you say.'
-    exampleMeaning: "\uACBD\uACC4\uD560 \uAC83. \uB450\uAEBC\uBE44\uB294 \uBB50\uB4E0
-      \uB9D0\uD558\uB294 \uB300\uB85C \uC0BC\uD0A8\uB2E4."
+    example: 'Stay alert: the toad swallows anything you say.'
+    exampleMeaning: "\uACBD\uACC4\uB97C \uB2A6\uCD94\uC9C0 \uB9D0 \uAC83. \uB450\uAEBC\uBE44\uB294
+      \uB124\uAC00 \uB9D0\uD558\uB294 \uAC83\uC740 \uBB34\uC5C7\uC774\uB4E0 \uC0BC\uD0A8\uB2E4."
     story: 202
     storyHeading: "85\uC77C\uC9F8"
   - id: alien
@@ -128,9 +129,9 @@ MonoBehaviour:
     english: ambassador
     meaning: "\uB300\uC0AC, \uC0AC\uC808"
     partOfSpeech: n
-    example: I am now the ambassador of the ministry to frogs.
-    exampleMeaning: "\uC774\uC81C \uB098\uB294 \uBD80\uCC98\uAC00 \uAC1C\uAD6C\uB9AC\uB4E4\uC5D0\uAC8C
-      \uBCF4\uB0B8 \uC0AC\uC808\uC774\uB2E4."
+    example: I am now the ministry's ambassador to the frogs.
+    exampleMeaning: "\uC774\uC81C \uB098\uB294 \uC815\uBD80 \uBD80\uCC98\uB97C \uB300\uD45C\uD574
+      \uAC1C\uAD6C\uB9AC\uB4E4\uC5D0\uAC8C \uD30C\uACAC\uB41C \uB300\uC0AC\uB2E4."
     story: 166
     storyHeading: 
   - id: ancient
@@ -156,8 +157,8 @@ MonoBehaviour:
     meaning: "\uAE30\uB150\uC77C"
     partOfSpeech: n
     example: Today is the anniversary of my last hot meal.
-    exampleMeaning: "\uC624\uB298\uC740 \uB9C8\uC9C0\uB9C9\uC73C\uB85C \uB530\uB73B\uD55C
-      \uBC25\uC744 \uBA39\uC740 \uAE30\uB150\uC77C\uC774\uB2E4."
+    exampleMeaning: "\uC624\uB298\uC740 \uB0B4\uAC00 \uB9C8\uC9C0\uB9C9\uC73C\uB85C
+      \uB530\uB73B\uD55C \uC2DD\uC0AC\uB97C \uD55C \uB0A0\uC758 \uAE30\uB150\uC77C\uC774\uB2E4."
     story: 115
     storyHeading: 
   - id: anxiety
@@ -191,9 +192,10 @@ MonoBehaviour:
     english: assault
     meaning: "\uD3ED\uD589, \uACF5\uACA9"
     partOfSpeech: n
-    example: The mule's assault on my map was sudden and complete.
-    exampleMeaning: "\uB0B4 \uC9C0\uB3C4\uC5D0 \uB300\uD55C \uB178\uC0C8\uC758 \uACF5\uACA9\uC740
-      \uAC11\uC791\uC2A4\uB7FD\uACE0 \uC644\uBCBD\uD588\uB2E4."
+    example: The mule's assault on my map came without warning and left it in pieces.
+    exampleMeaning: "\uB178\uC0C8\uAC00 \uB0B4 \uC9C0\uB3C4\uB97C \uAC11\uC790\uAE30
+      \uACF5\uACA9\uD588\uACE0, \uC9C0\uB3C4\uB294 \uC0B0\uC0B0\uC870\uAC01\uC774
+      \uB0AC\uB2E4."
     story: 84
     storyHeading: 
   - id: auction
@@ -281,7 +283,7 @@ MonoBehaviour:
     meaning: "\uBC29\uC1A1\uD558\uB2E4"
     partOfSpeech: v
     example: The frogs broadcast our location every night.
-    exampleMeaning: "\uAC1C\uAD6C\uB9AC\uB4E4\uC740 \uB9E4\uC77C \uBC24 \uC6B0\uB9AC
+    exampleMeaning: "\uAC1C\uAD6C\uB9AC\uB4E4\uC740 \uB9E4\uC77C \uBC24 \uC6B0\uB9AC\uC758
       \uC704\uCE58\uB97C \uBC29\uC1A1\uD55C\uB2E4."
     story: 165
     storyHeading: 
@@ -289,9 +291,9 @@ MonoBehaviour:
     english: bull
     meaning: "\uD669\uC18C"
     partOfSpeech: n
-    example: The mule thinks it is a bull.
-    exampleMeaning: "\uB178\uC0C8\uB294 \uC790\uAE30\uAC00 \uD669\uC18C\uC778 \uC904
-      \uC548\uB2E4."
+    example: The mule seems to think it is a bull.
+    exampleMeaning: "\uB178\uC0C8\uB294 \uC790\uAE30\uAC00 \uD669\uC18C\uB77C\uACE0
+      \uC0DD\uAC01\uD558\uB294 \uBAA8\uC591\uC774\uB2E4."
     story: 168
     storyHeading: 
   - id: cancer
@@ -361,8 +363,8 @@ MonoBehaviour:
     meaning: "\uD63C\uB3C8, \uD63C\uB780"
     partOfSpeech: n
     example: By the third day, the crew was in chaos.
-    exampleMeaning: "\uC0AC\uD758\uC9F8\uAC00 \uB418\uC790 \uD300\uC740 \uD63C\uB3C8\uC5D0
-      \uBE60\uC84C\uB2E4."
+    exampleMeaning: "\uC0AC\uD758\uC9F8\uAC00 \uB418\uC790 \uC6B0\uB9AC \uD300\uC740
+      \uD63C\uB780\uC5D0 \uBE60\uC84C\uB2E4."
     story: 21
     storyHeading: "3\uC77C\uC9F8"
   - id: charity
@@ -422,9 +424,8 @@ MonoBehaviour:
     english: communist
     meaning: "\uACF5\uC0B0\uC8FC\uC758\uC790"
     partOfSpeech: n
-    example: The old writer was a communist when young.
-    exampleMeaning: "\uADF8 \uB299\uC740 \uC791\uAC00\uB294 \uC80A\uC740 \uC2DC\uC808
-      \uACF5\uC0B0\uC8FC\uC758\uC790\uC600\uB2E4."
+    example: The old writer was a communist when he was young.
+    exampleMeaning: "\uADF8 \uB178\uC791\uAC00\uB294 \uC80A\uC740 \uC2DC\uC808 \uACF5\uC0B0\uC8FC\uC758\uC790\uC600\uB2E4."
     story: 0
     storyHeading: 
   - id: compete
@@ -440,9 +441,9 @@ MonoBehaviour:
     english: component
     meaning: "\uAD6C\uC131 \uC694\uC18C, \uBD80\uD488"
     partOfSpeech: n
-    example: One component was missing, so I used my spoon.
-    exampleMeaning: "\uBD80\uD488 \uD558\uB098\uAC00 \uC5C6\uC5B4\uC11C \uC21F\uAC00\uB77D\uC744
-      \uC37C\uB2E4."
+    example: One component was missing, so I used my spoon instead.
+    exampleMeaning: "\uBD80\uD488 \uD558\uB098\uAC00 \uBE60\uC838 \uC788\uC5B4\uC11C
+      \uB300\uC2E0 \uB0B4 \uC21F\uAC00\uB77D\uC744 \uC0AC\uC6A9\uD588\uB2E4."
     story: 229
     storyHeading: 
   - id: concrete
@@ -504,25 +505,26 @@ MonoBehaviour:
     meaning: "\uB17C\uB780"
     partOfSpeech: n
     example: The biscuits caused a serious controversy.
-    exampleMeaning: "\uBE44\uC2A4\uD0B7\uC740 \uC2EC\uAC01\uD55C \uB17C\uB780\uC744
-      \uBD88\uB7EC\uC654\uB2E4."
+    exampleMeaning: "\uBE44\uC2A4\uD0B7 \uB54C\uBB38\uC5D0 \uC2EC\uAC01\uD55C \uB17C\uB780\uC774
+      \uBC8C\uC5B4\uC84C\uB2E4."
     story: 24
     storyHeading: 
   - id: core
     english: core
     meaning: "\uD575\uC2EC, \uC911\uC2EC"
     partOfSpeech: n
-    example: At the core of the vine, sentences were trapped.
-    exampleMeaning: "\uB369\uAD74 \uC911\uC2EC\uC5D0 \uBB38\uC7A5\uB4E4\uC774 \uAC07\uD600
-      \uC788\uC5C8\uB2E4."
+    example: At the core of the vine, I found sentences trapped inside.
+    exampleMeaning: "\uB369\uAD74\uC758 \uC911\uC2EC\uBD80\uC5D0\uC11C \uADF8 \uC548\uC5D0
+      \uAC07\uD78C \uBB38\uC7A5\uB4E4\uC744 \uBC1C\uACAC\uD588\uB2E4."
     story: 280
     storyHeading: 
   - id: corporate
     english: corporate
     meaning: "\uAE30\uC5C5\uC758, \uBC95\uC778\uC758"
     partOfSpeech: adj
-    example: My corporate manners died in the swamp.
-    exampleMeaning: "\uB0B4 \uD68C\uC0AC \uC608\uC808\uC740 \uB2AA\uC5D0\uC11C \uC8FD\uC5C8\uB2E4."
+    example: My corporate manners disappeared somewhere in the swamp.
+    exampleMeaning: "\uB0B4 \uD68C\uC0AC \uC0DD\uD65C \uC608\uC808\uC740 \uB2AA \uC5B4\uB518\uAC00\uC5D0\uC11C
+      \uC0AC\uB77C\uC838 \uBC84\uB838\uB2E4."
     story: 158
     storyHeading: 
   - id: courage
@@ -547,18 +549,19 @@ MonoBehaviour:
     english: crew
     meaning: "\uC2B9\uBB34\uC6D0, \uD300"
     partOfSpeech: n
-    example: My crew had five people and one very angry mule.
-    exampleMeaning: "\uC6B0\uB9AC \uD300\uC740 \uB2E4\uC12F \uBA85\uACFC \uC544\uC8FC
-      \uD654\uB09C \uB178\uC0C8 \uD55C \uB9C8\uB9AC\uC600\uB2E4."
+    example: My crew consisted of five people and one very angry mule.
+    exampleMeaning: "\uC6B0\uB9AC \uD300\uC740 \uB2E4\uC12F \uBA85\uACFC \uBAB9\uC2DC
+      \uC2EC\uC220\uAD82\uC740 \uB178\uC0C8 \uD55C \uB9C8\uB9AC\uB85C \uC774\uB8E8\uC5B4\uC838
+      \uC788\uC5C8\uB2E4."
     story: 6
     storyHeading: 
   - id: crucial
     english: crucial
     meaning: "\uACB0\uC815\uC801\uC778, \uC911\uB300\uD55C"
     partOfSpeech: adj
-    example: It is crucial to pull the lever before the bridge.
-    exampleMeaning: "\uB2E4\uB9AC \uC55E\uC5D0\uC11C \uB808\uBC84\uB97C \uB2F9\uAE30\uB294
-      \uAC83\uC774 \uACB0\uC815\uC801\uC774\uB2E4."
+    example: It is crucial to pull the lever before crossing the bridge.
+    exampleMeaning: "\uB2E4\uB9AC\uB97C \uAC74\uB108\uAE30 \uC804\uC5D0 \uB808\uBC84\uB97C
+      \uB2F9\uAE30\uB294 \uAC83\uC774 \uB9E4\uC6B0 \uC911\uC694\uD558\uB2E4."
     story: 226
     storyHeading: 
   - id: crystal
@@ -591,9 +594,9 @@ MonoBehaviour:
     english: database
     meaning: "\uB370\uC774\uD130\uBCA0\uC774\uC2A4"
     partOfSpeech: n
-    example: The school keeps its records in a database.
+    example: The school stores its records in a database.
     exampleMeaning: "\uD559\uAD50\uB294 \uAE30\uB85D\uC744 \uB370\uC774\uD130\uBCA0\uC774\uC2A4\uC5D0
-      \uBCF4\uAD00\uD55C\uB2E4."
+      \uC800\uC7A5\uD55C\uB2E4."
     story: 0
     storyHeading: 
   - id: decade
@@ -609,9 +612,9 @@ MonoBehaviour:
     english: decent
     meaning: "\uAD1C\uCC2E\uC740, \uD488\uC704 \uC788\uB294"
     partOfSpeech: adj
-    example: A decent blanket would make me cry.
-    exampleMeaning: "\uAD1C\uCC2E\uC740 \uB2F4\uC694 \uD558\uB098\uBA74 \uC6B8 \uAC83
-      \uAC19\uB2E4."
+    example: A decent blanket would be enough to make me cry.
+    exampleMeaning: "\uC81C\uB300\uB85C \uB41C \uB2F4\uC694 \uD558\uB098\uB9CC \uC788\uC5B4\uB3C4
+      \uAC10\uACA9\uD574\uC11C \uC6B8 \uAC83 \uAC19\uB2E4."
     story: 138
     storyHeading: 
   - id: decline
@@ -643,9 +646,9 @@ MonoBehaviour:
     english: democracy
     meaning: "\uBBFC\uC8FC\uC8FC\uC758"
     partOfSpeech: n
-    example: Democracy is hard when the mule has the only vote.
-    exampleMeaning: "\uB178\uC0C8\uB9CC \uD45C\uB97C \uAC00\uC84C\uC73C\uBA74 \uBBFC\uC8FC\uC8FC\uC758\uB294
-      \uC5B4\uB835\uB2E4."
+    example: Democracy is difficult when the mule has the only vote.
+    exampleMeaning: "\uB178\uC0C8\uB9CC \uD22C\uD45C\uAD8C\uC744 \uAC00\uC9C0\uACE0
+      \uC788\uC73C\uBA74 \uBBFC\uC8FC\uC8FC\uC758\uB294 \uC5B4\uB824\uC6CC\uC9C4\uB2E4."
     story: 154
     storyHeading: 
   - id: device
@@ -678,18 +681,18 @@ MonoBehaviour:
     english: dispute
     meaning: "\uBD84\uC7C1, \uB17C\uC7C1"
     partOfSpeech: n
-    example: A dispute began over which way was north.
+    example: A dispute broke out over which direction was north.
     exampleMeaning: "\uC5B4\uB290 \uCABD\uC774 \uBD81\uCABD\uC778\uC9C0\uB97C \uB450\uACE0
-      \uBD84\uC7C1\uC774 \uC2DC\uC791\uB418\uC5C8\uB2E4."
+      \uB17C\uC7C1\uC774 \uBC8C\uC5B4\uC84C\uB2E4."
     story: 22
     storyHeading: 
   - id: distinct
     english: distinct
     meaning: "\uB69C\uB837\uD55C, \uBCC4\uAC1C\uC758"
     partOfSpeech: adj
-    example: 'I heard one distinct word: home.'
-    exampleMeaning: "\uB69C\uB837\uD55C \uD55C\uB9C8\uB514\uAC00 \uB4E4\uB838\uB2E4.
-      \uC9D1."
+    example: 'I heard one distinct word: "Home."'
+    exampleMeaning: "\uB098\uB294 \uB610\uB837\uD55C \uB2E8\uC5B4 \uD558\uB098\uB97C
+      \uB4E4\uC5C8\uB2E4. \"\uC9D1.\""
     story: 127
     storyHeading: 
   - id: domain
@@ -705,18 +708,20 @@ MonoBehaviour:
     english: draft
     meaning: "\uCD08\uC548, \uC6D0\uACE0"
     partOfSpeech: n
-    example: This is only a draft; please excuse the mud.
-    exampleMeaning: "\uC774\uAC74 \uCD08\uC548\uC77C \uBFD0\uC774\uB2E4. \uC9C4\uD759\uC740
-      \uC591\uD574\uD574 \uC8FC\uAE38."
+    example: This is only a draft, so please excuse the mud stains.
+    exampleMeaning: "\uC774\uAC74 \uCD08\uC548\uC77C \uBFD0\uC774\uB2C8 \uC9C4\uD759
+      \uC5BC\uB8E9\uC740 \uC591\uD574\uD574 \uC8FC\uAE38 \uBC14\uB780\uB2E4."
     story: 31
     storyHeading: 
   - id: dual
     english: dual
     meaning: "\uC774\uC911\uC758, \uB458\uC758"
     partOfSpeech: adj
-    example: It had a dual voice, mine and something worse.
-    exampleMeaning: "\uADF8\uAC83\uC740 \uC774\uC911\uC758 \uBAA9\uC18C\uB9AC\uB97C
-      \uB0C8\uB2E4. \uB0B4 \uAC83\uACFC \uB354 \uB098\uC05C \uAC83."
+    example: 'It had a dual voice: one sounded like mine, and the other sounded even
+      worse.'
+    exampleMeaning: "\uADF8\uAC83\uC740 \uB450 \uAC00\uC9C0 \uBAA9\uC18C\uB9AC\uB97C
+      \uB0C8\uB2E4. \uD558\uB098\uB294 \uB0B4 \uBAA9\uC18C\uB9AC\uC600\uACE0, \uB2E4\uB978
+      \uD558\uB098\uB294 \uADF8\uBCF4\uB2E4 \uB354 \uB054\uCC0D\uD588\uB2E4."
     story: 126
     storyHeading: 
   - id: dynamic
@@ -732,35 +737,35 @@ MonoBehaviour:
     english: efficient
     meaning: "\uD6A8\uC728\uC801\uC778"
     partOfSpeech: adj
-    example: The most efficient way to cross is to fall in.
-    exampleMeaning: "\uAC74\uB108\uB294 \uAC00\uC7A5 \uD6A8\uC728\uC801\uC778 \uBC29\uBC95\uC740
-      \uBE60\uC9C0\uB294 \uAC83\uC774\uB2E4."
+    example: The most efficient way to cross the river is to fall into it.
+    exampleMeaning: "\uAC15\uC744 \uAC74\uB108\uB294 \uAC00\uC7A5 \uD6A8\uC728\uC801\uC778
+      \uBC29\uBC95\uC740 \uADF8\uB0E5 \uBE60\uC9C0\uB294 \uAC83\uC774\uB2E4."
     story: 142
     storyHeading: 
   - id: electronic
     english: electronic
     meaning: "\uC804\uC790\uC758"
     partOfSpeech: adj
-    example: Electronic books are easy to carry.
-    exampleMeaning: "\uC804\uC790\uCC45\uC740 \uB4E4\uACE0 \uB2E4\uB2C8\uAE30 \uC27D\uB2E4."
+    example: Electronic books are easy to carry around.
+    exampleMeaning: "\uC804\uC790\uCC45\uC740 \uD734\uB300\uD558\uAE30 \uD3B8\uB9AC\uD558\uB2E4."
     story: 0
     storyHeading: 
   - id: elite
     english: elite
     meaning: "\uC5D8\uB9AC\uD2B8, \uC815\uC608"
     partOfSpeech: n
-    example: The elite of the ministry have never seen a swamp.
-    exampleMeaning: "\uBD80\uCC98\uC758 \uC5D8\uB9AC\uD2B8\uB4E4\uC740 \uB2AA\uC744
-      \uBCF8 \uC801\uC774 \uC5C6\uB2E4."
+    example: The elite at the ministry have never even seen a swamp.
+    exampleMeaning: "\uC815\uBD80 \uBD80\uCC98\uC758 \uC5D8\uB9AC\uD2B8\uB4E4\uC740
+      \uB2AA\uC744 \uBCF8 \uC801\uC870\uCC28 \uC5C6\uB2E4."
     story: 214
     storyHeading: 
   - id: emergency
     english: emergency
     meaning: "\uBE44\uC0C1\uC0AC\uD0DC, \uC751\uAE09"
     partOfSpeech: n
-    example: I declared an emergency. The mule did not care.
-    exampleMeaning: "\uB098\uB294 \uBE44\uC0C1\uC0AC\uD0DC\uB97C \uC120\uC5B8\uD588\uB2E4.
-      \uB178\uC0C8\uB294 \uC2E0\uACBD \uC4F0\uC9C0 \uC54A\uC558\uB2E4."
+    example: I declared an emergency, but the mule did not care.
+    exampleMeaning: "\uB098\uB294 \uBE44\uC0C1\uC0AC\uD0DC\uB97C \uC120\uC5B8\uD588\uC9C0\uB9CC,
+      \uB178\uC0C8\uB294 \uC2E0\uACBD\uB3C4 \uC4F0\uC9C0 \uC54A\uC558\uB2E4."
     story: 28
     storyHeading: 
   - id: encounter
@@ -784,9 +789,9 @@ MonoBehaviour:
     english: entry
     meaning: "\uC785\uC7A5, \uCD9C\uC785"
     partOfSpeech: n
-    example: The sign said no entry, but the letters were mixed up.
-    exampleMeaning: "\uD45C\uC9C0\uD310\uC5D0\uB294 \uCD9C\uC785 \uAE08\uC9C0\uB77C
-      \uC801\uD614\uC9C0\uB9CC \uAE00\uC790\uAC00 \uB4A4\uC11E\uC5EC \uC788\uC5C8\uB2E4."
+    example: The sign said no entry, but the letters were all jumbled.
+    exampleMeaning: "\uD45C\uC9C0\uD310\uC5D0\uB294 \uCD9C\uC785 \uAE08\uC9C0\uB77C\uACE0
+      \uC801\uD600 \uC788\uC5C8\uC9C0\uB9CC \uAE00\uC790\uB4E4\uC774 \uB4A4\uC8FD\uBC15\uC8FD\uC774\uC5C8\uB2E4."
     story: 16
     storyHeading: 
   - id: era
@@ -811,17 +816,18 @@ MonoBehaviour:
     english: ethnic
     meaning: "\uBBFC\uC871\uC758, \uC778\uC885\uC758"
     partOfSpeech: adj
-    example: The city has many ethnic restaurants.
-    exampleMeaning: "\uADF8 \uB3C4\uC2DC\uC5D0\uB294 \uC5EC\uB7EC \uBBFC\uC871 \uC74C\uC2DD\uC810\uC774
-      \uC788\uB2E4."
+    example: The city has restaurants serving many different ethnic cuisines.
+    exampleMeaning: "\uADF8 \uB3C4\uC2DC\uC5D0\uB294 \uB2E4\uC591\uD55C \uBBFC\uC871\uC758
+      \uC74C\uC2DD\uC744 \uC81C\uACF5\uD558\uB294 \uC2DD\uB2F9\uB4E4\uC774 \uC788\uB2E4."
     story: 0
     storyHeading: 
   - id: evolution
     english: evolution
     meaning: "\uC9C4\uD654, \uBC1C\uC804"
     partOfSpeech: n
-    example: The evolution of my diet is frightening.
-    exampleMeaning: "\uB0B4 \uC2DD\uB2E8\uC758 \uBC1C\uC804\uC740 \uBB34\uC12D\uB2E4."
+    example: The evolution of my diet is becoming frightening.
+    exampleMeaning: "\uB0B4 \uC2DD\uB2E8\uC758 \uBCC0\uD654 \uACFC\uC815\uC774 \uC810\uC810
+      \uBB34\uC11C\uC6CC\uC9C0\uACE0 \uC788\uB2E4."
     story: 250
     storyHeading: 
   - id: executive
@@ -862,9 +868,9 @@ MonoBehaviour:
     english: extraordinary
     meaning: "\uD2B9\uBCC4\uD55C, \uBE44\uBC94\uD55C"
     partOfSpeech: adj
-    example: Its tongue is extraordinary, and so is its appetite.
-    exampleMeaning: "\uADF8 \uD600\uB294 \uD2B9\uBCC4\uD558\uACE0, \uC2DD\uC695\uB3C4
-      \uADF8\uB807\uB2E4."
+    example: Its tongue is extraordinary, and its appetite is just as impressive.
+    exampleMeaning: "\uADF8 \uD600\uB294 \uB180\uB77C\uC6B8 \uC815\uB3C4\uB85C \uB300\uB2E8\uD558\uACE0,
+      \uC2DD\uC695\uB3C4 \uADF8\uC5D0 \uBABB\uC9C0\uC54A\uB2E4."
     story: 204
     storyHeading: 
   - id: facility
@@ -915,8 +921,9 @@ MonoBehaviour:
     english: federal
     meaning: "\uC5F0\uBC29\uC758"
     partOfSpeech: adj
-    example: No federal law covers this.
-    exampleMeaning: "\uC774\uAC74 \uC5B4\uB5A4 \uC5F0\uBC29\uBC95\uC5D0\uB3C4 \uC5C6\uB2E4."
+    example: No federal law seems to cover this situation.
+    exampleMeaning: "\uC774\uB7F0 \uC0C1\uD669\uC5D0 \uC801\uC6A9\uB418\uB294 \uC5F0\uBC29\uBC95\uC740
+      \uC5C6\uB294 \uAC83 \uAC19\uB2E4."
     story: 155
     storyHeading: 
   - id: fiction
@@ -931,18 +938,19 @@ MonoBehaviour:
     english: filter
     meaning: "\uC5EC\uACFC\uAE30, \uD544\uD130"
     partOfSpeech: n
-    example: I made a filter from my last clean sock.
-    exampleMeaning: "\uB9C8\uC9C0\uB9C9 \uB0A8\uC740 \uAE68\uB057\uD55C \uC591\uB9D0\uB85C
-      \uC5EC\uACFC\uAE30\uB97C \uB9CC\uB4E4\uC5C8\uB2E4."
+    example: I made a filter out of my last clean sock.
+    exampleMeaning: "\uB9C8\uC9C0\uB9C9\uC73C\uB85C \uB0A8\uC740 \uAE68\uB057\uD55C
+      \uC591\uB9D0\uB85C \uC5EC\uACFC\uAE30\uB97C \uB9CC\uB4E4\uC5C8\uB2E4."
     story: 39
     storyHeading: 
   - id: format
     english: format
     meaning: "\uD615\uC2DD, \uAD6C\uC131"
     partOfSpeech: n
-    example: The ministry wants a proper format, even here.
-    exampleMeaning: "\uBD80\uCC98\uB294 \uC5EC\uAE30\uC11C\uB3C4 \uC81C\uB300\uB85C
-      \uB41C \uD615\uC2DD\uC744 \uC6D0\uD55C\uB2E4."
+    example: The ministry still wants the report in the proper format, even out here.
+    exampleMeaning: "\uC815\uBD80 \uBD80\uCC98\uB294 \uC774\uB7F0 \uACF3\uC5D0\uC11C\uB3C4
+      \uBCF4\uACE0\uC11C\uB97C \uC815\uD574\uC9C4 \uD615\uC2DD\uC5D0 \uB9DE\uCD94\uAE38
+      \uC6D0\uD55C\uB2E4."
     story: 32
     storyHeading: 
   - id: former
@@ -957,9 +965,11 @@ MonoBehaviour:
     english: formula
     meaning: "\uACF5\uC2DD, \uBC29\uC2DD"
     partOfSpeech: n
-    example: 'I worked out a formula: lost plus hungry equals poet.'
-    exampleMeaning: "\uACF5\uC2DD\uC744 \uC138\uC6E0\uB2E4. \uAE38 \uC783\uC74C \uB354\uD558\uAE30
-      \uBC30\uACE0\uD514\uC740 \uC2DC\uC778."
+    example: 'I came up with a formula: being lost plus being hungry equals becoming
+      a poet.'
+    exampleMeaning: "\uACF5\uC2DD\uC744 \uD558\uB098 \uB9CC\uB4E4\uC5C8\uB2E4. \uAE38\uC744
+      \uC783\uC740 \uC0C1\uD0DC\uC5D0 \uBC30\uACE0\uD514\uC744 \uB354\uD558\uBA74
+      \uC2DC\uC778\uC774 \uB41C\uB2E4."
     story: 234
     storyHeading: 
   - id: foster
@@ -975,18 +985,18 @@ MonoBehaviour:
     english: framework
     meaning: "\uD2C0, \uCCB4\uACC4"
     partOfSpeech: n
-    example: I drew a framework for a new map from memory.
-    exampleMeaning: "\uAE30\uC5B5\uC73C\uB85C \uC0C8 \uC9C0\uB3C4\uC758 \uD2C0\uC744
-      \uADF8\uB838\uB2E4."
+    example: I sketched a framework for a new map from memory.
+    exampleMeaning: "\uAE30\uC5B5\uC744 \uB354\uB4EC\uC5B4 \uC0C8\uB85C\uC6B4 \uC9C0\uB3C4\uC758
+      \uAE30\uBCF8 \uD2C0\uC744 \uADF8\uB838\uB2E4."
     story: 233
     storyHeading: "100\uC77C\uC9F8"
   - id: frequent
     english: frequent
     meaning: "\uC7A6\uC740, \uBE48\uBC88\uD55C"
     partOfSpeech: adj
-    example: Frequent rain turned my notes to soup.
-    exampleMeaning: "\uC7A6\uC740 \uBE44\uC5D0 \uB0B4 \uAE30\uB85D\uC774 \uC218\uD504\uAC00
-      \uB418\uC5C8\uB2E4."
+    example: Frequent rain turned my notes into mush.
+    exampleMeaning: "\uC7A6\uC740 \uBE44 \uB54C\uBB38\uC5D0 \uB0B4 \uAE30\uB85D\uC740
+      \uC5C9\uB9DD\uC774 \uB418\uC5C8\uB2E4."
     story: 123
     storyHeading: 
   - id: fuel
@@ -1036,8 +1046,9 @@ MonoBehaviour:
     english: gap
     meaning: "\uD2C8, \uACA9\uCC28"
     partOfSpeech: n
-    example: Through a gap in the trees I saw a river.
-    exampleMeaning: "\uB098\uBB34 \uD2C8\uC73C\uB85C \uAC15\uC774 \uBCF4\uC600\uB2E4."
+    example: Through a gap in the trees, I caught sight of a river.
+    exampleMeaning: "\uB098\uBB34 \uC0AC\uC774\uC758 \uD2C8\uC73C\uB85C \uAC15\uC774
+      \uBCF4\uC600\uB2E4."
     story: 111
     storyHeading: 
   - id: gender
@@ -1061,9 +1072,9 @@ MonoBehaviour:
     english: genius
     meaning: "\uCC9C\uC7AC"
     partOfSpeech: n
-    example: I am no genius, but I can climb when afraid.
-    exampleMeaning: "\uCC9C\uC7AC\uB294 \uC544\uB2C8\uC9C0\uB9CC, \uBB34\uC11C\uC6B0\uBA74
-      \uB098\uBB34\uB294 \uD0C4\uB2E4."
+    example: I am no genius, but fear makes me a good climber.
+    exampleMeaning: "\uB098\uB294 \uCC9C\uC7AC\uB294 \uC544\uB2C8\uC9C0\uB9CC, \uB450\uB824\uC6B0\uBA74
+      \uB098\uBB34\uB97C \uC798 \uD0C4\uB2E4."
     story: 207
     storyHeading: 
   - id: genuine
@@ -1115,7 +1126,7 @@ MonoBehaviour:
     meaning: "\uCD1D\uACC4\uC758, \uC5ED\uACA8\uC6B4"
     partOfSpeech: adj
     example: The swamp water tastes gross.
-    exampleMeaning: "\uB2AA \uBB3C\uC740 \uC5ED\uACA8\uC6B4 \uB9DB\uC774 \uB09C\uB2E4."
+    exampleMeaning: "\uB2AA\uC758 \uBB3C\uC740 \uC5ED\uACA8\uC6B4 \uB9DB\uC774 \uB09C\uB2E4."
     story: 37
     storyHeading: 
   - id: guardian
@@ -1131,9 +1142,9 @@ MonoBehaviour:
     english: gulf
     meaning: "\uB9CC(\u7063), \uACA9\uCC28"
     partOfSpeech: n
-    example: The river opened into a wide gulf of brown water.
+    example: The river opened into a wide gulf of muddy water.
     exampleMeaning: "\uAC15\uC740 \uB113\uC740 \uD759\uD0D5\uBB3C \uB9CC\uC73C\uB85C
-      \uD2B8\uC600\uB2E4."
+      \uC774\uC5B4\uC84C\uB2E4."
     story: 121
     storyHeading: 
   - id: headquarters
@@ -1202,9 +1213,9 @@ MonoBehaviour:
     english: ideal
     meaning: "\uC774\uC0C1\uC801\uC778"
     partOfSpeech: adj
-    example: This is not an ideal place to sleep.
-    exampleMeaning: "\uC5EC\uAE30\uB294 \uC7A0\uC790\uAE30\uC5D0 \uC774\uC0C1\uC801\uC778
-      \uACF3\uC774 \uC544\uB2C8\uB2E4."
+    example: This is hardly an ideal place to sleep.
+    exampleMeaning: "\uC5EC\uAE30\uB294 \uC7A0\uC790\uAE30\uC5D0 \uC804\uD600 \uC774\uC0C1\uC801\uC778
+      \uC7A5\uC18C\uAC00 \uC544\uB2C8\uB2E4."
     story: 137
     storyHeading: 
   - id: impact
@@ -1238,9 +1249,9 @@ MonoBehaviour:
     english: initial
     meaning: "\uCC98\uC74C\uC758, \uCD08\uAE30\uC758"
     partOfSpeech: adj
-    example: My initial plan had a lunch break.
-    exampleMeaning: "\uB0B4 \uCC98\uC74C \uACC4\uD68D\uC5D0\uB294 \uC810\uC2EC\uC2DC\uAC04\uC774
-      \uC788\uC5C8\uB2E4."
+    example: My initial plan even included a lunch break.
+    exampleMeaning: "\uB0B4 \uCD5C\uCD08 \uACC4\uD68D\uC5D0\uB294 \uC810\uC2EC\uC2DC\uAC04\uB3C4
+      \uD3EC\uD568\uB418\uC5B4 \uC788\uC5C8\uB2E4."
     story: 242
     storyHeading: 
   - id: input
@@ -1266,8 +1277,8 @@ MonoBehaviour:
     meaning: "\uCD1D\uBA85\uD55C, \uC9C0\uC801\uC778"
     partOfSpeech: adj
     example: The toad is more intelligent than my old boss.
-    exampleMeaning: "\uB450\uAEBC\uBE44\uB294 \uB0B4 \uC61B \uC0C1\uC0AC\uBCF4\uB2E4
-      \uCD1D\uBA85\uD558\uB2E4."
+    exampleMeaning: "\uADF8 \uB450\uAEBC\uBE44\uB294 \uB0B4 \uC61B \uC0C1\uC0AC\uBCF4\uB2E4
+      \uB611\uB611\uD558\uB2E4."
     story: 208
     storyHeading: 
   - id: interior
@@ -1282,9 +1293,10 @@ MonoBehaviour:
     english: jail
     meaning: "\uAC10\uC625"
     partOfSpeech: n
-    example: Our jail was a circle of sticks; nobody stayed in it.
-    exampleMeaning: "\uC6B0\uB9AC \uAC10\uC625\uC740 \uB098\uBB47\uAC00\uC9C0 \uC6D0\uC774\uC5C8\uB2E4.
-      \uC544\uBB34\uB3C4 \uC548 \uC788\uC5C8\uB2E4."
+    example: Our jail was just a circle of sticks, and nobody stayed inside it.
+    exampleMeaning: "\uC6B0\uB9AC\uC758 \uAC10\uC625\uC740 \uB098\uBB47\uAC00\uC9C0\uB85C
+      \uB9CC\uB4E0 \uC6D0\uC5D0 \uBD88\uACFC\uD588\uACE0, \uADF8 \uC548\uC5D0 \uBA38\uBB34\uB294
+      \uC0AC\uB78C\uC740 \uC544\uBB34\uB3C4 \uC5C6\uC5C8\uB2E4."
     story: 82
     storyHeading: 
   - id: joint
@@ -1308,52 +1320,54 @@ MonoBehaviour:
     english: jury
     meaning: "\uBC30\uC2EC\uC6D0\uB2E8"
     partOfSpeech: n
-    example: We held a trial. The jury was two men and a mule.
-    exampleMeaning: "\uC7AC\uD310\uC744 \uC5F4\uC5C8\uB2E4. \uBC30\uC2EC\uC6D0\uB2E8\uC740
-      \uB450 \uC0AC\uB78C\uACFC \uB178\uC0C8\uC600\uB2E4."
+    example: We held a trial. The jury consisted of two men and a mule.
+    exampleMeaning: "\uC6B0\uB9AC\uB294 \uC7AC\uD310\uC744 \uC5F4\uC5C8\uB2E4. \uBC30\uC2EC\uC6D0\uC740
+      \uB450 \uC0AC\uB78C\uACFC \uB178\uC0C8 \uD55C \uB9C8\uB9AC\uC600\uB2E4."
     story: 80
     storyHeading: 
   - id: kit
     english: kit
     meaning: "\uB3C4\uAD6C \uD55C \uBC8C, \uD0A4\uD2B8"
     partOfSpeech: n
-    example: I packed a full kit of pens, rope and biscuits.
-    exampleMeaning: "\uD39C\uACFC \uBC27\uC904\uACFC \uBE44\uC2A4\uD0B7\uC73C\uB85C
-      \uB3C4\uAD6C \uD55C \uBC8C\uC744 \uAFB8\uB838\uB2E4."
+    example: I packed a complete kit of pens, rope, and biscuits.
+    exampleMeaning: "\uB098\uB294 \uD39C\uACFC \uBC27\uC904, \uBE44\uC2A4\uD0B7\uC73C\uB85C
+      \uD544\uC694\uD55C \uC7A5\uBE44\uB97C \uBE60\uC9D0\uC5C6\uC774 \uCC59\uACBC\uB2E4."
     story: 7
     storyHeading: 
   - id: knight
     english: knight
     meaning: "\uAE30\uC0AC(\u9A0E\u58EB)"
     partOfSpeech: n
-    example: I found a rusted knight standing guard, empty inside.
-    exampleMeaning: "\uC18D\uC774 \uBE48 \uB179\uC2A8 \uAE30\uC0AC\uAC00 \uBCF4\uCD08\uB97C
-      \uC11C\uACE0 \uC788\uC5C8\uB2E4."
+    example: I found a rusted knight standing guard, with nothing inside its armor.
+    exampleMeaning: "\uAC11\uC637 \uC18D\uC774 \uD145 \uBE48 \uB179\uC2A8 \uAE30\uC0AC\uAC00
+      \uACBD\uBE44\uB97C \uC11C\uACE0 \uC788\uB294 \uAC83\uC744 \uBC1C\uACAC\uD588\uB2E4."
     story: 278
     storyHeading: 
   - id: landscape
     english: landscape
     meaning: "\uD48D\uACBD, \uACBD\uCE58"
     partOfSpeech: n
-    example: The landscape was so green it hurt my eyes.
-    exampleMeaning: "\uD48D\uACBD\uC740 \uB208\uC774 \uC544\uD50C \uB9CC\uD07C \uD478\uB974\uB800\uB2E4."
+    example: The landscape was so green that it almost hurt my eyes.
+    exampleMeaning: "\uD48D\uACBD\uC740 \uB208\uC774 \uC544\uD50C \uC815\uB3C4\uB85C
+      \uC628\uD1B5 \uD478\uB974\uB800\uB2E4."
     story: 13
     storyHeading: 
   - id: latter
     english: latter
     meaning: "\uD6C4\uC790\uC758, \uD6C4\uBC18\uC758"
     partOfSpeech: adj
-    example: Mud or rain? I choose the latter, and get both.
-    exampleMeaning: "\uC9C4\uD759\uC774\uB0D0 \uBE44\uB0D0? \uD6C4\uC790\uB97C \uACE8\uB790\uB294\uB370
-      \uB458 \uB2E4 \uC654\uB2E4."
+    example: Mud or rain? I chose the latter and got both.
+    exampleMeaning: "\uC9C4\uD759\uACFC \uBE44 \uC911 \uBB34\uC5C7\uC744 \uACE0\uB97C\uAE4C?
+      \uD6C4\uC790\uB97C \uACE8\uB790\uB354\uB2C8 \uB458 \uB2E4 \uC5BB\uC5C8\uB2E4."
     story: 241
     storyHeading: 
   - id: launch
     english: launch
     meaning: "\uC2DC\uC791\uD558\uB2E4, \uBC1C\uC0AC\uD558\uB2E4"
     partOfSpeech: v
-    example: We launch it at dawn.
-    exampleMeaning: "\uC0C8\uBCBD\uC5D0 \uBC30\uB97C \uB744\uC6B4\uB2E4."
+    example: We launch it at dawn and hope for the best.
+    exampleMeaning: "\uC0C8\uBCBD\uC5D0 \uBC30\uB97C \uB744\uC6B0\uACE0 \uC798\uB418\uAE30\uB97C
+      \uBC14\uB780\uB2E4."
     story: 119
     storyHeading: 
   - id: leather
@@ -1388,8 +1402,8 @@ MonoBehaviour:
     meaning: "\uC790\uC720"
     partOfSpeech: n
     example: It then took the liberty of eating the treaty.
-    exampleMeaning: "\uB178\uC0C8\uB294 \uACE7 \uC81C \uB9C8\uC74C\uB300\uB85C \uC870\uC57D\uC744
-      \uBA39\uC5B4 \uBC84\uB838\uB2E4."
+    exampleMeaning: "\uADF8\uB7EC\uB354\uB2C8 \uB178\uC0C8\uB294 \uC81C\uBA4B\uB300\uB85C
+      \uC870\uC57D\uC744 \uBA39\uC5B4 \uCE58\uC6E0\uB2E4."
     story: 150
     storyHeading: 
   - id: liquid
@@ -1404,8 +1418,9 @@ MonoBehaviour:
     english: literature
     meaning: "\uBB38\uD559"
     partOfSpeech: n
-    example: Hunger is very bad for literature.
-    exampleMeaning: "\uBC30\uACE0\uD514\uC740 \uBB38\uD559\uC5D0 \uC544\uC8FC \uB098\uC058\uB2E4."
+    example: Hunger is terrible for literature.
+    exampleMeaning: "\uBC30\uACE0\uD514\uC740 \uBB38\uD559 \uD65C\uB3D9\uC5D0 \uC815\uB9D0
+      \uC88B\uC9C0 \uC54A\uB2E4."
     story: 196
     storyHeading: 
   - id: logic
@@ -1421,8 +1436,9 @@ MonoBehaviour:
     english: luxury
     meaning: "\uC0AC\uCE58, \uD638\uD654\uB85C\uC6C0"
     partOfSpeech: n
-    example: Sleep is a luxury here.
-    exampleMeaning: "\uC5EC\uAE30\uC11C \uC7A0\uC740 \uC0AC\uCE58\uB2E4."
+    example: A good night's sleep is a luxury out here.
+    exampleMeaning: "\uC774\uB7F0 \uACF3\uC5D0\uC11C \uD479 \uC790\uB294 \uAC83\uC740
+      \uC0AC\uCE58\uB2E4."
     story: 98
     storyHeading: 
   - id: margin
@@ -1438,18 +1454,19 @@ MonoBehaviour:
     english: marine
     meaning: "\uBC14\uB2E4\uC758, \uD574\uC591\uC758"
     partOfSpeech: adj
-    example: The air smelled almost marine, salty and thick.
-    exampleMeaning: "\uACF5\uAE30\uB294 \uBC14\uB2E4 \uB0C4\uC0C8\uAC00 \uB0A0 \uB9CC\uD07C
-      \uC9DC\uACE0 \uC9C4\uD588\uB2E4."
+    example: The air smelled almost marine, thick with salt and moisture.
+    exampleMeaning: "\uACF5\uAE30\uC5D0\uC11C\uB294 \uC9E0\uB0B4\uC640 \uC2B5\uAE30\uAC00
+      \uB4A4\uC11E\uC778 \uBC14\uB2E4 \uB0C4\uC0C8\uAC00 \uB0AC\uB2E4."
     story: 117
     storyHeading: 
   - id: mature
     english: mature
     meaning: "\uC131\uC219\uD55C, \uB2E4 \uC790\uB780"
     partOfSpeech: adj
-    example: The cook says I am more mature now. I bit a frog.
-    exampleMeaning: "\uC694\uB9AC\uC0AC\uB294 \uB0B4\uAC00 \uC131\uC219\uD574\uC84C\uB2E4
-      \uD55C\uB2E4. \uB098\uB294 \uAC1C\uAD6C\uB9AC\uB97C \uBB3C\uC5C8\uB2E4."
+    example: The cook says I am more mature now. I just bit a frog.
+    exampleMeaning: "\uC694\uB9AC\uC0AC\uB294 \uB0B4\uAC00 \uC774\uC81C \uB354 \uC131\uC219\uD574\uC84C\uB2E4\uACE0
+      \uD55C\uB2E4. \uBC29\uAE08 \uAC1C\uAD6C\uB9AC\uB97C \uBB3C\uC5B4\uB72F\uC5C8\uC744
+      \uBFD0\uC778\uB370."
     story: 140
     storyHeading: 
   - id: mayor
@@ -1501,9 +1518,9 @@ MonoBehaviour:
     english: minimum
     meaning: "\uCD5C\uC18C"
     partOfSpeech: n
-    example: I eat the minimum now and write the maximum.
-    exampleMeaning: "\uC774\uC81C \uB098\uB294 \uCD5C\uC18C\uD55C\uB9CC \uBA39\uACE0
-      \uCD5C\uB300\uD55C \uC801\uB294\uB2E4."
+    example: I eat the minimum I can and write as much as possible.
+    exampleMeaning: "\uB098\uB294 \uBA39\uB294 \uC591\uC740 \uCD5C\uB300\uD55C \uC904\uC774\uACE0,
+      \uAE30\uB85D\uC740 \uCD5C\uB300\uD55C \uB9CE\uC774 \uD55C\uB2E4."
     story: 27
     storyHeading: 
   - id: ministry
@@ -1519,9 +1536,9 @@ MonoBehaviour:
     english: mobile
     meaning: "\uC774\uB3D9\uC2DD\uC758, \uC6C0\uC9C1\uC774\uB294"
     partOfSpeech: adj
-    example: Our mobile kitchen is a pot on a mule.
-    exampleMeaning: "\uC6B0\uB9AC \uC774\uB3D9\uC2DD \uBD80\uC5CC\uC740 \uB178\uC0C8
-      \uC704\uC758 \uB0C4\uBE44\uB2E4."
+    example: Our mobile kitchen consists of a pot strapped to the mule.
+    exampleMeaning: "\uC6B0\uB9AC\uC758 \uC774\uB3D9\uC2DD \uC8FC\uBC29\uC740 \uB178\uC0C8\uC5D0
+      \uBB36\uC5B4 \uB454 \uB0C4\uBE44 \uD558\uB098\uAC00 \uC804\uBD80\uB2E4."
     story: 131
     storyHeading: 
   - id: mode
@@ -1536,9 +1553,9 @@ MonoBehaviour:
     english: moderate
     meaning: "\uC801\uB2F9\uD55C, \uC628\uAC74\uD55C"
     partOfSpeech: adj
-    example: Moderate rain here means a small flood.
-    exampleMeaning: "\uC5EC\uAE30\uC11C \uC801\uB2F9\uD55C \uBE44\uB780 \uC791\uC740
-      \uD64D\uC218\uB97C \uB73B\uD55C\uB2E4."
+    example: Moderate rain here is enough to cause a small flood.
+    exampleMeaning: "\uC774\uACF3\uC5D0\uC11C\uB294 \uC801\uB2F9\uD55C \uBE44\uB9CC
+      \uB0B4\uB824\uB3C4 \uC791\uC740 \uD64D\uC218\uAC00 \uB09C\uB2E4."
     story: 139
     storyHeading: 
   - id: monster
@@ -1562,9 +1579,10 @@ MonoBehaviour:
     english: murder
     meaning: "\uC0B4\uC778"
     partOfSpeech: n
-    example: There was nearly a murder over the last spoon of soup.
-    exampleMeaning: "\uB9C8\uC9C0\uB9C9 \uC218\uD504 \uD55C \uC21F\uAC08\uC5D0 \uD558\uB9C8\uD130\uBA74
-      \uC0B4\uC778\uC774 \uB0A0 \uBED4\uD588\uB2E4."
+    example: There was almost a murder over the last spoonful of soup.
+    exampleMeaning: "\uB9C8\uC9C0\uB9C9 \uC218\uD504 \uD55C \uC21F\uAC00\uB77D \uB54C\uBB38\uC5D0
+      \uD558\uB9C8\uD130\uBA74 \uC0B4\uC778 \uC0AC\uAC74\uC774 \uBC8C\uC5B4\uC9C8
+      \uBED4\uD588\uB2E4."
     story: 83
     storyHeading: 
   - id: naked
@@ -1597,18 +1615,18 @@ MonoBehaviour:
     english: nuclear
     meaning: "\uD575\uC758, \uC6D0\uC790\uB825\uC758"
     partOfSpeech: adj
-    example: The country closed its last nuclear plant.
+    example: The country shut down its last nuclear power plant.
     exampleMeaning: "\uADF8 \uB098\uB77C\uB294 \uB9C8\uC9C0\uB9C9 \uC6D0\uC790\uB825
-      \uBC1C\uC804\uC18C\uB97C \uB2EB\uC558\uB2E4."
+      \uBC1C\uC804\uC18C\uC758 \uAC00\uB3D9\uC744 \uC911\uB2E8\uD588\uB2E4."
     story: 0
     storyHeading: 
   - id: numerous
     english: numerous
     meaning: "\uC218\uB9CE\uC740"
     partOfSpeech: adj
-    example: Numerous bites cover my arms.
-    exampleMeaning: "\uC218\uB9CE\uC740 \uBB3C\uB9B0 \uC790\uAD6D\uC774 \uD314\uC744
-      \uB36E\uACE0 \uC788\uB2E4."
+    example: Numerous insect bites cover my arms.
+    exampleMeaning: "\uC218\uB9CE\uC740 \uBC8C\uB808 \uBB3C\uB9B0 \uC790\uAD6D\uC774
+      \uB0B4 \uD314\uC744 \uB4A4\uB36E\uACE0 \uC788\uB2E4."
     story: 255
     storyHeading: 
   - id: obtain
@@ -1624,9 +1642,9 @@ MonoBehaviour:
     english: origin
     meaning: "\uAE30\uC6D0, \uCD9C\uC2E0"
     partOfSpeech: n
-    example: It said the origin of all words lies under the desert.
-    exampleMeaning: "\uBAA8\uB4E0 \uB9D0\uC758 \uAE30\uC6D0\uC740 \uC0AC\uB9C9 \uC544\uB798\uC5D0
-      \uC788\uB2E4\uACE0 \uC4F0\uC5EC \uC788\uC5C8\uB2E4."
+    example: It said that the origin of all words lay beneath the desert.
+    exampleMeaning: "\uADF8\uACF3\uC5D0\uB294 \uBAA8\uB4E0 \uB9D0\uC758 \uAE30\uC6D0\uC774
+      \uC0AC\uB9C9 \uC544\uB798\uC5D0 \uC788\uB2E4\uACE0 \uC801\uD600 \uC788\uC5C8\uB2E4."
     story: 287
     storyHeading: 
   - id: outcome
@@ -1747,44 +1765,45 @@ MonoBehaviour:
     english: penalty
     meaning: "\uBC8C\uCE59, \uCC98\uBC8C"
     partOfSpeech: n
-    example: The penalty was washing the pot for a week.
-    exampleMeaning: "\uBC8C\uCE59\uC740 \uC77C\uC8FC\uC77C \uB3D9\uC548 \uB0C4\uBE44
-      \uB2E6\uAE30\uC600\uB2E4."
+    example: The penalty was a week of washing the cooking pot.
+    exampleMeaning: "\uBC8C\uCE59\uC740 \uC77C\uC8FC\uC77C \uB3D9\uC548 \uC694\uB9AC
+      \uB0C4\uBE44\uB97C \uC53B\uB294 \uAC83\uC774\uC5C8\uB2E4."
     story: 81
     storyHeading: 
   - id: permanent
     english: permanent
     meaning: "\uC601\uAD6C\uC801\uC778"
     partOfSpeech: adj
-    example: The mud on my coat is permanent.
-    exampleMeaning: "\uC678\uD22C\uC758 \uC9C4\uD759\uC740 \uC601\uAD6C\uC801\uC774\uB2E4."
+    example: The mud stains on my coat are permanent.
+    exampleMeaning: "\uB0B4 \uC678\uD22C\uC5D0 \uBB3B\uC740 \uC9C4\uD759 \uC5BC\uB8E9\uC740
+      \uC9C0\uC6CC\uC9C0\uC9C0 \uC54A\uC744 \uAC83 \uAC19\uB2E4."
     story: 225
     storyHeading: 
   - id: perspective
     english: perspective
     meaning: "\uAD00\uC810, \uC2DC\uAC01"
     partOfSpeech: n
-    example: From a mule's perspective, this is all my fault.
-    exampleMeaning: "\uB178\uC0C8\uC758 \uAD00\uC810\uC5D0\uC11C \uBCF4\uBA74 \uC804\uBD80
-      \uB0B4 \uC798\uBABB\uC774\uB2E4."
+    example: From a mule's perspective, everything is my fault.
+    exampleMeaning: "\uB178\uC0C8\uC758 \uAD00\uC810\uC5D0\uC11C \uBCF4\uBA74 \uBAA8\uB4E0
+      \uAC8C \uB0B4 \uC798\uBABB\uC774\uB2E4."
     story: 199
     storyHeading: 
   - id: phase
     english: phase
     meaning: "\uB2E8\uACC4, \uAD6D\uBA74"
     partOfSpeech: n
-    example: The last phase of this trip is going down.
-    exampleMeaning: "\uC774 \uC5EC\uD589\uC758 \uB9C8\uC9C0\uB9C9 \uB2E8\uACC4\uB294
-      \uB0B4\uB824\uAC00\uB294 \uAC83\uC774\uB2E4."
+    example: The final phase of this journey is the descent below.
+    exampleMeaning: "\uC774 \uC5EC\uC815\uC758 \uB9C8\uC9C0\uB9C9 \uB2E8\uACC4\uB294
+      \uC544\uB798\uB85C \uB0B4\uB824\uAC00\uB294 \uAC83\uC774\uB2E4."
     story: 288
     storyHeading: 
   - id: philosophy
     english: philosophy
     meaning: "\uCCA0\uD559"
     partOfSpeech: n
-    example: 'My philosophy now: keep your socks dry.'
-    exampleMeaning: "\uC774\uC81C \uB0B4 \uCCA0\uD559\uC740 \uC591\uB9D0\uC744 \uB9C8\uB974\uAC8C
-      \uB450\uB294 \uAC83\uC774\uB2E4."
+    example: 'My philosophy now is simple: keep your socks dry.'
+    exampleMeaning: "\uC774\uC81C \uB0B4 \uCCA0\uD559\uC740 \uAC04\uB2E8\uD558\uB2E4.
+      \uC591\uB9D0\uC744 \uB9C8\uB974\uAC8C \uC720\uC9C0\uD560 \uAC83."
     story: 198
     storyHeading: 
   - id: phrase
@@ -1799,9 +1818,10 @@ MonoBehaviour:
     english: physics
     meaning: "\uBB3C\uB9AC\uD559"
     partOfSpeech: n
-    example: Physics says mules cannot climb that. It climbed.
-    exampleMeaning: "\uBB3C\uB9AC\uD559\uC0C1 \uB178\uC0C8\uB294 \uC800\uAE38 \uBABB
-      \uC624\uB978\uB2E4. \uC62C\uB790\uB2E4."
+    example: Physics says mules cannot climb that. But this one did.
+    exampleMeaning: "\uBB3C\uB9AC\uD559\uC801\uC73C\uB85C \uB178\uC0C8\uB294 \uC800\uACF3\uC5D0
+      \uC624\uB97C \uC218 \uC5C6\uB2E4. \uD558\uC9C0\uB9CC \uC774 \uB140\uC11D\uC740
+      \uC62C\uB77C\uAC14\uB2E4."
     story: 172
     storyHeading: 
   - id: platform
@@ -1835,8 +1855,9 @@ MonoBehaviour:
     meaning: "\uC5EC\uB860 \uC870\uC0AC, \uD22C\uD45C"
     partOfSpeech: n
     example: We held a poll. North won, but nobody knew where it was.
-    exampleMeaning: "\uC5EC\uB860 \uC870\uC0AC\uB97C \uD588\uB2E4. \uBD81\uCABD\uC774
-      \uC774\uACBC\uC9C0\uB9CC \uC5B4\uB518\uC9C0\uB294 \uBAB0\uB790\uB2E4."
+    exampleMeaning: "\uD22C\uD45C\uB97C \uD588\uB2E4. \uBD81\uCABD\uC774 \uC774\uACBC\uC9C0\uB9CC,
+      \uC815\uC791 \uBD81\uCABD\uC774 \uC5B4\uB514\uC778\uC9C0\uB294 \uC544\uBB34\uB3C4
+      \uBAB0\uB790\uB2E4."
     story: 23
     storyHeading: 
   - id: portion
@@ -1851,9 +1872,10 @@ MonoBehaviour:
     english: praise
     meaning: "\uCE6D\uCC2C\uD558\uB2E4"
     partOfSpeech: v
-    example: Someone should praise the mule. Not me.
+    example: Someone should praise the mule. Just don't expect it to be me.
     exampleMeaning: "\uB204\uAD70\uAC00\uB294 \uB178\uC0C8\uB97C \uCE6D\uCC2C\uD574\uC57C
-      \uD55C\uB2E4. \uB098\uB294 \uC544\uB2C8\uACE0."
+      \uD55C\uB2E4. \uB0B4\uAC00 \uD560 \uAC70\uB77C\uACE0 \uAE30\uB300\uD558\uC9C0\uB294
+      \uB9D0\uACE0."
     story: 170
     storyHeading: 
   - id: premium
@@ -1932,9 +1954,9 @@ MonoBehaviour:
     english: protein
     meaning: "\uB2E8\uBC31\uC9C8"
     partOfSpeech: n
-    example: Bugs are good protein, I tell myself.
-    exampleMeaning: "\uBC8C\uB808\uB294 \uC88B\uC740 \uB2E8\uBC31\uC9C8\uC774\uB77C\uACE0
-      \uC2A4\uC2A4\uB85C\uC5D0\uAC8C \uB9D0\uD55C\uB2E4."
+    example: Bugs are a good source of protein, I keep telling myself.
+    exampleMeaning: "\uBC8C\uB808\uB294 \uC88B\uC740 \uB2E8\uBC31\uC9C8 \uACF5\uAE09\uC6D0\uC774\uB77C\uACE0
+      \uACC4\uC18D \uC2A4\uC2A4\uB85C\uC5D0\uAC8C \uB9D0\uD55C\uB2E4."
     story: 251
     storyHeading: 
   - id: province
@@ -1950,9 +1972,10 @@ MonoBehaviour:
     english: psychology
     meaning: "\uC2EC\uB9AC\uD559"
     partOfSpeech: n
-    example: I studied mule psychology. It is mostly spite.
-    exampleMeaning: "\uB178\uC0C8 \uC2EC\uB9AC\uD559\uC744 \uC5F0\uAD6C\uD588\uB2E4.
-      \uB300\uBD80\uBD84 \uC559\uC2EC\uC774\uB2E4."
+    example: I studied mule psychology. It seems to consist mostly of spite.
+    exampleMeaning: "\uB178\uC0C8 \uC2EC\uB9AC\uD559\uC744 \uACF5\uBD80\uD588\uB2E4.
+      \uB300\uBD80\uBD84 \uC559\uC2EC\uC73C\uB85C \uC774\uB8E8\uC5B4\uC9C4 \uAC83
+      \uAC19\uB2E4."
     story: 171
     storyHeading: 
   - id: rally
@@ -2003,9 +2026,9 @@ MonoBehaviour:
     english: reform
     meaning: "\uAC1C\uD601"
     partOfSpeech: n
-    example: 'My first reform: more soup.'
-    exampleMeaning: "\uB0B4 \uCCAB \uAC1C\uD601\uC740 \uC218\uD504\uB97C \uB298\uB9AC\uB294
-      \uAC83\uC774\uB2E4."
+    example: 'My first reform: more soup for everyone.'
+    exampleMeaning: "\uB098\uC758 \uCCAB \uBC88\uC9F8 \uAC1C\uD601\uC740 \uBAA8\uB450\uC5D0\uAC8C
+      \uC218\uD504\uB97C \uB354 \uC8FC\uB294 \uAC83\uC774\uB2E4."
     story: 146
     storyHeading: 
   - id: regret
@@ -2021,9 +2044,9 @@ MonoBehaviour:
     english: relevant
     meaning: "\uAD00\uB828 \uC788\uB294, \uC801\uC808\uD55C"
     partOfSpeech: adj
-    example: None of my training seems relevant now.
+    example: None of my training seems relevant anymore.
     exampleMeaning: "\uB0B4\uAC00 \uBC1B\uC740 \uD6C8\uB828\uC740 \uC774\uC81C \uC544\uBB34
-      \uAD00\uB828\uC774 \uC5C6\uC5B4 \uBCF4\uC778\uB2E4."
+      \uC4F8\uBAA8\uB3C4 \uC5C6\uB294 \uAC83 \uAC19\uB2E4."
     story: 222
     storyHeading: 
   - id: religion
@@ -2120,18 +2143,18 @@ MonoBehaviour:
     english: revolution
     meaning: "\uD601\uBA85"
     partOfSpeech: n
-    example: The mule started a revolution and took the soup.
+    example: The mule started a revolution and seized the soup.
     exampleMeaning: "\uB178\uC0C8\uAC00 \uD601\uBA85\uC744 \uC77C\uC73C\uCF1C \uC218\uD504\uB97C
-      \uAC00\uC838\uAC14\uB2E4."
+      \uBE7C\uC557\uC544 \uAC14\uB2E4."
     story: 147
     storyHeading: 
   - id: reward
     english: reward
     meaning: "\uBCF4\uC0C1, \uBCF4\uB2F5"
     partOfSpeech: n
-    example: The mule goes back with this journal and an apple as reward.
-    exampleMeaning: "\uB178\uC0C8\uB294 \uC774 \uC77C\uC9C0\uC640 \uBCF4\uC0C1\uC73C\uB85C
-      \uBC1B\uC740 \uC0AC\uACFC\uB97C \uB4E4\uACE0 \uB3CC\uC544\uAC04\uB2E4."
+    example: The mule will return with this journal and an apple as its reward.
+    exampleMeaning: "\uB178\uC0C8\uB294 \uBCF4\uC0C1\uC73C\uB85C \uBC1B\uC740 \uC0AC\uACFC\uC640
+      \uC774 \uC77C\uC9C0\uB97C \uAC00\uC9C0\uACE0 \uB3CC\uC544\uAC08 \uAC83\uC774\uB2E4."
     story: 289
     storyHeading: 
   - id: rid
@@ -2155,7 +2178,7 @@ MonoBehaviour:
     english: routine
     meaning: "\uC77C\uACFC, \uD310\uC5D0 \uBC15\uD78C \uC77C"
     partOfSpeech: n
-    example: 'My routine is simple: walk, eat, write, get lost.'
+    example: 'My routine is simple: walk, eat, write, and get lost.'
     exampleMeaning: "\uB0B4 \uC77C\uACFC\uB294 \uAC04\uB2E8\uD558\uB2E4. \uAC77\uACE0,
       \uBA39\uACE0, \uC4F0\uACE0, \uAE38\uC744 \uC783\uB294\uB2E4."
     story: 48
@@ -2173,17 +2196,18 @@ MonoBehaviour:
     english: sacrifice
     meaning: "\uD76C\uC0DD"
     partOfSpeech: n
-    example: Keeping one word takes the sacrifice of another.
-    exampleMeaning: "\uB9D0 \uD558\uB098\uB97C \uC9C0\uD0A4\uB824\uBA74 \uB2E4\uB978
-      \uB9D0\uC744 \uD76C\uC0DD\uD574\uC57C \uD55C\uB2E4."
+    example: Keeping one word means making the sacrifice of another.
+    exampleMeaning: "\uB2E8\uC5B4 \uD558\uB098\uB97C \uC9C0\uD0A4\uB824\uBA74 \uB2E4\uB978
+      \uB2E8\uC5B4 \uD558\uB098\uB97C \uD76C\uC0DD\uD574\uC57C \uD55C\uB2E4."
     story: 284
     storyHeading: 
   - id: satellite
     english: satellite
     meaning: "\uC704\uC131"
     partOfSpeech: n
-    example: A satellite sends pictures of the Earth.
-    exampleMeaning: "\uC704\uC131\uC740 \uC9C0\uAD6C \uC0AC\uC9C4\uC744 \uBCF4\uB0B8\uB2E4."
+    example: A satellite sends images of the Earth back to us.
+    exampleMeaning: "\uC778\uACF5\uC704\uC131\uC740 \uC9C0\uAD6C\uC758 \uC774\uBBF8\uC9C0\uB97C
+      \uC6B0\uB9AC\uC5D0\uAC8C \uC804\uC1A1\uD55C\uB2E4."
     story: 0
     storyHeading: 
   - id: scheme
@@ -2207,9 +2231,9 @@ MonoBehaviour:
     english: sequence
     meaning: "\uC21C\uC11C, \uC5F0\uC18D"
     partOfSpeech: n
-    example: I number the trees in sequence to find my way.
-    exampleMeaning: "\uAE38\uC744 \uCC3E\uC73C\uB824\uACE0 \uB098\uBB34\uC5D0 \uC21C\uC11C\uB300\uB85C
-      \uBC88\uD638\uB97C \uB9E4\uAE34\uB2E4."
+    example: I number the trees in sequence so I can find my way back.
+    exampleMeaning: "\uB3CC\uC544\uAC00\uB294 \uAE38\uC744 \uCC3E\uC744 \uC218 \uC788\uB3C4\uB85D
+      \uB098\uBB34\uC5D0 \uCC28\uB840\uB300\uB85C \uBC88\uD638\uB97C \uB9E4\uAE34\uB2E4."
     story: 47
     storyHeading: 
   - id: severe
@@ -2225,8 +2249,9 @@ MonoBehaviour:
     english: silent
     meaning: "\uC870\uC6A9\uD55C, \uB9D0\uC774 \uC5C6\uB294"
     partOfSpeech: adj
-    example: The forest went silent when the words left.
-    exampleMeaning: "\uB9D0\uC774 \uB5A0\uB098\uC790 \uC232\uC774 \uC870\uC6A9\uD574\uC84C\uB2E4."
+    example: The forest fell silent as the words disappeared.
+    exampleMeaning: "\uB9D0\uB4E4\uC774 \uC0AC\uB77C\uC9C0\uC790 \uC232\uC740 \uCE68\uBB35\uC5D0
+      \uC7A0\uACBC\uB2E4."
     story: 79
     storyHeading: 
   - id: sin
@@ -2242,25 +2267,26 @@ MonoBehaviour:
     english: sole
     meaning: "\uC720\uC77C\uD55C, \uB2E8\uB3C5\uC758"
     partOfSpeech: adj
-    example: My sole light is one small stone.
-    exampleMeaning: "\uB0B4 \uC720\uC77C\uD55C \uBE5B\uC740 \uC791\uC740 \uB3CC \uD558\uB098\uB2E4."
+    example: My sole source of light is a small glowing stone.
+    exampleMeaning: "\uB0B4\uAC00 \uAC00\uC9C4 \uC720\uC77C\uD55C \uBE5B\uC740 \uC791\uAC8C
+      \uBE5B\uB098\uB294 \uB3CC \uD558\uB098\uB2E4."
     story: 276
     storyHeading: 
   - id: split
     english: split
     meaning: "\uCABC\uAC1C\uB2E4, \uB098\uB204\uB2E4"
     partOfSpeech: v
-    example: We decided to split the last biscuit into six.
-    exampleMeaning: "\uB9C8\uC9C0\uB9C9 \uBE44\uC2A4\uD0B7\uC744 \uC5EC\uC12F\uC73C\uB85C
-      \uCABC\uAC1C\uAE30\uB85C \uD588\uB2E4."
+    example: We decided to split the last biscuit into six pieces.
+    exampleMeaning: "\uB9C8\uC9C0\uB9C9 \uBE44\uC2A4\uD0B7\uC744 \uC5EC\uC12F \uC870\uAC01\uC73C\uB85C
+      \uB098\uB204\uAE30\uB85C \uD588\uB2E4."
     story: 25
     storyHeading: 
   - id: status
     english: status
     meaning: "\uC9C0\uC704, \uC0C1\uD0DC"
     partOfSpeech: n
-    example: 'My status: alive, lost, slightly purple.'
-    exampleMeaning: "\uB0B4 \uC0C1\uD0DC: \uC0B4\uC544 \uC788\uC74C, \uAE38 \uC783\uC74C,
+    example: 'My status: alive, lost, and slightly purple.'
+    exampleMeaning: "\uB0B4 \uC0C1\uD0DC: \uC0DD\uC874 \uC911, \uAE38 \uC783\uC74C,
       \uC57D\uAC04 \uBCF4\uB77C\uC0C9."
     story: 211
     storyHeading: 
@@ -2313,26 +2339,27 @@ MonoBehaviour:
     english: summit
     meaning: "\uC815\uC0C1, \uC815\uC0C1 \uD68C\uB2F4"
     partOfSpeech: n
-    example: From the summit of the rock, I saw more rock.
-    exampleMeaning: "\uBC14\uC704 \uC815\uC0C1\uC5D0 \uC62C\uB790\uB354\uB2C8 \uB354
-      \uB9CE\uC740 \uBC14\uC704\uAC00 \uBCF4\uC600\uB2E4."
+    example: From the summit of the rock, all I could see was more rock.
+    exampleMeaning: "\uBC14\uC704 \uC815\uC0C1\uC5D0 \uC62C\uB77C\uAC14\uC9C0\uB9CC
+      \uBCF4\uC774\uB294 \uAC83\uC740 \uC628\uD1B5 \uBC14\uC704\uBFD0\uC774\uC5C8\uB2E4."
     story: 216
     storyHeading: 
   - id: superior
     english: superior
     meaning: "\uC6B0\uC218\uD55C, \uC0C1\uAE09\uC758"
     partOfSpeech: adj
-    example: A superior officer would still ask for the form.
-    exampleMeaning: "\uC0C1\uAE09 \uAD00\uB9AC\uB77C\uBA74 \uADF8\uB798\uB3C4 \uC11C\uB958\uB97C
-      \uB2EC\uB77C\uACE0 \uD560 \uAC83\uC774\uB2E4."
+    example: Even a superior officer would still ask me to fill out a form.
+    exampleMeaning: "\uC0C1\uAE09 \uAD00\uB9AC\uC870\uCC28 \uC5EC\uC804\uD788 \uB0B4\uAC8C
+      \uC11C\uB958\uB97C \uC791\uC131\uD558\uB77C\uACE0 \uD560 \uAC83\uC774\uB2E4."
     story: 209
     storyHeading: 
   - id: surgery
     english: surgery
     meaning: "\uC218\uC220"
     partOfSpeech: n
-    example: I did surgery on my boot with a fork.
-    exampleMeaning: "\uD3EC\uD06C\uB85C \uC7A5\uD654\uB97C \uC218\uC220\uD588\uB2E4."
+    example: I performed surgery on my boot using a fork.
+    exampleMeaning: "\uD3EC\uD06C\uB97C \uC0AC\uC6A9\uD574 \uB0B4 \uC7A5\uD654\uB97C
+      \uC218\uC220\uD588\uB2E4."
     story: 258
     storyHeading: 
   - id: swear
@@ -2340,8 +2367,8 @@ MonoBehaviour:
     meaning: "\uB9F9\uC138\uD558\uB2E4, \uC695\uD558\uB2E4"
     partOfSpeech: v
     example: I swear I will never complain about office work again.
-    exampleMeaning: "\uB2E4\uC2DC\uB294 \uC0AC\uBB34 \uC77C\uB85C \uBD88\uD3C9\uD558\uC9C0
-      \uC54A\uACA0\uB2E4\uACE0 \uB9F9\uC138\uD55C\uB2E4."
+    exampleMeaning: "\uB2E4\uC2DC\uB294 \uC0AC\uBB34\uC2E4 \uC5C5\uBB34\uC5D0 \uB300\uD574
+      \uBD88\uD3C9\uD558\uC9C0 \uC54A\uACA0\uB2E4\uACE0 \uB9F9\uC138\uD55C\uB2E4."
     story: 88
     storyHeading: 
   - id: symbol
@@ -2367,16 +2394,17 @@ MonoBehaviour:
     meaning: "\uC7AC\uB2A5"
     partOfSpeech: n
     example: Running away is my greatest talent.
-    exampleMeaning: "\uB3C4\uB9DD\uCE58\uAE30\uB294 \uB0B4 \uAC00\uC7A5 \uD070 \uC7AC\uB2A5\uC774\uB2E4."
+    exampleMeaning: "\uB3C4\uB9DD\uCE58\uB294 \uAC83\uC774 \uB0B4 \uCD5C\uACE0\uC758
+      \uC7AC\uB2A5\uC774\uB2E4."
     story: 206
     storyHeading: 
   - id: task
     english: task
     meaning: "\uACFC\uC81C, \uC5C5\uBB34"
     partOfSpeech: n
-    example: 'My task sounded simple: fix the signposts.'
-    exampleMeaning: "\uB0B4 \uC5C5\uBB34\uB294 \uAC04\uB2E8\uD574 \uBCF4\uC600\uB2E4.
-      \uC774\uC815\uD45C\uB97C \uACE0\uCE60 \uAC83."
+    example: 'My task sounded simple: repair the signposts.'
+    exampleMeaning: "\uB0B4 \uC784\uBB34\uB294 \uAC04\uB2E8\uD574 \uBCF4\uC600\uB2E4.
+      \uC774\uC815\uD45C\uB97C \uC218\uB9AC\uD558\uB294 \uAC83\uC774\uC5C8\uB2E4."
     story: 5
     storyHeading: 
   - id: temple
@@ -2408,9 +2436,9 @@ MonoBehaviour:
     english: territory
     meaning: "\uC601\uD1A0, \uC601\uC5ED"
     partOfSpeech: n
-    example: We are deep in raccoon territory now.
-    exampleMeaning: "\uC774\uC81C \uC6B0\uB9AC\uB294 \uB108\uAD6C\uB9AC \uC601\uD1A0
-      \uAE4A\uC219\uC774 \uC788\uB2E4."
+    example: We are deep inside raccoon territory now.
+    exampleMeaning: "\uC774\uC81C \uC6B0\uB9AC\uB294 \uB108\uAD6C\uB9AC\uC758 \uC601\uC5ED
+      \uAE4A\uC219\uC774 \uB4E4\uC5B4\uC640 \uC788\uB2E4."
     story: 107
     storyHeading: 
   - id: theme
@@ -2425,9 +2453,9 @@ MonoBehaviour:
     english: therapy
     meaning: "\uCE58\uB8CC, \uC694\uBC95"
     partOfSpeech: n
-    example: Writing here is my only therapy.
-    exampleMeaning: "\uC5EC\uAE30\uC5D0 \uC4F0\uB294 \uAC83\uC774 \uB0B4 \uC720\uC77C\uD55C
-      \uCE58\uB8CC\uB2E4."
+    example: Writing in this journal is my only therapy.
+    exampleMeaning: "\uC774 \uC77C\uC9C0\uC5D0 \uAE00\uC744 \uC4F0\uB294 \uAC83\uC774
+      \uB0B4 \uC720\uC77C\uD55C \uCE58\uB8CC\uBC95\uC774\uB2E4."
     story: 259
     storyHeading: 
   - id: thread
@@ -2443,36 +2471,37 @@ MonoBehaviour:
     english: tissue
     meaning: "(\uC0DD\uBB3C\uC758) \uC870\uC9C1, \uD654\uC7A5\uC9C0"
     partOfSpeech: n
-    example: I would trade a map for one tissue.
-    exampleMeaning: "\uC9C0\uB3C4 \uD55C \uC7A5\uC744 \uD654\uC7A5\uC9C0 \uD558\uB098\uC640
-      \uBC14\uAFB8\uACA0\uB2E4."
+    example: I would trade a map for a single tissue.
+    exampleMeaning: "\uD2F0\uC288 \uD55C \uC7A5\uB9CC \uC900\uB2E4\uBA74 \uC9C0\uB3C4
+      \uD55C \uC7A5\uACFC\uB3C4 \uBC14\uAFB8\uACA0\uB2E4."
     story: 257
     storyHeading: 
   - id: trail
     english: trail
     meaning: "\uC624\uC194\uAE38, \uC790\uAD6D"
     partOfSpeech: n
-    example: The trail into the forest was wide and friendly.
-    exampleMeaning: "\uC232\uC73C\uB85C \uB4DC\uB294 \uC624\uC194\uAE38\uC740 \uB113\uACE0
-      \uB2E4\uC815\uD588\uB2E4."
+    example: The trail into the forest was wide and easy to follow.
+    exampleMeaning: "\uC232\uC73C\uB85C \uC774\uC5B4\uC9C0\uB294 \uC624\uC194\uAE38\uC740
+      \uB113\uACE0 \uB530\uB77C\uAC00\uAE30 \uC26C\uC6E0\uB2E4."
     story: 12
     storyHeading: "1\uC77C\uC9F8"
   - id: transition
     english: transition
     meaning: "\uC804\uD658, \uBCC0\uCC9C"
     partOfSpeech: n
-    example: The transition from forest to jungle was sudden.
-    exampleMeaning: "\uC232\uC5D0\uC11C \uC815\uAE00\uB85C\uC758 \uC804\uD658\uC740
-      \uAC11\uC791\uC2A4\uB7EC\uC6E0\uB2E4."
+    example: The transition from forest to jungle happened suddenly.
+    exampleMeaning: "\uC232\uC5D0\uC11C \uC815\uAE00\uB85C\uC758 \uBCC0\uD654\uB294
+      \uAC11\uC791\uC2A4\uB7FD\uAC8C \uC77C\uC5B4\uB0AC\uB2E4."
     story: 116
     storyHeading: "41\uC77C\uC9F8"
   - id: treaty
     english: treaty
     meaning: "\uC870\uC57D"
     partOfSpeech: n
-    example: 'We signed a treaty: I carry the bags, it carries nothing.'
-    exampleMeaning: "\uC870\uC57D\uC744 \uB9FA\uC5C8\uB2E4. \uAC00\uBC29\uC740 \uB0B4\uAC00
-      \uB4E4\uACE0, \uB178\uC0C8\uB294 \uC548 \uB4E0\uB2E4."
+    example: 'We signed a treaty: I carry the bags, and the mule carries nothing.'
+    exampleMeaning: "\uC6B0\uB9AC\uB294 \uC870\uC57D\uC744 \uB9FA\uC5C8\uB2E4. \uAC00\uBC29\uC740
+      \uB0B4\uAC00 \uB4E4\uACE0, \uB178\uC0C8\uB294 \uC544\uBB34\uAC83\uB3C4 \uB4E4\uC9C0
+      \uC54A\uB294\uB2E4."
     story: 148
     storyHeading: 
   - id: trend
@@ -2497,18 +2526,20 @@ MonoBehaviour:
     english: ultimate
     meaning: "\uAD81\uADF9\uC801\uC778, \uCD5C\uD6C4\uC758"
     partOfSpeech: adj
-    example: The ultimate goal is now one dry night.
-    exampleMeaning: "\uAD81\uADF9\uC801\uC778 \uBAA9\uD45C\uB294 \uC774\uC81C \uB9C8\uB978
-      \uBC24 \uD558\uB098\uB2E4."
+    example: My ultimate goal is now to spend one night somewhere dry.
+    exampleMeaning: "\uC774\uC81C \uB098\uC758 \uAD81\uADF9\uC801\uC778 \uBAA9\uD45C\uB294
+      \uB9C8\uB978 \uACF3\uC5D0\uC11C \uD558\uB8FB\uBC24\uC744 \uBCF4\uB0B4\uB294
+      \uAC83\uC774\uB2E4."
     story: 244
     storyHeading: 
   - id: unique
     english: unique
     meaning: "\uB3C5\uD2B9\uD55C, \uC720\uC77C\uD55C"
     partOfSpeech: adj
-    example: Its unique skill was copying everything I said, badly.
-    exampleMeaning: "\uADF8 \uB3C5\uD2B9\uD55C \uC7AC\uC8FC\uB294 \uB0B4 \uB9D0\uC744
-      \uC5C9\uD130\uB9AC\uB85C \uB530\uB77C \uD558\uB294 \uAC83\uC774\uC5C8\uB2E4."
+    example: Its unique talent was repeating everything I said, but badly.
+    exampleMeaning: "\uADF8\uAC83\uC758 \uB3C5\uD2B9\uD55C \uC7AC\uC8FC\uB294 \uB0B4\uAC00
+      \uD558\uB294 \uB9D0\uC744 \uC804\uBD80 \uB530\uB77C \uD558\uB294 \uAC83\uC774\uC5C8\uB2E4.
+      \uBB3C\uB860 \uC5C9\uD130\uB9AC\uB85C."
     story: 125
     storyHeading: 
   - id: universe
@@ -2560,9 +2591,9 @@ MonoBehaviour:
     english: vessel
     meaning: "\uC120\uBC15, \uC6A9\uAE30, \uD608\uAD00"
     partOfSpeech: n
-    example: We built a vessel out of logs and bad ideas.
-    exampleMeaning: "\uD1B5\uB098\uBB34\uC640 \uB098\uC05C \uC0DD\uAC01\uB4E4\uB85C
-      \uBC30\uB97C \uB9CC\uB4E4\uC5C8\uB2E4."
+    example: We built a vessel out of logs and terrible ideas.
+    exampleMeaning: "\uC6B0\uB9AC\uB294 \uD1B5\uB098\uBB34\uC640 \uD615\uD3B8\uC5C6\uB294
+      \uC0DD\uAC01\uB4E4\uC744 \uBAA8\uC544 \uBC30\uB97C \uB9CC\uB4E4\uC5C8\uB2E4."
     story: 118
     storyHeading: 
   - id: vice
@@ -2570,7 +2601,8 @@ MonoBehaviour:
     meaning: "\uC545, \uBD80\uB3C4\uB355"
     partOfSpeech: n
     example: Biscuits were my one vice.
-    exampleMeaning: "\uBE44\uC2A4\uD0B7\uC740 \uB098\uC758 \uC720\uC77C\uD55C \uC545\uC774\uC5C8\uB2E4."
+    exampleMeaning: "\uBE44\uC2A4\uD0B7\uC740 \uB0B4\uAC00 \uC720\uC77C\uD558\uAC8C
+      \uB04A\uC9C0 \uBABB\uD558\uB294 \uB098\uC05C \uBC84\uB987\uC774\uC5C8\uB2E4."
     story: 90
     storyHeading: 
   - id: victory
@@ -2604,9 +2636,9 @@ MonoBehaviour:
     english: visual
     meaning: "\uC2DC\uAC01\uC758"
     partOfSpeech: adj
-    example: Visual signs fail here; I go by smell.
-    exampleMeaning: "\uC2DC\uAC01 \uD45C\uC9C0\uB294 \uC5EC\uAE30\uC11C \uC18C\uC6A9\uC5C6\uB2E4.
-      \uB0C4\uC0C8\uB85C \uAC04\uB2E4."
+    example: Visual signs are useless here, so I follow my nose instead.
+    exampleMeaning: "\uC774\uACF3\uC5D0\uC11C\uB294 \uC2DC\uAC01 \uD45C\uC9C0\uD310\uC774
+      \uC18C\uC6A9\uC5C6\uC5B4\uC11C \uB300\uC2E0 \uB0C4\uC0C8\uB97C \uB530\uB77C\uAC04\uB2E4."
     story: 128
     storyHeading: 
   - id: vital
@@ -2631,8 +2663,8 @@ MonoBehaviour:
     english: weed
     meaning: "\uC7A1\uCD08"
     partOfSpeech: n
-    example: Dinner was a boiled weed with no name.
-    exampleMeaning: "\uC800\uB141\uC740 \uC774\uB984 \uBAA8\uB97C \uC7A1\uCD08\uB97C
+    example: Dinner was a boiled weed whose name I didn't know.
+    exampleMeaning: "\uC800\uB141\uC740 \uC774\uB984\uB3C4 \uBAA8\uB974\uB294 \uC7A1\uCD08\uB97C
       \uC0B6\uC740 \uAC83\uC774\uC5C8\uB2E4."
     story: 34
     storyHeading: 

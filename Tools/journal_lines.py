@@ -8,6 +8,7 @@
   python Tools/journal_lines.py            검사만
   python Tools/journal_lines.py --text     검사를 통과하면 글만 Docs/GameStory/누군가의기록_글.txt로
   python Tools/journal_lines.py --apply    검사를 통과하면 CSV의 example·example_meaning·story·story_heading을 채움 (글 파일도 같이)
+  python Tools/journal_lines.py --import 파일   사람이 고친 글 파일을 원문으로 받아들임 (《 》 단어와 순서가 그대로여야 함, #204)
 
 한 곳이라도 문제가 있으면 아무 파일도 쓰지 않는다.
 """
@@ -22,9 +23,9 @@ TSV = ROOT / "Docs" / "GameStory" / "누군가의기록_문장.tsv"
 TEXT = ROOT / "Docs" / "GameStory" / "누군가의기록_글.txt"
 BOOKS = {"diary": "tier1_common", "survival": "tier2_advanced"}
 DOCUMENTS = [("diary", "누군가의 일기 (초원·서고)"), ("survival", "누군가의 생존일지 (숲·정글·동굴)"), ("plain", "기록에 안 들어가는 예문")]
-MAX_ENGLISH = 64
-MAX_KOREAN = 34
-ENGLISH = re.compile(r"^[A-Za-z ,.?!':;-]+$")
+MAX_ENGLISH = 84  # 전투 단어 카드는 글자가 줄어서 들어감 (#204 캡처로 확인)
+MAX_KOREAN = 50
+ENGLISH = re.compile(r"""^[A-Za-z ,.?!':;"-]+$""")
 PRONOUN = re.compile(r"\b(he|she|his|her|hers|him)\b", re.IGNORECASE)
 
 
@@ -54,9 +55,60 @@ def write_text(lines):
     print("글", TEXT.name)
 
 
+def read_lines():
+    return list(csv.DictReader(TSV.read_text(encoding="utf-8").splitlines(), delimiter="\t", quoting=csv.QUOTE_NONE))
+
+
+def import_text(path):
+    """고친 글 파일 → 원문. 단어·순서가 어긋나면 아무것도 쓰지 않고 어디인지 알려 준다"""
+    titles = [title for _, title in DOCUMENTS]
+    raw = Path(path).read_text(encoding="utf-8-sig").splitlines()
+    entries, heading, i = [], "", 0
+    while i < len(raw):
+        s = raw[i].strip()
+        if not s or s.startswith("==") or s.startswith("《 》") or any(s.startswith(title) for title in titles):
+            i += 1
+        elif s.startswith("[") and s.endswith("]"):
+            heading = s[1:-1]
+            i += 1
+        else:
+            entries.append((i + 1, heading, s, raw[i + 1].strip() if i + 1 < len(raw) else ""))
+            heading = ""
+            i += 2
+
+    lines = read_lines()
+    problems = []
+    if len(entries) != len(lines):
+        problems.append(f"줄 수가 다름: 파일 {len(entries)} / 원문 {len(lines)}")
+    changed = {"english": 0, "korean": 0, "heading": 0}
+    for (number, new_heading, english, korean), line in zip(entries, lines):
+        found = re.findall(r"《([^》]+)》", english)
+        if len(found) != 1:
+            problems.append(f"{number}번째 줄: 《 》 표시가 {len(found)}개 / 원문 단어 {line['word']} / {english}")
+        elif found[0].lower() != line["word"].lower():
+            problems.append(f"{number}번째 줄: 표시된 단어 {found[0]} / 원문 단어 {line['word']}")
+        clean = english.replace("《", "").replace("》", "")
+        changed["english"] += clean != line["english"]
+        changed["korean"] += korean != line["korean"]
+        changed["heading"] += new_heading != line["heading"]
+        line["english"], line["korean"], line["heading"] = clean, korean, new_heading
+    print("고친 곳", changed)
+    if problems:
+        print("문제", len(problems))
+        for problem in problems:
+            print(" ", problem)
+        return 1
+    columns = ["document", "heading", "word", "english", "korean"]
+    TSV.write_text("\n".join(["\t".join(columns)] + ["\t".join(line[c] for c in columns) for line in lines]) + "\n", encoding="utf-8", newline="\n")
+    print("원문에 받아들임", TSV.name)
+    return 0
+
+
 def main():
+    if "--import" in sys.argv:
+        return import_text(sys.argv[sys.argv.index("--import") + 1])
     apply = "--apply" in sys.argv
-    lines = list(csv.DictReader(TSV.read_text(encoding="utf-8").splitlines(), delimiter="\t"))
+    lines = read_lines()
     books = {name: read_book(name) for name in BOOKS.values()}
     owner = {row["english"]: name for name, (_, rows, _, _) in books.items() for row in rows}
 
@@ -75,7 +127,7 @@ def main():
             problems.append(f"단어가 꼴 그대로 없음: {word} / {en}")
         if not ENGLISH.match(en):
             problems.append(f"영어에 다른 글자: {en}")
-        if PRONOUN.search(en):
+        if doc in BOOKS and PRONOUN.search(en):  # 기록의 인물은 대명사로 성별을 정하지 않음. 예문만 있는 줄은 상관없음
             problems.append(f"성별 대명사: {en}")
         if len(en) > MAX_ENGLISH:
             problems.append(f"영어가 긺 {len(en)}: {en}")
