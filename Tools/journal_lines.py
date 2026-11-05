@@ -40,14 +40,15 @@ def read_book(name):
 
 def write_text(lines):
     """글만 읽을 수 있게 일반 텍스트로 (사용자 요청 #202)"""
-    out = []
+    out = ["《 》 = 그 문장에 반드시 들어가야 하는 단어 (게임에서 굵게 보이는 자리, 문장을 고쳐도 이 단어는 그대로)", ""]
     for key, title in DOCUMENTS:
         part = [line for line in lines if line["document"] == key]
         out += ["=" * 60, f" {title} ({len(part)}줄)", "=" * 60, ""]
         for line in part:
             if line["heading"]:
                 out += [f"[{line['heading']}]", ""]
-            out += [line["english"], line["korean"], ""]
+            marked = re.sub(rf"\b({re.escape(line['word'])})\b", r"《\1》", line["english"], count=1, flags=re.IGNORECASE)
+            out += [marked, line["korean"], ""]
         out.append("")
     TEXT.write_text("\n".join(out).rstrip() + "\n", encoding="utf-8", newline="\r\n")
     print("글", TEXT.name)
