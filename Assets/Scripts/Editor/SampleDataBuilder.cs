@@ -454,10 +454,14 @@ namespace WordRPG.EditorTools
             //     정글 0 = 동굴(강 가운데 섬의 'O', 1.2 — 처음부터 열림, #115), 정글 1 = 숲 ---
             const string meadowPath = "Assets/Data/Areas/meadow.asset", libraryPath = "Assets/Data/Areas/library.asset",
                 forestPath = "Assets/Data/Areas/forest.asset";
-            UpgradeMapIf(forestPath, ForestMap, "DC"); // 숲 보스 공터 위쪽에 정글 출입구가 생김 (#80), 야영지 아래 일지 상자 (#200)
-            UpgradeMapIf(libraryPath, LibraryMap, "C"); // 보스 문 앞 일기 상자 (#200)
+            UpgradeMapIf(forestPath, ForestMap, "DCNn"); // 숲 보스 공터 위쪽에 정글 출입구가 생김 (#80), 야영지 아래 일지 상자 (#200), 인물 (#209)
+            UpgradeMapIf(libraryPath, LibraryMap, "CN"); // 보스 문 앞 일기 상자 (#200), 인물 (#209)
+            UpgradeMapIf(meadowPath, MeadowMap, "N");
+            UpgradeMapIf(junglePath, JungleMap, "Nn");
+            UpgradeMapIf(cavePath, CaveMap, "n");
             InsertChestIf(libraryPath, 5, 1, diaryJournal); // 상자는 맵의 위→아래 순서라 그 자리에 끼움. 있던 상자 내용물은 그대로
             InsertChestIf(forestPath, 6, 5, survivalJournal);
+            BuildNpcs(meadowPath, libraryPath, forestPath, junglePath, cavePath);
             // 보스 대사 (#207, 스토리 문서 5장)
             SetBossLines(libraryPath, "잊어버리면… 아플 일도 없어!", "기억을 돌려줘! 아픈 기억도 우리 것이야.",
                 "책 속의 글자가 돌아왔다.\n하지만 몇 페이지는 누군가 일부러 뜯어냈다.");
@@ -529,10 +533,10 @@ namespace WordRPG.EditorTools
                 "#:::::::::::.:::::::::::#::,,,,,,,:::#\n" +
                 "#:#::#.............#:#::#:,,,,,,,,,::#\n" +
                 "#::::...E...F...S...::::#::,,,,,,,:::#\n" +
-                "#::#:...............::::#::::::::::::#\n" +
-                "#::::................................D\n" +
+                "#::#:......N........::::#::::::::::::#\n" +
+                "#::::............N...................D\n" +
                 "#::::.......P........................#\n" +
-                "#::::...............::::#::,:::::::::#\n" +
+                "#::::...N...........::::#::,:::::::::#\n" +
                 "#:~~:#.............#::::#::,,,,,,,,,##\n" +
                 "#:~~::::::::::::::::::#:#::,,,,,,,,,##\n" +
                 "#:::::::::::::::::::::::#::#,,,,,,,C##\n" +
@@ -616,7 +620,7 @@ namespace WordRPG.EditorTools
                 "####..##########...######,,#,,,###\n" +
                 "####..####::::::::::::::#,,#######\n" +
                 "####.....::::::::F:::::::##..C####\n" +
-                "#####....::::::::::::::::....#####\n" +
+                "#####....::::::::::::::::.N..#####\n" +
                 "#########:::::::::::L::::....#####\n" +
                 "##########::::::...:::::##########\n" +
                 "##C,,,,,,,,,,,,,...,,,,,,,,,,,,,##\n" +
@@ -680,10 +684,10 @@ namespace WordRPG.EditorTools
                 "######:...:#####,,,#########,,,,,,,#\n" +
                 "####::E:F:S::###,,,#########,,,,,,,#\n" +
                 "###::.......::..,,,##########,,,,,##\n" +
-                "#..::.............############,,,,##\n" +
+                "#..::......N......############,,,,##\n" +
                 "D..::P......::##..#,,,,#,,#,,#,,,,##\n" +
                 "####::::L::::###...,,,,,,,,,,,,,,###\n" +
-                "######:::::######..............,,,##\n" +
+                "######:::n:######..............,,,##\n" +
                 "########C##########,,,,,,,,,,,,,,,##\n" +
                 "###################,,#,,,,#,,,,,,C##\n" +
                 "####################################\n";
@@ -763,12 +767,12 @@ namespace WordRPG.EditorTools
                 "##::::::::::..:::::::::::::~~::::::,#,,::Q::...:::~~~~~~~~~~~~~~~~~:::::::Q::##\n" +
                 "##::::::::::..:::::::::::::~~::::,,,###,:::::...::~~~~~~~~~~~~~~~~~::###:::::##\n" +
                 "##::::::::::..:::::::::::::~~:::::,,,####:::::..:JJ~~~~~~~~~~~~~~~~:::###::::##\n" +
-                "##::::::Q:::..::::Q::::::::~~:::::,,,####:::::...JJ~~~~~~~~~~~~~~~~::,:#:::::##\n" +
-                "##::::::::F:..:::::::::::::~~:::::,:::####:::::..:~~~~~~~~~~~~~~~~~:,,:,:#:::##\n" +
+                "##::::::Q:::..::::Q:::n:n::~~:::::,,,####:::::...JJ~~~~~~~~~~~~~~~~::,:#:::::##\n" +
+                "##::::::::F:..:::::::::n:::~~:::::,:::####:::::..:~~~~~~~~~~~~~~~~~:,,:,:#:::##\n" +
                 "##:::::::::...::::::::::Y::~~::Q::::::##::#...::::~~~~~~~~~~~~~~~~~,,,#::::::##\n" +
                 "##:::E::::...::::S:::::::::~~::::::::###::....::Q:~~~~~~~~~~~~~~~~~,:,,##::::##\n" +
                 "##::::::::..:::::::::::::::HH...::::::#.....::::::~~~~~~~~~~~~~~~~~:::,,##:::##\n" +
-                "##::::::::..:::::::::::::::HH.......::.....:::::::~~~~~~~~~~~~~~~~~:::,:,,:::##\n" +
+                "##::::::::.N:::::::::::::::HH.......::.....:::::::~~~~~~~~~~~~~~~~~:::,:,,:::##\n" +
                 "##:::::::...::::::::Q::::::~~::.........,:::::,:::~~~~~~~~~~~~~~~~~::::,,::::##\n" +
                 "##::::::...::::::::::::::::~~::::::....,,,::,,,:::~~~~~~~~~~~~~~~~~::::,:#:::##\n" +
                 "D.....P...:::::::::::::::::~~:::::::,,,,,:,,,,,C::~~~~~~~~~~~~~~~~~::,Q,,:#::##\n" +
@@ -841,7 +845,7 @@ namespace WordRPG.EditorTools
                 "####:::Q:::::#~~##:::::...::::S:::###::.:#########\n" +
                 "###:::::::::::~~##::F:::..::::::::###:..:#########\n" +
                 "###:::::::::::HH:::::::::.:::::::::::..:::########\n" +
-                "###:::::::::::HH::#::::::.:::::.....:..#:::::#####\n" +
+                "###:::::::::::HH::#:::n::.:::::.....:..#:::::#####\n" +
                 "###C:I:,,::::#~~###::::::.:::::::....##:::::::::##\n" +
                 "####:::,,,Y::#~~###::E:::P:::L::#######:::::::::##\n" +
                 "#####,,,,,::##~~##::C::::.:::##########:::::::C::#\n" +
@@ -911,6 +915,73 @@ namespace WordRPG.EditorTools
         }
 
         // 원본 맵에 새 칸(added 글자들)이 생겼을 때: 에셋의 맵이 그 칸만 빼고 원본과 같으면 원본으로 바꾼다 (#80 숲의 정글 출입구 D)
+        // 말을 잃어 가는 사람들 (#209, GDD 9-10). 맵의 N·n을 위→아래, 왼→오른 순서로 채움
+        private static void BuildNpcs(string meadowPath, string libraryPath, string forestPath, string junglePath, string cavePath)
+        {
+            FieldArea Load(string path) => AssetDatabase.LoadAssetAtPath<FieldArea>(path);
+            var library = Load(libraryPath);
+            var forest = Load(forestPath);
+            var cave = Load(cavePath);
+
+            var elder = Npc("npc_elder", "어르신", 0,
+                new NpcStage("……", NpcMotionKind.Sit),
+                new NpcStage("내 사전을… 마을 위 어디 뒀더라.", NpcMotionKind.Stroll, library));
+            var chief = Npc("npc_chief", "촌장", 0,
+                new NpcStage("자네 이름이… 펜… 아니, 뭐였더라?", NpcMotionKind.Pace),
+                new NpcStage("{이름}! 그래, 그 이름이야!", NpcMotionKind.Stand, library));
+            var child = Npc("npc_child", "아이", 0,
+                new NpcStage("내 이름 첫 글자가 뭐였지?", NpcMotionKind.Sit),
+                new NpcStage("이제 세 글자 다 썼어요!", NpcMotionKind.Wander, null, 75));
+            var librarian = Npc("npc_librarian", "사서", 0,
+                new NpcStage("쉿. 소리 내어 읽으면 도깨비들이 와요.", NpcMotionKind.Pace),
+                new NpcStage("서쪽 열람실 구석은 보셨나요?", NpcMotionKind.Pace, null, 40));
+            var woodcutter = Npc("npc_woodcutter", "나무꾼", 0,
+                new NpcStage("길을 내가 잃었다, 아니 나를 길이…", NpcMotionKind.Wander),
+                new NpcStage("이정표가 돌아왔군. 늪 너머 공터를 가 봐.", NpcMotionKind.Pace, forest));
+            var mule = Npc("npc_mule", "노새", 23,
+                new NpcStage("히힝… 입가에 사과 조각이 붙어 있다.", NpcMotionKind.Stand));
+            var frog = Npc("npc_frog", "개구리", 16,
+                new NpcStage("개굴. (표결 중인 것 같다)", NpcMotionKind.Hop));
+            var pilgrim = Npc("npc_pilgrim", "순례자", 0,
+                new NpcStage("강을 ___ 건너면 ___에 ___가 있어.", NpcMotionKind.Sit),
+                new NpcStage("강을 뗏목으로 건너면 동쪽 기슭에 열쇠가 있어.", NpcMotionKind.Pace, null, 60));
+            var miner = Npc("npc_miner", "광부", 0,
+                new NpcStage("나가는 길은 저쪽으로 쭉 가서…", NpcMotionKind.Busy),
+                new NpcStage("문장이 돌아왔어! 반딧돌을 다 밝히면 좋은 게 있대.", NpcMotionKind.Pace, cave));
+
+            SetNpcs(meadowPath, elder, chief, child);
+            SetNpcs(libraryPath, librarian);
+            SetNpcs(forestPath, woodcutter, mule);
+            SetNpcs(junglePath, frog, frog, frog, pilgrim);
+            SetNpcs(cavePath, miner);
+        }
+
+        private static NpcData Npc(string id, string name, int animalFrameWidth, params NpcStage[] stages)
+        {
+            var path = $"{Root}/Npcs/{id}.asset";
+            var existing = AssetDatabase.LoadAssetAtPath<NpcData>(path);
+            if (existing == null)
+            {
+                EnsureFolder($"{Root}/Npcs");
+                existing = ScriptableObject.CreateInstance<NpcData>();
+                AssetDatabase.CreateAsset(existing, path);
+            }
+            existing.Configure(id, name, animalFrameWidth, stages);
+            EditorUtility.SetDirty(existing);
+            return existing;
+        }
+
+        private static void SetNpcs(string areaPath, params NpcData[] npcs)
+        {
+            var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);
+            if (area == null) return;
+            var so = new SerializedObject(area);
+            var list = Prop(so, "npcs");
+            list.arraySize = npcs.Length;
+            for (int i = 0; i < npcs.Length; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = npcs[i];
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         // 보스 대사 (#207)
         private static void SetBossLines(string areaPath, string bossLine, string heroLine, string afterLine)
         {

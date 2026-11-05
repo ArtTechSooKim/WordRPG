@@ -38,6 +38,7 @@ namespace WordRPG.Field
     {
         private readonly Func<Vector2Int, bool> isLockedDoor;
         private readonly Func<Vector2Int, bool> isCleared;
+        private readonly Func<Vector2Int, bool> isOccupied;
 
         public FieldMap Map { get; }
         public Vector2Int Position { get; private set; }
@@ -47,12 +48,14 @@ namespace WordRPG.Field
         // lockedDoor: 그 칸의 출입구가 지금 잠겨 있는지 (없으면 모든 출입구가 열림)
         // cleared: 원래 막힌 칸이지만 이제 지나갈 수 있는 칸 (쓰러뜨린 보스 자리 — 사전이 쉼터로 옮겨져 빈자리, #45)
         // rafting: 뗏목에 탄 채로 시작 (세이브가 강 위였을 때)
+        // occupied: 지금 인물이 서 있는 칸 (#209)
         public FieldWalker(FieldMap map, Vector2Int position, Func<Vector2Int, bool> lockedDoor = null, Func<Vector2Int, bool> cleared = null,
-            bool rafting = false)
+            bool rafting = false, Func<Vector2Int, bool> occupied = null)
         {
             Map = map ?? throw new ArgumentNullException(nameof(map));
             isLockedDoor = lockedDoor;
             isCleared = cleared;
+            isOccupied = occupied;
             WarpTo(position, rafting);
         }
 
@@ -84,6 +87,8 @@ namespace WordRPG.Field
                 }
                 return new StepOutcome(FieldMap.IsInteractive(tile) ? StepKind.BlockedByObject : StepKind.Blocked, target, tile);
             }
+
+            if (isOccupied != null && isOccupied(target)) return new StepOutcome(StepKind.BlockedByObject, target, tile);
 
             if (tile == FieldTile.Door && isLockedDoor != null && isLockedDoor(target))
                 return new StepOutcome(StepKind.BlockedByGate, target, tile);

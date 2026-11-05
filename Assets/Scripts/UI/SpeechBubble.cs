@@ -104,6 +104,9 @@ namespace WordRPG.UI
         // 혼잣말 한 줄 (잠긴 받침대·오늘은 그만 등). seconds 뒤에 사라짐
         public void Say(string message, float seconds, string footnote = null) => ShowText(null, null, message, footnote, seconds);
 
+        // 인물의 말 (#209): 이름 + 한두 줄
+        public void Speak(string name, string line, float seconds) => ShowText(name, null, line, null, seconds);
+
         // 새 단어: 머리말 · 영어 · 뜻 · 아래 작은 글씨. seconds ≤ 0 이면 움직일 때까지
         public void ShowWord(string headline, string english, string meaning, string footnote, float seconds) =>
             ShowText(headline, english, meaning, footnote, seconds);

@@ -70,7 +70,7 @@ namespace WordRPG.Field
         private static readonly TileDefinition[] Table =
         {
             //                  칸 종류              글자     성질                          이름표 기본 글자   쓰는 테마 (없으면 전부)
-            new TileDefinition(FieldTile.Floor,     ".P",   Walk | Roam),
+            new TileDefinition(FieldTile.Floor,     ".PN",  Walk | Roam),                  // N = 인물이 서는 바닥 (#209)
             new TileDefinition(FieldTile.Grass,     ",",    Walk | Roam),                  // 풀숲 — 조우
             new TileDefinition(FieldTile.Wall,      "#",    None),
             new TileDefinition(FieldTile.Water,     "~",    None),
@@ -80,7 +80,7 @@ namespace WordRPG.Field
             new TileDefinition(FieldTile.Shop,      "S",    Use | Tag | Camp,              "상점"),
             new TileDefinition(FieldTile.Door,      "DO",   Walk | Tag),                   // 이름표 = 도착 지역 이름
             new TileDefinition(FieldTile.Boss,      "B",    Use | Tag | Done | Opens),     // 이름표 = 보스 이름
-            new TileDefinition(FieldTile.Lawn,      ":",    Walk | Roam),                  // 잔디 — 조우 없음
+            new TileDefinition(FieldTile.Lawn,      ":n",   Walk | Roam),                  // 잔디 — 조우 없음
             new TileDefinition(FieldTile.Lectern,   "L",    Use | Tag | Done | Camp,       "빈 받침대"),
             new TileDefinition(FieldTile.Gate,      "G",    Use | Tag | Done | Opens,      "보스 방 문"),
             new TileDefinition(FieldTile.Key,       "K",    Use | Tag | Done,              "열쇠"),

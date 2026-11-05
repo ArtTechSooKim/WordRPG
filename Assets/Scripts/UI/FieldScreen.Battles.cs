@@ -102,6 +102,7 @@ namespace WordRPG.UI
                 SaveNow();
                 StartCoroutine(Respawn($"{area.DisplayName} 시작 지점으로 돌아왔다. HP가 회복되었다!"));
             }
+            npcs.Refresh(area, session); // 보스를 이겼거나 단어를 찾았으면 말이 되돌아옴 (#209)
             RefreshHud();
         }
 

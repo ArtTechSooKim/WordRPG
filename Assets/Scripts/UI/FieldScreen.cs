@@ -323,7 +323,7 @@ namespace WordRPG.UI
             UpdateToast();
             UpdateCamera();
             nameTags.Tick(cam, hudCanvas, Time.unscaledDeltaTime);
-            bubble.Tick(cam, hudCanvas, player.position + Vector3.up * 0.45f);
+            bubble.Tick(cam, hudCanvas, BubbleAnchor());
             if (bubble.IsVisible != bubbleShown)
             {
                 bubbleShown = bubble.IsVisible;
@@ -333,6 +333,7 @@ namespace WordRPG.UI
             if (saveMark.activeSelf && Time.unscaledTime > saveMarkUntil) saveMark.SetActive(false);
             PulseBadges();
             UpdateRoamers(Time.unscaledDeltaTime);
+            UpdateNpcs(Time.unscaledDeltaTime);
             characterSelect.Tick(Time.unscaledDeltaTime);
             introView.Tick(Time.unscaledDeltaTime);
             streams.Tick(Time.deltaTime, walker.Position);
@@ -482,8 +483,9 @@ namespace WordRPG.UI
         private bool TryInteract()
         {
             if (interactCooldown > 0f) return false;
+            if (TryTalkToNpc(facingOnly: true)) return true;
             var direction = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot);
-            if (!direction.HasValue) return false;
+            if (!direction.HasValue) return TryTalkToNpc(facingOnly: false);
             walker.Face(direction.Value);
             playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
             var cell = walker.Position + direction.Value.ToOffset();
@@ -710,11 +712,12 @@ namespace WordRPG.UI
         {
             area = newArea;
             var map = area.Map;
-            walker = new FieldWalker(map, position, cell => IsDoorLocked(cell) || IsPaywalled(cell), cell => IsCleared(area, cell), rafting);
+            walker = new FieldWalker(map, position, cell => IsDoorLocked(cell) || IsPaywalled(cell), cell => IsCleared(area, cell), rafting, npcs.IsOccupied);
             encounterCounter = new EncounterCounter(area.EncounterRate, area.MinStepsBetweenEncounters);
             if (FirstFightPending) encounterCounter.GuaranteeWithin(EncounterCounter.FirstFightGrassSteps); // #133
             session.World.SetPosition(area.AreaId, position, rafting);
             SetUpRoamers(position);
+            SetUpNpcs(position);
 
             DrawTiles(area, IsDoorLocked);
             streams.SetMap(map);

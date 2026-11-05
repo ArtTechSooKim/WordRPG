@@ -134,6 +134,19 @@ def copy_companions(pack_root=DEFAULT_PACK):
 
 # 주인공 모습 (#124 사용자: 처음에 8명 중에서 고름 — 모습만 다름): lookId → 팩 캐릭터 폴더.
 # 걷기 시트 → Player/{id}_sheet.png, 얼굴(Faceset) → Player/{id}_face.png. 순서·이름표는 hero.asset의 looks
+# 말을 잃어 가는 사람들 (#209, GDD 9-10): Art/NinjaAdventure/Npcs/{npcId}.png
+NPC_SHEETS = {
+    "npc_chief": "Actor/Characters/Master/SpriteSheet.png",
+    "npc_elder": "Actor/Characters/OldMan/SpriteSheet.png",
+    "npc_child": "Actor/Characters/EggBoy/SpriteSheet.png",
+    "npc_librarian": "Actor/Characters/Monk/SpriteSheet.png",
+    "npc_woodcutter": "Actor/Characters/ManGreen/SpriteSheet.png",
+    "npc_pilgrim": "Actor/Characters/Shaman/SpriteSheet.png",
+    "npc_miner": "Actor/Characters/Caveman/SpriteSheet.png",
+    "npc_mule": "Actor/Animals/Donkey/SpriteSheeGreySide.png",  # 23×16 두 장
+    "npc_frog": "Actor/Animals/Frog/SpriteSheet.png",           # 16×16 두 장
+}
+
 HERO_LOOKS = {
     "boy": "Actor/Characters/Boy",               # 소년 (1.0부터의 주인공)
     "eskimo": "Actor/Characters/Eskimo",         # 에스키모
@@ -149,6 +162,10 @@ HERO_LOOKS = {
 def copy_hero_looks(pack_root=DEFAULT_PACK):
     folder = os.path.join(OUT, "Player")
     os.makedirs(folder, exist_ok=True)
+    npc_folder = os.path.join(os.path.dirname(folder), "Npcs")
+    os.makedirs(npc_folder, exist_ok=True)
+    for npc_id, rel in NPC_SHEETS.items():
+        shutil.copyfile(os.path.join(pack_root, rel), os.path.join(npc_folder, npc_id + ".png"))
     for look_id, rel in HERO_LOOKS.items():
         shutil.copyfile(os.path.join(pack_root, rel, "SpriteSheet.png"), os.path.join(folder, look_id + "_sheet.png"))
         shutil.copyfile(os.path.join(pack_root, rel, "Faceset.png"), os.path.join(folder, look_id + "_face.png"))

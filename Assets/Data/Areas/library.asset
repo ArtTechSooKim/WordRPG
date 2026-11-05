@@ -67,7 +67,7 @@ MonoBehaviour:
 
     ####.....::::::::F:::::::##..C####
 
-    #####....::::::::::::::::....#####
+    #####....::::::::::::::::.N..#####
 
     #########:::::::::::L::::....#####
 
@@ -144,6 +144,8 @@ MonoBehaviour:
     count: 3
     gold: 0
     relic: {fileID: 0}
+  npcs:
+  - {fileID: 11400000, guid: 1915ea04451d7974793839cfc3f2783d, type: 2}
   exits:
   - target: {fileID: 11400000, guid: a2d06106feb91f048ad3b3d9f1f26ff0, type: 2}
     targetDoorIndex: 0

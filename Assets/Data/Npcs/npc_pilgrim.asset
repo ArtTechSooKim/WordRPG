@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41e346695651bea4b81094cc485af4d8, type: 3}
+  m_Name: npc_pilgrim
+  m_EditorClassIdentifier: WordRPG::WordRPG.Field.NpcData
+  npcId: npc_pilgrim
+  displayName: "\uC21C\uB840\uC790"
+  frameWidth: 0
+  stages:
+  - bossOf: {fileID: 0}
+    wordsNeeded: 0
+    line: "\uAC15\uC744 ___ \uAC74\uB108\uBA74 ___\uC5D0 ___\uAC00 \uC788\uC5B4."
+    motion: 4
+  - bossOf: {fileID: 0}
+    wordsNeeded: 60
+    line: "\uAC15\uC744 \uB5CF\uBAA9\uC73C\uB85C \uAC74\uB108\uBA74 \uB3D9\uCABD
+      \uAE30\uC2AD\uC5D0 \uC5F4\uC1E0\uAC00 \uC788\uC5B4."
+    motion: 1

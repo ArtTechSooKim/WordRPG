@@ -140,6 +140,8 @@ namespace WordRPG.Field
 
         [Header("보물상자 — 맵의 C를 위→아래, 왼→오른 순서로 하나씩 대응")]
         [SerializeField] private List<ChestContent> chests = new List<ChestContent>();
+        [Tooltip("맵의 N·n을 위→아래, 왼→오른 순서로 채우는 인물 (#209). 같은 인물을 여러 번 넣어도 됨")]
+        [SerializeField] private List<NpcData> npcs = new List<NpcData>();
 
         [Header("출입구 — 맵의 D를 위→아래, 왼→오른 순서로 하나씩 대응")]
         [SerializeField] private List<AreaExit> exits = new List<AreaExit>();
@@ -182,6 +184,7 @@ namespace WordRPG.Field
         public EncounterStyle EncounterStyle => encounterStyle;
         public EncounterTable WaterEncounters => waterEncounters;
         public IReadOnlyList<ChestContent> ChestContents => chests;
+        public IReadOnlyList<NpcData> Npcs => npcs;
         public ShopData Shop => shop;
         public FieldTheme Theme => theme;
         public IReadOnlyList<AreaExit> Exits => exits;

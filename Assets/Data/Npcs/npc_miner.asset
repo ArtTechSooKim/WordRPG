@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41e346695651bea4b81094cc485af4d8, type: 3}
+  m_Name: npc_miner
+  m_EditorClassIdentifier: WordRPG::WordRPG.Field.NpcData
+  npcId: npc_miner
+  displayName: "\uAD11\uBD80"
+  frameWidth: 0
+  stages:
+  - bossOf: {fileID: 0}
+    wordsNeeded: 0
+    line: "\uB098\uAC00\uB294 \uAE38\uC740 \uC800\uCABD\uC73C\uB85C \uCB49 \uAC00\uC11C\u2026"
+    motion: 5
+  - bossOf: {fileID: 11400000, guid: 3eaceaca8882957449f036b992066ba9, type: 2}
+    wordsNeeded: 0
+    line: "\uBB38\uC7A5\uC774 \uB3CC\uC544\uC654\uC5B4! \uBC18\uB527\uB3CC\uC744
+      \uB2E4 \uBC1D\uD788\uBA74 \uC88B\uC740 \uAC8C \uC788\uB300."
+    motion: 1

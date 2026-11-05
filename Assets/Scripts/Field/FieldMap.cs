@@ -92,6 +92,7 @@ namespace WordRPG.Field
         private readonly List<Vector2Int> doors;  // 같은 순서 (출입구 연결 배정 순서)
         private readonly Dictionary<Vector2Int, Direction> streams; // 얕은 강 칸의 물살 방향
         private readonly HashSet<Vector2Int> caveMouths;            // 'O' 출입구 (그림만 큰 동굴 입구)
+        private readonly List<Vector2Int> npcSpots;                 // 인물이 서는 자리 N·n: 위→아래, 왼→오른 순 (FieldArea npcs 배정 순서, #209)
         private HashSet<Vector2Int> raftWater;   // 나루터에서 뗏목으로 갈 수 있는 깊은 물 (처음 물을 때 계산)
         private List<List<Vector2Int>> bridges;   // 이어진 덩굴 다리 칸 덩어리들
 
@@ -100,16 +101,18 @@ namespace WordRPG.Field
         public Vector2Int Start { get; }
         public IReadOnlyList<Vector2Int> Chests => chests;
         public IReadOnlyList<Vector2Int> Doors => doors;
+        public IReadOnlyList<Vector2Int> NpcSpots => npcSpots;
         public Vector2Int? BossPosition { get; }
 
         private FieldMap(FieldTile[,] tiles, Vector2Int start, List<Vector2Int> chests, List<Vector2Int> doors,
-            Vector2Int? boss, Dictionary<Vector2Int, Direction> streams, HashSet<Vector2Int> caveMouths)
+            Vector2Int? boss, Dictionary<Vector2Int, Direction> streams, HashSet<Vector2Int> caveMouths, List<Vector2Int> npcSpots)
         {
             this.tiles = tiles;
             this.chests = chests;
             this.doors = doors;
             this.streams = streams;
             this.caveMouths = caveMouths;
+            this.npcSpots = npcSpots;
             BossPosition = boss;
             Width = tiles.GetLength(0);
             Height = tiles.GetLength(1);
@@ -135,6 +138,7 @@ namespace WordRPG.Field
             var caveMouths = new HashSet<Vector2Int>();
             Vector2Int? start = null;
             Vector2Int? boss = null;
+            var npcSpots = new List<Vector2Int>();
 
             for (int r = 0; r < height; r++)
             {
@@ -164,6 +168,7 @@ namespace WordRPG.Field
                             break;
                         case FieldTile.Stream: streams[cell] = FieldTiles.StreamDirection(c); break;
                     }
+                    if (c == 'N' || c == 'n') npcSpots.Add(cell);
                     if (c == FieldTiles.StartSymbol)
                     {
                         if (start.HasValue) throw new FormatException("시작 위치 'P'가 두 개 이상입니다");
@@ -173,7 +178,7 @@ namespace WordRPG.Field
             }
 
             if (!start.HasValue) throw new FormatException("시작 위치 'P'가 없습니다");
-            return new FieldMap(tiles, start.Value, chests, doors, boss, streams, caveMouths);
+            return new FieldMap(tiles, start.Value, chests, doors, boss, streams, caveMouths, npcSpots);
         }
 
         public bool InBounds(Vector2Int p) => p.x >= 0 && p.y >= 0 && p.x < Width && p.y < Height;

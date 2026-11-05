@@ -1,0 +1,103 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.TestTools;
+using WordRPG.Field;
+using WordRPG.Game;
+using WordRPG.Items;
+using WordRPG.Monsters;
+using WordRPG.UI;
+using WordRPG.Words;
+using static WordRPG.Tests.UiDriver;
+
+namespace WordRPG.Tests
+{
+    // 말을 잃어 가는 사람들 화면 (#209): 막힘 · 말 걸기 · 머리 위 말풍선 · 말이 되돌아옴 · 예전 세이브 자리 겹침
+    public class NpcScreenTests
+    {
+        private const string Map = "#######\n#PN...#\n#.....#\n#######";
+
+        private FieldArea area;
+        private GameDatabase database;
+        private WordDatabase words;
+
+        [SetUp]
+        public void SetUp()
+        {
+            words = ScriptableObject.CreateInstance<WordDatabase>().Set("regionId", "common").Set("regionName", "초원");
+            words.ReplaceWords(TestData.SampleWords());
+            var npc = ScriptableObject.CreateInstance<NpcData>();
+            npc.Configure("npc_chief", "촌장", 0, new[]
+            {
+                new NpcStage("자네 이름이 뭐였더라?", NpcMotionKind.Stand),
+                new NpcStage("{이름}! 그래, 그 이름이야!", NpcMotionKind.Stand, null, 1),
+            });
+            area = ScriptableObject.CreateInstance<FieldArea>()
+                .Set("areaId", "meadow").Set("displayName", "초원").Set("map", Map)
+                .Set("encounters", ScriptableObject.CreateInstance<EncounterTable>()).Set("words", words)
+                .Set("npcs", new List<NpcData> { npc });
+            database = ScriptableObject.CreateInstance<GameDatabase>();
+            database.ReplaceContents(new MonsterSpecies[0], new ItemData[0], new[] { area });
+        }
+
+        private static GameSession Session() => GameSession.NewGame(TestData.Hero(new MonsterStats(60, 14, 10)), 5);
+
+        private FieldScreen CreateField(GameSession session)
+        {
+            var field = new GameObject("NpcFieldUnderTest").AddComponent<FieldScreen>();
+            field.Configure(area, session, () => { }, step: 0.05f, animScale: 0.01f, gameDatabase: database);
+            return field;
+        }
+
+        [UnityTest]
+        public IEnumerator TheNpcBlocksTheWayAndTalksInABubbleAboveItsHead()
+        {
+            var session = Session();
+            var field = CreateField(session);
+            yield return null;
+            yield return null;
+            var view = field.Npcs.Views.Single();
+            Assert.AreEqual(new Vector2Int(2, 2), view.Motion.Cell);
+
+            // 부딪혀도 못 지나감
+            yield return HoldStick(field, Direction.Right, () => false, 0.15f);
+            Assert.AreEqual(new Vector2Int(1, 2), field.PlayerCell, "인물 칸으로 못 감");
+
+            // [확인] → 이름과 말, 말풍선은 인물 머리 위, 인물은 주인공을 봄
+            yield return PressConfirm(field);
+            Assert.IsTrue(field.Bubble.ShowsText);
+            Assert.AreEqual("촌장", field.Bubble.HeadText);
+            StringAssert.Contains("자네 이름이 뭐였더라?", field.Bubble.Text);
+            yield return null;
+            Assert.AreEqual(Direction.Left, view.Motion.Facing);
+
+            // 단어를 찾으면 말이 되돌아옴, 플레이어 이름으로
+            field.Bubble.Hide();
+            session.Vocabulary.Discover(words.Words[0].Id, System.DateTime.UtcNow);
+            yield return new WaitForSecondsRealtime(0.1f);
+            yield return PressConfirm(field);
+            StringAssert.Contains($"{session.Hero.DisplayName}! 그래, 그 이름이야!", field.Bubble.Text);
+
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator AnOldSaveStandingOnTheSpotPushesTheNpcAside()
+        {
+            var session = Session();
+            session.World.SetPosition("meadow", new Vector2Int(2, 2), false);
+            var field = CreateField(session);
+            yield return null;
+            yield return null;
+            Assert.AreEqual(new Vector2Int(2, 2), field.PlayerCell, "저장된 자리 그대로");
+            Assert.AreNotEqual(new Vector2Int(2, 2), field.Npcs.Views.Single().Motion.Cell, "인물이 비켜 섬");
+            yield return HoldStick(field, Direction.Down, () => field.IsMoving);
+            Assert.AreNotEqual(new Vector2Int(2, 2), field.PlayerCell, "못 움직이는 일이 없음");
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+    }
+}

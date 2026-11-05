@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41e346695651bea4b81094cc485af4d8, type: 3}
+  m_Name: npc_child
+  m_EditorClassIdentifier: WordRPG::WordRPG.Field.NpcData
+  npcId: npc_child
+  displayName: "\uC544\uC774"
+  frameWidth: 0
+  stages:
+  - bossOf: {fileID: 0}
+    wordsNeeded: 0
+    line: "\uB0B4 \uC774\uB984 \uCCAB \uAE00\uC790\uAC00 \uBB50\uC600\uC9C0?"
+    motion: 4
+  - bossOf: {fileID: 0}
+    wordsNeeded: 75
+    line: "\uC774\uC81C \uC138 \uAE00\uC790 \uB2E4 \uC37C\uC5B4\uC694!"
+    motion: 3

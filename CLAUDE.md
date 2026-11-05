@@ -60,6 +60,8 @@
      이름 뒤 조사는 꼭 `UiKit.WithJosa` (플레이어가 지은 이름이라 받침이 정해져 있지 않음)
    - 업데이트 안내 (#115): `UpdateNotices`(세이브 칸 notices) — 예전 세이브로 켠 사람(= 업데이트한 사람)만 타이틀에서 한 번 (`TitleScreen.ShowUpdateNotice`,
      `ConfirmDialog.ShowNotice` [확인] 하나). 새 게임은 모두 본 것으로 시작, 튜토리얼과 따로. 다음 업데이트 안내는 `UpdateNotices.All` 맨 뒤에 새 id로
+   - 말을 잃어 가는 사람들 = NPC (#209, GDD 9-10): 맵 글자 N(바닥)·n(잔디) = 서는 자리 (칸 종류는 바닥·잔디, `FieldMap.NpcSpots`), FieldArea `npcs`를 맵 순서로. 데이터 `NpcData`(npcId, 출시 뒤 바꾸지 말 것) + 단계 `NpcStage`(조건 = 보스 처치·찾은 단어 수 → 말·움직임), 규칙 `NpcLines`·`NpcMotion`(순수), 화면 `FieldNpcs`·`FieldScreen.Npcs`. 세이브 칸 없음.
+     그림 Art/NinjaAdventure/Npcs/{npcId}.png (import_ninja_art.py NPC_SHEETS). 대사는 말풍선 한두 줄, 목표·보상·빨간 점 없음 (사용자). 데이터 기준 = `SampleDataBuilder.BuildNpcs`
    - 보스 대사 (#207): BossEncounter `bossLine`·`heroLine`·`afterLine` (`SampleDataBuilder.SetBossLines`, 규칙 `BossLines.Intro`). 새 보스를 만들면 셋 다 필요 (BossLinesTests). 글 기준 = 스토리 문서
    - 누군가의 기록 (#201, 이스터에그 — 설계 `Docs/GameStory/누군가의기록_설계.md`): 단어장마다 기록 하나 (WordDatabase `journal`, ItemKind.Journal). 상자에서 얻어 도감에서 연다 (`DexView` → `JournalView`).
      규칙 `Journals`: 세이브 칸 없음 — 얻었는지는 소지품, 읽히는 줄은 찾은 단어. **목표·보상·빨간 점·안내·진행 숫자를 넣지 말 것, 새 단어 순서도 바꾸지 말 것** (사용자: 스트레스 받지 않게).
@@ -68,7 +70,7 @@
    - **수익화** (GDD 9-3): 산 상품(`Entitlements`, 정식판 id `com.arttechsoo.wordrpg.full` — 바꾸지 말 것)도 세이브가 아니라 PlayerPrefs.
      결제는 `IStore`(실제 `UnityIapStore` = Unity IAP 5 — 앱스토어·구글플레이, 상품 id 같음, 구매 복원 흐름은 스토어마다 다름 #149, 계정 이름 문구 `StoreLabels`, 테스트는 가짜 — `GameManager.StoreOverride`/`FieldScreen.Configure`).
      정식판이 필요한 지역은 FieldArea `requiresFullVersion` (숲·정글·동굴) → 입구에서 `PaywallView`, 어디서든 설정 > 정식판(보기·구매 복원).
-     앱 버전(PlayerSettings.bundleVersion)은 앱스토어 버전과 같아야 함 (지금 main = **1.3 준비 중**, 앱 버전 숫자는 아직 1.2 — 내기 전에 올릴 것. **1.2 고침은 가지 `release-1.2`**(태그 v1.2-build3에서 뜸 #164)에서. **1.1 출시·고침은 가지 `release-1.1`**에서 빌드하고
+     앱 버전(PlayerSettings.bundleVersion)은 앱스토어 버전과 같아야 함 (지금 main = **1.4 준비 중**, **1.3 출시·고침은 가지 `release-1.3`** #209 — 앱 버전 숫자는 아직 1.2, 내기 전에 올릴 것. **1.2 고침은 가지 `release-1.2`**(태그 v1.2-build3에서 뜸 #164)에서. **1.1 출시·고침은 가지 `release-1.1`**에서 빌드하고
      고친 것은 main에도 합침 — main에서 1.1을 빌드하지 말 것. 1.0 심사 코드는 태그 v1.0-build3, 1.0을 고쳐 다시 내야 하면 그 태그에서 가지를 땀). 지원·개인정보 웹 페이지 = `gh-pages` 브랜치 (작업메모)
    - 새 단어장은 regionId·regionName·도감 보상 `rewards`(`DexReward` 한 줄 = 보상 id·이름·징표(종류 Keepsake)·골드·wordsNeeded(0 = 다 채웠을 때)·storyOrder(징표 진열장 순서) — #147. 보상 id는 세이브에 적히니 출시 뒤 바꾸지 말 것)를 지정해야 함 (RegionDataTests가 검사)
    - 수련용 허수아비는 MonsterSpecies `trainingDummy`(맞아도 HP 그대로, 기술 없음) — 게임에 하나, 출현표에 넣지 말 것 (TrainingTests)
@@ -203,7 +205,7 @@ Assets/
                         숫자를 바꾸면 EditMode BalanceSimulationTests(정글 전투·보스) 확인, 표는 [Explicit] BalanceReport, Combo(콤보 단계·글자·추가 피해), BattleFormulas, BattleReward,
                         BattleSummary(한 판 결산: 새 단어·틀린 단어·기술별 피해·최대 콤보 — 결산 화면용), Preemptive(선제공격: HP 20%·이미 본 단어만)
     Field/              FieldMap(맵 글자→격자), FieldTiles(맵 글자 표 — 칸 종류마다 글자·성질·이름표·테마, #116), FieldWalker(이동), StickInput(스틱 값→4방향·달리기), EncounterCounter(조우), FieldInteraction([확인] 대상·이름표 규칙), FieldAutotile(길·물가 테두리 모양),
-                        FieldArea(지역 SO: 테마·출입구 연결·보스·상자·상점·조우 방식·물의 몬스터·유적 동료), EncounterTable, RoamingMonsters(보이는 몬스터: 어슬렁·발견·쫓기·포기·부딪힘),
+                        FieldArea(지역 SO: 테마·출입구 연결·보스·상자·상점·조우 방식·물의 몬스터·유적 동료), EncounterTable, RoamingMonsters(보이는 몬스터: 어슬렁·발견·쫓기·포기·부딪힘), NpcData·NpcMotion(인물: 말 단계·움직임 #209),
                         FieldReach(시작 칸에서 갈 수 있는 칸 — 걷기 + 뗏목, 문·다리를 연/닫은 기준, #80), CaveLight(동굴 빛 규칙 + DarknessMap — #112)
     Game/               GameSession(진행 상태 전체), GameManager(씬 간 유지 + 자동 저장 + 설정 + 결제 창구), GameDatabase(id→에셋), PlayerRecord,
                         Entitlements(산 상품) · IStore + UnityIapStore(애플 인앱 결제),

@@ -184,6 +184,7 @@ namespace WordRPG.UI
             playerRenderer.sortingOrder = 10;
             follower = new FieldFollower(transform);
             roamerViews = new FieldRoamerViews(transform, CellCenter);
+            npcs = new FieldNpcs(transform, CellCenter);
             streams = new FieldStreams(transform);
             scatter = new FieldScatter(transform);
             fog = new FieldFog(transform);

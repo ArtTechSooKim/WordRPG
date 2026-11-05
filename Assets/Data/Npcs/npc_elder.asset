@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41e346695651bea4b81094cc485af4d8, type: 3}
+  m_Name: npc_elder
+  m_EditorClassIdentifier: WordRPG::WordRPG.Field.NpcData
+  npcId: npc_elder
+  displayName: "\uC5B4\uB974\uC2E0"
+  frameWidth: 0
+  stages:
+  - bossOf: {fileID: 0}
+    wordsNeeded: 0
+    line: "\u2026\u2026"
+    motion: 4
+  - bossOf: {fileID: 11400000, guid: 2f0f21b4f39acf14fab8b7273b5e1a17, type: 2}
+    wordsNeeded: 0
+    line: "\uB0B4 \uC0AC\uC804\uC744\u2026 \uB9C8\uC744 \uC704 \uC5B4\uB514 \uB480\uB354\uB77C."
+    motion: 2

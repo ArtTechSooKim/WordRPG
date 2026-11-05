@@ -109,6 +109,19 @@ namespace WordRPG.UI
 
         public CharacterSheet(string resourcePath) => sheet = Resources.Load<Texture2D>(resourcePath);
 
+        // 시트 맨 아래 줄의 자세 (#209)
+        public Sprite Pose(PlayerPose pose)
+        {
+            if (sheet == null) return null;
+            int key = 1000 + (int)pose;
+            if (cache.TryGetValue(key, out var cached) && cached != null) return cached;
+            var rect = new Rect((int)pose * Cell, sheet.height - 7 * Cell, Cell, Cell);
+            var sprite = Sprite.Create(sheet, rect, new Vector2(0.5f, 0.5f), Cell, 0, SpriteMeshType.FullRect);
+            sprite.name = $"{sheet.name}_pose_{pose}";
+            cache[key] = sprite;
+            return sprite;
+        }
+
         public Sprite Get(Direction facing, int step)
         {
             if (sheet == null) return null;
