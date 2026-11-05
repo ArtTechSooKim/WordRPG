@@ -173,7 +173,17 @@ namespace WordRPG.UI
             var layer = (RectTransform)Root.parent;
             var canvasCamera = canvas == null || canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
             if (RectTransformUtility.ScreenPointToLocalPointInRectangle(layer, cam.WorldToScreenPoint(world), canvasCamera, out var local))
+            {
+                // 화면 끝에서 잘리지 않게 (#210): 말풍선 전체가 화면 안에
+                if (textRoot.gameObject.activeSelf)
+                {
+                    var bounds = layer.rect;
+                    float halfWidth = textRoot.sizeDelta.x * 0.5f + 8f;
+                    local.x = Mathf.Clamp(local.x, bounds.xMin + halfWidth, Mathf.Max(bounds.xMin + halfWidth, bounds.xMax - halfWidth));
+                    local.y = Mathf.Min(local.y, bounds.yMax - textRoot.sizeDelta.y - 8f);
+                }
                 Root.anchoredPosition = local;
+            }
         }
     }
 }

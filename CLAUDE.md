@@ -62,6 +62,7 @@
      `ConfirmDialog.ShowNotice` [확인] 하나). 새 게임은 모두 본 것으로 시작, 튜토리얼과 따로. 다음 업데이트 안내는 `UpdateNotices.All` 맨 뒤에 새 id로
    - 말을 잃어 가는 사람들 = NPC (#209, GDD 9-10): 맵 글자 N(바닥)·n(잔디) = 서는 자리 (칸 종류는 바닥·잔디, `FieldMap.NpcSpots`), FieldArea `npcs`를 맵 순서로. 데이터 `NpcData`(npcId, 출시 뒤 바꾸지 말 것) + 단계 `NpcStage`(조건 = 보스 처치·찾은 단어 수 → 말·움직임), 규칙 `NpcLines`·`NpcMotion`(순수), 화면 `FieldNpcs`·`FieldScreen.Npcs`. 세이브 칸 없음.
      그림 Art/NinjaAdventure/Npcs/{npcId}.png (import_ninja_art.py NPC_SHEETS). 대사는 말풍선 한두 줄, 목표·보상·빨간 점 없음 (사용자). 데이터 기준 = `SampleDataBuilder.BuildNpcs`
+   - 상점 가판대 (#210): 맵의 이어진 S 칸 = 가판대 하나 (`FieldMap.ShopBlocks`, 지금 3×2, 상인·이름표는 윗줄 가운데). 그림 Tiles/{테마}_Stall_back·front·roof.png (`python Tools/make_shop_stalls.py`, 차양은 주인공 위). ShopData `merchant`(NpcData — 첫 단계 움직임만)·`pitches`(호객 말, 규칙 `ShopPitch`). 새 지역 상점도 같은 모양으로
    - 보스 대사 (#207): BossEncounter `bossLine`·`heroLine`·`afterLine` (`SampleDataBuilder.SetBossLines`, 규칙 `BossLines.Intro`). 새 보스를 만들면 셋 다 필요 (BossLinesTests). 글 기준 = 스토리 문서
    - 누군가의 기록 (#201, 이스터에그 — 설계 `Docs/GameStory/누군가의기록_설계.md`): 단어장마다 기록 하나 (WordDatabase `journal`, ItemKind.Journal). 상자에서 얻어 도감에서 연다 (`DexView` → `JournalView`).
      규칙 `Journals`: 세이브 칸 없음 — 얻었는지는 소지품, 읽히는 줄은 찾은 단어. **목표·보상·빨간 점·안내·진행 숫자를 넣지 말 것, 새 단어 순서도 바꾸지 말 것** (사용자: 스트레스 받지 않게).
@@ -261,7 +262,7 @@ Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow
                         widen_maps.py (맵의 한 칸 통로 → 두 칸), subset_fonts.py (본문 글꼴에서 한자·가나 빼기 — 앱 크기, fontTools 필요),
                         pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구), make_preempt_sfx.py (선제공격 '카칭' 소리 합성 #147), make_skill_sfx.py (기술마다 다른 소리: 팩 소리 겹치기 #164),
                         check_android_bundle.py (구글플레이에 올리기 전 AAB 검사: 대상 API·게임 표시·뒤로 가기·권한·16KB 페이지·크기 #149),
-                        journal_lines.py (누군가의 기록 문장 검사·CSV에 넣기 #201 · 글 파일 만들기 --text #202 · 고친 글 받아들이기 --import #204), make_journal_smudge.py (못 찾은 줄의 필기 그림 #201),
+                        make_shop_stalls.py (상점 가판대 그림: 팩 조각 조립 #210), journal_lines.py (누군가의 기록 문장 검사·CSV에 넣기 #201 · 글 파일 만들기 --text #202 · 고친 글 받아들이기 --import #204), make_journal_smudge.py (못 찾은 줄의 필기 그림 #201),
                         prepare_ambience.py (지역 환경음: 팩·CC0 녹음 다듬기 → Resources/Audio/Ambience + BGM과 섞은 미리듣기, #193), prepare_music.py (받은 곡 → 게임용: 끝 무음 빼기·반복 이음새 찾아 겹치기·음량 맞추기 → Licensed 폴더, `--later` = 아직 안 쓰는 2.0 곡을 Builds로, imageio-ffmpeg·numpy 필요 #166·#172),
                         build_intro_video.py (입장 영상: Flow 컷 이어 붙이기·Veo 표시 잘라냄·자막표 → Resources/Video, imageio-ffmpeg 필요, #129 —
                         컷 원본은 저장소 밖 Builds/cinematic_pixellab/Videos, release-1.1 폴더에선 그 경로를 인자로),

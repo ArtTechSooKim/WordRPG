@@ -1,3 +1,4 @@
+using System.Linq;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -234,7 +235,10 @@ namespace WordRPG.Field
             var tile = Map.Get(position);
             switch (tile)
             {
-                case FieldTile.Shop: if (shop != null) return shop.DisplayName; break;
+                case FieldTile.Shop:
+                    if (Map.ShopBlocks.Count > 0 && !Map.ShopBlocks.Any(block => block.MerchantCell == position)) return null; // 가판대마다 이름표 하나 (#210)
+                    if (shop != null) return shop.DisplayName;
+                    break;
                 case FieldTile.Boss: return Boss?.Species.DisplayName;
                 case FieldTile.Lectern: if (HasDictionary) return dictionaryName; break;
                 case FieldTile.Gate: if (!IsMiddleOfGate(position)) return null; break; // 여러 칸짜리 문은 가운데 칸에만

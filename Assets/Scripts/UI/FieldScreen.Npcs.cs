@@ -1,5 +1,6 @@
 using UnityEngine;
 using WordRPG.Field;
+using WordRPG.Items;
 
 namespace WordRPG.UI
 {
@@ -7,9 +8,11 @@ namespace WordRPG.UI
     public partial class FieldScreen
     {
         private const float NpcLineSeconds = 4f;
+        private const float ShopPitchSeconds = 3.5f;
 
         private FieldNpcs npcs;
         private NpcView talkingNpc;
+        private readonly ShopPitch shopPitch = new ShopPitch();
 
         public FieldNpcs Npcs => npcs;
 
@@ -24,6 +27,20 @@ namespace WordRPG.UI
             if (talkingNpc != null && !bubble.IsVisible) talkingNpc = null;
             if (inBattle || transitioning || IsPanelOpen) return;
             npcs.Tick(dt, walker.Position, talkingNpc);
+            UpdateShopPitch();
+        }
+
+        // 상점 근처를 지나가면 상인이 부른다 (#210)
+        private void UpdateShopPitch()
+        {
+            var merchant = npcs.Merchant;
+            if (merchant == null) return;
+            var offset = walker.Position - merchant.Motion.Cell;
+            string line = shopPitch.Update(area.Shop.Pitches, Mathf.Abs(offset.x) + Mathf.Abs(offset.y), Time.unscaledTime, rng);
+            if (line == null || bubble.IsVisible || fieldTutorialRunning || NeedsPrologue) return;
+            talkingNpc = merchant;
+            bubble.Speak(merchant.Data.DisplayName, line, ShopPitchSeconds);
+            bubbleKeepUntil = Time.unscaledTime + ShopPitchSeconds;
         }
 
         // 말풍선은 말하는 인물의 머리 위에

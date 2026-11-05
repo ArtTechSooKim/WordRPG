@@ -85,6 +85,21 @@ namespace WordRPG.Field
     //               'T' 단어 석판   'A' 유적 제단   'O' 동굴 입구(1.2부터 출입구 — 'D'와 같고 그림만 큰 동굴, #115)   'Q' 꾸밈(#86, 막힘)
     //   동굴 (#112): 'I' 글자 반딧돌 (정글의 'Y' 레버 · 'H' 덩굴 다리 · 'Q' 꾸밈도 씀)
     // 좌표: x는 오른쪽, y는 위쪽 (맨 아래 줄이 y=0) — Unity 월드 좌표와 같은 방향
+    // 이어진 S 칸 한 덩어리 = 가판대 하나 (#210)
+    public readonly struct ShopBlock
+    {
+        public Vector2Int Min { get; }
+        public Vector2Int Max { get; }
+        public ShopBlock(Vector2Int min, Vector2Int max)
+        {
+            Min = min;
+            Max = max;
+        }
+        // 상인이 서는 칸 = 윗줄 가운데. 이름표도 여기
+        public Vector2Int MerchantCell => new Vector2Int((Min.x + Max.x) / 2, Max.y);
+        public float CenterX => (Min.x + Max.x + 1) / 2f;
+    }
+
     public class FieldMap
     {
         private readonly FieldTile[,] tiles;
@@ -102,6 +117,41 @@ namespace WordRPG.Field
         public IReadOnlyList<Vector2Int> Chests => chests;
         public IReadOnlyList<Vector2Int> Doors => doors;
         public IReadOnlyList<Vector2Int> NpcSpots => npcSpots;
+        private List<ShopBlock> shopBlocks;
+
+        public IReadOnlyList<ShopBlock> ShopBlocks
+        {
+            get
+            {
+                if (shopBlocks != null) return shopBlocks;
+                shopBlocks = new List<ShopBlock>();
+                var seen = new HashSet<Vector2Int>();
+                for (int y = Height - 1; y >= 0; y--)
+                for (int x = 0; x < Width; x++)
+                {
+                    var first = new Vector2Int(x, y);
+                    if (Get(first) != FieldTile.Shop || seen.Contains(first)) continue;
+                    var min = first;
+                    var max = first;
+                    var open = new Stack<Vector2Int>();
+                    open.Push(first);
+                    seen.Add(first);
+                    while (open.Count > 0)
+                    {
+                        var cell = open.Pop();
+                        min = Vector2Int.Min(min, cell);
+                        max = Vector2Int.Max(max, cell);
+                        foreach (var step in new[] { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right })
+                        {
+                            var next = cell + step;
+                            if (Get(next) == FieldTile.Shop && seen.Add(next)) open.Push(next);
+                        }
+                    }
+                    shopBlocks.Add(new ShopBlock(min, max));
+                }
+                return shopBlocks;
+            }
+        }
         public Vector2Int? BossPosition { get; }
 
         private FieldMap(FieldTile[,] tiles, Vector2Int start, List<Vector2Int> chests, List<Vector2Int> doors,

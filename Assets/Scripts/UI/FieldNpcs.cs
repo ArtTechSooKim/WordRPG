@@ -20,14 +20,14 @@ namespace WordRPG.UI
         public NpcStage Stage { get; set; }
         public Vector3 Position => body.transform.position;
 
-        public NpcView(NpcData data, Transform parent, Vector2Int home, Vector2Int cell, NpcMotionKind kind, Random rng)
+        public NpcView(NpcData data, Transform parent, Vector2Int home, Vector2Int cell, NpcMotionKind kind, Random rng, int sortingOrder = 9)
         {
             Data = data;
             Motion = new NpcMotion(home, kind, rng, cell);
             var go = new GameObject($"Npc_{data.NpcId}", typeof(SpriteRenderer));
             go.transform.SetParent(parent, false);
             body = go.GetComponent<SpriteRenderer>();
-            body.sortingOrder = 9; // 주인공(10) 바로 아래. 동굴에서는 어둠(14) 아래라 빛 안에서만 보임
+            body.sortingOrder = sortingOrder; // 주인공(10) 바로 아래. 동굴에서는 어둠(14) 아래라 빛 안에서만 보임. 상인은 계산대 뒤 6
             string path = "Art/NinjaAdventure/Npcs/" + data.NpcId;
             if (data.IsAnimal) frames = CutFrames(Resources.Load<Texture2D>(path), data.FrameWidth);
             else sheet = new CharacterSheet(path);
@@ -83,6 +83,7 @@ namespace WordRPG.UI
         private Vector2Int playerCell;
 
         public IReadOnlyList<NpcView> Views => views;
+        public NpcView Merchant { get; private set; } // 가판대 안의 상인 (#210)
 
         public FieldNpcs(Transform parent, Func<Vector2Int, Vector3> cellCenter)
         {
@@ -95,8 +96,18 @@ namespace WordRPG.UI
         {
             foreach (var view in views) view.Destroy();
             views.Clear();
+            Merchant?.Destroy();
+            Merchant = null;
             map = area.Map;
             playerCell = player;
+            var merchantData = area.Shop != null ? area.Shop.Merchant : null;
+            if (merchantData != null && map.ShopBlocks.Count > 0)
+            {
+                var cell = map.ShopBlocks[0].MerchantCell;
+                var kind = merchantData.Stages.Count > 0 ? merchantData.Stages[0].Motion : NpcMotionKind.Stand;
+                Merchant = new NpcView(merchantData, parent, cell, cell, kind, rng, 6);
+                Merchant.Draw(0f, cellCenter);
+            }
             var spots = map.NpcSpots;
             for (int i = 0; i < spots.Count && i < area.Npcs.Count; i++)
             {
@@ -153,6 +164,13 @@ namespace WordRPG.UI
         public void Tick(float dt, Vector2Int player, NpcView talking)
         {
             playerCell = player;
+            if (Merchant != null)
+            {
+                if (Merchant == talking) Merchant.Motion.Hold(Direction.Down);
+                else Merchant.Motion.Release();
+                Merchant.Motion.Tick(dt, _ => false);
+                Merchant.Draw(dt, cellCenter);
+            }
             foreach (var view in views)
             {
                 var motion = view.Motion;

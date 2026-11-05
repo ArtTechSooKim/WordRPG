@@ -145,6 +145,11 @@ NPC_SHEETS = {
     "npc_miner": "Actor/Characters/Caveman/SpriteSheet.png",
     "npc_mule": "Actor/Animals/Donkey/SpriteSheeGreySide.png",  # 23×16 두 장
     "npc_frog": "Actor/Animals/Frog/SpriteSheet.png",           # 16×16 두 장
+    # 상점 가판대 안의 상인 (#210)
+    "npc_merchant_meadow": "Actor/Characters/Woman/SpriteSheet.png",
+    "npc_merchant_forest": "Actor/Characters/OldMan3/SpriteSheet.png",
+    "npc_merchant_jungle": "Actor/Characters/Monkey/SpriteSheet.png",
+    "npc_merchant_cave": "Actor/Characters/Inspector/SpriteSheet.png",
 }
 
 HERO_LOOKS = {

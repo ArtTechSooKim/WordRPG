@@ -99,5 +99,47 @@ namespace WordRPG.Tests
             Object.Destroy(field.gameObject);
             yield return null;
         }
+
+        // 상점 가판대 (#210): 상인이 안에 서고, 가까이 가면 부르고, [확인]은 그대로 상점
+        [UnityTest]
+        public IEnumerator TheMerchantCallsAsYouPassAndTheStallStillOpensTheShop()
+        {
+            var merchant = ScriptableObject.CreateInstance<NpcData>();
+            merchant.Configure("npc_merchant_meadow", "잡화점 아주머니", 0, new[] { new NpcStage("", NpcMotionKind.Stand) });
+            var shop = ScriptableObject.CreateInstance<ShopData>().Set("displayName", "초원 마을 잡화점").Set("merchant", merchant)
+                .Set("pitches", new List<string> { "상처약 있어요!" });
+            var stallArea = ScriptableObject.CreateInstance<FieldArea>()
+                .Set("areaId", "market").Set("displayName", "장터").Set("map", "###########\n#SSS......#\n#SSS......#\n#........P#\n###########")
+                .Set("encounters", ScriptableObject.CreateInstance<EncounterTable>()).Set("words", words).Set("shop", shop);
+            database.ReplaceContents(new MonsterSpecies[0], new ItemData[0], new[] { stallArea });
+            var session = Session();
+            var field = new GameObject("StallFieldUnderTest").AddComponent<FieldScreen>();
+            field.Configure(stallArea, session, () => { }, step: 0.05f, animScale: 0.01f, gameDatabase: database);
+            yield return null;
+            yield return null;
+
+            Assert.IsNotNull(field.Npcs.Merchant, "상인이 가판대 안에");
+            Assert.AreEqual(new Vector2Int(2, 3), field.Npcs.Merchant.Motion.Cell);
+            Assert.IsFalse(field.Bubble.IsVisible, "멀면 안 부름");
+
+            // 왼쪽으로 걸어 가까이 → 상인 머리 위에 호객
+            yield return HoldStick(field, Direction.Left, () => field.Bubble.IsVisible, 3f);
+            Assert.IsTrue(field.Bubble.ShowsText, "가까이 가면 부름");
+            Assert.AreEqual("잡화점 아주머니", field.Bubble.HeadText);
+            StringAssert.Contains("상처약 있어요!", field.Bubble.Text);
+
+            // 가판대 앞까지 가서 [확인] → 상점
+            field.Bubble.Hide();
+            yield return HoldStick(field, Direction.Left, () => field.PlayerCell.x <= 4, 3f);
+            yield return WaitFor(() => !field.IsMoving);
+            yield return HoldStick(field, Direction.Up, () => field.PlayerCell.y >= 2, 1f);
+            yield return WaitFor(() => !field.IsMoving);
+            yield return FaceStick(field, Direction.Left);
+            yield return PressConfirm(field);
+            Assert.IsTrue(field.IsPanelOpen, "가판대 어느 칸이든 [확인]이면 상점이 열림");
+
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
     }
 }

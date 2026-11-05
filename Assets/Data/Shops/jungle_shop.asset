@@ -24,3 +24,9 @@ MonoBehaviour:
     price: 150
   - item: {fileID: 11400000, guid: d06f0e6a146e8d7419259d713eb87c86, type: 2}
     price: 2000
+  merchant: {fileID: 11400000, guid: 22c2a3b0a134b7d469883e8ebb3d5ba6, type: 2}
+  pitches:
+  - "\uB07D\uB07D! \uB5CF\uBAA9 \uD0C0\uAE30 \uC804\uC5D0 \uD558\uB098 \uCC59\uACA8\uC694!"
+  - "\uB07D! \uC0B4\uAE08\uC0B4\uAE08 \uBB3C\uC57D\uC774 \uC815\uAE00\uC5D4 \uD544\uC218\uB77C\uB2C8\uAE4C!"
+  - "\uB07D! \uC5EC\uAE30\uAC00 \uC81C\uC77C \uC2F8\uC694, \uC815\uAE00\uC5D0 \uC5EC\uAE30\uBC16\uC5D0
+    \uC5C6\uC9C0\uB9CC!"

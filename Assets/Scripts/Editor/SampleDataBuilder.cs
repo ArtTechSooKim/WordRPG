@@ -454,11 +454,11 @@ namespace WordRPG.EditorTools
             //     정글 0 = 동굴(강 가운데 섬의 'O', 1.2 — 처음부터 열림, #115), 정글 1 = 숲 ---
             const string meadowPath = "Assets/Data/Areas/meadow.asset", libraryPath = "Assets/Data/Areas/library.asset",
                 forestPath = "Assets/Data/Areas/forest.asset";
-            UpgradeMapIf(forestPath, ForestMap, "DCNn"); // 숲 보스 공터 위쪽에 정글 출입구가 생김 (#80), 야영지 아래 일지 상자 (#200), 인물 (#209)
+            UpgradeMapIf(forestPath, ForestMap, "DCNnS"); // 숲 보스 공터 위쪽에 정글 출입구가 생김 (#80), 야영지 아래 일지 상자 (#200), 인물 (#209)
             UpgradeMapIf(libraryPath, LibraryMap, "CN"); // 보스 문 앞 일기 상자 (#200), 인물 (#209)
-            UpgradeMapIf(meadowPath, MeadowMap, "N");
-            UpgradeMapIf(junglePath, JungleMap, "Nn");
-            UpgradeMapIf(cavePath, CaveMap, "n");
+            UpgradeMapIf(meadowPath, MeadowMap, "NS"); // 상점 가판대 3×2 (#210)
+            UpgradeMapIf(junglePath, JungleMap, "NnS");
+            UpgradeMapIf(cavePath, CaveMap, "nS");
             InsertChestIf(libraryPath, 5, 1, diaryJournal); // 상자는 맵의 위→아래 순서라 그 자리에 끼움. 있던 상자 내용물은 그대로
             InsertChestIf(forestPath, 6, 5, survivalJournal);
             BuildNpcs(meadowPath, libraryPath, forestPath, junglePath, cavePath);
@@ -531,8 +531,8 @@ namespace WordRPG.EditorTools
                 "#:::::::::::.:::::::::::::#:::########\n" +
                 "###########..############::::::::::::#\n" +
                 "#:::::::::::.:::::::::::#::,,,,,,,:::#\n" +
-                "#:#::#.............#:#::#:,,,,,,,,,::#\n" +
-                "#::::...E...F...S...::::#::,,,,,,,:::#\n" +
+                "#:#::#.........SSS.#:#::#:,,,,,,,,,::#\n" +
+                "#::::...E...F..SSS..::::#::,,,,,,,:::#\n" +
                 "#::#:......N........::::#::::::::::::#\n" +
                 "#::::............N...................D\n" +
                 "#::::.......P........................#\n" +
@@ -681,8 +681,8 @@ namespace WordRPG.EditorTools
                 "#######..############,,,######,,,C##\n" +
                 "#######..##########..,,,#####,,,,,##\n" +
                 "######:...:######......#####,,,,,,,#\n" +
-                "######:...:#####,,,#########,,,,,,,#\n" +
-                "####::E:F:S::###,,,#########,,,,,,,#\n" +
+                "######:...SSS###,,,#########,,,,,,,#\n" +
+                "####::E:F:SSS###,,,#########,,,,,,,#\n" +
                 "###::.......::..,,,##########,,,,,##\n" +
                 "#..::......N......############,,,,##\n" +
                 "D..::P......::##..#,,,,#,,#,,#,,,,##\n" +
@@ -769,8 +769,8 @@ namespace WordRPG.EditorTools
                 "##::::::::::..:::::::::::::~~:::::,,,####:::::..:JJ~~~~~~~~~~~~~~~~:::###::::##\n" +
                 "##::::::Q:::..::::Q:::n:n::~~:::::,,,####:::::...JJ~~~~~~~~~~~~~~~~::,:#:::::##\n" +
                 "##::::::::F:..:::::::::n:::~~:::::,:::####:::::..:~~~~~~~~~~~~~~~~~:,,:,:#:::##\n" +
-                "##:::::::::...::::::::::Y::~~::Q::::::##::#...::::~~~~~~~~~~~~~~~~~,,,#::::::##\n" +
-                "##:::E::::...::::S:::::::::~~::::::::###::....::Q:~~~~~~~~~~~~~~~~~,:,,##::::##\n" +
+                "##:::::::::...::SSS:::::Y::~~::Q::::::##::#...::::~~~~~~~~~~~~~~~~~,,,#::::::##\n" +
+                "##:::E::::...:::SSS::::::::~~::::::::###::....::Q:~~~~~~~~~~~~~~~~~,:,,##::::##\n" +
                 "##::::::::..:::::::::::::::HH...::::::#.....::::::~~~~~~~~~~~~~~~~~:::,,##:::##\n" +
                 "##::::::::.N:::::::::::::::HH.......::.....:::::::~~~~~~~~~~~~~~~~~:::,:,,:::##\n" +
                 "##:::::::...::::::::Q::::::~~::.........,:::::,:::~~~~~~~~~~~~~~~~~::::,,::::##\n" +
@@ -841,8 +841,8 @@ namespace WordRPG.EditorTools
                 "#####:::::::~~#######..:::###########::~~~::,,::##\n" +
                 "####:::::::::~~#######..:::##########:::~:::,,,:##\n" +
                 "####:::##::::~~~####::..:::::#:#######::.:Q:,,,###\n" +
-                "####::::::####~~###::::..::::::#######:..::::#####\n" +
-                "####:::Q:::::#~~##:::::...::::S:::###::.:#########\n" +
+                "####::::::####~~###::::..::::SSS######:..::::#####\n" +
+                "####:::Q:::::#~~##:::::...:::SSS::###::.:#########\n" +
                 "###:::::::::::~~##::F:::..::::::::###:..:#########\n" +
                 "###:::::::::::HH:::::::::.:::::::::::..:::########\n" +
                 "###:::::::::::HH::#:::n::.:::::.....:..#:::::#####\n" +
@@ -954,6 +954,28 @@ namespace WordRPG.EditorTools
             SetNpcs(forestPath, woodcutter, mule);
             SetNpcs(junglePath, frog, frog, frog, pilgrim);
             SetNpcs(cavePath, miner);
+
+            // 상점의 상인과 호객 말 (#210). 그림 = Npcs/{id}.png, 첫 단계의 움직임만 씀
+            SetMerchant("meadow_shop", Npc("npc_merchant_meadow", "잡화점 아주머니", 0, new NpcStage("", NpcMotionKind.Busy)),
+                "상처약 있어요, 상처약!", "거기 모험가님, 그냥 가시게요?", "풀숲 가기 전에 하나 챙겨 가요!");
+            SetMerchant("forest_shop", Npc("npc_merchant_forest", "약초 할아버지", 0, new NpcStage("", NpcMotionKind.Stand)),
+                "이 숲에서 길 잃으면 약도 없어요! 약 사 가요!", "특제 상처약 막 들어왔어요!", "호기심 물약 한번 마셔 봐요. 새 단어가 쏟아진다니까!");
+            SetMerchant("jungle_shop", Npc("npc_merchant_jungle", "원숭이 상인", 0, new NpcStage("", NpcMotionKind.Hop)),
+                "끽끽! 뗏목 타기 전에 하나 챙겨요!", "끽! 살금살금 물약이 정글엔 필수라니까!", "끽! 여기가 제일 싸요, 정글에 여기밖에 없지만!");
+            SetMerchant("cave_shop", Npc("npc_merchant_cave", "떠돌이 상인", 0, new NpcStage("", NpcMotionKind.Stand)),
+                "여기까지 왔는데 빈손으로 가요?", "어둠 속에서 다치면 누가 구해 줘요? 상처약 사 가요!", "반딧돌 보러 가요? 약은 챙겼고요?");
+        }
+
+        private static void SetMerchant(string shopId, NpcData merchant, params string[] pitches)
+        {
+            var shop = AssetDatabase.LoadAssetAtPath<ShopData>($"{Root}/Shops/{shopId}.asset");
+            if (shop == null) return;
+            var so = new SerializedObject(shop);
+            Prop(so, "merchant").objectReferenceValue = merchant;
+            var list = Prop(so, "pitches");
+            list.arraySize = pitches.Length;
+            for (int i = 0; i < pitches.Length; i++) list.GetArrayElementAtIndex(i).stringValue = pitches[i];
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static NpcData Npc(string id, string name, int animalFrameWidth, params NpcStage[] stages)

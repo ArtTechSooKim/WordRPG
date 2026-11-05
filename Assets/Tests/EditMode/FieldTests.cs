@@ -336,9 +336,19 @@ namespace WordRPG.Tests
                     var cell = new Vector2Int(x, y);
                     var tile = map.Get(cell);
                     if (!FieldMap.IsInteractive(tile)) continue;
+                    if (tile == FieldTile.Shop) continue; // 가판대는 아래에서 덩어리로 (#210 — 벽에 붙은 뒤쪽 칸은 안 닿아도 됨)
                     bool adjacent = new[] { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right }
                         .Any(d => reachable.Contains(cell + d));
                     Assert.IsTrue(adjacent, $"{area.name}: {cell}의 {tile}에 갈 수 없음");
+                }
+                foreach (var block in map.ShopBlocks)
+                {
+                    bool touches = false;
+                    for (int x = block.Min.x; x <= block.Max.x; x++)
+                    for (int y = block.Min.y; y <= block.Max.y; y++)
+                        touches |= new[] { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right }
+                            .Any(d => reachable.Contains(new Vector2Int(x, y) + d));
+                    Assert.IsTrue(touches, $"{area.name}: 가판대 {block.Min}에 갈 수 없음");
                 }
             }
         }

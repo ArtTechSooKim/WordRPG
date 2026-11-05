@@ -75,6 +75,9 @@ namespace WordRPG.UI
         // 동굴 입구 'O' 출입구 (#115)의 큰 그림(3×3): Tiles/{테마}_Door_Cave_prop.png
         public static Sprite CaveMouthProp(FieldTheme theme) => LoadProp($"{theme}_Door_Cave_prop");
 
+        // 상점 가판대 (#210, Tools/make_shop_stalls.py): part = back·front·roof
+        public static Sprite Stall(FieldTheme theme, string part) => LoadProp($"{theme}_Stall_{part}");
+
         // 큰 그림: 16px = 1칸, 아래 가운데 기준 (칸 아래쪽에 맞춰 위로 그림)
         private static Sprite LoadProp(string key)
         {

@@ -44,6 +44,35 @@ namespace WordRPG.UI
             }
             cam.backgroundColor = ThemeLooks.Of(fieldArea.Theme).Outside;
             DrawProps(fieldArea);
+            DrawStalls(fieldArea);
+        }
+
+        // 상점 가판대 (#210): 뒤 벽 → (상인 6) → 계산대 → (주인공 10) → 차양. 뒤로 지나가면 차양에 가려짐
+        private readonly List<GameObject> stalls = new List<GameObject>();
+
+        private void DrawStalls(FieldArea fieldArea)
+        {
+            foreach (var stall in stalls) Destroy(stall);
+            stalls.Clear();
+            foreach (var block in fieldArea.Map.ShopBlocks)
+            {
+                StallPart(fieldArea, block, "back", 5);
+                StallPart(fieldArea, block, "front", 7);
+                StallPart(fieldArea, block, "roof", 11);
+            }
+        }
+
+        private void StallPart(FieldArea fieldArea, ShopBlock block, string part, int order)
+        {
+            var sprite = FieldArt.Stall(fieldArea.Theme, part);
+            if (sprite == null) return;
+            var go = new GameObject("Stall_" + part, typeof(SpriteRenderer));
+            go.transform.SetParent(transform, false);
+            go.transform.position = new Vector3(block.CenterX, block.Min.y, 0f);
+            var renderer = go.GetComponent<SpriteRenderer>();
+            renderer.sprite = sprite;
+            renderer.sortingOrder = order;
+            stalls.Add(go);
         }
 
         // 칸보다 큰 그림 (#80): 유적 제단의 잠든 석상 · 섬의 동굴 입구. 바닥 칸 아래 가운데에 맞춰 타일 위에 (주인공보다 아래)
