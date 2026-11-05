@@ -81,6 +81,33 @@ namespace WordRPG.Tests
             }
         }
 
+        // 성격에 맞는 빠르기 (#211): 같은 왕복이어도 느긋한 인물은 덜 걷고, 쉬는 시간도 길다
+        [TestCase(NpcMotionKind.Pace)]
+        [TestCase(NpcMotionKind.Stroll)]
+        [TestCase(NpcMotionKind.Wander)]
+        public void AHigherPaceTakesMoreStepsInTheSameTime(NpcMotionKind kind)
+        {
+            int Steps(float pace)
+            {
+                var motion = new NpcMotion(new Vector2Int(10, 10), kind, new Random(11), null, pace);
+                for (int i = 0; i < 6000; i++) motion.Tick(0.05f, _ => true);
+                return motion.StepsTaken;
+            }
+
+            int slow = Steps(0.6f), normal = Steps(1f), fast = Steps(1.6f);
+            Assert.Greater(normal, slow, "보통이 느긋한 인물보다 많이 걸음");
+            Assert.Greater(fast, normal, "빠른 인물이 보통보다 많이 걸음");
+        }
+
+        [Test]
+        public void ChangingStagesAlsoChangesThePace()
+        {
+            var motion = new NpcMotion(new Vector2Int(1, 1), NpcMotionKind.Pace, new Random(1), null, 0.7f);
+            Assert.AreEqual(0.7f, motion.Pace);
+            motion.SetKind(NpcMotionKind.Pace, 1.4f);
+            Assert.AreEqual(1.4f, motion.Pace, "움직임 종류가 같아도 빠르기는 바뀜");
+        }
+
         [Test]
         public void HoldingStopsWalkingAndFacesThePlayer()
         {
@@ -151,6 +178,18 @@ namespace WordRPG.Tests
                 total += area.Npcs.Count;
             }
             Assert.AreEqual(11, total, "초원 3 · 서고 1 · 숲 2 · 정글 4(개구리 셋) · 동굴 1");
+        }
+
+        // 걷는 인물들의 빠르기가 성격마다 다름 (#211 사용자)
+        [Test]
+        public void WalkersHaveDifferentPaces()
+        {
+            var paces = RealAreas().SelectMany(a => a.Npcs).Distinct().SelectMany(n => n.Stages)
+                .Where(s => s.Motion == NpcMotionKind.Pace || s.Motion == NpcMotionKind.Stroll || s.Motion == NpcMotionKind.Wander)
+                .Select(s => s.Pace).Distinct().ToList();
+            Assert.GreaterOrEqual(paces.Count, 5, string.Join(", ", paces));
+            Assert.Less(paces.Min(), 1f);
+            Assert.Greater(paces.Max(), 1f);
         }
 
         [Test]

@@ -20,7 +20,9 @@ MonoBehaviour:
     wordsNeeded: 0
     line: "\u2026\u2026"
     motion: 4
+    pace: 1
   - bossOf: {fileID: 11400000, guid: 2f0f21b4f39acf14fab8b7273b5e1a17, type: 2}
     wordsNeeded: 0
     line: "\uB0B4 \uC0AC\uC804\uC744\u2026 \uB9C8\uC744 \uC704 \uC5B4\uB514 \uB480\uB354\uB77C."
     motion: 2
+    pace: 0.75

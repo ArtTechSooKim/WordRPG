@@ -27,7 +27,10 @@ namespace WordRPG.Field
         [Tooltip("{이름} = 플레이어가 지은 이름")]
         [SerializeField] private string line;
         [SerializeField] private NpcMotionKind motion;
+        [Tooltip("빠르기 배수 (#211): 1 = 보통, 작을수록 느긋함. 걸음·쉬는 시간·일하는 박자에 모두 적용")]
+        [SerializeField] private float pace = 1f;
 
+        public float Pace => pace > 0f ? pace : 1f;
         public FieldArea BossOf => bossOf;
         public int WordsNeeded => wordsNeeded;
         public string Line => line;
@@ -35,10 +38,11 @@ namespace WordRPG.Field
 
         private NpcStage() { } // Unity 직렬화용
 
-        public NpcStage(string line, NpcMotionKind motion, FieldArea bossOf = null, int wordsNeeded = 0)
+        public NpcStage(string line, NpcMotionKind motion, FieldArea bossOf = null, int wordsNeeded = 0, float pace = 1f)
         {
             this.line = line;
             this.motion = motion;
+            this.pace = pace;
             this.bossOf = bossOf;
             this.wordsNeeded = wordsNeeded;
         }

@@ -20,8 +20,10 @@ MonoBehaviour:
     wordsNeeded: 0
     line: "\uAC15\uC744 ___ \uAC74\uB108\uBA74 ___\uC5D0 ___\uAC00 \uC788\uC5B4."
     motion: 4
+    pace: 1
   - bossOf: {fileID: 0}
     wordsNeeded: 60
     line: "\uAC15\uC744 \uB5CF\uBAA9\uC73C\uB85C \uAC74\uB108\uBA74 \uB3D9\uCABD
       \uAE30\uC2AD\uC5D0 \uC5F4\uC1E0\uAC00 \uC788\uC5B4."
     motion: 1
+    pace: 0.65

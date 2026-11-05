@@ -20,10 +20,10 @@ namespace WordRPG.UI
         public NpcStage Stage { get; set; }
         public Vector3 Position => body.transform.position;
 
-        public NpcView(NpcData data, Transform parent, Vector2Int home, Vector2Int cell, NpcMotionKind kind, Random rng, int sortingOrder = 9)
+        public NpcView(NpcData data, Transform parent, Vector2Int home, Vector2Int cell, NpcMotionKind kind, Random rng, int sortingOrder = 9, float pace = 1f)
         {
             Data = data;
-            Motion = new NpcMotion(home, kind, rng, cell);
+            Motion = new NpcMotion(home, kind, rng, cell, pace);
             var go = new GameObject($"Npc_{data.NpcId}", typeof(SpriteRenderer));
             go.transform.SetParent(parent, false);
             body = go.GetComponent<SpriteRenderer>();
@@ -104,8 +104,8 @@ namespace WordRPG.UI
             if (merchantData != null && map.ShopBlocks.Count > 0)
             {
                 var cell = map.ShopBlocks[0].MerchantCell;
-                var kind = merchantData.Stages.Count > 0 ? merchantData.Stages[0].Motion : NpcMotionKind.Stand;
-                Merchant = new NpcView(merchantData, parent, cell, cell, kind, rng, 6);
+                var first = merchantData.Stages.Count > 0 ? merchantData.Stages[0] : null;
+                Merchant = new NpcView(merchantData, parent, cell, cell, first != null ? first.Motion : NpcMotionKind.Stand, rng, 6, first != null ? first.Pace : 1f);
                 Merchant.Draw(0f, cellCenter);
             }
             var spots = map.NpcSpots;
@@ -116,7 +116,7 @@ namespace WordRPG.UI
                 var stage = StageOf(data, area, session);
                 var cell = spots[i];
                 if (cell == player) cell = FreeCellBeside(cell);
-                var view = new NpcView(data, parent, spots[i], cell, stage != null ? stage.Motion : NpcMotionKind.Stand, rng) { Stage = stage };
+                var view = new NpcView(data, parent, spots[i], cell, stage != null ? stage.Motion : NpcMotionKind.Stand, rng, 9, stage != null ? stage.Pace : 1f) { Stage = stage };
                 views.Add(view);
                 view.Draw(0f, cellCenter);
             }
@@ -144,7 +144,7 @@ namespace WordRPG.UI
             foreach (var view in views)
             {
                 view.Stage = StageOf(view.Data, area, session);
-                if (view.Stage != null) view.Motion.SetKind(view.Stage.Motion);
+                if (view.Stage != null) view.Motion.SetKind(view.Stage.Motion, view.Stage.Pace);
             }
         }
 

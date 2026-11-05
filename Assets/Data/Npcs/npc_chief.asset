@@ -20,7 +20,9 @@ MonoBehaviour:
     wordsNeeded: 0
     line: "\uC790\uB124 \uC774\uB984\uC774\u2026 \uD39C\u2026 \uC544\uB2C8, \uBB50\uC600\uB354\uB77C?"
     motion: 1
+    pace: 0.7
   - bossOf: {fileID: 11400000, guid: 2f0f21b4f39acf14fab8b7273b5e1a17, type: 2}
     wordsNeeded: 0
     line: "{\uC774\uB984}! \uADF8\uB798, \uADF8 \uC774\uB984\uC774\uC57C!"
     motion: 0
+    pace: 1

@@ -44,6 +44,7 @@ namespace WordRPG.Field
         public Vector2Int Cell { get; private set; }
         public Vector2Int Previous { get; private set; }
         public NpcMotionKind Kind { get; private set; }
+        public float Pace { get; private set; } = 1f; // 성격에 맞는 빠르기 (#211)
         public Direction Facing { get; private set; } = Direction.Down;
         public NpcPose Pose { get; private set; }
         public bool Walking { get; private set; }
@@ -52,19 +53,20 @@ namespace WordRPG.Field
         public bool Held { get; private set; }
         public float HopHeight => hopT < 1f ? Mathf.Sin(hopT * Mathf.PI) * 0.25f : 0f;
 
-        public NpcMotion(Vector2Int home, NpcMotionKind kind, Random random, Vector2Int? startCell = null)
+        public NpcMotion(Vector2Int home, NpcMotionKind kind, Random random, Vector2Int? startCell = null, float pace = 1f)
         {
             Home = home;
             Cell = Previous = startCell ?? home;
             rng = random;
             paceDirection = rng.Next(2) == 0 ? Direction.Left : Direction.Right;
-            SetKind(kind);
+            SetKind(kind, pace);
         }
 
-        public void SetKind(NpcMotionKind kind)
+        public void SetKind(NpcMotionKind kind, float pace = 1f)
         {
-            if (kind == Kind && timer > 0f) return;
+            if (kind == Kind && Mathf.Approximately(pace, Pace) && timer > 0f) return;
             Kind = kind;
+            Pace = pace > 0f ? pace : 1f;
             Pose = NpcPose.None;
             busyBeats = 0;
             timer = Range(0.2f, 1.2f);
@@ -101,9 +103,9 @@ namespace WordRPG.Field
 
             switch (Kind)
             {
-                case NpcMotionKind.Stand: LookAround(Range(2f, 5f)); break;
-                case NpcMotionKind.Pace: Pacing(PaceStep, Range(0.8f, 2.4f), canStand); break;
-                case NpcMotionKind.Stroll: Pacing(StrollStep, Range(1.5f, 3.5f), canStand); break;
+                case NpcMotionKind.Stand: LookAround(Scaled(Range(2f, 5f))); break;
+                case NpcMotionKind.Pace: Pacing(PaceStep / Pace, Scaled(Range(0.8f, 2.4f)), canStand); break;
+                case NpcMotionKind.Stroll: Pacing(StrollStep / Pace, Scaled(Range(1.5f, 3.5f)), canStand); break;
                 case NpcMotionKind.Wander: Wandering(canStand); break;
                 case NpcMotionKind.Sit: Sitting(); break;
                 case NpcMotionKind.Busy: BeingBusy(); break;
@@ -140,8 +142,8 @@ namespace WordRPG.Field
             Facing = direction;
             var target = Cell + direction.ToOffset();
             bool inRange = Mathf.Abs(target.x - Home.x) + Mathf.Abs(target.y - Home.y) <= WanderRadius;
-            if (inRange && canStand(target) && rng.NextDouble() < 0.75) StepTo(target, direction, WanderStep);
-            timer = Range(0.05f, 0.7f);
+            if (inRange && canStand(target) && rng.NextDouble() < 0.75) StepTo(target, direction, WanderStep / Pace);
+            timer = Scaled(Range(0.05f, 0.7f));
         }
 
         private void Sitting()
@@ -150,12 +152,12 @@ namespace WordRPG.Field
             {
                 Pose = NpcPose.None;
                 Facing = (Direction)rng.Next(4);
-                timer = Range(0.8f, 1.6f);
+                timer = Scaled(Range(0.8f, 1.6f));
             }
             else
             {
                 Pose = NpcPose.Crouch;
-                timer = Range(2.5f, 5f);
+                timer = Scaled(Range(2.5f, 5f));
             }
         }
 
@@ -167,21 +169,21 @@ namespace WordRPG.Field
                 if (Pose != NpcPose.None)
                 {
                     Pose = NpcPose.None;
-                    timer = Range(1.2f, 3f);
+                    timer = Scaled(Range(1.2f, 3f));
                     return;
                 }
                 busyBeats = 4 + rng.Next(5);
             }
             Pose = Pose == NpcPose.Item ? NpcPose.Crouch : NpcPose.Item;
             busyBeats--;
-            timer = 0.32f;
+            timer = Scaled(0.32f);
         }
 
         private void Hopping()
         {
             hopT = 0f;
             if (rng.Next(2) == 0) Facing = rng.Next(2) == 0 ? Direction.Left : Direction.Right;
-            timer = Range(0.9f, 3f);
+            timer = Scaled(Range(0.9f, 3f));
         }
 
         private void StepTo(Vector2Int target, Direction direction, float seconds)
@@ -196,6 +198,7 @@ namespace WordRPG.Field
         }
 
         private float Range(float min, float max) => min + (float)rng.NextDouble() * (max - min);
+        private float Scaled(float seconds) => seconds / Pace;
 
         private static Direction Opposite(Direction direction)
         {

@@ -21,8 +21,10 @@ MonoBehaviour:
     line: "\uAE38\uC744 \uB0B4\uAC00 \uC783\uC5C8\uB2E4, \uC544\uB2C8 \uB098\uB97C
       \uAE38\uC774\u2026"
     motion: 3
+    pace: 1.25
   - bossOf: {fileID: 11400000, guid: a3e19a296f3df11468a130c5e27e87f5, type: 2}
     wordsNeeded: 0
     line: "\uC774\uC815\uD45C\uAC00 \uB3CC\uC544\uC654\uAD70. \uB2AA \uB108\uBA38
       \uACF5\uD130\uB97C \uAC00 \uBD10."
     motion: 1
+    pace: 1

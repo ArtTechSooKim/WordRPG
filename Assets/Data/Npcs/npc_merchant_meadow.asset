@@ -20,3 +20,4 @@ MonoBehaviour:
     wordsNeeded: 0
     line: 
     motion: 5
+    pace: 1

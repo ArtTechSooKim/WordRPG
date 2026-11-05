@@ -925,18 +925,18 @@ namespace WordRPG.EditorTools
 
             var elder = Npc("npc_elder", "어르신", 0,
                 new NpcStage("……", NpcMotionKind.Sit),
-                new NpcStage("내 사전을… 마을 위 어디 뒀더라.", NpcMotionKind.Stroll, library));
+                new NpcStage("내 사전을… 마을 위 어디 뒀더라.", NpcMotionKind.Stroll, library, 0, 0.75f)); // 노인: 아주 천천히
             var chief = Npc("npc_chief", "촌장", 0,
-                new NpcStage("자네 이름이… 펜… 아니, 뭐였더라?", NpcMotionKind.Pace),
+                new NpcStage("자네 이름이… 펜… 아니, 뭐였더라?", NpcMotionKind.Pace, null, 0, 0.7f), // 뒷짐 지고 느긋하게
                 new NpcStage("{이름}! 그래, 그 이름이야!", NpcMotionKind.Stand, library));
             var child = Npc("npc_child", "아이", 0,
                 new NpcStage("내 이름 첫 글자가 뭐였지?", NpcMotionKind.Sit),
-                new NpcStage("이제 세 글자 다 썼어요!", NpcMotionKind.Wander, null, 75));
+                new NpcStage("이제 세 글자 다 썼어요!", NpcMotionKind.Wander, null, 75, 1.6f)); // 신나서 뛰어다님
             var librarian = Npc("npc_librarian", "사서", 0,
-                new NpcStage("쉿. 소리 내어 읽으면 도깨비들이 와요.", NpcMotionKind.Pace),
-                new NpcStage("서쪽 열람실 구석은 보셨나요?", NpcMotionKind.Pace, null, 40));
+                new NpcStage("쉿. 소리 내어 읽으면 도깨비들이 와요.", NpcMotionKind.Pace, null, 0, 0.55f), // 발소리를 죽여 살금살금
+                new NpcStage("서쪽 열람실 구석은 보셨나요?", NpcMotionKind.Pace, null, 40, 0.55f));
             var woodcutter = Npc("npc_woodcutter", "나무꾼", 0,
-                new NpcStage("길을 내가 잃었다, 아니 나를 길이…", NpcMotionKind.Wander),
+                new NpcStage("길을 내가 잃었다, 아니 나를 길이…", NpcMotionKind.Wander, null, 0, 1.25f), // 허둥지둥
                 new NpcStage("이정표가 돌아왔군. 늪 너머 공터를 가 봐.", NpcMotionKind.Pace, forest));
             var mule = Npc("npc_mule", "노새", 23,
                 new NpcStage("히힝… 입가에 사과 조각이 붙어 있다.", NpcMotionKind.Stand));
@@ -944,10 +944,10 @@ namespace WordRPG.EditorTools
                 new NpcStage("개굴. (표결 중인 것 같다)", NpcMotionKind.Hop));
             var pilgrim = Npc("npc_pilgrim", "순례자", 0,
                 new NpcStage("강을 ___ 건너면 ___에 ___가 있어.", NpcMotionKind.Sit),
-                new NpcStage("강을 뗏목으로 건너면 동쪽 기슭에 열쇠가 있어.", NpcMotionKind.Pace, null, 60));
+                new NpcStage("강을 뗏목으로 건너면 동쪽 기슭에 열쇠가 있어.", NpcMotionKind.Pace, null, 60, 0.65f)); // 경건하게
             var miner = Npc("npc_miner", "광부", 0,
-                new NpcStage("나가는 길은 저쪽으로 쭉 가서…", NpcMotionKind.Busy),
-                new NpcStage("문장이 돌아왔어! 반딧돌을 다 밝히면 좋은 게 있대.", NpcMotionKind.Pace, cave));
+                new NpcStage("나가는 길은 저쪽으로 쭉 가서…", NpcMotionKind.Busy, null, 0, 1.2f), // 쉬지 않고 일함
+                new NpcStage("문장이 돌아왔어! 반딧돌을 다 밝히면 좋은 게 있대.", NpcMotionKind.Pace, cave, 0, 1.4f)); // 신이 나서 성큼성큼
 
             SetNpcs(meadowPath, elder, chief, child);
             SetNpcs(libraryPath, librarian);
@@ -960,7 +960,7 @@ namespace WordRPG.EditorTools
                 "상처약 있어요, 상처약!", "거기 모험가님, 그냥 가시게요?", "풀숲 가기 전에 하나 챙겨 가요!");
             SetMerchant("forest_shop", Npc("npc_merchant_forest", "약초 할아버지", 0, new NpcStage("", NpcMotionKind.Stand)),
                 "이 숲에서 길 잃으면 약도 없어요! 약 사 가요!", "특제 상처약 막 들어왔어요!", "호기심 물약 한번 마셔 봐요. 새 단어가 쏟아진다니까!");
-            SetMerchant("jungle_shop", Npc("npc_merchant_jungle", "원숭이 상인", 0, new NpcStage("", NpcMotionKind.Hop)),
+            SetMerchant("jungle_shop", Npc("npc_merchant_jungle", "원숭이 상인", 0, new NpcStage("", NpcMotionKind.Hop, null, 0, 1.5f)),
                 "끽끽! 뗏목 타기 전에 하나 챙겨요!", "끽! 살금살금 물약이 정글엔 필수라니까!", "끽! 여기가 제일 싸요, 정글에 여기밖에 없지만!");
             SetMerchant("cave_shop", Npc("npc_merchant_cave", "떠돌이 상인", 0, new NpcStage("", NpcMotionKind.Stand)),
                 "여기까지 왔는데 빈손으로 가요?", "어둠 속에서 다치면 누가 구해 줘요? 상처약 사 가요!", "반딧돌 보러 가요? 약은 챙겼고요?");
