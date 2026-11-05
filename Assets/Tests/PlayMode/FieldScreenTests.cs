@@ -27,7 +27,7 @@ namespace WordRPG.Tests
 
         private ItemData ink;
 
-        private FieldScreen CreateField(GameSession session, MonsterSpecies enemy, string map = TestMap)
+        private FieldScreen CreateField(GameSession session, MonsterSpecies enemy, string map = TestMap, GameSettings settings = null)
         {
             ink = TestData.Item("shiny_ink").Set("displayName", "빛나는 잉크");
             var table = ScriptableObject.CreateInstance<EncounterTable>()
@@ -43,7 +43,7 @@ namespace WordRPG.Tests
 
             var go = new GameObject("FieldUnderTest");
             var field = go.AddComponent<FieldScreen>();
-            field.Configure(area, session, step: 0.05f, animScale: 0.01f);
+            field.Configure(area, session, step: 0.05f, animScale: 0.01f, gameSettings: settings);
             return field;
         }
 
@@ -123,6 +123,38 @@ namespace WordRPG.Tests
         }
 
         // 스틱 (#34): 계속 밀면 서지 않고 여러 칸, 끝까지 밀면 달리기(금색 '달리기'), 누른 자리로 받침이 옮겨 옴,
+        // 왼손 모드 (#215): 스틱은 왼쪽 아래·[확인]과 [선제공격]은 오른쪽 아래. 걷기·달리기·[확인]은 그대로 동작
+        [UnityTest]
+        public IEnumerator LeftHandedModeSwapsStickAndConfirm()
+        {
+            const string corridor = "#########\n#P.....C#\n#########";
+            var session = GameSession.NewGame(Hero(100, 30), 1);
+            var field = CreateField(session, Enemy(40, 1, 5), corridor, new GameSettings { LeftHanded = true });
+            yield return null;
+            yield return null;
+
+            var confirm = FindButton(field.transform, "Pad_Confirm");
+            Assert.Greater(RectTransformUtility.WorldToScreenPoint(null, confirm.transform.position).x, Screen.width * 0.6f, "[확인]은 오른쪽");
+            Assert.Less(field.Stick.ScreenPointFor(Vector2.zero).x, Screen.width * 0.5f, "스틱 제자리는 왼쪽");
+            var corners = new Vector3[4];
+            field.Stick.Zone.GetWorldCorners(corners);
+            Assert.Less(corners[2].x, RectTransformUtility.WorldToScreenPoint(null, confirm.transform.position).x, "스틱 영역이 [확인]을 덮지 않음");
+            var preempt = (RectTransform)field.transform.Find("FieldHud/SafeArea/PreemptPrompt");
+            Assert.AreEqual(0.81f, preempt.anchorMin.x, 0.001f, "[선제공격]은 [확인] 위");
+
+            yield return HoldStick(field, Direction.Right, () => field.PlayerCell.x >= 3);
+            Assert.GreaterOrEqual(field.PlayerCell.x, 3, "왼쪽 스틱으로 걸음");
+            bool sawRun = false;
+            yield return HoldStick(field, Direction.Left, () =>
+            {
+                sawRun |= field.IsRunning;
+                return field.PlayerCell.x <= 1;
+            }, run: true);
+            Assert.IsTrue(sawRun, "끝까지 밀면 달리기");
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
         // [확인]은 왼쪽 아래·스틱은 오른쪽 아래
         [UnityTest]
         public IEnumerator StickWalksRunsAndConfirmIsOnTheLeft()

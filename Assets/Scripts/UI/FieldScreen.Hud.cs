@@ -152,17 +152,23 @@ namespace WordRPG.UI
             UiKit.Pad(toastText.rectTransform, 20, 6, 20, 6);
             toastPanel.SetActive(false);
 
-            // 가상 스틱 (Figma 'Virtual Stick' #34): 오른쪽 아래 아무 곳이나 엄지를 대면 그 자리에 생김, 끝까지 밀면 달리기
-            stick = VirtualStick.Create(hudRoot, 0.4f, 0f, 1f, 0.27f);
-            // [확인]은 왼쪽 아래로 따로 (스틱을 밀면서 다른 손가락으로 누를 수 있게)
-            BuildConfirmButton(UiKit.Rect("ConfirmArea", hudRoot, 0.02f, 0.03f, 0.36f, 0.24f));
+            // 가상 스틱 (Figma 'Virtual Stick' #34): 아래쪽 한 편 아무 곳이나 엄지를 대면 그 자리에 생김, 끝까지 밀면 달리기
+            // 자리는 오른손 기준으로 만들고 끝에서 ApplyHand가 설정대로 옮김 (왼손 모드 #215)
+            var stickArea = HandLayout.Stick(false);
+            stick = VirtualStick.Create(hudRoot, stickArea.MinX, stickArea.MinY, stickArea.MaxX, stickArea.MaxY);
+            // [확인]은 반대쪽 아래로 따로 (스틱을 밀면서 다른 손가락으로 누를 수 있게)
+            var confirmPlace = HandLayout.Confirm(false);
+            confirmArea = UiKit.Rect("ConfirmArea", hudRoot, confirmPlace.MinX, confirmPlace.MinY, confirmPlace.MaxX, confirmPlace.MaxY);
+            BuildConfirmButton(confirmArea);
             // [선제공격] (#73 → #74 QTE): 쫓아오는 몬스터가 가까우면 몬스터에 빨간 조준 괄호, [확인] 바로 위에 둥근 버튼 (왼손 엄지로)
             markLayer = UiKit.Stretch("RoamerMarks", hudRoot);
             preemptLock = TargetLock.Create(markLayer, Palette.Bad, false);
             preemptLock.SetActive(false);
             preemptRange = UiRing.Create("PreemptRange", markLayer, Palette.Gold, 5f, 100f, 28);
             preemptRange.gameObject.SetActive(false);
-            BuildPreemptPrompt(UiKit.Rect("PreemptPrompt", hudRoot, 0.19f, 0.3f, 0.19f, 0.3f));
+            float preemptX = HandLayout.PreemptX(false);
+            preemptArea = UiKit.Rect("PreemptPrompt", hudRoot, preemptX, PreemptAnchorY, preemptX, PreemptAnchorY);
+            BuildPreemptPrompt(preemptArea);
 
             // 주인공 말풍선: 상단 바·미니맵·목표 한 줄·메뉴·스틱 위, 조우 번쩍임·창 아래
             // (#120 사용자: "새로운 단어로 힘을 모아야해"가 목표 한 줄·가방 버튼에 가려졌음 — 예전엔 이름표 바로 위였음)
@@ -191,9 +197,23 @@ namespace WordRPG.UI
             preemptView = PreemptView.Create(hudRoot);
             BuildHeroSetup(); // 모습 고르기·이름 (#124) — 다른 창보다 위
             guide = GuideHints.Create(transform); // 자기 캔버스로 HUD·전투 위에 (눌림은 받지 않음)
+            ApplyHand();
         }
 
-        // 왼쪽 아래 [확인] (Figma 'Action Button'): 옆에 쓸 것이 있으면 금색(Ready), 없으면 반투명(Idle)
+        private const float PreemptAnchorY = 0.3f;
+        private RectTransform confirmArea, preemptArea;
+
+        // 왼손 모드 (#215): 설정대로 스틱과 [확인]·[선제공격] 자리를 정함. 설정 창에서 바꾸면 바로 옮김
+        private void ApplyHand()
+        {
+            bool left = settings != null && settings.LeftHanded;
+            stick.SetArea(HandLayout.Stick(left), HandLayout.StickHomeX(left));
+            HandLayout.Confirm(left).ApplyTo(confirmArea);
+            float preemptX = HandLayout.PreemptX(left);
+            new HandLayout.Area(preemptX, PreemptAnchorY, preemptX, PreemptAnchorY).ApplyTo(preemptArea);
+        }
+
+        // [확인] (Figma 'Action Button'): 옆에 쓸 것이 있으면 금색(Ready), 없으면 반투명(Idle)
         private void BuildConfirmButton(RectTransform area)
         {
             confirmGlow = UiKit.IconImage("ConfirmGlow", area, UiKit.GlowSprite(), 0.5f, 0.5f, 0.5f, 0.5f);
@@ -596,7 +616,11 @@ namespace WordRPG.UI
         {
             if (!CanOpenMenu) return;
             var full = FullVersionArea();
-            settingsView.Show(settings, saveSettings, deleteSave, ReplayTutorial, new SettingsView.PurchaseHooks
+            settingsView.Show(settings, () =>
+            {
+                ApplyHand();
+                saveSettings?.Invoke();
+            }, deleteSave, ReplayTutorial, new SettingsView.PurchaseHooks
             {
                 Store = store, Owned = entitlements, OpenOffer = full != null ? () => OpenFullVersionOffer(full) : (Action)null
             }, ReplayIntro);

@@ -7,7 +7,7 @@ using WordRPG.Game;
 
 namespace WordRPG.UI
 {
-    // 설정 (Figma '설정 — 전투 강도 (#147)'): 소리(배경 음악·효과음), 전투 강도, 진동, [튜토리얼 다시 보기] [입장 영상 다시 보기](#138), [처음부터 다시 하기], 정식판, 정보.
+    // 설정 (Figma '설정 — 왼손 모드 (#215)'): 소리(배경 음악·효과음), 전투 강도, 진동, 왼손 모드, [튜토리얼 다시 보기] [입장 영상 다시 보기](#138), [처음부터 다시 하기], 정식판, 정보.
     // 정식판 칸 (#63, 앱스토어 심사 대비): 언제든 [정식판 보기](정식판 안내 창)와 [구매 복원] — 숲 입구까지 가지 않아도 살 수 있고 되찾을 수 있다.
     // 값을 바꿀 때마다 onSettingsChanged로 저장. 처음부터는 실수로 지우지 않게 확인 창을 두 번 거쳐야 onDeleteSave
     // ('설정 — 처음부터 1차/2차 확인 (#37)')
@@ -20,7 +20,7 @@ namespace WordRPG.UI
         private Slider music, sfx;
         private readonly System.Collections.Generic.List<Button> intensityOptions = new System.Collections.Generic.List<Button>();
         private Text intensitySub;
-        private SwitchView vibration;
+        private SwitchView vibration, leftHanded;
         private GameSettings settings;
         private Action onSettingsChanged;
         private bool dirty; // 슬라이더로 바꾸고 아직 저장하지 않음
@@ -67,10 +67,12 @@ namespace WordRPG.UI
 
             view.BuildIntensity(Section(root, "전투 강도", 0.695f, 0.78f));
 
-            // 게임: 진동 + 튜토리얼 다시 보기 · 입장 영상 다시 보기 (두 버튼 배치는 아래 정식판 칸과 같음)
+            // 게임: 진동 · 왼손 모드 + 튜토리얼 다시 보기 · 입장 영상 다시 보기 (두 칸·두 버튼 배치는 아래 정식판 칸과 같음)
             var game = Section(root, "게임", 0.545f, 0.685f);
-            Row(game, null, "진동", "틀렸을 때 짧게 떨려요", 0.43f, 0.8f);
-            view.vibration = SwitchView.Create("VibrationSwitch", game, 0.84f, 0.5f, 0.965f, 0.73f);
+            Row(game, null, "진동", "틀렸을 때 짧게 떨려요", 0.43f, 0.8f, 0.035f, 0.36f);
+            view.vibration = SwitchView.Create("VibrationSwitch", game, 0.365f, 0.5f, 0.49f, 0.73f);
+            Row(game, null, "왼손 모드", "스틱과 [확인]을 바꿔요", 0.43f, 0.8f, 0.51f, 0.835f);
+            view.leftHanded = SwitchView.Create("LeftHandedSwitch", game, 0.84f, 0.5f, 0.965f, 0.73f);
             view.replayButton = UiKit.MakeButton("TutorialReplayButton", game, "튜토리얼 다시 보기", Palette.Neutral, 38,
                 0.035f, 0.07f, 0.49f, 0.36f);
             view.replayButton.onClick.AddListener(view.ReplayTutorial);
@@ -159,9 +161,10 @@ namespace WordRPG.UI
         }
 
         // [아이콘] 이름 (+ 작은 설명)
-        private static void Row(RectTransform section, string icon, string label, string sub, float minY, float maxY)
+        private static void Row(RectTransform section, string icon, string label, string sub, float minY, float maxY,
+            float minX = 0.035f, float maxX = 0.8f)
         {
-            float x = 0.035f;
+            float x = minX;
             if (icon != null)
             {
                 UiKit.IconImage($"Icon_{label}", section, UiKit.Icon(icon), x, minY + 0.02f, x + 0.05f, maxY - 0.02f);
@@ -173,8 +176,8 @@ namespace WordRPG.UI
                 return;
             }
             float mid = minY + (maxY - minY) * 0.45f;
-            UiKit.Label($"Label_{label}", section, label, 34, Palette.Text, x, mid, 0.8f, maxY, TextAnchor.LowerLeft, FontStyle.Bold);
-            UiKit.Label($"Sub_{label}", section, sub, 24, Palette.TextDim, x, minY, 0.8f, mid, TextAnchor.UpperLeft,
+            UiKit.Label($"Label_{label}", section, label, 34, Palette.Text, x, mid, maxX, maxY, TextAnchor.LowerLeft, FontStyle.Bold);
+            UiKit.Label($"Sub_{label}", section, sub, 24, Palette.TextDim, x, minY, maxX, mid, TextAnchor.UpperLeft,
                 FontStyle.Normal, true, 18);
         }
 
@@ -199,6 +202,7 @@ namespace WordRPG.UI
             music.SetValueWithoutNotify(settings.MusicVolume);
             sfx.SetValueWithoutNotify(settings.SfxVolume);
             vibration.Bind(settings.Vibration, on => Change(s => s.Vibration = on));
+            leftHanded.Bind(settings.LeftHanded, on => Change(s => s.LeftHanded = on));
             RefreshIntensity();
             Dialog.Hide();
             Root.transform.SetAsLastSibling();

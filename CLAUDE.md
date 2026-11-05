@@ -67,7 +67,7 @@
    - 누군가의 기록 (#201, 이스터에그 — 설계 `Docs/GameStory/누군가의기록_설계.md`): 단어장마다 기록 하나 (WordDatabase `journal`, ItemKind.Journal). 상자에서 얻어 도감에서 연다 (`DexView` → `JournalView`).
      규칙 `Journals`: 세이브 칸 없음 — 얻었는지는 소지품, 읽히는 줄은 찾은 단어. **목표·보상·빨간 점·안내·진행 숫자를 넣지 말 것, 새 단어 순서도 바꾸지 말 것** (사용자: 스트레스 받지 않게).
      문장 = 단어 CSV example·story·story_heading ← 원문 TSV, `python Tools/journal_lines.py --apply` (사용자 검수본 #204 — 문장을 함부로 다시 쓰지 말 것). 못 찾은 줄은 글자 대신 그림 `Resources/UI/Journal/smudge.png` (줄은 곧게 — 사용자)
-   - 설정(`GameSettings`: 음량·진동·전투 강도 `BattleIntensity` #147 — 0 = 매번 고르기, 1~ = 묻지 않고 그 강도)은 세이브가 아니라 PlayerPrefs. `GameManager.Settings` / `SaveSettings()`
+   - 설정(`GameSettings`: 음량·진동·전투 강도 `BattleIntensity` #147 — 0 = 매번 고르기, 1~ = 묻지 않고 그 강도 · 왼손 모드 `LeftHanded` #215 — 스틱과 [확인]·[선제공격] 자리 표 `HandLayout`, 적용 `FieldScreen.ApplyHand`)은 세이브가 아니라 PlayerPrefs. `GameManager.Settings` / `SaveSettings()`
    - **수익화** (GDD 9-3): 산 상품(`Entitlements`, 정식판 id `com.arttechsoo.wordrpg.full` — 바꾸지 말 것)도 세이브가 아니라 PlayerPrefs.
      결제는 `IStore`(실제 `UnityIapStore` = Unity IAP 5 — 앱스토어·구글플레이, 상품 id 같음, 구매 복원 흐름은 스토어마다 다름 #149, 계정 이름 문구 `StoreLabels`, 테스트는 가짜 — `GameManager.StoreOverride`/`FieldScreen.Configure`).
      정식판이 필요한 지역은 FieldArea `requiresFullVersion` (숲·정글·동굴) → 입구에서 `PaywallView`, 어디서든 설정 > 정식판(보기·구매 복원).
@@ -230,7 +230,7 @@ Assets/
                         TrainingView(수련 창: 전체적 암기·오답 위주 암기 → BattleScreen.BeginTraining, 허수아비),
                         SpeechBubble(주인공 머리 위 말풍선 — 팩 DialogInfo·Emote: 점점점·느낌표 풍선, 글자 풍선. 사전 읽기·혼잣말),
                         FieldNameTags(오브젝트 이름표),
-                        TitleScreen(타이틀), Haptics(진동), UnitView, VirtualStick(가상 스틱 — 누른 자리에 생김, 끝까지 밀면 달리기),
+                        TitleScreen(타이틀), Haptics(진동), UnitView, VirtualStick(가상 스틱 — 누른 자리에 생김, 끝까지 밀면 달리기) · HandLayout(왼손 모드 자리 — #215),
                         GuideHints(튜토리얼: 화면을 막지 않는 한 줄 알약 + 손끝 끌기·톡톡·화살표, 해 보면 끝 — #61),
                         PauseTutorial(예외로 화면을 멈추는 단계 설명 — 정글 첫 선제공격 기회 #79, 강조할 버튼만 막 위로),
                         TabletQuizView(단어 석판 문제 창 — #81) · FieldStreams(얕은 강 물결선 — #81) · FieldDarkness(동굴 어둠 한 장 — #112) ·

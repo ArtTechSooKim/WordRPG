@@ -47,6 +47,9 @@ namespace WordRPG.Tests
         [Test]
         public void BattleIntensitySettingDefaultsToAskingEveryTime()
         {
+            Assert.IsFalse(new GameSettings().LeftHanded, "왼손 모드는 기본 꺼짐 (#215)");
+            Assert.IsFalse(GameSettings.FromJson("{\"musicVolume\":0.2}").LeftHanded, "예전 설정");
+            Assert.IsTrue(GameSettings.FromJson(new GameSettings { LeftHanded = true }.ToJson()).LeftHanded, "저장했다 불러와도");
             Assert.AreEqual(0, new GameSettings().BattleIntensity);
             Assert.AreEqual(0, GameSettings.FromJson("{\"musicVolume\":0.2}").BattleIntensity, "예전 설정");
             Assert.AreEqual(3, GameSettings.FromJson(new GameSettings { BattleIntensity = 3 }.ToJson()).BattleIntensity);

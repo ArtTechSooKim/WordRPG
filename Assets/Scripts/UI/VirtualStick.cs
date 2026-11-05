@@ -15,7 +15,7 @@ namespace WordRPG.UI
         public const float BaseSize = 375f;
         public const float KnobSize = 132f;
         public const float Travel = 137.5f; // 손잡이가 움직이는 최대 거리 (받침 반지름 - 여유) — 달리기는 이 거리의 85% 이상
-        private static readonly Vector2 HomeAnchor = new Vector2(0.52f, 0.45f); // 손을 떼면 돌아가는 자리 (영역 비율)
+        private Vector2 homeAnchor = new Vector2(HandLayout.StickHomeX(false), 0.45f); // 손을 떼면 돌아가는 자리 (영역 비율)
 
         private RectTransform zone, stickRoot, knob;
         private Image baseImage, ring, knobImage, glow;
@@ -113,13 +113,21 @@ namespace WordRPG.UI
             if (!held && knob != null) Release();
         }
 
+        // 왼손 모드 (#215): 영역과 제자리를 옮김. 누르고 있었으면 손을 뗀 것으로
+        public void SetArea(HandLayout.Area area, float homeX)
+        {
+            area.ApplyTo(zone);
+            homeAnchor.x = homeX;
+            Release();
+        }
+
         // 손을 떼면: 멈추고 받침은 제자리로
         public void Release()
         {
             held = false;
             Value = Vector2.zero;
             if (knob == null) return; // 만드는 중 (부품이 아직 다 없음)
-            stickRoot.anchoredPosition = Vector2.Scale(zone.rect.size, HomeAnchor);
+            stickRoot.anchoredPosition = Vector2.Scale(zone.rect.size, homeAnchor);
             knob.anchoredPosition = Vector2.zero;
             Refresh();
         }
@@ -127,7 +135,7 @@ namespace WordRPG.UI
         // 테스트·연출용: 받침이 제자리에 있을 때 스틱 값 value가 되는 화면 좌표
         public Vector2 ScreenPointFor(Vector2 value)
         {
-            var local = Vector2.Scale(zone.rect.size, HomeAnchor) + value * Travel;
+            var local = Vector2.Scale(zone.rect.size, homeAnchor) + value * Travel;
             return RectTransformUtility.WorldToScreenPoint(EventCamera(), zone.TransformPoint(local));
         }
 

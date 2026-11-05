@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace WordRPG.Game
 {
-    // 기기별 설정 (소리·진동·전투 강도). 세이브 파일과 따로 저장해서, 저장 데이터를 지워도 설정은 남는다
+    // 기기별 설정 (소리·진동·전투 강도·왼손 모드). 세이브 파일과 따로 저장해서, 저장 데이터를 지워도 설정은 남는다
     [Serializable]
     public class GameSettings
     {
@@ -14,6 +14,7 @@ namespace WordRPG.Game
         [SerializeField] private float sfxVolume = DefaultSfxVolume;
         [SerializeField] private bool vibration = true;
         [SerializeField] private int battleIntensity; // 0 = 공격할 때마다 고름 (예전 설정도)
+        [SerializeField] private bool leftHanded; // 예전 설정은 꺼짐
 
         // 소리는 아직 없어서 값만 저장해 둔다 (소리를 넣을 때 연결)
         public float MusicVolume
@@ -40,6 +41,13 @@ namespace WordRPG.Game
         {
             get => battleIntensity;
             set => battleIntensity = Mathf.Max(0, value);
+        }
+
+        // 왼손 모드 (#215 사용자): 필드의 스틱과 [확인] 자리를 서로 바꿈
+        public bool LeftHanded
+        {
+            get => leftHanded;
+            set => leftHanded = value;
         }
 
         public string ToJson() => JsonUtility.ToJson(this);

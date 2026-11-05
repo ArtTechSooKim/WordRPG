@@ -662,6 +662,21 @@ namespace WordRPG.Tests
             Assert.IsFalse(settings.Vibration);
             Assert.AreEqual(1, saved);
 
+            // 왼손 모드 (#215): 켜면 바로 스틱과 [확인]이 자리를 바꾸고 저장됨, 끄면 돌아옴
+            var confirmArea = (RectTransform)hud.Find("ConfirmArea");
+            Assert.AreEqual(0.02f, confirmArea.anchorMin.x, 0.001f, "기본은 [확인]이 왼쪽");
+            FindButton(view.transform, "LeftHandedSwitch").onClick.Invoke();
+            Assert.IsTrue(settings.LeftHanded);
+            Assert.AreEqual(2, saved);
+            Assert.AreEqual(0.64f, confirmArea.anchorMin.x, 0.001f, "[확인]이 오른쪽으로");
+            Assert.AreEqual(0.6f, field.Stick.Zone.anchorMax.x, 0.001f, "스틱 영역이 왼쪽으로");
+            FindButton(view.transform, "LeftHandedSwitch").onClick.Invoke();
+            Assert.IsFalse(settings.LeftHanded);
+            Assert.AreEqual(3, saved);
+            Assert.AreEqual(0.02f, confirmArea.anchorMin.x, 0.001f, "끄면 제자리로");
+            Assert.AreEqual(0.4f, field.Stick.Zone.anchorMin.x, 0.001f);
+            saved = 1; // 아래 저장 횟수는 진동 스위치 기준 그대로
+
             var music = view.GetComponentsInChildren<Slider>(true).First(s => s.name == "MusicSlider");
             Assert.AreEqual(GameSettings.DefaultMusicVolume, music.value, 0.001f, "현재 값으로 열림");
             music.value = 0.2f;
