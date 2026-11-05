@@ -288,4 +288,5 @@ MonoBehaviour:
   shrineWords: 100
   glowStoneRelic: {fileID: 0}
   requiresFullVersion: 1
+  storyOrder: 4
   dictionaryName: "\uC815\uAE00\uC758 \uC0AC\uC804"

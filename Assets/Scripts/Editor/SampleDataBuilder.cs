@@ -462,6 +462,12 @@ namespace WordRPG.EditorTools
             InsertChestIf(libraryPath, 5, 1, diaryJournal); // 상자는 맵의 위→아래 순서라 그 자리에 끼움. 있던 상자 내용물은 그대로
             InsertChestIf(forestPath, 6, 5, survivalJournal);
             BuildNpcs(meadowPath, libraryPath, forestPath, junglePath, cavePath);
+            // 샘 이동 창의 지역 순서 (#216)
+            SetStoryOrder(meadowPath, 1);
+            SetStoryOrder(libraryPath, 2);
+            SetStoryOrder(forestPath, 3);
+            SetStoryOrder(junglePath, 4);
+            SetStoryOrder(cavePath, 5);
             // 보스 대사 (#207, 스토리 문서 5장)
             SetBossLines(libraryPath, "잊어버리면… 아플 일도 없어!", "기억을 돌려줘! 아픈 기억도 우리 것이야.",
                 "책 속의 글자가 돌아왔다.\n하지만 몇 페이지는 누군가 일부러 뜯어냈다.");
@@ -991,6 +997,15 @@ namespace WordRPG.EditorTools
             existing.Configure(id, name, animalFrameWidth, stages);
             EditorUtility.SetDirty(existing);
             return existing;
+        }
+
+        private static void SetStoryOrder(string areaPath, int order)
+        {
+            var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);
+            if (area == null) return;
+            var so = new SerializedObject(area);
+            Prop(so, "storyOrder").intValue = order;
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void SetNpcs(string areaPath, params NpcData[] npcs)

@@ -1,0 +1,61 @@
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using WordRPG.Field;
+
+namespace WordRPG.Game
+{
+    // 샘으로 다른 지역 가기 (#216 사용자, GDD 9-11): 지역마다 회복의 샘 하나가 다른 지역으로 가는 길이다.
+    // 옆에서 [확인] → 회복 + '다른 지역으로 이동하시겠습니까?'. 갈 수 있는 곳 = 이미 본 샘 — 탐험 안개 기록을 보므로 세이브 칸이 필요 없고
+    // 예전 세이브도 바로 된다. 정식판이 필요한 지역은 샀을 때만. 게임 안에서는 '샘'이라고만 부른다 ('이정표'는 사막 같은 큰 지역 안의 빠른 이동, 따로)
+    public static class SpringWarp
+    {
+        // 도착하면 샘 아래에 서는 것이 먼저 (샘이 주인공 위로 보임)
+        private static readonly Direction[] ArrivalOrder = { Direction.Down, Direction.Left, Direction.Right, Direction.Up };
+
+        // 그 지역의 이동용 샘: 맵에서 처음 찾은 샘 (지금은 지역마다 하나)
+        public static Vector2Int? SpringOf(FieldMap map)
+        {
+            for (int y = 0; y < map.Height; y++)
+            for (int x = 0; x < map.Width; x++)
+            {
+                var cell = new Vector2Int(x, y);
+                if (map.Get(cell) == FieldTile.Fountain) return cell;
+            }
+            return null;
+        }
+
+        // 샘 옆 걸을 수 있는 칸 (출입구는 밟으면 다시 옮겨지므로 뺌). 없으면 지역 시작 칸
+        public static Vector2Int ArrivalCell(FieldMap map, Vector2Int spring)
+        {
+            foreach (var direction in ArrivalOrder)
+            {
+                var cell = spring + direction.ToOffset();
+                if (map.IsWalkable(cell) && map.Get(cell) != FieldTile.Door) return cell;
+            }
+            return map.Start;
+        }
+
+        // 도착한 칸에서 샘을 보는 방향
+        public static Direction FacingSpring(Vector2Int arrival, Vector2Int spring)
+        {
+            foreach (var direction in ArrivalOrder)
+                if (arrival + direction.ToOffset() == spring) return direction;
+            return Direction.Down;
+        }
+
+        // 지금 갈 수 있는 지역 (이야기 순서)
+        public static List<FieldArea> Destinations(IEnumerable<FieldArea> areas, FieldArea here, WorldState world, bool ownsFullVersion)
+        {
+            if (areas == null) return new List<FieldArea>();
+            return areas.Where(area => area != null && area != here && (ownsFullVersion || !area.RequiresFullVersion) && HasSeenSpring(area, world))
+                .OrderBy(area => area.StoryOrder).ToList();
+        }
+
+        private static bool HasSeenSpring(FieldArea area, WorldState world)
+        {
+            var spring = SpringOf(area.Map);
+            return spring != null && world.IsExplored(area.AreaId, spring.Value);
+        }
+    }
+}

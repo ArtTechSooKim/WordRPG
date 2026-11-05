@@ -170,6 +170,9 @@ namespace WordRPG.Field
         [Tooltip("정식판(인앱 결제)을 사야 들어갈 수 있는 지역 — 입구에서 정식판 안내가 뜬다 (#40, 숲부터)")]
         [SerializeField] private bool requiresFullVersion;
 
+        [Tooltip("이야기 순서 (샘 이동 창에 나오는 순서, #216). 새 지역은 맨 뒤 번호로")]
+        [SerializeField] private int storyOrder;
+
         [Tooltip("보스의 사전 이름 (예: 숲의 사전). 맵의 받침대 'L'에 이 지역 보스를 물리치면 놓이고, 이 지역 단어장의 단어를 하루 한 번 하나씩 알려 준다 (#45)")]
         [SerializeField] private string dictionaryName;
 
@@ -194,6 +197,7 @@ namespace WordRPG.Field
         public string DictionaryName => dictionaryName;
         public bool HasDictionary => !string.IsNullOrEmpty(dictionaryName);
         public bool RequiresFullVersion => requiresFullVersion;
+        public int StoryOrder => storyOrder;
         public ItemData BossKey => bossKey;
         public int BossGateWords => bossGateWords;
         public CompanionData ShrineCompanion => shrineCompanion;

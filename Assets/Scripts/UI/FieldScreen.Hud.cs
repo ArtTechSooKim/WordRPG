@@ -189,6 +189,8 @@ namespace WordRPG.UI
             learnView = SkillLearnView.Create(hudRoot);
             quitDialog = ConfirmDialog.Create(hudRoot);
             returnDialog = ConfirmDialog.Create(hudRoot);
+            springDialog = ConfirmDialog.Create(hudRoot);
+            springWarpView = SpringWarpView.Create(hudRoot);
             paywall = PaywallView.Create(hudRoot);
             companionCutscene = CompanionCutscene.Create(hudRoot);
             tabletView = TabletQuizView.Create(hudRoot);

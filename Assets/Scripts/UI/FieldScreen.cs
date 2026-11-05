@@ -170,6 +170,7 @@ namespace WordRPG.UI
         public bool IsPanelOpen => dexView.IsOpen || trainingView.IsOpen || altarView.IsOpen || shopView.IsOpen
                                    || inventoryView.IsOpen || settingsView.IsOpen || mapView.IsOpen || learnView.IsOpen
                                    || (quitDialog != null && quitDialog.IsOpen) || (returnDialog != null && returnDialog.IsOpen)
+                                   || (springDialog != null && springDialog.IsOpen) || (springWarpView != null && springWarpView.IsOpen)
                                    || (paywall != null && paywall.IsOpen) || (preemptView != null && preemptView.IsOpen)
                                    || (companionCutscene != null && companionCutscene.IsPlaying)
                                    || (pauseTutorial != null && pauseTutorial.IsShowing)
@@ -532,6 +533,8 @@ namespace WordRPG.UI
             }
             if (quitDialog.IsOpen) quitDialog.Hide();
             else if (returnDialog.IsOpen) returnDialog.Hide(); // = 여기 있기
+            else if (springDialog.IsOpen) springDialog.Hide(); // = 여기 있기 (회복은 그대로)
+            else if (springWarpView.IsOpen) springWarpView.Hide();
             else if (learnView.IsOpen) learnView.Cancel();
             else if (inventoryView.LearnView.IsOpen) inventoryView.LearnView.Cancel();
             else if (altarView.IsOpen)

@@ -77,6 +77,7 @@
    - 수련용 허수아비는 MonsterSpecies `trainingDummy`(맞아도 HP 그대로, 기술 없음) — 게임에 하나, 출현표에 넣지 말 것 (TrainingTests)
    - 필드 맵은 FieldArea의 글자 맵 (GDD 7·9장). 상자 수 = 내용물 수, 출입구 수 = 연결 수(서로 왕복), B ↔ 보스 지정,
      모든 상자·샘·출입구 도달 가능 (AreaDataTests·DungeonDataTests가 검사). 지역을 새로 만들면 Refresh Game Database
+   - 샘으로 다른 지역 가기 (#216, GDD 9-11): 샘 옆 [확인] → 회복 + 다른 지역의 샘으로 (규칙 `SpringWarp`, 화면 `FieldScreen.Springs`·`SpringWarpView`). 갈 곳 = 이미 본 샘(탐험 기록 — 세이브 칸 없음) + 정식판. 샘은 지역마다 하나, 문·다리 밖 쉼터에 (SpringWarpTests). 새 지역은 FieldArea `storyOrder` 필수 (`SampleDataBuilder.SetStoryOrder`). 게임 안에서는 '샘'이라고만 — '이정표'는 큰 지역 안의 빠른 이동, 따로 (사용자)
    - 맵 글자 'L' = 사전 받침대: 보스가 있는 맵마다 쉼터에 하나, FieldArea `dictionaryName` 필수 (BossDictionaryTests). 하루 한 번 읽기 = `BossDictionary`
    - 맵 글자 'G' = 보스 방 문, 'K' = 열쇠 받침대 (#76): 보스가 있는 맵마다 G 한 덩어리(가운데 칸에 이름표)·K 하나 + FieldArea `bossKey`(종류 Key)·`bossGateWords`(40).
      열쇠 + 그 단어장 단어 N개 발견 → [확인]으로 열림 (규칙 `BossGate`, 세이브 `WorldState.openedGates`). 열면 열쇠는 소지품에서 사라짐 (#147 — 받침대는 `BossGate.KeyTaken`, 예전 세이브는 불러올 때 `DiscardUsedKey`). 열쇠는 문 밖, 보스는 문 안에서만 닿아야 함 (BossGateDataTests)
@@ -217,13 +218,13 @@ Assets/
                         Ruins(유적: 석판 T 4개 + 정글 단어 60개 → 제단 A에서 동료) · Levers(레버 Y → 덩굴 다리 H) · CellState(칸의 끝난 모습·지나갈 수 있음) — #80,
                         TabletQuiz(석판 3문제: 틀리면 벌점 없이 다시, 숙련도는 처음 답만 — #81), GlowStones(글자 반딧돌: 밝힘·밝힌 수·모두 밝힌 보상 — #112·#115),
                         UpdateNotices(업데이트 안내: 업데이트한 사람만 타이틀에서 한 번 — #115), PotionEffects(효과 물약이 남긴 효과 — #146),
-                        RelicTutorials(성유물 안내 규칙: 언제 · 가장 가까운 제단과 그 앞 칸 — #142), Journals(누군가의 기록 규칙 — #201)
+                        RelicTutorials(성유물 안내 규칙: 언제 · 가장 가까운 제단과 그 앞 칸 — #142), Journals(누군가의 기록 규칙 — #201), SpringWarp(샘으로 다른 지역 가기 — #216)
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
     UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투 + 보스 결정타 연출 + 전투 결산, 단독 연습 모드도 있음)
                         — 둘 다 partial로 나눔 (#93): FieldScreen.cs(상태·이동·입력) + .Places([확인] 장소)·.Jungle(정글 기믹)·.Battles(조우·전투 뒤·수련)·
-                        .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴)·.Cave(동굴 어둠·반딧돌 #112)·.RelicGuides(성유물 바꾸기·제단 안내 #142) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout·.Events(사건 연출: 사건 종류마다 Show… 함수 — #119)·.SkillFx(기술 연출: 몸짓·회복·보호막·특수 — #137).
+                        .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴)·.Cave(동굴 어둠·반딧돌 #112)·.RelicGuides(성유물 바꾸기·제단 안내 #142)·.Springs(샘: 회복·다른 지역으로 #216) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout·.Events(사건 연출: 사건 종류마다 Show… 함수 — #119)·.SkillFx(기술 연출: 몸짓·회복·보호막·특수 — #137).
                         새 기능은 맞는 파일에, 기능 묶음이 커지면 새 partial 파일로,
-                        DexView(도감) + JournalView(누군가의 기록 #201), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기),
+                        DexView(도감) + JournalView(누군가의 기록 #201), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기), SpringWarpView(샘 이동: 지역 고르기 #216),
                         InventoryView(소지품: 주인공·성유물·아이템(넘치면 스크롤, 놓는 순서 `ItemData.BagOrder` #147)·징표) + HeroViews(HeroInfoPage·RelicPage·RelicSlotsRow·SkillRowView),
                         HeroSetupViews(처음 시작: CharacterSelectView 모습 8명 · NameEntryView 이름 — #124) · IntroCinematicView(입장 영상 + 자막 + [건너뛰기] — #129),
                         SettingsView(설정) + ConfirmDialog(확인 창 · ShowNotice = [확인] 하나), SwitchView, GateCutscene(보스가 연 길을 보여 주는 연출),

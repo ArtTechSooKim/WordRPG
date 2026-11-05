@@ -212,4 +212,5 @@ MonoBehaviour:
   shrineWords: 60
   glowStoneRelic: {fileID: 11400000, guid: 6342b1987d1925f4ea9d7fe71a94d883, type: 2}
   requiresFullVersion: 1
+  storyOrder: 5
   dictionaryName: "\uB3D9\uAD74\uC758 \uC0AC\uC804"

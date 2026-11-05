@@ -165,4 +165,5 @@ MonoBehaviour:
   shrineWords: 60
   glowStoneRelic: {fileID: 0}
   requiresFullVersion: 0
+  storyOrder: 1
   dictionaryName: 

@@ -247,15 +247,6 @@ namespace WordRPG.UI
             });
         }
 
-        private void UseFountain()
-        {
-            session.RestoreHero();
-            SaveNow();
-            RefreshHud();
-            Sound.Play(Sfx.Fountain);
-            ShowToast("회복의 샘 — HP가 모두 회복되었다!");
-        }
-
         // 새 성유물을 얻었을 때 안내: 빈 칸이 있어 바로 끼웠는지, 가방에서 바꿔 끼워야 하는지
         private string RelicHint(OwnedRelic relic) =>
             session.Hero.IsEquipped(relic) ? $"빈 칸에 끼웠다 — 새 기술 '{relic.Skill.DisplayName}'" : "칸이 가득 — 가방 > 성유물에서 바꿔 끼울 수 있어요";
