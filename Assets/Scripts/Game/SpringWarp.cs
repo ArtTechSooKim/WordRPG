@@ -5,7 +5,7 @@ using WordRPG.Field;
 
 namespace WordRPG.Game
 {
-    // 샘으로 다른 지역 가기 (#216 사용자, GDD 9-11): 지역마다 회복의 샘 하나가 다른 지역으로 가는 길이다.
+    // 샘으로 다른 지역 가기 (#216 사용자, GDD 9-11): 지역마다 회복의 샘 하나가 다른 지역으로 가는 길이다. 옛날부터 사람들은 샘으로 오갔다 (#217 사용자).
     // 옆에서 [확인] → 회복 + '다른 지역으로 이동하시겠습니까?'. 갈 수 있는 곳 = 이미 본 샘 — 탐험 안개 기록을 보므로 세이브 칸이 필요 없고
     // 예전 세이브도 바로 된다. 정식판이 필요한 지역은 샀을 때만. 게임 안에서는 '샘'이라고만 부른다 ('이정표'는 사막 같은 큰 지역 안의 빠른 이동, 따로)
     public static class SpringWarp
@@ -36,11 +36,22 @@ namespace WordRPG.Game
             return map.Start;
         }
 
-        // 도착한 칸에서 샘을 보는 방향
-        public static Direction FacingSpring(Vector2Int arrival, Vector2Int spring)
+        // 함께 튀어나온 동료가 내릴 칸: 주인공 옆 (주인공 뒤는 샘이라 못 섬). 없으면 주인공 칸
+        public static Vector2Int CompanionCell(FieldMap map, Vector2Int arrival, Vector2Int spring)
+        {
+            foreach (var direction in new[] { Direction.Left, Direction.Right, Direction.Down, Direction.Up })
+            {
+                var cell = arrival + direction.ToOffset();
+                if (cell != spring && map.IsWalkable(cell) && map.Get(cell) != FieldTile.Door) return cell;
+            }
+            return arrival;
+        }
+
+        // 옆 칸으로 가는 방향 (뛰어들 때 = 샘 쪽, 튀어나올 때 = 샘에서 도착 칸 쪽)
+        public static Direction DirectionBetween(Vector2Int from, Vector2Int to)
         {
             foreach (var direction in ArrivalOrder)
-                if (arrival + direction.ToOffset() == spring) return direction;
+                if (from + direction.ToOffset() == to) return direction;
             return Direction.Down;
         }
 

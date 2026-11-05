@@ -405,6 +405,16 @@ namespace WordRPG.UI
         {
             if (!showTutorials || guide.IsShowing || fieldTutorialRunning) return;
             if (MaybeStartAltarGuide()) return;
+            if (confirmReady && SpringGuideDue())
+            {
+                int before = interactions;
+                StartCoroutine(guide.Run(session, TutorialProgress.Spring, new GuideHints.Hint
+                {
+                    Text = "옛날부터 사람들은 샘으로 오갔어요", Target = () => confirmImage.rectTransform, Gesture = GuideHints.Gesture.Tap,
+                    DoneWhen = () => interactions > before
+                }, SaveNow, () => !confirmReady && interactions == before));
+                return;
+            }
             if (confirmReady && !session.Tutorials.Has(TutorialProgress.Confirm))
             {
                 int before = interactions;

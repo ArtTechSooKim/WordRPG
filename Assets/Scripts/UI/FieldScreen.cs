@@ -568,7 +568,7 @@ namespace WordRPG.UI
             switch (tile)
             {
                 case FieldTile.Chest: OpenChest(cell); break;
-                case FieldTile.Fountain: UseFountain(); break;
+                case FieldTile.Fountain: UseFountain(cell); break;
                 case FieldTile.Altar: altarView.Show(session, OnTownChanged); break;
                 case FieldTile.Shop:
                     if (area.Shop == null) ShowToast("상점 문이 닫혀 있다.");
@@ -738,13 +738,17 @@ namespace WordRPG.UI
             RefreshHud();
         }
 
+        // 주인공이 world에 있을 때 카메라가 볼 곳
+        private Vector3 CameraTarget(Vector3 world) =>
+            cam == null ? world : world + Vector3.down * (tilesAcross / Mathf.Max(0.1f, cam.aspect) * 0.10f);
+
         private void UpdateCamera()
         {
             if (cam == null) return;
             float visibleHeight = tilesAcross / Mathf.Max(0.1f, cam.aspect);
             cam.orthographicSize = visibleHeight / 2f;
             // 아래쪽은 가상 패드가 가리므로 플레이어가 화면 높이 60% 지점에 오게 카메라를 내린다 (연출 중에는 그곳이 가운데)
-            var target = cameraFocus ?? player.position + Vector3.down * (visibleHeight * 0.10f);
+            var target = cameraFocus ?? CameraTarget(player.position);
             cam.transform.position = new Vector3(target.x, target.y, -10f);
         }
 
@@ -755,7 +759,7 @@ namespace WordRPG.UI
         // 주인공 이동이 끝난 뒤 같은 프레임에 동료가 자취를 따라온다 (#78)
         private void LateUpdate()
         {
-            if (follower == null || walker == null || session == null) return;
+            if (follower == null || walker == null || session == null || springJumping) return; // 샘으로 뛰어드는 동안은 연출이 직접 움직임
             follower.SetCompanion(session.PartyCompanion?.Data, player.position, walker.Facing, CanFollowerStand); // 바뀌었을 때만
             if (walker.Rafting)
             {

@@ -44,6 +44,14 @@ namespace WordRPG.Tests
             return GameSession.NewGame(TestData.Hero(new MonsterStats(100, 30, 10)).Set("basicSkill", strike), 1);
         }
 
+        private static CompanionData Ara()
+        {
+            var pebble = TestData.Skill("ara_pebble", SkillKind.Damage, SkillTarget.SingleEnemy, 12);
+            return ScriptableObject.CreateInstance<CompanionData>()
+                .Set("companionId", "ara").Set("displayName", "아라").Set("baseStats", new MonsterStats(50, 10, 10)).Set("basicSkill", pebble)
+                .Set("learnedSkills", new List<CompanionSkill>());
+        }
+
         private static void See(GameSession session, FieldArea area)
         {
             var map = area.Map;
@@ -66,6 +74,7 @@ namespace WordRPG.Tests
             var far = Area("far", "먼 곳", FarMap, 2);
             var session = NewSession();
             See(session, far);
+            session.AddCompanion(Ara());
             int saves = 0;
             var field = MakeField(village, session, () => saves++, village, far);
             yield return null;
@@ -78,6 +87,7 @@ namespace WordRPG.Tests
             Assert.IsTrue(field.SpringDialog.IsOpen);
             Assert.AreEqual("회복의 샘", field.SpringDialog.TitleText);
             StringAssert.Contains("HP가 모두 회복되었습니다.", field.SpringDialog.MessageText);
+            StringAssert.DoesNotContain("옛날부터", field.SpringDialog.MessageText, "이야기는 창이 아니라 튜토리얼로");
             StringAssert.Contains("먼 곳의 샘으로 이동하시겠습니까?", field.SpringDialog.MessageText);
             Assert.IsTrue(field.IsPanelOpen, "창이 떠 있는 동안 필드가 멈춤");
 
@@ -98,10 +108,26 @@ namespace WordRPG.Tests
             yield return PressConfirm(field);
             int before = saves;
             FindButton(field.SpringDialog.Root.transform, "DialogConfirmButton").onClick.Invoke();
-            yield return WaitFor(() => field.CurrentArea == far && !field.IsMoving && field.ToastMessage == "먼 곳", 3f);
+            // 쏙 들어갔다가 쏙 나옴 (#217): 들어간 뒤에는 잠깐 안 보이고, 동료도 함께
+            bool sawDive = false, sawGoneHere = false, sawGoneThere = false;
+            yield return WaitFor(() =>
+            {
+                sawDive |= field.ToastMessage == "샘으로 뛰어들었다!";
+                bool gone = field.PlayerScale.x < 0.01f;
+                if (field.CurrentArea == village) sawGoneHere |= gone;
+                else sawGoneThere |= gone;
+                return field.CurrentArea == far && field.ToastMessage == "먼 곳";
+            }, 3f);
+            Assert.IsTrue(sawDive, "샘으로 뛰어들었다!");
+            Assert.IsTrue(sawGoneHere, "떠나는 샘으로 쏙 들어감");
+            Assert.IsTrue(sawGoneThere, "도착한 샘에서 쏙 나오기 전");
             Assert.AreSame(far, field.CurrentArea);
             Assert.AreEqual(new Vector2Int(2, 2), field.PlayerCell, "샘 바로 아래");
-            Assert.AreEqual(Direction.Up, field.Facing, "샘을 봄");
+            Assert.AreEqual(Direction.Down, field.Facing, "샘에서 튀어나온 쪽을 봄");
+            Assert.AreEqual(1f, field.PlayerScale.x, 0.001f, "크기는 원래대로");
+            Assert.AreEqual(new Vector3(2.5f, 2.5f, 0f), field.PlayerWorld, "칸 가운데에 섬");
+            Assert.AreEqual(1f, field.Follower.Root.localScale.x, 0.001f, "동료 크기도 원래대로");
+            Assert.AreEqual(new Vector3(1.5f, 2.5f, 0f), field.Follower.Position, "동료는 주인공 옆 (뒤는 샘)");
             Assert.Greater(saves, before, "도착하면 저장");
             Assert.IsTrue(session.World.TryGetPosition("far", out var position));
             Assert.AreEqual(new Vector2Int(2, 2), position);
@@ -151,6 +177,63 @@ namespace WordRPG.Tests
             yield return WaitFor(() => field.CurrentArea == far && field.ToastMessage == "먼 곳", 3f);
             Assert.AreSame(far, field.CurrentArea);
             Assert.IsFalse(field.SpringWarpPicker.IsOpen);
+
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
+        // 튜토리얼 (#217): 다른 샘을 본 뒤 처음 샘 옆에 서면 한 번. 그전엔 안 나오고, 멀어지면 다음에 다시, [확인]을 누르면 끝
+        [UnityTest]
+        public IEnumerator GuideAppearsOnceAnotherSpringIsKnown()
+        {
+            var village = Area("village", "마을", VillageMap, 1);
+            var far = Area("far", "먼 곳", FarMap, 2);
+            var session = NewSession();
+            foreach (var id in TutorialProgress.All)
+                if (id != TutorialProgress.Spring) session.Tutorials.Mark(id);
+            var database = ScriptableObject.CreateInstance<GameDatabase>();
+            database.ReplaceContents(new MonsterSpecies[0], new ItemData[0], new[] { village, far });
+            var field = new GameObject("SpringGuideUnderTest").AddComponent<FieldScreen>();
+            field.Configure(village, session, () => { }, step: 0.05f, animScale: 0.01f, gameDatabase: database, tutorials: true);
+            yield return null;
+            yield return null;
+
+            // 새로 하는 사람: 첫 샘(마을)에서는 갈 곳이 없어 안 나옴
+            yield return FaceStick(field, Direction.Left);
+            yield return new WaitForSecondsRealtime(0.2f);
+            Assert.IsFalse(field.Guide.IsShowing, "다른 샘을 보기 전엔 안 나옴");
+
+            // 다른 샘을 봄 (서고 샘 / 이미 하던 세이브) → 샘 옆에서 안내
+            See(session, far);
+            yield return WaitFor(() => field.Guide.IsShowing, 2f);
+            Assert.AreEqual("옛날부터 사람들은 샘으로 오갔어요", field.Guide.CurrentText);
+            Assert.AreEqual(GuideHints.Gesture.Tap, field.Guide.CurrentGesture);
+            Assert.IsFalse(session.Tutorials.Has(TutorialProgress.Spring));
+            yield return null;
+            var corners = new Vector3[4];
+            field.Guide.PillRect.GetWorldCorners(corners);
+            Assert.GreaterOrEqual(corners[0].x, 0f, "글이 화면 왼쪽으로 잘리지 않음");
+            Assert.LessOrEqual(corners[2].x, Screen.width, "오른쪽으로도");
+
+            // 멀어지면 사라지고 본 것으로 치지 않음 → 돌아오면 다시
+            yield return HoldStick(field, Direction.Right, () => field.PlayerCell.x >= 3);
+            yield return WaitFor(() => !field.Guide.IsShowing, 2f);
+            Assert.IsFalse(field.Guide.IsShowing, "멀어지면 사라짐");
+            Assert.IsFalse(session.Tutorials.Has(TutorialProgress.Spring), "아직 안 해 봄");
+            yield return HoldStick(field, Direction.Left, () => field.PlayerCell.x <= 2);
+            yield return FaceStick(field, Direction.Left);
+            yield return WaitFor(() => field.Guide.IsShowing, 2f);
+            Assert.IsTrue(field.Guide.IsShowing, "돌아오면 다시");
+
+            // [확인]을 누르면 끝 — 창은 뜨고 안내는 다시 안 나옴
+            yield return PressConfirm(field);
+            Assert.IsTrue(field.SpringDialog.IsOpen);
+            yield return WaitFor(() => session.Tutorials.Has(TutorialProgress.Spring), 2f);
+            Assert.IsTrue(session.Tutorials.Has(TutorialProgress.Spring));
+            Assert.IsFalse(field.Guide.IsShowing);
+            FindButton(field.SpringDialog.Root.transform, "DialogCancelButton").onClick.Invoke();
+            yield return new WaitForSecondsRealtime(AfterPanelSeconds);
+            Assert.IsFalse(field.Guide.IsShowing, "한 번 본 안내는 다시 안 나옴");
 
             Object.Destroy(field.gameObject);
             yield return null;

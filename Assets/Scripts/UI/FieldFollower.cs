@@ -26,6 +26,7 @@ namespace WordRPG.UI
 
         public bool Visible => root.gameObject.activeSelf;
         public Vector3 Position => root.position;
+        public Transform Root => root; // 샘으로 뛰어들 때처럼 연출이 직접 움직일 때 (#217) — 끝나면 Place로 되돌림
         public Direction Facing => facing;
         public CompanionData Companion => companion;
 
@@ -64,6 +65,9 @@ namespace WordRPG.UI
             walked = 0f;
             Show(false);
         }
+
+        // 정해진 칸에 세운다 — 샘에서 함께 튀어나왔을 때 주인공 옆 (#217). 주인공이 걸으면 그때부터 자취를 따라옴
+        public void StandAt(Vector3 spot, Vector3 hero, Direction heroFacing) => Ride(spot, hero, heroFacing);
 
         // 뗏목 (#81, 사용자: 아라도 같은 뗏목에 앉은 모습): 뗏목 뒤쪽 자리에 같은 쪽을 보고 선다. 자취는 지금 자리에서 다시 시작
         public void Ride(Vector3 seat, Vector3 hero, Direction heroFacing)

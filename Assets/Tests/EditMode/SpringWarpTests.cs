@@ -39,7 +39,13 @@ namespace WordRPG.Tests
                 Assert.AreEqual(1, Mathf.Abs(arrival.x - springs[0].x) + Mathf.Abs(arrival.y - springs[0].y), $"{area.name}: 샘 바로 옆");
                 Assert.IsTrue(map.IsWalkable(arrival), area.name);
                 Assert.AreNotEqual(FieldTile.Door, map.Get(arrival), $"{area.name}: 출입구에 내리지 않음");
-                Assert.AreEqual(springs[0], arrival + SpringWarp.FacingSpring(arrival, springs[0]).ToOffset(), $"{area.name}: 샘을 봄");
+                Assert.AreEqual(springs[0], arrival + SpringWarp.DirectionBetween(arrival, springs[0]).ToOffset(), $"{area.name}: 뛰어드는 방향");
+                Assert.AreEqual(arrival, springs[0] + SpringWarp.DirectionBetween(springs[0], arrival).ToOffset(), $"{area.name}: 튀어나오는 방향");
+
+                var friend = SpringWarp.CompanionCell(map, arrival, springs[0]);
+                Assert.AreNotEqual(arrival, friend, $"{area.name}: 동료가 주인공과 겹치지 않음");
+                Assert.AreNotEqual(springs[0], friend, $"{area.name}: 동료가 샘 위에 서지 않음");
+                Assert.IsTrue(map.IsWalkable(friend), $"{area.name}: 동료가 설 수 있는 칸");
 
                 // 문·다리를 열기 전에도 시작 칸에서 갈 수 있는 곳 → 이동으로 진행을 건너뛰지 않음
                 Assert.IsTrue(FieldReach.Flood(map, gatesOpen: false, bridgesOpen: false).Contains(arrival), $"{area.name}: 문 밖 쉼터의 샘");
