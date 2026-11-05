@@ -14,6 +14,10 @@
    2) 콘솔 대시보드에서 [프로덕션 신청] → 구글 검토 (보통 7일 이내, 더 걸릴 수도 있음)
    3) 그다음 정식 출시 심사
  → 계정이 준비된 날부터 정식 출시까지 약 4주.
+ 2026-11-06 사용자 = 개인 계정으로 만듦 (이 조건 적용).
+ 기기 수는 조건이 아님. 신청 때 테스터가 모든 기능을 써 봤는지·실제 사용자처럼 썼는지 묻고, 부족하면 테스트를 더 하라고 할 수 있음.
+ → 혼자 계정 여러 개로 채우지 말고 친구들에게 부탁. 친구들을 라이선스 테스트에도 넣으면 돈을 내지 않고 정식판 지역까지 해 볼 수 있음.
+ 참여 링크는 앱 상태가 Published일 때만 보임 (임시 저장·게시 대기 중에는 안 보임).
  구글 안내는 '개인 계정'만 말하고 조직 계정(사업자)은 언급이 없음 — 조직 계정으로 만들면 콘솔에서 조건을 확인할 것.
 
  앱스토어는 이 조건을 기다리지 않음. 구글플레이 첫 버전은 그때의 최신 main으로 빌드하고, 앱 버전은 그때 정함.
@@ -54,7 +58,7 @@
     "C:/Program Files/Unity/Hub/Editor/6000.3.11f1/Editor/Unity.exe" -batchmode -quit -projectPath "F:/_WordRPG_androidcopy"
       -buildTarget Android -executeMethod WordRPG.EditorTools.MobileBuild.BuildAndroidAab -logFile build-android.log
     → F:/_WordRPG_androidcopy/Builds/Android/WordRPG-1.2.aab
-    휴대폰에 바로 깔아 볼 APK는 BuildAndroidApk (열쇠가 없어도 됨, 스토어에는 못 올림)
+    휴대폰에 바로 깔아 볼 APK는 BuildAndroidApk (열쇠가 없어도 됨, 스토어에는 못 올림. 스토어 밖 설치라 결제가 안 되어 숲부터는 못 들어감)
  4. 검사: python Tools/check_android_bundle.py F:/_WordRPG_androidcopy/Builds/Android/WordRPG-1.2.aab
     (패키지 · 대상 API 36 · 게임 표시 · 뒤로 가기 · 결제 권한 · 64비트 · 16KB 페이지 · 크기)
  5. 콘솔 > 테스트 > 내부 테스트 > 새 버전 → AAB 올리기 (처음은 직접. 나중에 서비스 계정을 만들면 Claude가 자동으로)
