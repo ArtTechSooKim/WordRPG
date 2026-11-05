@@ -844,15 +844,16 @@ def build_tiles(pack):
     autos["Meadow_Grass_auto"] = meadow_grass_atlas(pack, pack.tile("TilesetField.png", 1, 4), pack.tile("TilesetField.png", 1, 7),
                                                     pack.tile("TilesetNature.png", 7, 10))
     # 서고: 어두운 돌바닥(책장과 잘 구분되게), 책장 벽, 잉크 웅덩이, 나무 문,
-    #       받침대 위 파란 구슬(회복 지점), 작은 트렁크. 풀숲 = 바닥에 흩어진 바랜 종이 조각
+    #       둥근 연못(회복의 샘 — 다른 지역과 같음, #218), 작은 트렁크. 풀숲 = 바닥에 흩어진 바랜 종이 조각
     # #98 다듬기 (사용자: 서고가 가장 아쉬움): 하얀 지그재그(흰 풀 그림)가 400칸 넘게 깔려 시끄럽던 것 → 양피지색으로 바랜 종이 조각 3가지,
     #     책장 3가지(_v1·_v2 — 게임이 칸 위치로 섞음), 열람실 카펫에 옅은 무늬, 잉크 웅덩이 물가 테두리(Library_Water_auto)
 #     #101~103: 바랜 종이도 '가시밭길 같다'(사용자) → 몬스터 칸은 바닥 안개 한 장 (게임의 FieldFog/FogMap)
     stone = pack.tile("Interior/TilesetInteriorFloor.png", 16, 13)
     carpet = pack.tile("Interior/TilesetInteriorFloor.png", 12, 7)
+    rug = Image.blend(carpet, pack.tile("Interior/TilesetInteriorFloor.png", 20, 9), 0.35)
     themes["Library"] = {
         "Floor": stone,
-        "Lawn": Image.blend(carpet, pack.tile("Interior/TilesetInteriorFloor.png", 20, 9), 0.35),  # 열람실 카펫 + 옅은 꽃무늬 (조우 없음)
+        "Lawn": rug,  # 열람실 카펫 + 옅은 꽃무늬 (조우 없음)
         "Grass": stone.copy(),  # 몬스터 칸 = 돌바닥 + 게임이 위에 얹는 바닥 안개 한 장 (FieldFog/FogMap, #103 — 사용자 참고 그림)
         "Wall": over(stone, pack.tile("TilesetElement.png", 3, 8)),
         "Wall_v1": over(stone, pack.tile("TilesetElement.png", 8, 8)),  # 넓은 책장 왼쪽
@@ -860,7 +861,7 @@ def build_tiles(pack):
         "Water": ink(pack.tile("TilesetWater.png", 11, 2)),
         "Door": over(stone, pack.tile("TilesetElement.png", 8, 13)),
         "Door_locked": over(stone, pack.tile("TilesetElement.png", 1, 11)),  # 쇠창살
-        "Fountain": over(stone, pack.tile("TilesetDungeon.png", 4, 2)),
+        "Fountain": pond_on(rug, pond),  # #218 사용자: 구슬은 샘처럼 안 보임. 샘 둘레가 카펫이라 카펫 위에 (돌바닥이면 네모로 보임)
         "Chest": over(stone, small_chest[0]),
         "Chest_done": over(stone, small_chest[1]),
         "Altar": over(stone, gem),
