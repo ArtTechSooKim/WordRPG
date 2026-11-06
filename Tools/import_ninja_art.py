@@ -137,7 +137,7 @@ def copy_companions(pack_root=DEFAULT_PACK):
 # 말을 잃어 가는 사람들 (#209, GDD 9-10): Art/NinjaAdventure/Npcs/{npcId}.png
 NPC_SHEETS = {
     "npc_chief": "Actor/Characters/Master/SpriteSheet.png",
-    "npc_elder": "Actor/Characters/OldMan/SpriteSheet.png",
+    "npc_elder": "Actor/Characters/OldMan2/SpriteSheet.png",  # #225 사용자: OldMan은 아저씨 같음 → 하얀 수염 할아버지
     "npc_child": "Actor/Characters/EggBoy/SpriteSheet.png",
     "npc_librarian": "Actor/Characters/Monk/SpriteSheet.png",
     "npc_woodcutter": "Actor/Characters/ManGreen/SpriteSheet.png",
