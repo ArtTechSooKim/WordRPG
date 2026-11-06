@@ -67,6 +67,7 @@
    - 누군가의 기록 (#201, 이스터에그 — 설계 `Docs/GameStory/누군가의기록_설계.md`): 단어장마다 기록 하나 (WordDatabase `journal`, ItemKind.Journal). 상자에서 얻어 도감에서 연다 (`DexView` → `JournalView`).
      규칙 `Journals`: 세이브 칸 없음 — 얻었는지는 소지품, 읽히는 줄은 찾은 단어. **목표·보상·빨간 점·안내·진행 숫자를 넣지 말 것, 새 단어 순서도 바꾸지 말 것** (사용자: 스트레스 받지 않게).
      문장 = 단어 CSV example·story·story_heading ← 원문 TSV, `python Tools/journal_lines.py --apply` (사용자 검수본 #204 — 문장을 함부로 다시 쓰지 말 것). 못 찾은 줄은 글자 대신 그림 `Resources/UI/Journal/smudge.png` (줄은 곧게 — 사용자)
+   - **테스터 메뉴** (#229, 사용자): 설정 > 정보 칸 [테스터 메뉴] = 레벨·골드·재료·지역까지 건너뛰기·단어 발견 (규칙 `TesterTools`, 화면 `TesterMenuView`·`FieldScreen.Tester`). **테스트 빌드에만** — 코드는 `#if WORDRPG_TESTER || UNITY_EDITOR` 안에 (에디터에선 `TesterBuild.Enabled`를 테스트에서만 켬). TestFlight = `MobileBuild.BuildIosTester`, **앱스토어 심사 = `BuildIos`로 빌드 번호를 따로** (테스터 코드가 심사 빌드에 들어가면 안 됨)
    - 설정(`GameSettings`: 음량·진동·전투 강도 `BattleIntensity` #147 — 0 = 매번 고르기, 1~ = 묻지 않고 그 강도 · 왼손 모드 `LeftHanded` #215 — 스틱과 [확인]·[선제공격] 자리 표 `HandLayout`, 적용 `FieldScreen.ApplyHand`)은 세이브가 아니라 PlayerPrefs. `GameManager.Settings` / `SaveSettings()`
    - **수익화** (GDD 9-3): 산 상품(`Entitlements`, 정식판 id `com.arttechsoo.wordrpg.full` — 바꾸지 말 것)도 세이브가 아니라 PlayerPrefs.
      결제는 `IStore`(실제 `UnityIapStore` = Unity IAP 5 — 앱스토어·구글플레이, 상품 id 같음, 구매 복원 흐름은 스토어마다 다름 #149, 계정 이름 문구 `StoreLabels`, 테스트는 가짜 — `GameManager.StoreOverride`/`FieldScreen.Configure`).
@@ -274,7 +275,7 @@ Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow
 ## 명령어
 
 에디터 메뉴: `WordRPG > Data > Import Word CSVs`, `WordRPG > Data > Create Sample Data` (없는 에셋만 생성), `WordRPG > Data > Refresh Game Database`, `WordRPG > Scenes > Create All Scenes` (타이틀·필드·전투 씬 다시 생성 + 빌드 순서), `WordRPG > Save > Delete Save Data / Open Save Folder`,
-`WordRPG > Build > Apply Mobile Settings / iOS Xcode 프로젝트 (앱스토어용, Mac에서 열기) / Android APK (폰 테스트용) / Android AAB`
+`WordRPG > Build > Apply Mobile Settings / iOS Xcode 프로젝트 (앱스토어용, Mac에서 열기) / iOS Xcode 프로젝트 — 테스트 빌드 (TestFlight, 테스터 메뉴 #229) / Android APK (폰 테스트용) / Android AAB`
 (각 플랫폼 Build Support 모듈 필요, 결과는 `Builds/iOS/`·`Builds/Android/`. AAB는 올림 열쇠 필요 — 환경변수 `WORDRPG_ANDROID_KEYS`, 순서는 `Docs/안드로이드출시방법.txt`. 번들 ID `com.arttechsoo.wordrpg` 확정 — 바꾸지 말 것, companyName도 그대로)
 
 게임 실행: `Assets/Scenes/Title.unity`를 열고 Play (Game 뷰를 세로 비율로, 예: 1080x1920). 필드부터 바로: `Field.unity`, 전투만 연습: `Battle.unity`
@@ -288,6 +289,7 @@ UNITY="C:/Program Files/Unity/Hub/Editor/6000.3.11f1/Editor/Unity.exe"
 # 아이폰 Xcode 프로젝트 (iOS 모듈 필요) → Mac으로 옮길 zip (Mac 단계는 Docs/아이폰출시방법.txt) / 안드로이드 APK
 #   사용자 프로젝트의 플랫폼을 바꾸지 않으려면 Library 없는 복사본에서 빌드 (Docs/작업메모.md)
 "$UNITY" -batchmode -quit -projectPath . -buildTarget iOS -executeMethod WordRPG.EditorTools.MobileBuild.BuildIos -logFile build-ios.log
+#   TestFlight 시험용은 BuildIosTester (테스터 메뉴 #229) — 심사에 내는 빌드만 BuildIos
 python Tools/zip_ios_for_mac.py [Xcode 프로젝트 폴더, 기본 Builds/iOS]
 # Mac 없이 TestFlight로: zip을 릴리스로 올리면 .github/workflows/ios-testflight.yml이 서명·업로드 (gh = C:\Program Files\GitHub CLI, PATH에 있음)
 gh release create ios-build-0.1-1 Builds/WordRPG-iOS-0.1-build1.zip --prerelease --title "iOS 빌드 0.1 (1)"

@@ -176,7 +176,7 @@ namespace WordRPG.UI
                                    || (pauseTutorial != null && pauseTutorial.IsShowing)
                                    || (tabletView != null && tabletView.IsOpen)
                                    || (stoneView != null && stoneView.IsOpen) || heroSetupRunning
-                                   || (introView != null && introView.IsOpen);
+                                   || (introView != null && introView.IsOpen) || TesterMenuOpen;
         public PauseTutorial PauseTutorial => pauseTutorial;
         public bool IsPreemptRangeVisible => preemptRange != null && preemptRange.gameObject.activeSelf;
         public CompanionCutscene CompanionCutscene => companionCutscene;
@@ -548,6 +548,7 @@ namespace WordRPG.UI
             else if (shopView.IsOpen) shopView.Hide();
             else if (dexView.IsOpen) dexView.Back();
             else if (trainingView.IsOpen) trainingView.Hide();
+            else if (TesterMenuOpen) CloseTesterMenu(); // 테스트 빌드에만 (#229) — 설정 위에 뜸
             else if (settingsView.IsOpen) settingsView.Hide();
             else if (mapView.IsOpen) mapView.Hide();
             else if (bubble.IsVisible) bubble.Hide();

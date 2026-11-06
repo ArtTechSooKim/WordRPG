@@ -14,6 +14,11 @@
    3) GitHub 로그인 (Claude가 코드를 알려 주면 github.com/login/device 에서 입력)
    4) Claude가 GitHub 저장소 비밀값 4개를 넣음: APPSTORE_KEY_ID, APPSTORE_ISSUER_ID, APPSTORE_KEY_P8, APPLE_TEAM_ID
       (직접 넣으려면 저장소 Settings > Secrets and variables > Actions > New repository secret)
+  테스트 빌드와 심사 빌드 (#229, 2026-11-06 사용자 결정)
+   - TestFlight로 시험할 빌드 = '테스트 빌드' (Unity 메뉴 WordRPG > Build > iOS Xcode 프로젝트 — 테스트 빌드, BuildIosTester):
+     설정 > 정보 칸에 [테스터 메뉴]가 있음 (레벨·골드·재료·지역까지 건너뛰기·단어 발견). 체험단에게도 보임
+   - 앱스토어 심사에 낼 빌드 = 지금처럼 BuildIos (메뉴 코드가 아예 없음). 빌드 번호를 하나 올려 따로 만들어 올리고 그 번호로 제출
+     (테스트 빌드를 심사에 내면 심사원이 테스터 메뉴를 볼 수 있음 — 거절될 수 있으니 꼭 따로)
   올릴 때마다 (Claude에게 "TestFlight에 올려 줘")
    - Windows에서 Unity로 Xcode 프로젝트 → zip → GitHub '릴리스'(ios-build-…)로 올림
    - GitHub의 Mac 서버가 서명하고 앱스토어 커넥트에 업로드 (20~40분), 빌드 번호는 자동으로 다음 번호

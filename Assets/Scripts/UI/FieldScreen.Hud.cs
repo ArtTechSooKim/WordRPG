@@ -639,7 +639,7 @@ namespace WordRPG.UI
             }, deleteSave, ReplayTutorial, new SettingsView.PurchaseHooks
             {
                 Store = store, Owned = entitlements, OpenOffer = full != null ? () => OpenFullVersionOffer(full) : (Action)null
-            }, ReplayIntro);
+            }, ReplayIntro, TesterMenuOpener());
         }
 
         private void OpenDex()

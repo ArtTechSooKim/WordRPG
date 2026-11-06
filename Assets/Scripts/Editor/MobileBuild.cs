@@ -81,6 +81,21 @@ namespace WordRPG.EditorTools
             Build(BuildTarget.iOS, BuildTargetGroup.iOS, IosFolder);
         }
 
+        // 테스트 빌드 (#229 사용자): 설정 > [테스터 메뉴](레벨·골드·재료·지역 건너뛰기·단어 발견)가 들어간 TestFlight용.
+        // 앱스토어 심사에 낼 빌드는 위의 BuildIos (메뉴 코드가 아예 없음) — 빌드 번호를 하나 올려 따로 만든다 (Docs/아이폰출시방법.txt)
+        public const string TesterDefine = "WORDRPG_TESTER";
+
+        [MenuItem("WordRPG/Build/iOS Xcode 프로젝트 — 테스트 빌드 (TestFlight, 테스터 메뉴)", priority = 21)]
+        public static void BuildIosTester()
+        {
+            if (!BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.iOS, BuildTarget.iOS))
+            {
+                Fail("iOS Build Support 모듈이 없어요. Unity Hub > 설치 > 6000.3.11f1 > 모듈 추가에서 iOS Build Support를 설치한 뒤 다시 해 주세요.");
+                return;
+            }
+            Build(BuildTarget.iOS, BuildTargetGroup.iOS, IosFolder, TesterDefine);
+        }
+
         [MenuItem("WordRPG/Build/Android APK (폰 테스트용)", priority = 40)]
         public static void BuildAndroidApk() => BuildAndroid(false);
 
@@ -123,7 +138,8 @@ namespace WordRPG.EditorTools
             return true;
         }
 
-        private static void Build(BuildTarget target, BuildTargetGroup group, string location)
+        // defines: 이 빌드에만 더하는 컴파일 기호 (ProjectSettings에는 남지 않음)
+        private static void Build(BuildTarget target, BuildTargetGroup group, string location, params string[] defines)
         {
             ApplyMobileSettings();
             var scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray();
@@ -141,6 +157,7 @@ namespace WordRPG.EditorTools
                 target = target,
                 targetGroup = group,
                 options = BuildOptions.None,
+                extraScriptingDefines = defines,
             });
 
             if (report.summary.result != BuildResult.Succeeded)
@@ -148,7 +165,8 @@ namespace WordRPG.EditorTools
                 Fail($"빌드 실패 ({report.summary.result}, 오류 {report.summary.totalErrors}개) — Console 창을 확인해 주세요.");
                 return;
             }
-            Debug.Log($"[WordRPG] 빌드 완료: {location} ({report.summary.totalSize / (1024f * 1024f):0.0} MB)");
+            Debug.Log($"[WordRPG] 빌드 완료: {location} ({report.summary.totalSize / (1024f * 1024f):0.0} MB)" +
+                      (defines.Length > 0 ? $" — 기호 {string.Join(", ", defines)}" : ""));
             if (!Application.isBatchMode) EditorUtility.RevealInFinder(location);
         }
 

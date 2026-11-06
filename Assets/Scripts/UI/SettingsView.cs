@@ -28,6 +28,8 @@ namespace WordRPG.UI
         private Action onReplayTutorial;
         private Action onReplayIntro;
         private Button replayButton, introReplayButton;
+        private Action onOpenTester;
+        private Button testerButton; // 테스트 빌드에만 (#229)
 
         // 정식판 칸 (#63)
         public class PurchaseHooks
@@ -105,6 +107,11 @@ namespace WordRPG.UI
                 TextAnchor.MiddleLeft);
             UiKit.Label("Fonts", info, "글꼴  Jua · Noto Sans KR — SIL Open Font License 1.1", 28, Palette.TextDim,
                 0.035f, 0.1f, 0.965f, 0.38f, TextAnchor.MiddleLeft, FontStyle.Normal, true, 18);
+#if WORDRPG_TESTER || UNITY_EDITOR
+            // 테스터 메뉴 (#229): 테스트 빌드(TestFlight)에만 — 앱스토어 빌드에는 이 버튼이 없음
+            view.testerButton = UiKit.MakeButton("TesterMenuButton", info, "테스터 메뉴", Palette.Neutral, 32, 0.6f, 0.38f, 0.965f, 0.72f);
+            view.testerButton.onClick.AddListener(view.OpenTester);
+#endif
 
             var close = UiKit.MakeButton("SettingsCloseButton", root, "닫기", Palette.Neutral, 44, 0.05f, 0.015f, 0.95f, 0.095f);
             close.onClick.AddListener(view.Hide);
@@ -182,9 +189,9 @@ namespace WordRPG.UI
         }
 
         // replayTutorial: [튜토리얼 다시 보기]를 누르면 (없으면 버튼을 숨김). purchaseHooks: 정식판 칸 (없으면 칸을 숨김).
-        // replayIntro: [입장 영상 다시 보기]를 누르면 (없으면 버튼을 숨김)
+        // replayIntro: [입장 영상 다시 보기]를 누르면 (없으면 버튼을 숨김). openTester: [테스터 메뉴] (테스트 빌드에만, 없으면 숨김 — #229)
         public void Show(GameSettings gameSettings, Action settingsChanged, Action deleteSave, Action replayTutorial = null,
-            PurchaseHooks purchaseHooks = null, Action replayIntro = null)
+            PurchaseHooks purchaseHooks = null, Action replayIntro = null, Action openTester = null)
         {
             if (purchase?.Owned != null) purchase.Owned.Changed -= RefreshPurchase;
             purchase = purchaseHooks;
@@ -199,6 +206,8 @@ namespace WordRPG.UI
             replayButton.gameObject.SetActive(replayTutorial != null);
             onReplayIntro = replayIntro;
             introReplayButton.gameObject.SetActive(replayIntro != null);
+            onOpenTester = openTester;
+            if (testerButton != null) testerButton.gameObject.SetActive(openTester != null);
             music.SetValueWithoutNotify(settings.MusicVolume);
             sfx.SetValueWithoutNotify(settings.SfxVolume);
             vibration.Bind(settings.Vibration, on => Change(s => s.Vibration = on));
@@ -299,6 +308,13 @@ namespace WordRPG.UI
             var replay = onReplayTutorial;
             Hide();
             replay?.Invoke();
+        }
+
+        // 설정은 열어 둔 채 위에 테스터 메뉴를 띄움 (닫으면 설정으로 돌아옴)
+        private void OpenTester()
+        {
+            if (dirty) Flush();
+            onOpenTester?.Invoke();
         }
 
         private void ReplayIntro()
