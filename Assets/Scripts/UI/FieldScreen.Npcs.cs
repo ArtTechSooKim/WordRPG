@@ -15,6 +15,7 @@ namespace WordRPG.UI
         private readonly ShopPitch shopPitch = new ShopPitch();
 
         public FieldNpcs Npcs => npcs;
+        public NpcView TalkingNpc => talkingNpc; // 테스트용: 말풍선이 붙은 인물 (없으면 주인공)
 
         private void SetUpNpcs(Vector2Int position)
         {

@@ -263,17 +263,26 @@ namespace WordRPG.Tests
             yield return null;
 
             session.World.MarkBossDefeated(far.BossId);
-            field = MakeField(village, session, () => { }, village, far);
+            // 실제 빠르기로 (#224 사용자: 둘째 말이 주인공에게 붙었음 — 줄 사이에 말풍선이 닫히는 순간이 있어야 드러남)
+            var realTime = ScriptableObject.CreateInstance<GameDatabase>();
+            realTime.ReplaceContents(new MonsterSpecies[0], new ItemData[0], new[] { village, far });
+            field = new GameObject("ElderRealTime").AddComponent<FieldScreen>();
+            field.Configure(village, session, () => { }, step: 0.05f, animScale: 1f, gameDatabase: realTime);
             yield return null;
             yield return null;
-            bool sawElderLine = false, sawHeroLine = false;
+            bool sawElderLine = false, sawSecondLine = false, sawHeroLine = false, elderLinesOnElder = true;
             yield return WaitFor(() =>
             {
-                sawElderLine |= field.Bubble.IsVisible && field.Bubble.Text.Contains("땅 밑으로");
+                bool elderSpeaking = field.Bubble.IsVisible && (field.Bubble.Text.Contains("땅 밑으로") || field.Bubble.Text.Contains("얍!"));
+                if (elderSpeaking && (field.TalkingNpc == null || field.TalkingNpc.Data != elder)) elderLinesOnElder = false;
+                sawElderLine |= elderSpeaking && field.Bubble.Text.Contains("땅 밑으로");
+                sawSecondLine |= elderSpeaking && field.Bubble.Text.Contains("얍!");
                 sawHeroLine |= field.Bubble.IsVisible && field.Bubble.Text.Contains("어르신?!");
                 return sawHeroLine;
-            }, 5f);
+            }, 12f);
             Assert.IsTrue(sawElderLine, "어르신이 샘 이야기를 함");
+            Assert.IsTrue(sawSecondLine, "둘째 말까지");
+            Assert.IsTrue(elderLinesOnElder, "어르신의 말풍선은 끝까지 어르신 머리 위 (#224)");
             Assert.IsTrue(sawHeroLine, "주인공이 놀람");
             Assert.IsTrue(session.World.HasEvent(SpringLeap.EventId(elder)), "한 번 본 것으로 저장");
             Assert.AreEqual(0, field.Npcs.Views.Count, "샘으로 들어가 사라짐");

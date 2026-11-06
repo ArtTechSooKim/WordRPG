@@ -89,11 +89,12 @@ namespace WordRPG.UI
             elder.Motion.Hold(FacingToward(walker.Position - elder.Motion.Cell));
             npcs.Redraw(elder);
 
-            talkingNpc = elder;
             foreach (var line in elder.Data.SpringLeapLines)
             {
                 float seconds = Mathf.Clamp(0.8f + line.Length * 0.07f, 1f, 3f);
-                bubble.Speak(elder.Data.DisplayName, NpcLines.Render(line, session.Hero.DisplayName), seconds);
+                // 줄마다 다시 정함: 말풍선이 잠깐이라도 닫히면 UpdateNpcs가 말하는 인물을 비워 다음 말이 주인공에 붙었음 (#224 사용자)
+                talkingNpc = elder;
+                bubble.Speak(elder.Data.DisplayName, NpcLines.Render(line, session.Hero.DisplayName), seconds + 0.3f);
                 yield return WaitUnscaled(seconds);
             }
             bubble.Hide();
