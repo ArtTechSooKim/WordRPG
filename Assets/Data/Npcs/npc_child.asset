@@ -18,7 +18,18 @@ MonoBehaviour:
   stages:
   - bossOf: {fileID: 0}
     wordsNeeded: 0
-    line: "\uB0B4 \uC774\uB984 \uCCAB \uAE00\uC790\uAC00 \uBB50\uC600\uC9C0?"
+    line: "\uB545\uC5D0 \uB0B4 \uC774\uB984\uC744 \uC4F0\uB294 \uC911\uC774\uC5D0\uC694.
+      \uCCAB \uAE00\uC790\uAC00\u2026 \uC74C\u2026"
+    motion: 4
+    pace: 1
+  - bossOf: {fileID: 0}
+    wordsNeeded: 25
+    line: "\uCCAB \uAE00\uC790\uAC00 \uC0DD\uAC01\uB0AC\uC5B4\uC694! \uADF8\uB2E4\uC74C\uC740\u2026"
+    motion: 4
+    pace: 1
+  - bossOf: {fileID: 0}
+    wordsNeeded: 50
+    line: "\uB450 \uAE00\uC790\uAE4C\uC9C0 \uC37C\uC5B4\uC694."
     motion: 4
     pace: 1
   - bossOf: {fileID: 0}

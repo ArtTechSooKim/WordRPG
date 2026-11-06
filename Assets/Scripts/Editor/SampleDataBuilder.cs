@@ -935,8 +935,11 @@ namespace WordRPG.EditorTools
             var chief = Npc("npc_chief", "촌장", 0,
                 new NpcStage("자네 이름이… 펜… 아니, 뭐였더라?", NpcMotionKind.Pace, null, 0, 0.7f), // 뒷짐 지고 느긋하게
                 new NpcStage("{이름}! 그래, 그 이름이야!", NpcMotionKind.Stand, library));
+            // #222 사용자: '첫 글자가 뭐였지?'는 부탁(서브퀘스트)처럼 들림 → 땅에 이름을 쓰는 아이의 혼잣말, 단어를 찾을수록 한 글자씩
             var child = Npc("npc_child", "아이", 0,
-                new NpcStage("내 이름 첫 글자가 뭐였지?", NpcMotionKind.Sit),
+                new NpcStage("땅에 내 이름을 쓰는 중이에요. 첫 글자가… 음…", NpcMotionKind.Sit),
+                new NpcStage("첫 글자가 생각났어요! 그다음은…", NpcMotionKind.Sit, null, 25),
+                new NpcStage("두 글자까지 썼어요.", NpcMotionKind.Sit, null, 50),
                 new NpcStage("이제 세 글자 다 썼어요!", NpcMotionKind.Wander, null, 75, 1.6f)); // 신나서 뛰어다님
             var librarian = Npc("npc_librarian", "사서", 0,
                 new NpcStage("쉿. 소리 내어 읽으면 도깨비들이 와요.", NpcMotionKind.Pace, null, 0, 0.55f), // 발소리를 죽여 살금살금
