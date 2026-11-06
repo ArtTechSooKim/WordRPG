@@ -127,6 +127,13 @@ namespace WordRPG.Tests
             Assert.IsTrue(field.Bubble.ShowsText, "가까이 가면 부름");
             Assert.AreEqual("잡화점 아주머니", field.Bubble.HeadText);
             StringAssert.Contains("상처약 있어요!", field.Bubble.Text);
+            Assert.AreSame(field.Npcs.Merchant, field.TalkingNpc, "호객은 상인 머리 위");
+
+            // 호객이 떠 있는 동안 주인공이 말하면 (사전 읽기 등) 주인공 머리 위로 (#227 사용자 — 상인에게 붙었음)
+            field.Bubble.ShowWord("새로운 단어를 발견했다!", "overcome", "극복하다", "", 2f);
+            Assert.IsFalse(field.Bubble.FromNpc);
+            yield return null;
+            Assert.IsNull(field.TalkingNpc, "주인공 말풍선은 주인공 머리 위");
 
             // 가판대 앞까지 가서 [확인] → 상점
             field.Bubble.Hide();

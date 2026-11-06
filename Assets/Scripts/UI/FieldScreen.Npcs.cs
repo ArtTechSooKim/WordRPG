@@ -25,7 +25,8 @@ namespace WordRPG.UI
 
         private void UpdateNpcs(float dt)
         {
-            if (talkingNpc != null && !bubble.IsVisible) talkingNpc = null;
+            // 말풍선이 닫혔거나 주인공이 말을 이어받으면 (#227 — 호객 중에 사전을 읽으면 주인공 말이 상인에게 붙었음)
+            if (talkingNpc != null && (!bubble.IsVisible || !bubble.FromNpc)) talkingNpc = null;
             if (inBattle || transitioning || IsPanelOpen) return;
             npcs.Tick(dt, walker.Position, talkingNpc);
             MaybeStartSpringLeap();
@@ -46,7 +47,7 @@ namespace WordRPG.UI
         }
 
         // 말풍선은 말하는 인물의 머리 위에
-        private Vector3 BubbleAnchor() => (talkingNpc != null ? talkingNpc.Position : player.position) + Vector3.up * 0.45f;
+        private Vector3 BubbleAnchor() => (talkingNpc != null && bubble.FromNpc ? talkingNpc.Position : player.position) + Vector3.up * 0.45f;
 
         private bool TryTalkToNpc(bool facingOnly)
         {
