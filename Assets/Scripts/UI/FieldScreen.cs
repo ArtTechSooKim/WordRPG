@@ -324,12 +324,6 @@ namespace WordRPG.UI
             UpdateToast();
             UpdateCamera();
             nameTags.Tick(cam, hudCanvas, Time.unscaledDeltaTime);
-            bubble.Tick(cam, hudCanvas, BubbleAnchor());
-            if (bubble.IsVisible != bubbleShown)
-            {
-                bubbleShown = bubble.IsVisible;
-                RefreshNameTags();
-            }
 
             if (saveMark.activeSelf && Time.unscaledTime > saveMarkUntil) saveMark.SetActive(false);
             PulseBadges();
@@ -760,6 +754,7 @@ namespace WordRPG.UI
         // 주인공 이동이 끝난 뒤 같은 프레임에 동료가 자취를 따라온다 (#78)
         private void LateUpdate()
         {
+            if (initialized) TickBubble();
             if (follower == null || walker == null || session == null || springJumping) return; // 샘으로 뛰어드는 동안은 연출이 직접 움직임
             follower.SetCompanion(session.PartyCompanion?.Data, player.position, walker.Facing, CanFollowerStand); // 바뀌었을 때만
             if (walker.Rafting)
@@ -769,6 +764,15 @@ namespace WordRPG.UI
                 follower.Ride(raftRenderer.transform.position - offset * 0.5f + new Vector3(0f, 0.28f, 0f), player.position, walker.Facing);
             }
             else follower.Tick(player.position, walker.Facing, CanFollowerStand);
+        }
+
+        // 말풍선은 주인공·인물·카메라가 모두 움직인 뒤에 자리를 잡는다 — 꼬리 끝이 그려진 머리에 딱 붙게 (#231)
+        private void TickBubble()
+        {
+            bubble.Tick(cam, hudCanvas);
+            if (bubble.IsVisible == bubbleShown) return;
+            bubbleShown = bubble.IsVisible;
+            RefreshNameTags();
         }
 
         // 자동 저장 + (필드에서) 잠깐 '✓ 저장'. 자주 저장되어도 SaveMarkGap보다 자주 띄우지 않는다

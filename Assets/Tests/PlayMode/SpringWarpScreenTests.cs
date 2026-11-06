@@ -271,10 +271,16 @@ namespace WordRPG.Tests
             yield return null;
             yield return null;
             bool sawElderLine = false, sawSecondLine = false, sawHeroLine = false, elderLinesOnElder = true;
+            float worstTailGap = 0f;
+            string shownLastFrame = "";
             yield return WaitFor(() =>
             {
                 bool elderSpeaking = field.Bubble.IsVisible && (field.Bubble.Text.Contains("땅 밑으로") || field.Bubble.Text.Contains("얍!"));
                 if (elderSpeaking && (field.TalkingNpc == null || field.TalkingNpc.Data != elder)) elderLinesOnElder = false;
+                // 꼬리 끝이 어르신 머리에 (#231 사용자) — 말풍선은 프레임 끝에 자리를 잡으므로 앞 프레임과 같은 말일 때 잰다
+                if (elderSpeaking && field.Bubble.Text == shownLastFrame)
+                    worstTailGap = Mathf.Max(worstTailGap, SpeechBubbleTests.TailGap(field.Bubble, Camera.main));
+                shownLastFrame = field.Bubble.IsVisible ? field.Bubble.Text : "";
                 sawElderLine |= elderSpeaking && field.Bubble.Text.Contains("땅 밑으로");
                 sawSecondLine |= elderSpeaking && field.Bubble.Text.Contains("얍!");
                 sawHeroLine |= field.Bubble.IsVisible && field.Bubble.Text.Contains("어르신?!");
@@ -283,6 +289,7 @@ namespace WordRPG.Tests
             Assert.IsTrue(sawElderLine, "어르신이 샘 이야기를 함");
             Assert.IsTrue(sawSecondLine, "둘째 말까지");
             Assert.IsTrue(elderLinesOnElder, "어르신의 말풍선은 끝까지 어르신 머리 위 (#224)");
+            Assert.Less(worstTailGap, 2f, "꼬리 끝이 늘 어르신 머리에 (#231)");
             Assert.IsTrue(sawHeroLine, "주인공이 놀람");
             Assert.IsTrue(session.World.HasEvent(SpringLeap.EventId(elder)), "한 번 본 것으로 저장");
             Assert.AreEqual(0, field.Npcs.Views.Count, "샘으로 들어가 사라짐");

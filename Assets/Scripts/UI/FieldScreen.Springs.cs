@@ -92,13 +92,10 @@ namespace WordRPG.UI
             foreach (var line in elder.Data.SpringLeapLines)
             {
                 float seconds = Mathf.Clamp(0.8f + line.Length * 0.07f, 1f, 3f);
-                // 줄마다 다시 정함: 말풍선이 잠깐이라도 닫히면 UpdateNpcs가 말하는 인물을 비워 다음 말이 주인공에 붙었음 (#224 사용자)
-                talkingNpc = elder;
-                bubble.Speak(elder.Data.DisplayName, NpcLines.Render(line, session.Hero.DisplayName), seconds + 0.3f);
+                bubble.Speak(elder.Body, elder.Data.DisplayName, NpcLines.Render(line, session.Hero.DisplayName), seconds + 0.3f);
                 yield return WaitUnscaled(seconds);
             }
             bubble.Hide();
-            talkingNpc = null;
 
             // 쓩
             elder.Motion.Hold(FacingToward(spring - elder.Motion.Cell));
@@ -195,7 +192,6 @@ namespace WordRPG.UI
             {
                 session.Tutorials.Mark(TutorialProgress.SpringArrived);
                 SaveNow();
-                talkingNpc = null;
                 bubble.Say("정말 이어져 있었어!", 2.2f);
                 bubbleKeepUntil = Time.unscaledTime + 2.2f;
             }

@@ -149,6 +149,16 @@ namespace WordRPG.UI
             }
         }
 
+        // 그 그림(말풍선의 말하는 캐릭터)의 인물 — 상인 포함 (#231)
+        public NpcView ViewOf(Transform speaker)
+        {
+            if (speaker == null) return null;
+            if (Merchant != null && Merchant.Body == speaker) return Merchant;
+            foreach (var view in views)
+                if (view.Body == speaker) return view;
+            return null;
+        }
+
         // 컷씬이 끝나 사라짐 (#223)
         public void Remove(NpcView view)
         {

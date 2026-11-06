@@ -11,24 +11,24 @@ namespace WordRPG.UI
         private const float ShopPitchSeconds = 3.5f;
 
         private FieldNpcs npcs;
-        private NpcView talkingNpc;
         private readonly ShopPitch shopPitch = new ShopPitch();
 
         public FieldNpcs Npcs => npcs;
-        public NpcView TalkingNpc => talkingNpc; // 테스트용: 말풍선이 붙은 인물 (없으면 주인공)
+
+        // 지금 말풍선이 붙은 인물 (없으면 주인공) — 말풍선이 말하는 캐릭터를 기억하므로 따로 맞춰 둘 값이 없다
+        // (#231: 예전엔 여기서 따로 기억해서 #224·#227처럼 어긋났음)
+        public NpcView TalkingNpc => bubble != null && bubble.IsVisible && bubble.FromNpc ? npcs.ViewOf(bubble.Speaker) : null;
 
         private void SetUpNpcs(Vector2Int position)
         {
-            talkingNpc = null;
+            if (bubble != null && bubble.FromNpc) bubble.Hide(); // 인물 그림을 새로 만드니 하던 말도 닫음
             npcs.Build(area, session, position, rng);
         }
 
         private void UpdateNpcs(float dt)
         {
-            // 말풍선이 닫혔거나 주인공이 말을 이어받으면 (#227 — 호객 중에 사전을 읽으면 주인공 말이 상인에게 붙었음)
-            if (talkingNpc != null && (!bubble.IsVisible || !bubble.FromNpc)) talkingNpc = null;
             if (inBattle || transitioning || IsPanelOpen) return;
-            npcs.Tick(dt, walker.Position, talkingNpc);
+            npcs.Tick(dt, walker.Position, TalkingNpc);
             MaybeStartSpringLeap();
             UpdateShopPitch();
         }
@@ -41,13 +41,9 @@ namespace WordRPG.UI
             var offset = walker.Position - merchant.Motion.Cell;
             string line = shopPitch.Update(area.Shop.Pitches, Mathf.Abs(offset.x) + Mathf.Abs(offset.y), Time.unscaledTime, rng);
             if (line == null || bubble.IsVisible || fieldTutorialRunning || NeedsPrologue) return;
-            talkingNpc = merchant;
-            bubble.Speak(merchant.Data.DisplayName, line, ShopPitchSeconds);
+            bubble.Speak(merchant.Body, merchant.Data.DisplayName, line, ShopPitchSeconds);
             bubbleKeepUntil = Time.unscaledTime + ShopPitchSeconds;
         }
-
-        // 말풍선은 말하는 인물의 머리 위에
-        private Vector3 BubbleAnchor() => (talkingNpc != null && bubble.FromNpc ? talkingNpc.Position : player.position) + Vector3.up * 0.45f;
 
         private bool TryTalkToNpc(bool facingOnly)
         {
@@ -60,8 +56,7 @@ namespace WordRPG.UI
             playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
             npcs.Refresh(area, session);
             interactions++;
-            talkingNpc = view;
-            bubble.Speak(view.Data.DisplayName, NpcLines.Render(view.Stage.Line, session.Hero.DisplayName), NpcLineSeconds);
+            bubble.Speak(view.Body, view.Data.DisplayName, NpcLines.Render(view.Stage.Line, session.Hero.DisplayName), NpcLineSeconds);
             bubbleKeepUntil = Time.unscaledTime + 0.3f;
             return true;
         }

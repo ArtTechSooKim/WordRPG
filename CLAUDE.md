@@ -230,7 +230,7 @@ Assets/
                         HeroSetupViews(처음 시작: CharacterSelectView 모습 8명 · NameEntryView 이름 — #124) · IntroCinematicView(입장 영상 + 자막 + [건너뛰기] — #129),
                         SettingsView(설정) + ConfirmDialog(확인 창 · ShowNotice = [확인] 하나), SwitchView, GateCutscene(보스가 연 길을 보여 주는 연출),
                         TrainingView(수련 창: 전체적 암기·오답 위주 암기 → BattleScreen.BeginTraining, 허수아비),
-                        SpeechBubble(주인공 머리 위 말풍선 — 팩 DialogInfo·Emote: 점점점·느낌표 풍선, 글자 풍선. 사전 읽기·혼잣말),
+                        SpeechBubble(머리 위 말풍선 — 팩 DialogInfo·Emote: 점점점·느낌표 풍선, 글자 풍선. 사전 읽기·혼잣말·인물의 말. 말하는 캐릭터를 띄울 때 넘김 `Speak(Transform, …)` → 꼬리 끝은 늘 그 머리, 몸통만 화면 안으로, 인물이 화면 밖이면 닫힘 #231),
                         FieldNameTags(오브젝트 이름표),
                         TitleScreen(타이틀), Haptics(진동), UnitView, VirtualStick(가상 스틱 — 누른 자리에 생김, 끝까지 밀면 달리기) · HandLayout(왼손 모드 자리 — #215),
                         GuideHints(튜토리얼: 화면을 막지 않는 한 줄 알약 + 손끝 끌기·톡톡·화살표, 해 보면 끝 — #61),

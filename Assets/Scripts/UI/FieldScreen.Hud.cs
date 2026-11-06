@@ -172,7 +172,7 @@ namespace WordRPG.UI
 
             // 주인공 말풍선: 상단 바·미니맵·목표 한 줄·메뉴·스틱 위, 조우 번쩍임·창 아래
             // (#120 사용자: "새로운 단어로 힘을 모아야해"가 목표 한 줄·가방 버튼에 가려졌음 — 예전엔 이름표 바로 위였음)
-            bubble = SpeechBubble.Create(hudRoot);
+            bubble = SpeechBubble.Create(hudRoot, player); // 말하는 캐릭터 기본 = 주인공 (인물의 말은 Speak에 그 인물을, #231)
 
             // 조우 연출용 번쩍임
             flash = UiKit.Panel("EncounterFlash", hudRoot, Color.clear);
@@ -409,7 +409,6 @@ namespace WordRPG.UI
             {
                 // #223 사용자: 이야기는 주인공이 스스로 알아채는 혼잣말 + [확인] 안내
                 int before = interactions;
-                talkingNpc = null;
                 bubble.Say(SpringMonologue(), SpringMonologueSeconds);
                 bubbleKeepUntil = Time.unscaledTime + SpringMonologueSeconds;
                 StartCoroutine(guide.Run(session, TutorialProgress.Spring, new GuideHints.Hint

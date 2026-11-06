@@ -72,6 +72,8 @@ namespace WordRPG.Tests
             StringAssert.Contains("자네 이름이 뭐였더라?", field.Bubble.Text);
             yield return null;
             Assert.AreEqual(Direction.Left, view.Motion.Facing);
+            Assert.AreSame(view.Body, field.Bubble.Speaker, "말풍선은 말한 인물의 것");
+            Assert.Less(SpeechBubbleTests.TailGap(field.Bubble, Camera.main), 2f, "꼬리 끝이 인물 머리에 (#231)");
 
             // 단어를 찾으면 말이 되돌아옴, 플레이어 이름으로
             field.Bubble.Hide();
@@ -128,12 +130,17 @@ namespace WordRPG.Tests
             Assert.AreEqual("잡화점 아주머니", field.Bubble.HeadText);
             StringAssert.Contains("상처약 있어요!", field.Bubble.Text);
             Assert.AreSame(field.Npcs.Merchant, field.TalkingNpc, "호객은 상인 머리 위");
+            yield return WaitFor(() => !field.IsMoving);
+            yield return null;
+            Assert.Less(SpeechBubbleTests.TailGap(field.Bubble, Camera.main), 2f, "꼬리 끝이 상인 머리에 (#231)");
 
             // 호객이 떠 있는 동안 주인공이 말하면 (사전 읽기 등) 주인공 머리 위로 (#227 사용자 — 상인에게 붙었음)
             field.Bubble.ShowWord("새로운 단어를 발견했다!", "overcome", "극복하다", "", 2f);
             Assert.IsFalse(field.Bubble.FromNpc);
             yield return null;
             Assert.IsNull(field.TalkingNpc, "주인공 말풍선은 주인공 머리 위");
+            yield return null;
+            Assert.Less(SpeechBubbleTests.TailGap(field.Bubble, Camera.main), 2f, "꼬리 끝이 주인공 머리에");
 
             // 가판대 앞까지 가서 [확인] → 상점
             field.Bubble.Hide();
