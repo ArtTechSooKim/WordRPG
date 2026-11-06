@@ -21,3 +21,5 @@ MonoBehaviour:
     line: 
     motion: 0
     pace: 1
+  springLeapAfter: {fileID: 0}
+  springLeapLines: []

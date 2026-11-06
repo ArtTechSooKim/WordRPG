@@ -22,3 +22,5 @@ MonoBehaviour:
       \uBD99\uC5B4 \uC788\uB2E4."
     motion: 0
     pace: 1
+  springLeapAfter: {fileID: 0}
+  springLeapLines: []

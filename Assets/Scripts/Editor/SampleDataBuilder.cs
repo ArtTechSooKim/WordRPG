@@ -932,6 +932,12 @@ namespace WordRPG.EditorTools
             var elder = Npc("npc_elder", "어르신", 0,
                 new NpcStage("……", NpcMotionKind.Sit),
                 new NpcStage("내 사전을… 마을 위 어디 뒀더라.", NpcMotionKind.Stroll, library, 0, 0.75f)); // 노인: 아주 천천히
+            // #223 사용자: 서고 보스 뒤 다른 샘으로 갈 수 있게 되면, 가까이 갔을 때 한 번 — 샘 이야기를 하고 샘으로 쓩 (다시 안 나옴)
+            elder.SetSpringLeap(library,
+                "내 사전은 아직 못 찾았지만… 샘 길은 기억났단다!",
+                "샘물은 땅 밑으로 다 이어져 있지. 옛날엔 다들 이렇게 다녔어.",
+                "얍!");
+            EditorUtility.SetDirty(elder);
             var chief = Npc("npc_chief", "촌장", 0,
                 new NpcStage("자네 이름이… 펜… 아니, 뭐였더라?", NpcMotionKind.Pace, null, 0, 0.7f), // 뒷짐 지고 느긋하게
                 new NpcStage("{이름}! 그래, 그 이름이야!", NpcMotionKind.Stand, library));

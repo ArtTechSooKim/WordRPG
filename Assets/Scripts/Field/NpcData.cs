@@ -59,12 +59,19 @@ namespace WordRPG.Field
         [SerializeField] private int frameWidth;
         [Tooltip("앞에서부터 차례로. 조건을 채운 것 중 맨 뒤의 것을 씀")]
         [SerializeField] private List<NpcStage> stages = new List<NpcStage>();
+        [Tooltip("#223: 이 지역 보스를 물리친 뒤 다른 지역 샘으로 갈 수 있게 되면, 주인공이 가까이 올 때 한 번 샘으로 뛰어들어 사라짐 (컷씬). 비면 없음")]
+        [SerializeField] private FieldArea springLeapAfter;
+        [Tooltip("뛰어들기 전에 하는 말 (말풍선 차례로, {이름} = 플레이어 이름)")]
+        [SerializeField] private List<string> springLeapLines = new List<string>();
 
         public string NpcId => npcId;
         public string DisplayName => displayName;
         public int FrameWidth => frameWidth;
         public bool IsAnimal => frameWidth > 0;
         public IReadOnlyList<NpcStage> Stages => stages;
+        public FieldArea SpringLeapAfter => springLeapAfter;
+        public bool LeapsIntoSpring => springLeapAfter != null;
+        public IReadOnlyList<string> SpringLeapLines => springLeapLines;
 
         // 샘플 데이터 생성 전용. 런타임에서는 호출하지 않는다
         public void Configure(string id, string name, int animalFrameWidth, IEnumerable<NpcStage> newStages)
@@ -73,6 +80,13 @@ namespace WordRPG.Field
             displayName = name;
             frameWidth = animalFrameWidth;
             stages = new List<NpcStage>(newStages);
+        }
+
+        // 샘플 데이터 생성 전용 (#223)
+        public void SetSpringLeap(FieldArea after, params string[] lines)
+        {
+            springLeapAfter = after;
+            springLeapLines = new List<string>(lines);
         }
     }
 }

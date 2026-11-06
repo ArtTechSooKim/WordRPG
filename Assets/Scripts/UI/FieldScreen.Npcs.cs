@@ -27,6 +27,7 @@ namespace WordRPG.UI
             if (talkingNpc != null && !bubble.IsVisible) talkingNpc = null;
             if (inBattle || transitioning || IsPanelOpen) return;
             npcs.Tick(dt, walker.Position, talkingNpc);
+            MaybeStartSpringLeap();
             UpdateShopPitch();
         }
 

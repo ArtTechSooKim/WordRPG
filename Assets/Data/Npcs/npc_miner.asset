@@ -27,3 +27,5 @@ MonoBehaviour:
       \uB2E4 \uBC1D\uD788\uBA74 \uC88B\uC740 \uAC8C \uC788\uB300."
     motion: 1
     pace: 1.4
+  springLeapAfter: {fileID: 0}
+  springLeapLines: []

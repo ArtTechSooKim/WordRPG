@@ -407,10 +407,14 @@ namespace WordRPG.UI
             if (MaybeStartAltarGuide()) return;
             if (confirmReady && SpringGuideDue())
             {
+                // #223 사용자: 이야기는 주인공이 스스로 알아채는 혼잣말 + [확인] 안내
                 int before = interactions;
+                talkingNpc = null;
+                bubble.Say(SpringMonologue(), SpringMonologueSeconds);
+                bubbleKeepUntil = Time.unscaledTime + SpringMonologueSeconds;
                 StartCoroutine(guide.Run(session, TutorialProgress.Spring, new GuideHints.Hint
                 {
-                    Text = "옛날부터 사람들은 샘으로 오갔어요", Target = () => confirmImage.rectTransform, Gesture = GuideHints.Gesture.Tap,
+                    Text = "[확인]을 눌러 샘에 뛰어들어 보세요", Target = () => confirmImage.rectTransform, Gesture = GuideHints.Gesture.Tap,
                     DoneWhen = () => interactions > before
                 }, SaveNow, () => !confirmReady && interactions == before));
                 return;

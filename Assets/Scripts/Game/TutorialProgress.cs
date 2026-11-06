@@ -24,6 +24,7 @@ namespace WordRPG.Game
         public const string Altar = "field_altar";            // 강화할 재료가 처음 모이면 제단 앞으로 옮겨 설명 (#142 사용자)
         // 샘으로 다른 지역에 갈 수 있게 된 뒤 처음 샘 옆에 서면 (#217 사용자: 새로 하는 사람은 서고 샘, 이미 하던 사람은 어느 샘이든)
         public const string Spring = "field_spring";
+        public const string SpringArrived = "field_spring_arrived"; // 처음 샘으로 건너간 뒤 '정말 이어져 있었어!' (#223)
         public const string RelicSkills = "bag_relic_skills"; // 성유물 끼우기와 기술 넣기는 다른 일 — 성유물 안내 중에 설명 (#147 사용자)
         // #131 입장 영상(#129)을 본 기록 (사용자: 이미 하던 사람도 영상을 볼 수 있게) — 새 게임이든 하던 세이브든 못 본 사람은 필드에서 한 번.
         // 튜토리얼 다시 보기(Clear)로는 지우지 않음 — 다시 켤 때마다 영상이 나오지 않게 (그래서 All에도 없음)
@@ -33,7 +34,7 @@ namespace WordRPG.Game
 
         public static readonly IReadOnlyList<string> All = new[]
         {
-            Field, Confirm, Grass, Skill, Intensity, NewWord, Quiz, Potion, Preempt, Raft, CompanionTurn, GrassFight, Goal, Altar, RelicSkills, Spring,
+            Field, Confirm, Grass, Skill, Intensity, NewWord, Quiz, Potion, Preempt, Raft, CompanionTurn, GrassFight, Goal, Altar, RelicSkills, Spring, SpringArrived,
             MenuBadges.Dex, MenuBadges.Training, MenuBadges.Bag, MenuBadges.Map, MenuBadges.Companion, MenuBadges.RelicNew, MenuBadges.RelicSwap
         };
 

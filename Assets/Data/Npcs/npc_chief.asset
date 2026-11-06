@@ -26,3 +26,5 @@ MonoBehaviour:
     line: "{\uC774\uB984}! \uADF8\uB798, \uADF8 \uC774\uB984\uC774\uC57C!"
     motion: 0
     pace: 1
+  springLeapAfter: {fileID: 0}
+  springLeapLines: []

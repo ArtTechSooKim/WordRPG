@@ -19,6 +19,7 @@ namespace WordRPG.UI
         public NpcMotion Motion { get; }
         public NpcStage Stage { get; set; }
         public Vector3 Position => body.transform.position;
+        public Transform Body => body.transform; // 컷씬이 직접 움직일 때 (#223 — 어르신이 샘으로 뛰어듦)
 
         public NpcView(NpcData data, Transform parent, Vector2Int home, Vector2Int cell, NpcMotionKind kind, Random rng, int sortingOrder = 9, float pace = 1f)
         {
@@ -112,7 +113,7 @@ namespace WordRPG.UI
             for (int i = 0; i < spots.Count && i < area.Npcs.Count; i++)
             {
                 var data = area.Npcs[i];
-                if (data == null) continue;
+                if (data == null || SpringLeap.Gone(data, session.World)) continue; // 샘으로 뛰어든 인물은 다시 안 나옴 (#223)
                 var stage = StageOf(data, area, session);
                 var cell = spots[i];
                 if (cell == player) cell = FreeCellBeside(cell);
@@ -147,6 +148,16 @@ namespace WordRPG.UI
                 if (view.Stage != null) view.Motion.SetKind(view.Stage.Motion, view.Stage.Pace);
             }
         }
+
+        // 컷씬이 끝나 사라짐 (#223)
+        public void Remove(NpcView view)
+        {
+            view.Destroy();
+            views.Remove(view);
+        }
+
+        // 컷씬이 바라보는 쪽을 바꾼 뒤 그림만 다시 (움직임은 멈춘 채)
+        public void Redraw(NpcView view) => view.Draw(0f, cellCenter);
 
         public bool IsOccupied(Vector2Int cell)
         {

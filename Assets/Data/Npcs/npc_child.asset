@@ -37,3 +37,5 @@ MonoBehaviour:
     line: "\uC774\uC81C \uC138 \uAE00\uC790 \uB2E4 \uC37C\uC5B4\uC694!"
     motion: 3
     pace: 1.6
+  springLeapAfter: {fileID: 0}
+  springLeapLines: []

@@ -27,6 +27,8 @@ namespace WordRPG.Game
         [SerializeField] private List<string> solvedTablets = new List<string>();
         // 1.2 동굴 (#112, 예전 세이브엔 없음 → 빈 목록): 밝힌 글자 반딧돌 (id = "지역:x,y")
         [SerializeField] private List<string> litStones = new List<string>();
+        // 1.3 (#223, 예전 세이브엔 없음 → 빈 목록): 한 번만 일어난 일 — 어르신이 샘으로 뛰어듦 (id = "spring_leap:npcId")
+        [SerializeField] private List<string> events = new List<string>();
 
         public string AreaId => hasPosition ? areaId : null;
         public IReadOnlyList<string> OpenedChests => openedChests;
@@ -119,6 +121,15 @@ namespace WordRPG.Game
         {
             if (litStones == null) litStones = new List<string>();
             if (!litStones.Contains(stoneId)) litStones.Add(stoneId);
+        }
+
+        public bool HasEvent(string eventId) => events != null && events.Contains(eventId);
+        public bool HasEventStartingWith(string prefix) => events != null && events.Exists(e => e.StartsWith(prefix, System.StringComparison.Ordinal));
+
+        public void MarkEvent(string eventId)
+        {
+            if (events == null) events = new List<string>();
+            if (!events.Contains(eventId)) events.Add(eventId);
         }
 
         // 그 지역 사전을 마지막으로 읽은 날 ("yyyy-MM-dd", 없으면 null)

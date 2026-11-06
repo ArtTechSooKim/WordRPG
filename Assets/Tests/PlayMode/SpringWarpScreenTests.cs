@@ -206,7 +206,8 @@ namespace WordRPG.Tests
             // 다른 샘을 봄 (서고 샘 / 이미 하던 세이브) → 샘 옆에서 안내
             See(session, far);
             yield return WaitFor(() => field.Guide.IsShowing, 2f);
-            Assert.AreEqual("옛날부터 사람들은 샘으로 오갔어요", field.Guide.CurrentText);
+            Assert.AreEqual("[확인]을 눌러 샘에 뛰어들어 보세요", field.Guide.CurrentText);
+            StringAssert.Contains("먼 곳 샘이랑 같은 냄새", field.Bubble.Text, "주인공이 스스로 알아챔 (#223)");
             Assert.AreEqual(GuideHints.Gesture.Tap, field.Guide.CurrentGesture);
             Assert.IsFalse(session.Tutorials.Has(TutorialProgress.Spring));
             yield return null;
@@ -236,6 +237,56 @@ namespace WordRPG.Tests
             Assert.IsFalse(field.Guide.IsShowing, "한 번 본 안내는 다시 안 나옴");
 
             Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
+        // 어르신 컷씬 (#223): 말이 돌아온(보스를 물리친) 어르신 가까이 가면 한 번 — 말하고 샘으로 쓩, 다시 안 나옴
+        [UnityTest]
+        public IEnumerator ElderLeapsIntoTheSpringOnce()
+        {
+            //   y=2  #..F..#
+            //   y=1  #.N.P.#   ← 어르신 (2,1) · 주인공 (4,1)
+            var village = Area("village", "마을", "#######\n#..F..#\n#.N.P.#\n#######", 1);
+            var far = Area("far", "먼 곳", FarMap, 2);
+            var elder = ScriptableObject.CreateInstance<NpcData>();
+            elder.Configure("npc_elder", "어르신", 0, new[] { new NpcStage("……", NpcMotionKind.Stand) });
+            elder.SetSpringLeap(far, "샘물은 땅 밑으로 다 이어져 있지.", "얍!");
+            village.Set("npcs", new List<NpcData> { elder });
+            var session = NewSession();
+            See(session, far);
+
+            var field = MakeField(village, session, () => { }, village, far);
+            yield return new WaitForSecondsRealtime(0.3f);
+            Assert.AreEqual(1, field.Npcs.Views.Count);
+            Assert.IsFalse(session.World.HasEvent(SpringLeap.EventId(elder)), "말이 돌아오기 전(보스 전)에는 안 함");
+            Object.Destroy(field.gameObject);
+            yield return null;
+
+            session.World.MarkBossDefeated(far.BossId);
+            field = MakeField(village, session, () => { }, village, far);
+            yield return null;
+            yield return null;
+            bool sawElderLine = false, sawHeroLine = false;
+            yield return WaitFor(() =>
+            {
+                sawElderLine |= field.Bubble.IsVisible && field.Bubble.Text.Contains("땅 밑으로");
+                sawHeroLine |= field.Bubble.IsVisible && field.Bubble.Text.Contains("어르신?!");
+                return sawHeroLine;
+            }, 5f);
+            Assert.IsTrue(sawElderLine, "어르신이 샘 이야기를 함");
+            Assert.IsTrue(sawHeroLine, "주인공이 놀람");
+            Assert.IsTrue(session.World.HasEvent(SpringLeap.EventId(elder)), "한 번 본 것으로 저장");
+            Assert.AreEqual(0, field.Npcs.Views.Count, "샘으로 들어가 사라짐");
+            Assert.AreSame(village, field.CurrentArea, "주인공은 그대로");
+            Object.Destroy(field.gameObject);
+            yield return null;
+
+            // 다시 와도 어르신은 없음
+            var again = MakeField(village, session, () => { }, village, far);
+            yield return null;
+            yield return null;
+            Assert.AreEqual(0, again.Npcs.Views.Count, "다시 안 나옴");
+            Object.Destroy(again.gameObject);
             yield return null;
         }
 

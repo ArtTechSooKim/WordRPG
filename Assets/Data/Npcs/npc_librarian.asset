@@ -27,3 +27,5 @@ MonoBehaviour:
     line: "\uC11C\uCABD \uC5F4\uB78C\uC2E4 \uAD6C\uC11D\uC740 \uBCF4\uC168\uB098\uC694?"
     motion: 1
     pace: 0.55
+  springLeapAfter: {fileID: 0}
+  springLeapLines: []
