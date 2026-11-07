@@ -31,6 +31,11 @@ namespace WordRPG.UI
         private PauseTutorial pauseTutorial; // 처음 [선제공격] 기회에 화면을 멈추고 설명 (#79)
         private UiRing preemptRange;        // 튜토리얼 2단계: 몬스터 둘레 '선제공격 범위' 점선
         private bool preemptTutorialRunning;
+        // 선제공격 안내부터 그 기회가 끝날 때까지 (#232 사용자: 살금살금 물약을 먼저 마셔도 처음 한 번은 몬스터가 쫓아와 안내가 나오게)
+        private bool preemptLesson;
+        private bool PreemptLessonPending => showTutorials && !session.Tutorials.Has(TutorialProgress.Preempt) && preemptBooks.Count > 0;
+        // 살금살금 물약으로 몬스터가 알아채지 않는지 — 첫 선제공격 안내 전·중에는 아님
+        public bool SneakingPastRoamers => session.Effects.Quiet && !preemptLesson && !PreemptLessonPending;
         private float preemptGrace;         // 안내를 닫은 뒤 몬스터가 멈춰 있는 남은 시간 — 그래야 [선제공격]을 누를 틈이 있음 (#145)
         private Roamer battleRoamer; // 지금 싸우는 보이는 몬스터 (이기면 사라지고, 도망치면 잠깐 멈춤)
         private List<IReadOnlyList<WordEntry>> preemptBooks = new List<IReadOnlyList<WordEntry>>(); // 선제공격 문제 = 이미 본 단어만
@@ -80,7 +85,7 @@ namespace WordRPG.UI
             if (!paused && preemptGrace > 0f && !quiz) preemptGrace -= dt;
             else if (!paused)
             {
-                roaming.Quiet = session.Effects.Quiet;
+                roaming.Quiet = SneakingPastRoamers;
                 bool chance = preemptPrompt.activeSelf && preemptWindow < PreemptWindowSeconds;
                 roaming.SlowFactor = quiz ? PreemptSlow : chance ? PreemptChanceSlow : 1f;
                 var events = roaming.Tick(dt, walker.Position);
@@ -121,6 +126,7 @@ namespace WordRPG.UI
             if (!show)
             {
                 preemptWindow = 0f;
+                if (!hidden && preemptGrace <= 0f) preemptLesson = false; // 안내 뒤 기회가 끝남 (전투를 했거나 놓침)
                 return;
             }
             // 기회 슬로모션 (QTE): 버튼이 뜨면 1.5초 동안 몬스터가 느려지고, 버튼 둘레의 금색 원이 줄어들며 남은 기회를 보여 줌
@@ -147,6 +153,7 @@ namespace WordRPG.UI
         private IEnumerator RunPreemptTutorial()
         {
             preemptTutorialRunning = true;
+            preemptLesson = true;
             if (moving) SnapPlayer();
             guide.Hide();
             pauseTutorial.RaiseBelow(markLayer); // 조준 괄호·범위·[선제공격] 버튼은 막 위에서 밝게 (안내 중엔 안 눌림 — StartPreempt)
@@ -166,7 +173,7 @@ namespace WordRPG.UI
         private bool BumpOpensPreempt(Roamer bumped)
         {
             if (preemptGrace > 0f) return true;
-            if (session.Effects.Quiet) return false; // 살금살금 물약 중엔 몬스터가 알아채지 않음 — 일부러 부딪히면 전투
+            if (SneakingPastRoamers) return false; // 살금살금 물약 중엔 몬스터가 알아채지 않음 — 일부러 부딪히면 전투
             if (!showTutorials || session.Tutorials.Has(TutorialProgress.Preempt) || preemptBooks.Count == 0) return false;
             roaming.Alert(bumped);
             return true;

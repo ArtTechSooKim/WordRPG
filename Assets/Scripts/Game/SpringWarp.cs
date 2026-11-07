@@ -55,12 +55,22 @@ namespace WordRPG.Game
             return Direction.Down;
         }
 
-        // 지금 갈 수 있는 지역 (이야기 순서)
+        // 지금 갈 수 있는 지역 (이야기 순서). 첫 보스를 물리치기 전엔 없음
         public static List<FieldArea> Destinations(IEnumerable<FieldArea> areas, FieldArea here, WorldState world, bool ownsFullVersion)
         {
             if (areas == null) return new List<FieldArea>();
-            return areas.Where(area => area != null && area != here && (ownsFullVersion || !area.RequiresFullVersion) && HasSeenSpring(area, world))
+            var list = areas.Where(area => area != null).ToList();
+            if (!IsOpen(list, world)) return new List<FieldArea>();
+            return list.Where(area => area != here && (ownsFullVersion || !area.RequiresFullVersion) && HasSeenSpring(area, world))
                 .OrderBy(area => area.StoryOrder).ToList();
+        }
+
+        // 샘 길은 첫 보스(이야기 순서로 가장 앞 지역의 보스 = 서고의 까먹깨비)를 물리친 뒤에 열림 (#232 사용자: 그 전엔 서고와 초원을
+        // 오가다 샘 냄새로 먼저 알아 버려서, 보스 뒤 어르신이 샘 길을 알려 주는 이야기가 어색했음)
+        public static bool IsOpen(IEnumerable<FieldArea> areas, WorldState world)
+        {
+            var first = areas.Where(area => area != null && area.Boss != null).OrderBy(area => area.StoryOrder).FirstOrDefault();
+            return first == null || world.IsBossDefeated(first.BossId);
         }
 
         private static bool HasSeenSpring(FieldArea area, WorldState world)

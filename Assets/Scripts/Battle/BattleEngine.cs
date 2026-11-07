@@ -60,6 +60,9 @@ namespace WordRPG.Battle
         public bool IsOver => Phase == BattlePhase.Victory || Phase == BattlePhase.Defeat || Phase == BattlePhase.Fled;
         public bool CanFlee { get; }
         public bool IsFleeQuiz { get; private set; } // 지금 문제가 도망 문제인지 (#84)
+        // 몰래 다니던 중 부딪힌 전투 (살금살금 물약이 남아 있음): 몬스터 등급과 상관없이 바로 도망 (#232 사용자 — 물약의 취지).
+        // 보스전(CanFlee = false)은 그대로 막힘
+        public bool SureEscape { get; set; }
 
         // 도망 등급 = 살아 있는 적 중 가장 강한 등급
         public FleeTier EscapeTier
@@ -215,7 +218,7 @@ namespace WordRPG.Battle
                 return events;
             }
             var tier = EscapeTier;
-            bool quizNeeded = tier == FleeTier.Strong || (tier == FleeTier.Normal && rng.NextDouble() < config.NormalFleeQuizChance);
+            bool quizNeeded = !SureEscape && (tier == FleeTier.Strong || (tier == FleeTier.Normal && rng.NextDouble() < config.NormalFleeQuizChance));
             if (quizNeeded)
             {
                 IsFleeQuiz = true;

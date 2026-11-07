@@ -40,7 +40,8 @@ namespace WordRPG.UI
             if (merchant == null) return;
             var offset = walker.Position - merchant.Motion.Cell;
             string line = shopPitch.Update(area.Shop.Pitches, Mathf.Abs(offset.x) + Mathf.Abs(offset.y), Time.unscaledTime, rng);
-            if (line == null || bubble.IsVisible || fieldTutorialRunning || NeedsPrologue) return;
+            // 첫 전투 전엔 부르지 않음 (#232 사용자: 분신이 풀숲으로 이끄는 안내에서 시선을 빼앗음)
+            if (line == null || bubble.IsVisible || fieldTutorialRunning || NeedsPrologue || FirstFightPending) return;
             bubble.Speak(merchant.Body, merchant.Data.DisplayName, line, ShopPitchSeconds);
             bubbleKeepUntil = Time.unscaledTime + ShopPitchSeconds;
         }

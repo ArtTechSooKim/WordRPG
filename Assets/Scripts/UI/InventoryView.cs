@@ -483,7 +483,7 @@ namespace WordRPG.UI
                 onChanged?.Invoke();
                 CollectItems();
                 ShowMaterial(Mathf.Min(selectedMaterial, Mathf.Max(0, materials.Count - 1)));
-                detailMeta.text = $"{UiKit.WithJosa(item.DisplayName, "을", "를")} 마셨어요   (남은 {session.Inventory.GetCount(item)}개)";
+                detailMeta.text = $"{UiKit.WithJosa(item.DisplayName, "을", "를")} 마셨어요   (남은 개수 {session.Inventory.GetCount(item)}개)"; // #232 사용자
                 detailMeta.color = Palette.Good;
                 return;
             }
@@ -508,7 +508,7 @@ namespace WordRPG.UI
             onChanged?.Invoke();
             CollectItems();
             ShowMaterial(Mathf.Min(selectedMaterial, Mathf.Max(0, materials.Count - 1)));
-            detailMeta.text = $"HP +{healed} 회복했어요   (남은 {session.Inventory.GetCount(item)}개)";
+            detailMeta.text = $"HP +{healed} 회복했어요   (남은 개수 {session.Inventory.GetCount(item)}개)";
             detailMeta.color = Palette.Good;
         }
 

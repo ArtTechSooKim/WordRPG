@@ -19,13 +19,13 @@ MonoBehaviour:
   - bossOf: {fileID: 0}
     wordsNeeded: 0
     line: "\uB098\uAC00\uB294 \uAE38\uC740 \uC800\uCABD\uC73C\uB85C \uCB49 \uAC00\uC11C\u2026"
-    motion: 5
-    pace: 1.2
+    motion: 0
+    pace: 1
   - bossOf: {fileID: 11400000, guid: 3eaceaca8882957449f036b992066ba9, type: 2}
     wordsNeeded: 0
-    line: "\uBB38\uC7A5\uC774 \uB3CC\uC544\uC654\uC5B4! \uBC18\uB527\uB3CC\uC744
-      \uB2E4 \uBC1D\uD788\uBA74 \uC88B\uC740 \uAC8C \uC788\uB300."
-    motion: 1
-    pace: 1.4
+    line: "\uB3D9\uAD74\uC774 \uD658\uD574\uC84C\uC5B4! \uB2E4\uC2DC \uC77C\uD560
+      \uC218 \uC788\uACA0\uB2E4!"
+    motion: 0
+    pace: 1
   springLeapAfter: {fileID: 0}
   springLeapLines: []

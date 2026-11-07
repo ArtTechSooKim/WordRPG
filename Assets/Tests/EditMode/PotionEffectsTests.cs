@@ -157,7 +157,8 @@ namespace WordRPG.Tests
             Assert.IsFalse(roaming.HuntingPlayer, "쫓던 몬스터도 돌아감");
         }
 
-        // 실제 데이터: 초원 상점은 그대로, 숲부터 세 가지 더. 값은 사용자가 정한 관계대로
+        // 실제 데이터: 초원 상점은 그대로, 숲은 특제 상처약까지, 효과 물약 두 가지는 정글부터 (#232 사용자 — 값도 밸런스로 2000·10000).
+        // 동굴엔 상점이 없음 (#232 사용자: 동굴 속 가게는 이상함). 값은 사용자가 정한 관계대로
         [Test]
         public void ForestAndLaterShopsSellTheNewPotions()
         {
@@ -166,8 +167,12 @@ namespace WordRPG.Tests
 
             var meadow = db.FindArea("meadow").Shop;
             CollectionAssert.AreEquivalent(new[] { "potion", "potion_large" }, meadow.Entries.Select(e => e.Item.ItemId), "초원은 그대로");
+            var forest = db.FindArea("forest").Shop;
+            CollectionAssert.AreEquivalent(new[] { "potion", "potion_large", "potion_great" }, forest.Entries.Select(e => e.Item.ItemId), "숲은 특제 상처약까지");
+            Assert.IsNull(db.FindArea("cave").Shop, "동굴엔 상점 없음");
+            Assert.AreEqual(0, db.FindArea("cave").Map.ShopBlocks.Count, "맵에도 가판대 없음");
 
-            foreach (var areaId in new[] { "forest", "jungle", "cave" })
+            foreach (var areaId in new[] { "jungle" })
             {
                 var shop = db.FindArea(areaId).Shop;
                 var large = Entry(shop, "potion_large");
@@ -184,6 +189,8 @@ namespace WordRPG.Tests
                 Assert.Greater(curious.Price, quiet.Price);
                 Assert.AreEqual(ItemEffect.Quiet, quiet.Item.Effect);
                 Assert.AreEqual(ItemEffect.NewWords, curious.Item.Effect);
+                Assert.AreEqual(2000, quiet.Price, "살금살금 물약 (#232 사용자)");
+                Assert.AreEqual(10000, curious.Price, "호기심 물약 (#232 사용자)");
             }
             foreach (var id in new[] { "potion_great", "potion_quiet", "potion_curious" })
             {

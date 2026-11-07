@@ -55,6 +55,7 @@ namespace WordRPG.UI
                 UiKit.IconImage("Gold", row.Buy.transform, UiKit.Icon("gold"), 0.08f, 0.2f, 0.34f, 0.8f);
                 row.BuyLabel = UiKit.LabelOf(row.Buy);
                 row.BuyLabel.rectTransform.anchorMin = new Vector2(0.3f, 0);
+                row.BuyLabel.horizontalOverflow = HorizontalWrapMode.Overflow; // 값은 줄을 바꾸지 않음 (#232)
                 int index = i;
                 row.Buy.onClick.AddListener(() => view.OnBuy(index));
                 view.rows.Add(row);
@@ -102,12 +103,17 @@ namespace WordRPG.UI
                 row.Icon.enabled = icon != null;
                 row.Info.text = $"<b>{entry.Item.DisplayName}</b>   <color=#A6B3D1>보유 {owned}</color>\n<size=26><color=#A6B3D1>{entry.Item.Description}</color></size>";
                 row.BuyLabel.text = $"{entry.Price}G";
+                row.BuyLabel.fontSize = PriceFontSize(row.BuyLabel.text);
                 bool affordable = session.Inventory.Gold >= entry.Price;
                 row.Buy.interactable = affordable;
                 UiKit.SetColor(row.Buy, affordable ? Palette.Button : Palette.Disabled);
                 row.BuyLabel.color = affordable ? Palette.Text : Palette.TextDim;
             }
         }
+
+        // 값이 길면 글씨를 줄임 (#232 사용자: 2000G가 버튼에 다 안 들어가 줄이 바뀜 — 폰 화면 비율에선 버튼이 조금 좁음).
+        // Jua 글꼴 너비 기준: 버튼 안 글자 칸 약 125 (1080 기준)에 들어가는 크기
+        public static int PriceFontSize(string price) => price.Length <= 4 ? 44 : price.Length == 5 ? 34 : 30;
 
         private void OnBuy(int index)
         {

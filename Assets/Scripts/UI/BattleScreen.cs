@@ -355,7 +355,7 @@ namespace WordRPG.UI
             }
             // 연속 정답 콤보는 전투가 바뀌어도 이어진다. 보스전은 도망칠 수 없다
             engine = new BattleEngine(session.PartyMembers, enemies, provider, battleConfig, rng,
-                session.StartBattleCombo(DateTime.UtcNow), canFlee: !bossBattle);
+                session.StartBattleCombo(DateTime.UtcNow), canFlee: !bossBattle) { SureEscape = session.Effects.Quiet };
             fleeEvents = null;
             fleeQuizEvents = null;
 

@@ -187,6 +187,41 @@ namespace WordRPG.Tests
             Object.Destroy(field.gameObject);
         }
 
+        // #232 사용자: 살금살금 물약을 먼저 마셔도 처음 한 번은 몬스터가 쫓아와 선제공격 안내가 나옴. 안내를 본 뒤로는 물약대로 못 알아챔
+        [UnityTest]
+        public IEnumerator TheFirstPreemptLessonComesEvenWhileSneaking()
+        {
+            var quiet = TestData.Item("potion_quiet").Set("kind", WordRPG.Items.ItemKind.Consumable)
+                .Set("effect", WordRPG.Items.ItemEffect.Quiet).Set("effectAmount", 500);
+            var session = GameSession.NewGame(Hero(), 5);
+            foreach (var id in new[] { TutorialProgress.Field, TutorialProgress.Confirm, TutorialProgress.Grass }) session.Tutorials.Mark(id);
+            session.Effects.Apply(quiet);
+            var (field, words) = Create(session, tutorials: true);
+            for (int i = 0; i < 5; i++) session.Vocabulary.Discover(words.Words[i].Id, System.DateTime.UtcNow.AddDays(-1));
+            yield return null;
+            yield return null;
+            Assert.IsFalse(field.SneakingPastRoamers, "안내를 아직 못 봄 → 물약이 있어도 알아챔");
+
+            yield return HoldStick(field, Direction.Right, () => field.PauseTutorial.IsShowing || field.IsInBattle, 6f);
+            Assert.IsTrue(field.PauseTutorial.IsShowing, "물약 중에도 첫 선제공격 안내");
+            for (int i = 0; i < 3; i++)
+            {
+                field.PauseTutorial.PressNext();
+                yield return null;
+                yield return null;
+            }
+            Assert.IsFalse(field.SneakingPastRoamers, "안내 뒤 그 기회가 끝날 때까지는 계속 쫓아옴");
+            Assert.IsTrue(field.IsPreemptAvailable, "그래서 [선제공격]을 해 볼 수 있음");
+            Object.Destroy(field.gameObject);
+            yield return null;
+
+            // 안내를 본 사람: 물약대로 몬스터가 못 알아챔
+            var (again, _) = Create(session, tutorials: true);
+            yield return null;
+            Assert.IsTrue(again.SneakingPastRoamers);
+            Object.Destroy(again.gameObject);
+        }
+
         // #145 사용자: 딱 붙자 그냥 전투로 넘어감 — 아직 나를 못 본 몬스터에 처음 부딪히면 전투 대신 선제공격 안내, 안내를 본 뒤로는 부딪히면 전투
         [UnityTest]
         public IEnumerator BumpingBeforeTheFirstPreemptShowsTheTutorialInstead()

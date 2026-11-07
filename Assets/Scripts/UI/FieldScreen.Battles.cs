@@ -129,16 +129,18 @@ namespace WordRPG.UI
                 while (learnView.IsOpen) yield return null;
             }
             while (inBattle || transitioning || IsPanelOpen) yield return null;
-            if (area != bossArea || walker.Position == walker.Map.Start) yield break; // 이미 다른 지역이나 시작 지점이면 묻지 않음
-            returnDialog.Show(BossDefeatedTitle, $"{area.DisplayName} 시작 지점으로 돌아갈까요?", "돌아가기", false,
-                () => StartCoroutine(ReturnToStart()), "star_full", "여기 있기");
+            // 서고 보스 뒤엔 초원 시작 지점으로 (#232 사용자: 던전을 깨고 돌아가면 당연히 마을 — 어르신 샘 이야기도 거기서)
+            var home = bossArea.ReturnAfterBoss;
+            if (area != bossArea || (home == area && walker.Position == walker.Map.Start)) yield break; // 이미 다른 지역이나 시작 지점이면 묻지 않음
+            returnDialog.Show(BossDefeatedTitle, $"{home.DisplayName} 시작 지점으로 돌아갈까요?", "돌아가기", false,
+                () => StartCoroutine(ReturnToStart(home)), "star_full", "여기 있기");
         }
 
         private const string BossDefeatedTitle = "보스를 물리쳤다!";
         private const float BossAfterLineSeconds = 4.5f; // 승리 뒤 글이 머리 위에 머무는 시간
 
         // 시작 지점으로: 어두워짐 + 문 소리 → 시작 지점에 정면으로 서서 밝아짐
-        private IEnumerator ReturnToStart()
+        private IEnumerator ReturnToStart(FieldArea home)
         {
             transitioning = true;
             ReturnsToStart++;
@@ -146,13 +148,22 @@ namespace WordRPG.UI
             bubble.Hide();
             var cutscene = GateCutscene.Create(transform);
             yield return cutscene.Fade(0f, 1f, 0.35f * animationScale);
-            walker.WarpTo(walker.Map.Start);
-            walker.Face(Direction.Down);
-            SnapPlayer();
-            if (session.World.Reveal(area.AreaId, walker.Map.Width, walker.Map.Height, walker.Position) > 0)
+            if (home != null && home != area)
             {
-                minimap.Redraw();
-                RefreshDarkness();
+                EnterArea(home, home.Map.Start); // 다른 지역(서고 → 초원)의 시작 지점
+                walker.Face(Direction.Down);
+                SnapPlayer();
+            }
+            else
+            {
+                walker.WarpTo(walker.Map.Start);
+                walker.Face(Direction.Down);
+                SnapPlayer();
+                if (session.World.Reveal(area.AreaId, walker.Map.Width, walker.Map.Height, walker.Position) > 0)
+                {
+                    minimap.Redraw();
+                    RefreshDarkness();
+                }
             }
             RefreshNameTags();
             session.World.SetPosition(area.AreaId, walker.Position);

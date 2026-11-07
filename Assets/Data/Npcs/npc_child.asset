@@ -29,7 +29,8 @@ MonoBehaviour:
     pace: 1
   - bossOf: {fileID: 0}
     wordsNeeded: 50
-    line: "\uB450 \uAE00\uC790\uAE4C\uC9C0 \uC37C\uC5B4\uC694."
+    line: "\uC81C \uC774\uB984 \uB450 \uAE00\uC790\uAC00 \uC0DD\uAC01\uB0AC\uC5B4\uC694.
+      \uB9C8\uC9C0\uB9C9 \uD558\uB098\uAC00 \uBB50\uC600\uB354\uB77C\u2026"
     motion: 4
     pace: 1
   - bossOf: {fileID: 0}

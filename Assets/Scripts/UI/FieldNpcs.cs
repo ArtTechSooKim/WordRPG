@@ -63,12 +63,13 @@ namespace WordRPG.UI
             }
         }
 
-        // 동물: 그림이 두 장뿐이라 번갈아 쉬고, 오른쪽을 볼 땐 뒤집는다
+        // 동물: 그림이 두 장뿐이라 번갈아 쉬고, 오른쪽을 볼 땐 뒤집는다.
+        // 폴짝 뛰는 동물(개구리)은 둘째 그림이 앞으로 뛰는 자세라 제자리 뜀과 안 맞음 → 앉은 그림 한 장으로 위아래만 (#232 사용자)
         private void DrawAnimal(float dt)
         {
             if (frames.Length == 0) return;
             animalClock += dt;
-            body.sprite = frames[(int)(animalClock / 0.8f) % frames.Length];
+            body.sprite = Motion.Kind == NpcMotionKind.Hop ? frames[0] : frames[(int)(animalClock / 0.8f) % frames.Length];
             body.flipX = Motion.Facing == Direction.Right;
         }
 

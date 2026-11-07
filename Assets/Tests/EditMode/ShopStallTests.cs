@@ -63,7 +63,7 @@ namespace WordRPG.Tests
             var areas = AssetDatabase.FindAssets("t:FieldArea", new[] { "Assets/Data/Areas" })
                 .Select(guid => AssetDatabase.LoadAssetAtPath<FieldArea>(AssetDatabase.GUIDToAssetPath(guid)))
                 .Where(area => area.Map.ShopBlocks.Count > 0).ToList();
-            Assert.AreEqual(4, areas.Count, "초원·숲·정글·동굴");
+            Assert.AreEqual(3, areas.Count, "초원·숲·정글 (동굴 가게는 없앰 #232)");
             foreach (var area in areas)
             {
                 var block = area.Map.ShopBlocks.Single();

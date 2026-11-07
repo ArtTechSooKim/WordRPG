@@ -61,8 +61,26 @@ namespace WordRPG.Tests
 
             var world = new WorldState();
             foreach (var area in areas.Values) See(world, area);
+            world.MarkBossDefeated(areas["library"].BossId);
             var list = SpringWarp.Destinations(areas.Values.OrderBy(area => area.AreaId), areas["cave"], world, true);
             CollectionAssert.AreEqual(new[] { "meadow", "library", "forest", "jungle" }, list.Select(area => area.AreaId));
+        }
+
+        // #232 사용자: 샘 길은 서고 보스(까먹깨비)를 물리친 뒤에 열림 — 그 전엔 샘을 봤어도 갈 곳 없음 (어르신이 알려 주는 이야기 순서)
+        [Test]
+        public void SpringsOpenOnlyAfterTheFirstBoss()
+        {
+            var areas = RealAreas();
+            var all = areas.Values.ToList();
+            var world = new WorldState();
+            foreach (var area in all) See(world, area);
+            Assert.IsFalse(SpringWarp.IsOpen(all, world));
+            Assert.IsEmpty(SpringWarp.Destinations(all, areas["meadow"], world, true), "샘을 다 봤어도 서고 보스 전엔 못 감");
+            world.MarkBossDefeated(areas["library"].BossId);
+            Assert.IsTrue(SpringWarp.IsOpen(all, world));
+            CollectionAssert.Contains(SpringWarp.Destinations(all, areas["meadow"], world, true), areas["library"]);
+            Assert.AreSame(areas["meadow"], areas["library"].ReturnAfterBoss, "서고 보스 뒤 [돌아가기]는 초원으로");
+            Assert.AreSame(areas["forest"], areas["forest"].ReturnAfterBoss, "다른 지역은 그 지역 시작 지점");
         }
 
         [Test]
@@ -74,6 +92,7 @@ namespace WordRPG.Tests
             Assert.IsEmpty(SpringWarp.Destinations(all, areas["meadow"], world, true), "처음엔 갈 곳 없음");
             Assert.IsEmpty(SpringWarp.Destinations(null, areas["meadow"], world, true), "데이터가 없어도 안전");
 
+            world.MarkBossDefeated(areas["library"].BossId);
             See(world, areas["meadow"]);
             Assert.IsEmpty(SpringWarp.Destinations(all, areas["meadow"], world, true), "지금 있는 지역은 안 나옴");
 

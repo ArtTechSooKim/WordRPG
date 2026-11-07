@@ -68,7 +68,7 @@ namespace WordRPG.UI
                 {
                     tilemap.SetTile(new Vector3Int(cell.x, cell.y, 0), BridgeTile(area.Theme, true, horizontal));
                     StartCoroutine(FieldFx.Play(transform, CellCenter(cell), Fx.Sparkle, 1.3f, animationScale, 12, tint: new Color(0.6f, 1f, 0.5f)));
-                    Sound.Play(Sfx.EvolveLight);
+                    Sound.Play(Sfx.VineGrow); // 풀이 뻗는 소리 (#232 사용자: 예전 소리는 유령 웃음 같았음)
                     yield return WaitUnscaled(0.22f);
                 }
                 ShowToast("덩굴 다리가 놓였다!", 2.5f);

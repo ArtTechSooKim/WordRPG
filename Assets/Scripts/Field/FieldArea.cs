@@ -149,6 +149,8 @@ namespace WordRPG.Field
 
         [Header("보스 — 맵의 B (한 번 쓰러뜨리면 다시 나오지 않음)")]
         [SerializeField] private BossEncounter boss;
+        [Tooltip("보스를 이긴 뒤 '시작 지점으로 돌아갈까요?'가 데려가는 지역 (비우면 이 지역). 서고처럼 마을에서 들어가는 던전은 마을로 (#232 사용자)")]
+        [SerializeField] private FieldArea returnAfterBoss;
 
         [Header("보스 방 문 — 맵의 G (#76)")]
         [Tooltip("맵의 열쇠 받침대 'K'에서 얻는 열쇠 (종류 Key). 이 열쇠 + 단어 발견 수가 모이면 보스 방 문 'G'가 열린다")]
@@ -194,6 +196,7 @@ namespace WordRPG.Field
         public IReadOnlyList<AreaExit> Exits => exits;
         public BossEncounter Boss => boss != null && boss.Species != null ? boss : null;
         public string BossId => $"{areaId}:boss";
+        public FieldArea ReturnAfterBoss => returnAfterBoss != null ? returnAfterBoss : this;
         public string DictionaryName => dictionaryName;
         public bool HasDictionary => !string.IsNullOrEmpty(dictionaryName);
         public bool RequiresFullVersion => requiresFullVersion;

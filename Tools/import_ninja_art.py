@@ -149,7 +149,6 @@ NPC_SHEETS = {
     "npc_merchant_meadow": "Actor/Characters/Woman/SpriteSheet.png",
     "npc_merchant_forest": "Actor/Characters/OldMan3/SpriteSheet.png",
     "npc_merchant_jungle": "Actor/Characters/Monkey/SpriteSheet.png",
-    "npc_merchant_cave": "Actor/Characters/Inspector/SpriteSheet.png",
 }
 
 HERO_LOOKS = {

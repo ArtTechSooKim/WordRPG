@@ -433,7 +433,8 @@ namespace WordRPG.UI
                         var across = new Vector3(back.y, -back.x, 0f) * side;
                         var at = player.position + Vector3.down * 0.3f + back * 0.5f + across;
                         LastDustColor = FieldArt.DustColor(area.Theme, walker.Map.Get(outcome.Target - direction.ToOffset()));
-                        StartCoroutine(FieldFx.Play(transform, at, Fx.Dust, 1.5f, animationScale, 9, 6f,
+                        // 먼지는 동료(9·11) 아래 8 — 뒤따라오는 아라에게 먼지가 튀어 보였음 (#232 사용자)
+                        StartCoroutine(FieldFx.Play(transform, at, Fx.Dust, 1.5f, animationScale, 8, 6f,
                             back * 1.0f + Vector3.up * 0.2f, 0.45f, direction == Direction.Left, LastDustColor));
                     }
                     currentStep = stepDuration * (run ? runStepRatio : 1f);

@@ -21,7 +21,8 @@ namespace WordRPG.UI
         // 기술마다 다른 소리 (#164 — 표 SkillLooks, 파일은 Tools/make_skill_sfx.py가 만듦)
         SkillSlash, SkillClaw, SkillHeavy, SkillThunder, SkillInk, SkillWater, SkillPlant, SkillWhip, SkillRock, SkillLight,
         SkillLetters, SkillHighlight, SkillSound, SkillSpore, SkillSwirl, SkillHealLeaf, SkillHealWater, SkillDrain,
-        SkillGuardEcho, SkillGuardBook, SkillGuardTime, SkillGuardSeed, SkillHealLight
+        SkillGuardEcho, SkillGuardBook, SkillGuardTime, SkillGuardSeed, SkillHealLight,
+        VineGrow // 덩굴 다리가 놓임 (#232 — Tools/make_skill_sfx.py)
     }
 
     // 지역 환경음 (#193): BGM 밑에 깔리는 소리. 어느 지역이 어느 소리인지는 테마 표 ThemeLooks.

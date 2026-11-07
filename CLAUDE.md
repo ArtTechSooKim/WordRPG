@@ -43,7 +43,7 @@
 5. **저장 데이터는 id 문자열로 참조**: wordId, itemId, relicId, areaId. 에셋 이름이 바뀌어도 세이브가 깨지지 않게 (세이브 v2: 주인공 + 성유물, v1 몬스터 파티는 불러올 때 변환)
    - 아이템·성유물·몬스터·지역을 새로 만들면 `WordRPG > Data > Refresh Game Database` 실행 (안 하면 세이브에서 불러올 수 없음, DataIntegrityTests가 잡음)
    - 성유물은 시작·보물상자(ChestContent.relic)·보스(BossEncounter.rewardRelic)·반딧돌 보상(FieldArea.glowStoneRelic) 중 하나에서 얻을 수 있어야 하고, 강화 재료는 적 드롭·상자에서 얻을 수 있어야 함.
-     상점은 회복 아이템과 효과 물약만 판다 (강화 재료는 안 팜) — 사용자 결정 (TownTests가 검사). 효과 물약 (#146, 숲 상점부터): ItemData `effect`(`ItemEffect` — 에셋에 번호로 저장, 새 효과는 맨 뒤)·`effectAmount` →
+     상점은 회복 아이템과 효과 물약만 판다 (강화 재료는 안 팜) — 사용자 결정 (TownTests가 검사). 효과 물약 (#146, 정글 상점부터 #232 — 숲은 특제 상처약까지, 동굴은 상점 없음): ItemData `effect`(`ItemEffect` — 에셋에 번호로 저장, 새 효과는 맨 뒤)·`effectAmount` →
      가방에서 `GameSession.UseEffectItem` → `PotionEffects`(세이브 칸 newWordsLeft·quietStepsLeft): 호기심 물약 = `WordQuizService` wantNewWord(새 단어가 실제로 나올 때만 줄어듦) · 살금살금 물약 = 걸음 수 + `RoamingMonsters.Quiet`. 알약은 `FieldScreen.RefreshEffects`
    - 기술문서(ItemKind.SkillDocument)는 taughtSkill이 있어야 하고 상자·보스(BossEncounter.rewardItem)에서 얻을 수 있어야 함 (SkillDocumentDataTests).
      전투 기술 = 기본 기술 자리(휘두르기 — 바꿀 수 있음 #147: `Hero.BasicSeat`·`PutBackBasicSkill`, 세이브 칸 basicSeat, 공격 기술은 하나 남김 `CanReplace`) + 기술 칸 3개(성유물 기술·기술문서 기술), 세이브에는 칸 순서를 키 문자열로 저장
@@ -78,7 +78,7 @@
    - 수련용 허수아비는 MonsterSpecies `trainingDummy`(맞아도 HP 그대로, 기술 없음) — 게임에 하나, 출현표에 넣지 말 것 (TrainingTests)
    - 필드 맵은 FieldArea의 글자 맵 (GDD 7·9장). 상자 수 = 내용물 수, 출입구 수 = 연결 수(서로 왕복), B ↔ 보스 지정,
      모든 상자·샘·출입구 도달 가능 (AreaDataTests·DungeonDataTests가 검사). 지역을 새로 만들면 Refresh Game Database
-   - 샘으로 다른 지역 가기 (#216, GDD 9-11): 샘 옆 [확인] → 회복 + 다른 지역의 샘으로 (규칙 `SpringWarp`, 화면 `FieldScreen.Springs`·`SpringWarpView`, 쏙 들어갔다 나오는 연출·안내 `TutorialProgress.Spring` #217 — 이야기 글은 창에 쓰지 말 것, 사용자. 이야기 = 주인공 혼잣말 + 초원 어르신이 샘으로 뛰어드는 1회 컷씬 #223: NpcData `springLeapAfter`·`springLeapLines`, 규칙 `SpringLeap`, 세이브 `WorldState.events` — 한 번만 일어난 일 목록). 갈 곳 = 이미 본 샘(탐험 기록 — 세이브 칸 없음) + 정식판. 샘은 지역마다 하나, 문·다리 밖 쉼터에 (SpringWarpTests). 새 지역은 FieldArea `storyOrder` 필수 (`SampleDataBuilder.SetStoryOrder`). 게임 안에서는 '샘'이라고만 — '이정표'는 큰 지역 안의 빠른 이동, 따로 (사용자)
+   - 샘으로 다른 지역 가기 (#216, GDD 9-11): 샘 옆 [확인] → 회복 + 다른 지역의 샘으로 (규칙 `SpringWarp`, 화면 `FieldScreen.Springs`·`SpringWarpView`, 쏙 들어갔다 나오는 연출·안내 `TutorialProgress.Spring` #217 — 이야기 글은 창에 쓰지 말 것, 사용자. 이야기 = 주인공 혼잣말 + 초원 어르신이 샘으로 뛰어드는 1회 컷씬 #223: NpcData `springLeapAfter`·`springLeapLines`, 규칙 `SpringLeap`, 세이브 `WorldState.events` — 한 번만 일어난 일 목록). 갈 곳 = 이미 본 샘(탐험 기록 — 세이브 칸 없음) + 정식판, 첫 보스(서고) 뒤에만 (#232 `SpringWarp.IsOpen`). 보스를 이긴 뒤 [돌아가기] 갈 곳 = FieldArea `returnAfterBoss` (서고 → 초원 #232). 샘은 지역마다 하나, 문·다리 밖 쉼터에 (SpringWarpTests). 새 지역은 FieldArea `storyOrder` 필수 (`SampleDataBuilder.SetStoryOrder`). 게임 안에서는 '샘'이라고만 — '이정표'는 큰 지역 안의 빠른 이동, 따로 (사용자)
    - 맵 글자 'L' = 사전 받침대: 보스가 있는 맵마다 쉼터에 하나, FieldArea `dictionaryName` 필수 (BossDictionaryTests). 하루 한 번 읽기 = `BossDictionary`
    - 맵 글자 'G' = 보스 방 문, 'K' = 열쇠 받침대 (#76): 보스가 있는 맵마다 G 한 덩어리(가운데 칸에 이름표)·K 하나 + FieldArea `bossKey`(종류 Key)·`bossGateWords`(40).
      열쇠 + 그 단어장 단어 N개 발견 → [확인]으로 열림 (규칙 `BossGate`, 세이브 `WorldState.openedGates`). 열면 열쇠는 소지품에서 사라짐 (#147 — 받침대는 `BossGate.KeyTaken`, 예전 세이브는 불러올 때 `DiscardUsedKey`). 열쇠는 문 밖, 보스는 문 안에서만 닿아야 함 (BossGateDataTests)

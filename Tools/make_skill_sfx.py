@@ -56,6 +56,9 @@ SOUNDS = {
     "skillguardbook": ([(HIT, "Impact4", 0, 0), (MAGIC, "Magic1", -8, 40)], 0, PEAK),
     "skillguardtime": ([(MAGIC, "Magic4", 0, 0)], 0, PEAK),
     "skillguardseed": ([(BOUNCE, "Bounce5", 0, 0), (MAGIC, "Magic1", -8, 40)], 0, PEAK),
+    # 필드 (기술이 아닌 소리도 같은 방식으로)
+    # 덩굴 다리가 한 칸씩 놓임 (#232 사용자: 예전 Spirit 소리는 유령 웃음 같음 → 덩굴이 뻗는 풀 소리). 칸마다 울려서 조금 작게
+    "vinegrow": ([(ELEMENT, "Grass2", 0, 0), (ELEMENT, "Grass", -6, 60)], 4500, -9.0),
 }
 
 

@@ -359,6 +359,40 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // #232 사용자: 서고 보스(까먹깨비)를 이기고 [돌아가기]를 고르면 초원 시작 지점으로 — 던전을 깨면 마을로 돌아가는 게 당연함
+        [UnityTest]
+        public IEnumerator DungeonBossVictoryReturnsToTheVillageStart()
+        {
+            var hero = Hero();
+            var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var king = TestData.Species("king", new MonsterStats(40, 1, 50), new MonsterStats(0, 0, 0), bite).Set("displayName", "까먹대왕");
+            var village = Area("village", "마을", "######\n#..P.#\n######", hero);
+            var lair = Area("lair", "보스 방", "#####\n#.B.#\n#.P.#\n#####", hero)
+                .Set("boss", new BossEncounter(king, 3)).Set("returnAfterBoss", village);
+            var session = GameSession.NewGame(Player(), 1);
+            var field = CreateField(lair, session);
+            yield return null;
+            yield return null;
+
+            yield return FaceStick(field, Direction.Up);
+            yield return PressConfirm(field);
+            yield return WaitFor(() => field.Battle.IsRunning);
+            yield return PlayUntilResult(field.Battle, answerCorrectly: true);
+            FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
+            yield return WaitFor(() => field.IsReturnDialogOpen, 5f);
+            StringAssert.Contains("마을 시작 지점으로 돌아갈까요", AllText(field), "보스 방 시작 지점에 서 있어도 마을로 갈지 물음");
+
+            VisibleButton(field, "DialogConfirmButton").onClick.Invoke();
+            yield return WaitFor(() => field.ReturnsToStart == 1 && field.ToastMessage.Contains("시작 지점으로 돌아왔다"), 5f);
+            Assert.AreSame(village, field.CurrentArea, "마을로");
+            Assert.AreEqual(village.Map.Start, field.PlayerCell, "마을 시작 지점");
+            Assert.IsTrue(session.World.TryGetPosition("village", out var saved));
+            Assert.AreEqual(village.Map.Start, saved);
+            StringAssert.Contains("마을 시작 지점으로 돌아왔다", field.ToastMessage);
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator StartsInTheAreaWhereTheGameWasSaved()
         {

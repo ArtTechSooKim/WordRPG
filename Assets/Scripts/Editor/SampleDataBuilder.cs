@@ -47,8 +47,10 @@ namespace WordRPG.EditorTools
                 new Color(0.45f, 0.75f, 0.85f), ItemKind.Consumable, effect: ItemEffect.Quiet, effectAmount: 100);
             var curiousPotion = Item("potion_curious", "호기심 물약", "마시면 전투 문제에 새 단어만 10개 나온다. 필드에서 쓸 수 있다.",
                 new Color(1f, 0.82f, 0.3f), ItemKind.Consumable, effect: ItemEffect.NewWords, effectAmount: 10);
-            var forestPotions = new[] { new ShopEntry(potion, 30), new ShopEntry(largePotion, 90), new ShopEntry(greatPotion, 180),
-                new ShopEntry(quietPotion, 150), new ShopEntry(curiousPotion, 2000) };
+            // #232 사용자: 숲은 특제 상처약까지, 효과 물약 두 가지는 정글 상점부터 (값도 밸런스로 올림)
+            var forestPotions = new[] { new ShopEntry(potion, 30), new ShopEntry(largePotion, 90), new ShopEntry(greatPotion, 180) };
+            var junglePotions = new[] { new ShopEntry(potion, 30), new ShopEntry(largePotion, 90), new ShopEntry(greatPotion, 180),
+                new ShopEntry(quietPotion, 2000), new ShopEntry(curiousPotion, 10000) };
 
             // --- 지역 도감 완성 징표 (지역 특색에 맞는 기념물) ---
             var meadowKeepsake = Item("keepsake_meadow", "네잎클로버 책갈피",
@@ -334,7 +336,7 @@ namespace WordRPG.EditorTools
                 new ChestContent(sparkleDust, 2, 60),     // 동쪽 기슭 맨 아래
                 new ChestContent(potion, 2),              // 야영지
                 new ChestContent(null, 0, 200));          // 강 아래쪽 모래톱 둘째
-            var jungleShop = ShopAsset("jungle_shop", "메아리 야영지 가게", forestPotions);
+            var jungleShop = ShopAsset("jungle_shop", "메아리 야영지 가게", junglePotions);
             AssignShopIfEmpty(junglePath, jungleShop);
             SetFullVersionArea(junglePath); // 정식판에 포함 (추가 결제 없음 — 사용자)
             SetDictionary(junglePath, "정글의 사전");
@@ -424,8 +426,7 @@ namespace WordRPG.EditorTools
                 new ChestContent(hardCover, 3),           // 개울가 굴 (레버 옆)
                 new ChestContent(potion, 2),              // 반딧불 쉼터
                 new ChestContent(shinyInk, 3, 200));      // 무너진 갱도 (숨은 방)
-            var caveShop = ShopAsset("cave_shop", "반딧불 쉼터 가게", forestPotions);
-            AssignShopIfEmpty(cavePath, caveShop);
+            // 동굴엔 상점 없음 (#232 사용자: 동굴 속 가게는 이상함 — 샘 길도 있고 정글에 가게가 있음)
             SetFullVersionArea(cavePath); // 정식판에 포함 (추가 결제 없음)
             SetDictionary(cavePath, "동굴의 사전");
             SetBossGate(cavePath, caveKey, 120); // 단어장을 같이 쓰니 앞 지역보다 많이 (#147 사용자: 숲 40 · 정글 80 · 유적 100 · 동굴 120)
@@ -688,7 +689,7 @@ namespace WordRPG.EditorTools
                 "#######..##########..,,,#####,,,,,##\n" +
                 "######:...:######......#####,,,,,,,#\n" +
                 "######:...SSS###,,,#########,,,,,,,#\n" +
-                "####::E:F:SSS###,,,#########,,,,,,,#\n" +
+                "####E:::F:SSS###,,,#########,,,,,,,#\n" +
                 "###::.......::..,,,##########,,,,,##\n" +
                 "#..::......N......############,,,,##\n" +
                 "D..::P......::##..#,,,,#,,#,,#,,,,##\n" +
@@ -847,8 +848,8 @@ namespace WordRPG.EditorTools
                 "#####:::::::~~#######..:::###########::~~~::,,::##\n" +
                 "####:::::::::~~#######..:::##########:::~:::,,,:##\n" +
                 "####:::##::::~~~####::..:::::#:#######::.:Q:,,,###\n" +
-                "####::::::####~~###::::..::::SSS######:..::::#####\n" +
-                "####:::Q:::::#~~##:::::...:::SSS::###::.:#########\n" +
+                "####::::::####~~###::::..:::::::######:..::::#####\n" +
+                "####:::Q:::::#~~##:::::...::::::::###::.:#########\n" +
                 "###:::::::::::~~##::F:::..::::::::###:..:#########\n" +
                 "###:::::::::::HH:::::::::.:::::::::::..:::########\n" +
                 "###:::::::::::HH::#:::n::.:::::.....:..#:::::#####\n" +
@@ -945,7 +946,7 @@ namespace WordRPG.EditorTools
             var child = Npc("npc_child", "아이", 0,
                 new NpcStage("땅에 내 이름을 쓰는 중이에요. 첫 글자가… 음…", NpcMotionKind.Sit),
                 new NpcStage("첫 글자가 생각났어요! 그다음은…", NpcMotionKind.Sit, null, 25),
-                new NpcStage("두 글자까지 썼어요.", NpcMotionKind.Sit, null, 50),
+                new NpcStage("제 이름 두 글자가 생각났어요. 마지막 하나가 뭐였더라…", NpcMotionKind.Sit, null, 50), // #232 사용자
                 new NpcStage("이제 세 글자 다 썼어요!", NpcMotionKind.Wander, null, 75, 1.6f)); // 신나서 뛰어다님
             var librarian = Npc("npc_librarian", "사서", 0,
                 new NpcStage("쉿. 소리 내어 읽으면 도깨비들이 와요.", NpcMotionKind.Pace, null, 0, 0.55f), // 발소리를 죽여 살금살금
@@ -956,15 +957,20 @@ namespace WordRPG.EditorTools
             var mule = Npc("npc_mule", "노새", 23,
                 new NpcStage("히힝… 입가에 사과 조각이 붙어 있다.", NpcMotionKind.Stand));
             var frog = Npc("npc_frog", "개구리", 16,
-                new NpcStage("개굴. (표결 중인 것 같다)", NpcMotionKind.Hop));
+                new NpcStage("개굴! (다른 개구리들이 메아리처럼 따라 운다)", NpcMotionKind.Hop)); // #232 사용자: '표결 중'은 뜻이 안 와닿음
             var pilgrim = Npc("npc_pilgrim", "순례자", 0,
                 new NpcStage("강을 ___ 건너면 ___에 ___가 있어.", NpcMotionKind.Sit),
                 new NpcStage("강을 뗏목으로 건너면 동쪽 기슭에 열쇠가 있어.", NpcMotionKind.Pace, null, 60, 0.65f)); // 경건하게
+            // #232 사용자: 움직임이 이상함 → 가만히 서 있고, 말을 걸면 바라보기만
             var miner = Npc("npc_miner", "광부", 0,
-                new NpcStage("나가는 길은 저쪽으로 쭉 가서…", NpcMotionKind.Busy, null, 0, 1.2f), // 쉬지 않고 일함
-                new NpcStage("문장이 돌아왔어! 반딧돌을 다 밝히면 좋은 게 있대.", NpcMotionKind.Pace, cave, 0, 1.4f)); // 신이 나서 성큼성큼
+                new NpcStage("나가는 길은 저쪽으로 쭉 가서…", NpcMotionKind.Stand),
+                new NpcStage("동굴이 환해졌어! 다시 일할 수 있겠다!", NpcMotionKind.Stand, cave));
 
             SetNpcs(meadowPath, elder, chief, child);
+            // 서고 보스 뒤 [돌아가기]는 초원 시작 지점으로 (#232 사용자)
+            var librarySo = new SerializedObject(library);
+            Prop(librarySo, "returnAfterBoss").objectReferenceValue = Load(meadowPath);
+            librarySo.ApplyModifiedPropertiesWithoutUndo();
             SetNpcs(libraryPath, librarian);
             SetNpcs(forestPath, woodcutter, mule);
             SetNpcs(junglePath, frog, frog, frog, pilgrim);
@@ -974,11 +980,10 @@ namespace WordRPG.EditorTools
             SetMerchant("meadow_shop", Npc("npc_merchant_meadow", "잡화점 아주머니", 0, new NpcStage("", NpcMotionKind.Busy)),
                 "상처약 있어요, 상처약!", "거기 모험가님, 그냥 가시게요?", "풀숲 가기 전에 하나 챙겨 가요!");
             SetMerchant("forest_shop", Npc("npc_merchant_forest", "약초 할아버지", 0, new NpcStage("", NpcMotionKind.Stand)),
-                "이 숲에서 길 잃으면 약도 없어요! 약 사 가요!", "특제 상처약 막 들어왔어요!", "호기심 물약 한번 마셔 봐요. 새 단어가 쏟아진다니까!");
+                "이 숲에서 길 잃으면 약도 없어요! 약 사 가요!", "특제 상처약 막 들어왔어요!", "숲이 깊어요. 상처약 넉넉히 챙겨 가요!");
             SetMerchant("jungle_shop", Npc("npc_merchant_jungle", "원숭이 상인", 0, new NpcStage("", NpcMotionKind.Hop, null, 0, 1.5f)),
-                "끽끽! 뗏목 타기 전에 하나 챙겨요!", "끽! 살금살금 물약이 정글엔 필수라니까!", "끽! 여기가 제일 싸요, 정글에 여기밖에 없지만!");
-            SetMerchant("cave_shop", Npc("npc_merchant_cave", "떠돌이 상인", 0, new NpcStage("", NpcMotionKind.Stand)),
-                "여기까지 왔는데 빈손으로 가요?", "어둠 속에서 다치면 누가 구해 줘요? 상처약 사 가요!", "반딧돌 보러 가요? 약은 챙겼고요?");
+                "끽끽! 뗏목 타기 전에 하나 챙겨요!", "끽! 살금살금 물약이 정글엔 필수라니까!", "끽! 호기심 물약 마시면 새 단어가 쏟아진대요!",
+                "끽! 여기가 제일 싸요, 정글에 여기밖에 없지만!");
         }
 
         private static void SetMerchant(string shopId, NpcData merchant, params string[] pitches)

@@ -93,6 +93,23 @@ namespace WordRPG.Tests
             CollectionAssert.AreEqual(new[] { false, true }, quiz.Submitted, "숙련도에도 기록");
         }
 
+        // 살금살금 물약이 남아 있으면 강한 몬스터라도 바로 도망 (#232 사용자: 몰래 가다 부딪힌 전투). 보스전은 그대로 막힘
+        [Test]
+        public void SneakingLetsYouEscapeEvenAStrongMonster()
+        {
+            var (battle, _, quiz) = Start(1f, Species("goblin", FleeTier.Strong));
+            battle.SureEscape = true;
+            var events = battle.Flee();
+            Assert.AreEqual(BattlePhase.Fled, battle.Phase);
+            Assert.AreEqual(BattleEventType.Fled, events.Single().Type);
+            Assert.IsEmpty(quiz.AskedDirections, "문제 없음");
+
+            var hero = new Hero(TestData.Hero(new MonsterStats(100, 10, 10)), 5);
+            var boss = new BattleEngine(new ICombatant[] { hero }, new List<MonsterInstance> { new MonsterInstance(Species("king", FleeTier.Strong), 3) },
+                new FakeQuizProvider(), new BattleConfig(), new Random(1), canFlee: false) { SureEscape = true };
+            Assert.AreEqual(BattleEventType.FleeBlocked, boss.Flee().Single().Type, "보스전은 물약이 있어도 못 도망");
+        }
+
         [Test]
         public void DefeatedStrongMonsterNoLongerBlocks()
         {
