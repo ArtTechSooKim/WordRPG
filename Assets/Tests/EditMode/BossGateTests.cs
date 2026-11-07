@@ -41,6 +41,37 @@ namespace WordRPG.Tests
             for (int i = 0; i < count; i++) session.Vocabulary.Discover(area.Words.Words[i].Id, Now);
         }
 
+        // #233 사용자 ㉟ (동굴): 열쇠 받침대가 없고 반딧돌이 있는 지역은 반딧돌을 모두 밝히면 열림 — 단어 수 조건 없음.
+        // 예전 세이브에 남은 열쇠는 문이 열릴 때 치움
+        [Test]
+        public void AStoneGateOpensWhenEveryGlowStoneIsLit()
+        {
+            //  y=3  #..B..#
+            //  y=2  ##GGG##
+            //  y=1  #I..IP#   반딧돌 (1,1)·(4,1)
+            var area = Area(needWords: 99).Set("map", "#######\n#..B..#\n##GGG##\n#I..IP#\n#######").Set("theme", FieldTheme.Cave);
+            var session = Session();
+            session.Inventory.Add(area.BossKey); // 1.2에서 주운 열쇠
+            Assert.IsTrue(BossGate.OpensWithStones(area));
+            Assert.AreEqual(BossGateState.NeedStones, BossGate.State(area, session), "열쇠가 있어도 반딧돌이 먼저");
+            Assert.AreEqual(ObjectiveKind.LightStones, Objectives.Current(WithBattle(session), area).Kind);
+            GlowStones.Light(area, session.World, new Vector2Int(1, 1));
+            Assert.AreEqual(BossGateState.NeedStones, BossGate.State(area, session), "1/2");
+            Assert.IsFalse(BossGate.TryOpen(area, session));
+            GlowStones.Light(area, session.World, new Vector2Int(4, 1));
+            Assert.AreEqual(BossGateState.Ready, BossGate.State(area, session), "단어 수는 안 봄");
+            Assert.IsTrue(BossGate.TryOpen(area, session));
+            Assert.AreEqual(BossGateState.Open, BossGate.State(area, session));
+            Assert.AreEqual(0, session.Inventory.GetCount(area.BossKey), "남은 열쇠는 치움");
+            Assert.IsFalse(BossGate.OpensWithStones(Area()), "열쇠 받침대가 있는 지역은 원래대로");
+        }
+
+        private static GameSession WithBattle(GameSession session)
+        {
+            session.Record.RecordBattle(true, 1, 0);
+            return session;
+        }
+
         // 문을 열면 열쇠는 소지품에서 사라짐 (#147 사용자). 받침대는 빈 채로 — 다시 받지 못함
         [Test]
         public void OpeningTheGateUsesUpTheKey()
@@ -206,6 +237,16 @@ namespace WordRPG.Tests
                 }
                 checkedAreas++;
                 Assert.IsNotEmpty(gates, $"{area.name}: 보스 방 문(G)이 없음");
+                if (BossGate.OpensWithStones(area))
+                {
+                    // 반딧돌 문 (#233, 동굴): 모든 반딧돌에 문을 열기 전에 갈 수 있어야 함
+                    var shut = Flood(map, gateOpen: false);
+                    foreach (var stone in GlowStones.Stones(area))
+                        Assert.IsTrue(Touches(shut, stone), $"{area.name}: 문을 열기 전에 반딧돌 {stone}에 갈 수 없음");
+                    Assert.IsTrue(gates.Any(g => Touches(shut, g)), $"{area.name}: 문 앞에 갈 수 없음");
+                    Assert.IsFalse(Touches(shut, map.BossPosition.Value), $"{area.name}: 문을 안 열어도 보스에게 갈 수 있음");
+                    continue;
+                }
                 Assert.AreEqual(1, keys.Count, $"{area.name}: 열쇠 받침대(K)는 하나");
                 Assert.IsNotNull(area.BossKey, $"{area.name}: 열쇠 아이템(bossKey)이 비어 있음");
                 Assert.AreEqual(ItemKind.Key, area.BossKey.Kind, $"{area.name}: 열쇠 아이템 종류가 Key가 아님");

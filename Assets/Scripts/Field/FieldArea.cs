@@ -89,6 +89,8 @@ namespace WordRPG.Field
         [SerializeField] private string heroLine;
         [Tooltip("이긴 뒤 주인공 머리 위에 나오는 글. 다시 찾아가 [확인]해도 나옴")]
         [SerializeField] private string afterLine;
+        [Tooltip("필드에 서 있는 보스 그림 크기 (칸, 가로·세로). 0이면 B 칸 하나에 작게 (#233 사용자: 보스 방에 꽉 차게 — 위엄)")]
+        [SerializeField] private Vector2 fieldSize;
 
         public MonsterSpecies Species => species;
         public int Level => level;
@@ -97,6 +99,8 @@ namespace WordRPG.Field
         public string BossLine => bossLine ?? "";
         public string HeroLine => heroLine ?? "";
         public string AfterLine => afterLine ?? "";
+        public Vector2 FieldSize => fieldSize;
+        public bool StandsBig => fieldSize.x > 1.01f && fieldSize.y > 1.01f; // B 칸 하나보다 큰 그림으로 서 있음
 
         private BossEncounter() { } // Unity 직렬화용
 

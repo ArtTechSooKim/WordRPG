@@ -31,28 +31,37 @@ namespace WordRPG.UI
         {
             paywallArmed = false;
             var target = area.GetExit(cell).Target;
-            paywall.Show(store, entitlements, OfferFor(target), () =>
-                ShowToast($"정식판이 열렸어요! 이제 {UiKit.WithJosa(target.DisplayName, "으로", "로")} 들어갈 수 있어요.", 3f));
+            paywall.Show(store, entitlements, OfferFor(target, database), () => ShowUnlocked(target));
         }
 
         // 설정 > 정식판 (#63): 정식판이 필요한 지역(지금은 숲)의 안내를 어디서든 띄운다
         private void OpenFullVersionOffer(FieldArea target) =>
-            paywall.Show(store, entitlements, OfferFor(target), () =>
-                ShowToast($"정식판이 열렸어요! 이제 {UiKit.WithJosa(target.DisplayName, "으로", "로")} 들어갈 수 있어요.", 3f));
+            paywall.Show(store, entitlements, OfferFor(target, database), () => ShowUnlocked(target));
+
+        // 정식판이 열린 알림 + 그때 받은 특전 (#233)
+        private void ShowUnlocked(FieldArea target)
+        {
+            string gift = TakeGiftNotice();
+            ShowToast($"정식판이 열렸어요! 이제 {UiKit.WithJosa(target.DisplayName, "으로", "로")} 들어갈 수 있어요." + (gift.Length > 0 ? "\n" + gift : ""),
+                gift.Length > 0 ? 4.5f : 3f);
+        }
 
         // 정식판이 필요한 지역: 게임 데이터에서 (없으면 지금 지역의 출입구가 이어지는 곳에서)
         private FieldArea FullVersionArea()
         {
+            // 이야기 순서로 가장 앞 지역 (#233: 예전엔 목록 순서라 설정의 안내가 숲 대신 동굴로 나왔음)
+            FieldArea first = null;
             if (database != null)
                 foreach (var candidate in database.Areas)
-                    if (candidate != null && candidate.RequiresFullVersion) return candidate;
+                    if (candidate != null && candidate.RequiresFullVersion && (first == null || candidate.StoryOrder < first.StoryOrder)) first = candidate;
+            if (first != null) return first;
             foreach (var exit in area.Exits)
                 if (exit.Target != null && exit.Target.RequiresFullVersion) return exit.Target;
             return null;
         }
 
         // 안내 문구는 그 지역 데이터에서: 단어 수 · 몬스터·보스 · 성유물(상자·보스 보상)
-        private static PaywallOffer OfferFor(FieldArea target)
+        private static PaywallOffer OfferFor(FieldArea target, GameDatabase gameDatabase)
         {
             var offer = new PaywallOffer { AreaName = target.DisplayName };
             if (target.Words != null && target.Words.Words.Count > 0)
@@ -70,6 +79,8 @@ namespace WordRPG.UI
             if (relics.Count > 0)
                 offer.Lines.Add($"{target.DisplayName}의 성유물 {relics.Count}개 ({string.Join("·", relics.ConvertAll(r => r.DisplayName))})");
             offer.Lines.Add("앞으로 추가될 지역도 모두");
+            string gift = gameDatabase != null ? FullVersionGift.Describe(gameDatabase.FullVersionGift) : "";
+            offer.Lines.Add(gift.Length > 0 ? $"특전: {gift} · 모습 바꾸기" : "특전: 모습 바꾸기 (8가지 중 언제든)"); // #233 사용자 ⑨⑮
             foreach (var relic in relics) offer.Icons.Add(UiKit.RelicIcon(relic));
             return offer;
         }
@@ -81,6 +92,10 @@ namespace WordRPG.UI
             {
                 case BossGateState.NeedKey:
                     bubble.Say("열쇠가 필요한 것 같다", 3f);
+                    break;
+                case BossGateState.NeedStones:
+                    bubble.Say("반딧돌을 모두 밝히면 열릴 것 같다", 3.5f,
+                        $"반딧돌 {GlowStones.LitCount(area, session.World)} / {GlowStones.Stones(area).Count}");
                     break;
                 case BossGateState.NeedWords:
                     bubble.Say("보스를 상대하려면 새로운 단어로 힘을 모아야해", 4f,

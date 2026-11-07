@@ -162,6 +162,8 @@ MonoBehaviour:
     afterLine: "\uC774\uC815\uD45C\uAC00 \uC81C\uC790\uB9AC\uB97C \uCC3E\uC558\uB2E4.\n\uC232
       \uAE4A\uC740 \uACF3\uC5D0\uC11C \uC624\uB798\uB41C \uBA54\uC544\uB9AC\uAC00
       \uB4E4\uB9B0\uB2E4."
+    fieldSize: {x: 5, y: 5}
+  returnAfterBoss: {fileID: 0}
   bossKey: {fileID: 11400000, guid: f7d1bd7717ac67f4bb0ce50b193977b0, type: 2}
   bossGateWords: 40
   shrineCompanion: {fileID: 0}

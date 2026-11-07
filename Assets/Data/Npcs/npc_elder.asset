@@ -33,3 +33,7 @@ MonoBehaviour:
   - "\uC0D8\uBB3C\uC740 \uB545 \uBC11\uC73C\uB85C \uB2E4 \uC774\uC5B4\uC838 \uC788\uC9C0.
     \uC61B\uB0A0\uC5D4 \uB2E4\uB4E4 \uC774\uB807\uAC8C \uB2E4\uB154\uC5B4."
   - "\uC58D!"
+  entryLines: []
+  bossThanksLines: []
+  exitCallLines: []
+  exitStoryLines: []

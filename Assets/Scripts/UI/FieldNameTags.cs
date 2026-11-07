@@ -24,6 +24,7 @@ namespace WordRPG.UI
 
         private readonly RectTransform layer;
         private readonly List<Tag> tags = new List<Tag>();
+        private Func<Vector2Int, float> topOf; // 칸 아래 변에서 이름표 꼬리까지 높이 (칸) — 크게 선 보스는 머리 위 (#233)
 
         private FieldNameTags(RectTransform layer)
         {
@@ -51,8 +52,9 @@ namespace WordRPG.UI
 
         // 지역이 바뀌면 이름표를 다시 만든다 (이름이 없는 칸 — 연결 안 된 출입구 등 — 은 건너뜀).
         // lockedDoor: 잠긴 출입구는 '숲 · 잠김'처럼 표시
-        public void SetArea(FieldArea area, Func<Vector2Int, bool> lockedDoor = null)
+        public void SetArea(FieldArea area, Func<Vector2Int, bool> lockedDoor = null, Func<Vector2Int, float> top = null)
         {
+            topOf = top;
             foreach (var tag in tags) UnityEngine.Object.Destroy(tag.Root.gameObject);
             tags.Clear();
             foreach (var cell in FieldInteraction.Landmarks(area.Map))
@@ -83,7 +85,7 @@ namespace WordRPG.UI
                 if (tag.Group.alpha <= 0f) continue;
 
                 // 오브젝트 칸의 윗변 가운데 → 꼬리 끝이 거기에 오게
-                var world = new Vector3(tag.Cell.x + 0.5f, tag.Cell.y + 1f, 0f);
+                var world = new Vector3(tag.Cell.x + 0.5f, tag.Cell.y + (topOf != null ? topOf(tag.Cell) : 1f), 0f);
                 var screen = cam.WorldToScreenPoint(world);
                 if (RectTransformUtility.ScreenPointToLocalPointInRectangle(layer, screen, canvasCamera, out var local))
                     tag.Root.anchoredPosition = local + new Vector2(0f, PointerSize / 2f + 2f);

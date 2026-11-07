@@ -208,4 +208,34 @@ namespace WordRPG.Tests
             }
         }
     }
+    // #234 사용자 ⑲: 숲 나무꾼 컷씬 — 길 찾기와 실제 대사 데이터
+    public class NpcCutsceneTests
+    {
+        [Test]
+        public void PathToGoesAroundWalls()
+        {
+            //  y=2  #....#
+            //  y=1  #.##.#
+            //  y=0  ######  (맵 밖은 벽)
+            var map = FieldMap.Parse("######\n#P...#\n#.##.#\n######"); // P = 시작 칸 (걸을 수 있음)
+            var path = FieldReach.PathTo(map, new Vector2Int(1, 1), new Vector2Int(4, 1), map.IsWalkable);
+            Assert.AreEqual(new Vector2Int(4, 1), path.Last(), "목표까지");
+            Assert.AreEqual(5, path.Count, "벽을 돌아 위로 (시작 칸은 빼고)");
+            Assert.IsFalse(path.Contains(new Vector2Int(2, 1)), "벽은 지나지 않음");
+            Assert.IsEmpty(FieldReach.PathTo(map, new Vector2Int(1, 1), new Vector2Int(1, 1), map.IsWalkable), "제자리면 빈 길");
+            Assert.IsEmpty(FieldReach.PathTo(map, new Vector2Int(1, 1), new Vector2Int(4, 1), cell => cell == new Vector2Int(1, 1)), "못 가면 빈 길");
+        }
+
+        [Test]
+        public void TheForestWoodcutterBriefsAndSeesTheHeroOff()
+        {
+            var forest = AssetDatabase.LoadAssetAtPath<FieldArea>("Assets/Data/Areas/forest.asset");
+            var woodcutter = forest.Npcs.Single(npc => npc.NpcId == "npc_woodcutter");
+            Assert.IsTrue(woodcutter.BriefsOnEntry, "숲에 처음 들어오면 알려 줌");
+            Assert.IsTrue(woodcutter.SeesOffAfterBoss, "헷갈너구리 뒤 배웅");
+            CollectionAssert.AreEqual(new[] { "이정표가 돌아왔군!", "고맙네. 덕분에 이제 길을 헷갈릴 일이 없겠어." }, woodcutter.BossThanksLines, "사용자가 정한 말");
+            Assert.AreEqual("행운을 빌겠네!", woodcutter.ExitStoryLines.Last());
+            Assert.AreEqual(1, forest.Npcs.Count(npc => npc.BriefsOnEntry), "숲에 알려 주는 인물은 하나");
+        }
+    }
 }

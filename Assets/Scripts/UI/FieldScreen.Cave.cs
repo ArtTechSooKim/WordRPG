@@ -158,14 +158,56 @@ namespace WordRPG.UI
             Sound.PlayJingle(Sfx.DexComplete);
             darkness.Refresh();
             bubble.Say("반딧돌을 모두 밝혔다!\n동굴 천장의 반딧불이 깨어났다", 4f);
-            if (stoneRelic == null) yield break;
-            // 모두 밝힌 보상 (#115): 반딧불이 깨어난 뒤 성유물 (상자에서 얻을 때와 같은 알림)
-            var relic = stoneRelic;
-            stoneRelic = null;
-            yield return WaitUnscaled(1.6f);
-            Sound.Play(Sfx.Evolve);
-            ShowToast($"성유물 '{relic.Data.DisplayName}'을(를) 손에 넣었다!\n" + RelicHint(relic), 3.5f);
-            RefreshHud();
+            bool gotRelic = stoneRelic != null;
+            if (gotRelic)
+            {
+                // 모두 밝힌 보상 (#115): 반딧불이 깨어난 뒤 성유물 (상자에서 얻을 때와 같은 알림)
+                var relic = stoneRelic;
+                stoneRelic = null;
+                yield return WaitUnscaled(1.6f);
+                Sound.Play(Sfx.Evolve);
+                ShowToast($"성유물 '{relic.Data.DisplayName}'을(를) 손에 넣었다!\n" + RelicHint(relic), 3.5f);
+                RefreshHud();
+            }
+            if (BossGate.OpensWithStones(area) && BossGate.State(area, session) == BossGateState.Ready)
+            {
+                yield return WaitUnscaled(gotRelic ? 3.5f : 2f); // 성유물 알림을 먼저 읽게
+                yield return OpenStoneGate();
+            }
+        }
+
+        // 반딧돌을 다 밝히면 (#233 사용자 ㉟): 카메라가 잠긴 보스 방 문으로 가서 문이 열리는 모습을 보여 주고 돌아옴
+        public int StoneGatesOpened { get; private set; } // 테스트용
+
+        private IEnumerator OpenStoneGate()
+        {
+            if (!BossGate.TryOpen(area, session)) yield break;
+            StoneGatesOpened++;
+            SaveNow();
+            transitioning = true;
+            var cells = BossGate.Cells(area);
+            var center = Vector3.zero;
+            foreach (var cell in cells) center += CellCenter(cell);
+            center /= cells.Count;
+            yield return PanCamera(center, 0.8f);
+            yield return WaitUnscaled(0.3f);
+            foreach (var gate in cells)
+            {
+                tilemap.SetTile(new Vector3Int(gate.x, gate.y, 0), TileFor(FieldTile.Gate, true));
+                StartCoroutine(FieldFx.Play(transform, CellCenter(gate), Fx.Sparkle, 1.3f, animationScale, 16, tint: new Color(0.6f, 0.92f, 1f)));
+            }
+            Sound.PlayJingle(Sfx.GateOpen);
+            ShowToast("보스 방 문이 열렸다!", 2.5f);
+            AfterFieldChange();
+            yield return WaitUnscaled(1.4f);
+            yield return PanCamera(null, 0.6f);
+            transitioning = false;
+        }
+
+        // 예전 세이브 (1.2에서 반딧돌을 다 밝혔지만 문은 안 연 사람): 지역에 들어오면 조용히 열어 둠
+        private void OpenStoneGateIfAllLit(FieldArea newArea)
+        {
+            if (BossGate.OpensWithStones(newArea) && BossGate.State(newArea, session) == BossGateState.Ready) BossGate.TryOpen(newArea, session);
         }
 
         public int StonesLit { get; private set; } // 이번에 밝힌 반딧돌 수 (테스트용)

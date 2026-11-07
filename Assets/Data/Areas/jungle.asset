@@ -268,7 +268,7 @@ MonoBehaviour:
   exits:
   - target: {fileID: 11400000, guid: 3eaceaca8882957449f036b992066ba9, type: 2}
     targetDoorIndex: 0
-    openedByBossOf: {fileID: 0}
+    openedByBossOf: {fileID: 11400000}
   - target: {fileID: 11400000, guid: a3e19a296f3df11468a130c5e27e87f5, type: 2}
     targetDoorIndex: 0
     openedByBossOf: {fileID: 0}
@@ -282,6 +282,8 @@ MonoBehaviour:
     heroLine: "\uBE48\uCE78\uC740 \uB05D\uC774 \uC544\uB2C8\uC57C. \uB2E4\uC2DC \uCC44\uC6B8
       \uC218 \uC788\uC5B4."
     afterLine: "\uC815\uAE00\uC5D0 \uBA54\uC544\uB9AC\uAC00 \uB3CC\uC544\uC654\uB2E4."
+    fieldSize: {x: 6, y: 6}
+  returnAfterBoss: {fileID: 0}
   bossKey: {fileID: 11400000, guid: 3754fc86bfc73ef42af9f87a064dbd92, type: 2}
   bossGateWords: 80
   shrineCompanion: {fileID: 11400000, guid: 52ba6ccb4d7a2cf44b9de8c5f1a97d8f, type: 2}

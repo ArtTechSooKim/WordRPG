@@ -168,11 +168,54 @@ namespace WordRPG.UI
             session.Tutorials.Mark(TutorialProgress.Goal);
             SaveNow();
             if (boss == null) yield break;
+            if (database != null && goal.Destination != SpringWarp.FirstBossArea(database.Areas)) yield break; // #234: 숲 등은 그 지역 인물이 알려 줌
             yield return new WaitForSecondsRealtime(0.3f * animationScale);
+            // 목표 한 줄을 막 위로 올려 [확인]을 누를 때까지 글자·별이 밝아졌다 어두워졌다 (#233 사용자: 글을 안 읽어도 어디를 보라는지 알게)
+            int order = objectivePill.GetSiblingIndex();
+            objectivePill.SetAsLastSibling();
+            ObjectivePulsing = true;
+            var pulse = StartCoroutine(PulseObjective());
             yield return pauseTutorial.Tell(new[]
             {
                 $"목표는 {goal.Destination.DisplayName}의 {UiKit.WithJosa(boss.DisplayName, "을", "를")} 물리치는 것입니다!\n미니맵 아래 목표 한 줄이 길을 알려 줘요."
             });
+            StopCoroutine(pulse);
+            ObjectivePulsing = false;
+            ResetObjectiveGlow();
+            objectivePill.SetSiblingIndex(order);
+        }
+
+        public bool ObjectivePulsing { get; private set; } // 테스트용
+
+        // 시간이 멈춘 안내 중이라 실제 시간으로. 한 번 밝아졌다 어두워지는 데 1초
+        private IEnumerator PulseObjective()
+        {
+            while (true)
+            {
+                SetObjectiveGlow(Mathf.PingPong(Time.unscaledTime * 2f, 1f));
+                yield return null;
+            }
+        }
+
+        // glow 0 = 어둡게, 1 = 가장 밝게 (글자는 흐린 흰색 → 금빛 흰색, 별은 어두운 금색 → 밝은 금색 + 살짝 커짐)
+        private void SetObjectiveGlow(float glow)
+        {
+            objectiveText.color = Color.Lerp(new Color(0.6f, 0.62f, 0.7f), new Color(1f, 0.96f, 0.72f), glow);
+            SetStar(Color.Lerp(Palette.Gold * new Color(0.55f, 0.55f, 0.55f, 1f), new Color(1f, 0.95f, 0.55f), glow), 1f + 0.25f * glow);
+        }
+
+        private void ResetObjectiveGlow()
+        {
+            objectiveText.color = Palette.Text;
+            SetStar(Palette.Gold, 1f);
+        }
+
+        private void SetStar(Color color, float scale)
+        {
+            var star = objectivePill.Find("Star");
+            if (star == null) return;
+            star.GetComponent<UnityEngine.UI.Text>().color = color;
+            star.localScale = Vector3.one * scale;
         }
     }
 }

@@ -160,6 +160,7 @@ MonoBehaviour:
       \uC6B0\uB9AC \uAC83\uC774\uC57C."
     afterLine: "\uCC45 \uC18D\uC758 \uAE00\uC790\uAC00 \uB3CC\uC544\uC654\uB2E4.\n\uD558\uC9C0\uB9CC
       \uBA87 \uD398\uC774\uC9C0\uB294 \uB204\uAD70\uAC00 \uC77C\uBD80\uB7EC \uB72F\uC5B4\uB0C8\uB2E4."
+    fieldSize: {x: 5, y: 5}
   returnAfterBoss: {fileID: 11400000, guid: a2d06106feb91f048ad3b3d9f1f26ff0, type: 2}
   bossKey: {fileID: 11400000, guid: e2d52f7fbc559d2459414dddf06ac7b5, type: 2}
   bossGateWords: 40

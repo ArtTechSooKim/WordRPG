@@ -35,7 +35,7 @@ MonoBehaviour:
 
     ######:::::::#####:::::::::::::::#####:::::::#####
 
-    #######:::::#######::::::::::::::###C::::::K::####
+    #######:::::#######::::::::::::::###C:::::::::####
 
     ########:::########::::::::::::#####:::::::::::###
 
@@ -206,6 +206,8 @@ MonoBehaviour:
     afterLine: "\uB9C8\uC9C0\uB9C9 \uBB38\uC7A5\uC774 \uC644\uC131\uB410\uB2E4.\n'\uC0AC\uB9C9
       \uC544\uB798\uC758 \uCCAB \uAE30\uB85D'\uC774\uB77C\uB294 \uB9D0\uC774 \uC801\uD600
       \uC788\uB2E4."
+    fieldSize: {x: 5, y: 6}
+  returnAfterBoss: {fileID: 0}
   bossKey: {fileID: 11400000, guid: 6b549213061020449b26370e0467ef0f, type: 2}
   bossGateWords: 120
   shrineCompanion: {fileID: 0}

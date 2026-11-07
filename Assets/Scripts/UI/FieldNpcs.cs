@@ -74,6 +74,13 @@ namespace WordRPG.UI
         }
 
         public void Destroy() => UnityEngine.Object.Destroy(body.gameObject);
+
+        // 컷씬이 직접 걸릴 때 (#234): 바라보는 쪽 + 걷기 그림 몇 번째
+        public void PoseWalking(Direction facing, int frame)
+        {
+            if (Data.IsAnimal) return;
+            body.sprite = sheet.Get(facing, frame);
+        }
     }
 
     public class FieldNpcs

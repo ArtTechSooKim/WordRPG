@@ -80,3 +80,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: eef2fb082a5a0ae4b8da35987d1ae574, type: 2}
   companions:
   - {fileID: 11400000, guid: 52ba6ccb4d7a2cf44b9de8c5f1a97d8f, type: 2}
+  fullVersionGift:
+  - item: {fileID: 11400000, guid: d06f0e6a146e8d7419259d713eb87c86, type: 2}
+    count: 3
+  - item: {fileID: 11400000, guid: 5d1c837450b64c04db0b503c5b52edfe, type: 2}
+    count: 5

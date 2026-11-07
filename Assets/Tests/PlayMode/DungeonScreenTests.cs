@@ -359,7 +359,7 @@ namespace WordRPG.Tests
             yield return null;
         }
 
-        // #232 사용자: 서고 보스(까먹깨비)를 이기고 [돌아가기]를 고르면 초원 시작 지점으로 — 던전을 깨면 마을로 돌아가는 게 당연함
+        // #232 사용자: 서고 보스(까먹대왕)를 이기고 [돌아가기]를 고르면 초원 시작 지점으로 — 던전을 깨면 마을로 돌아가는 게 당연함
         [UnityTest]
         public IEnumerator DungeonBossVictoryReturnsToTheVillageStart()
         {

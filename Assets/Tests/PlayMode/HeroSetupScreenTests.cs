@@ -153,6 +153,29 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // #233 사용자: 처음 강도 고르기가 나온 전투가 끝나면 '설정에서 전투 강도를 정할 수 있어요!' — 설정을 열어 보면 끝, 다시 안 나옴
+        [UnityTest]
+        public IEnumerator AfterTheFirstIntensityBattleTheSettingsButtonIsPointedOut()
+        {
+            var session = NewSession();
+            session.Record.RecordBattle(true, 3, 0);
+            foreach (var id in TutorialProgress.All.Where(id => id != TutorialProgress.IntensitySetting)) session.Tutorials.Mark(id);
+            session.Tutorials.Mark(TutorialProgress.Intro);
+            session.Hero.SetLook("knight");
+            session.Hero.Rename("아린");
+            var field = CreateField(session);
+            yield return WaitFor(() => field.Guide != null && field.Guide.IsShowing, 2f);
+            StringAssert.Contains("설정에서 전투 강도를 정할 수 있어요", field.Guide.CurrentText);
+            var hud = field.transform.Find("FieldHud/SafeArea");
+            FindButton(hud, "SettingsButton").onClick.Invoke();
+            yield return null;
+            yield return null;
+            Assert.IsFalse(field.Guide.IsShowing, "설정을 열어 보면 끝");
+            Assert.IsTrue(session.Tutorials.Has(TutorialProgress.IntensitySetting), "다시 안 나옴");
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
         // #138 설정 > [입장 영상 다시 보기]: 설정을 닫고 영상, 그동안 필드는 멈춤, 끝나면 필드로. 몇 번이든 다시 볼 수 있음
         [UnityTest]
         public IEnumerator SettingsCanReplayTheIntroAnyTime()
@@ -328,9 +351,25 @@ namespace WordRPG.Tests
             FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
             yield return WaitFor(() => field.PauseTutorial.IsShowing, 3f);
             StringAssert.Contains("목표는 잊혀진 서고의 까먹대왕을 물리치는 것입니다", field.PauseTutorial.Message);
+            // #233 사용자: 안내하는 동안 목표 한 줄이 막 위에서 밝아졌다 어두워졌다
+            var objective = field.transform.GetComponentsInChildren<RectTransform>(true).First(r => r.name == "Objective");
+            Assert.IsTrue(field.ObjectivePulsing);
+            Assert.AreEqual(objective.parent.childCount - 1, objective.GetSiblingIndex(), "목표 한 줄이 맨 위 (어두운 막보다 위)");
+            var star = objective.Find("Star");
+            float smallest = 9f, largest = 0f;
+            for (float t0 = Time.realtimeSinceStartup; Time.realtimeSinceStartup - t0 < 0.6f;)
+            {
+                smallest = Mathf.Min(smallest, star.localScale.x);
+                largest = Mathf.Max(largest, star.localScale.x);
+                yield return null;
+            }
+            Assert.Greater(largest - smallest, 0.08f, "별이 커졌다 작아졌다");
             ActiveButton(field.transform, "TutorialNextButton").onClick.Invoke();
             yield return null;
             Assert.IsFalse(field.PauseTutorial.IsShowing);
+            Assert.IsFalse(field.ObjectivePulsing);
+            Assert.AreEqual(1f, star.localScale.x, 0.001f, "닫으면 원래대로");
+            Assert.Less(objective.GetSiblingIndex(), objective.parent.childCount - 1, "원래 순서로");
             Assert.IsTrue(session.Tutorials.Has(TutorialProgress.Goal), "한 번만");
             Object.Destroy(field.gameObject);
             yield return null;

@@ -66,7 +66,7 @@ namespace WordRPG.Tests
             CollectionAssert.AreEqual(new[] { "meadow", "library", "forest", "jungle" }, list.Select(area => area.AreaId));
         }
 
-        // #232 사용자: 샘 길은 서고 보스(까먹깨비)를 물리친 뒤에 열림 — 그 전엔 샘을 봤어도 갈 곳 없음 (어르신이 알려 주는 이야기 순서)
+        // #232 사용자: 샘 길은 서고 보스(까먹대왕)를 물리친 뒤에 열림 — 그 전엔 샘을 봤어도 갈 곳 없음 (어르신이 알려 주는 이야기 순서)
         [Test]
         public void SpringsOpenOnlyAfterTheFirstBoss()
         {

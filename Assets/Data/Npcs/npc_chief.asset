@@ -28,3 +28,7 @@ MonoBehaviour:
     pace: 1
   springLeapAfter: {fileID: 0}
   springLeapLines: []
+  entryLines: []
+  bossThanksLines: []
+  exitCallLines: []
+  exitStoryLines: []

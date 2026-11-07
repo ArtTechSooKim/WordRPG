@@ -184,6 +184,7 @@ namespace WordRPG.UI
             altarView = RelicAltarView.Create(hudRoot, animationScale);
             shopView = ShopView.Create(hudRoot);
             inventoryView = InventoryView.Create(hudRoot);
+            inventoryView.ChangeLook = ChangeLook;
             settingsView = SettingsView.Create(hudRoot);
             mapView = MapView.Create(hudRoot);
             learnView = SkillLearnView.Create(hudRoot);
@@ -405,6 +406,17 @@ namespace WordRPG.UI
         {
             if (!showTutorials || guide.IsShowing || fieldTutorialRunning) return;
             if (MaybeStartAltarGuide()) return;
+            if (session.Tutorials.Has(TutorialProgress.Intensity) && !session.Tutorials.Has(TutorialProgress.IntensitySetting))
+            {
+                // 처음 강도 고르기가 나온 전투가 끝나면 한 번 (#233 사용자 ⑬): 설정 버튼을 톡톡 — 설정을 열어 보면 끝
+                int opened = SettingsOpened;
+                StartCoroutine(guide.Run(session, TutorialProgress.IntensitySetting, new GuideHints.Hint
+                {
+                    Text = "설정에서 전투 강도를 정할 수 있어요!", Target = () => menuRect.Find("SettingsButton") as RectTransform,
+                    Gesture = GuideHints.Gesture.Tap, DoneWhen = () => SettingsOpened > opened
+                }, SaveNow));
+                return;
+            }
             if (confirmReady && SpringGuideDue())
             {
                 // #223 사용자: 이야기는 주인공이 스스로 알아채는 혼잣말 + [확인] 안내
@@ -627,9 +639,35 @@ namespace WordRPG.UI
             if (relicGuide) StartCoroutine(RelicBagGuide(swapGuide));
         }
 
+        public int SettingsOpened { get; private set; } // 테스트·안내용
+
+        // 모습 바꾸기 (#233 사용자 ⑮: 정식판이면 8명 중 언제든 — 아낄 기능이 아님). 무료판은 정식판 안내
+        public bool CanChangeLook => entitlements == null || entitlements.HasFullVersion; // 테스트(결제 없음)는 열림
+
+        private void ChangeLook()
+        {
+            if (!CanChangeLook)
+            {
+                var full = FullVersionArea();
+                if (full != null) OpenFullVersionOffer(full);
+                return;
+            }
+            characterSelect.ShowChange(session.Hero.Data.Looks, session.Hero.LookOrDefault, id =>
+            {
+                session.Hero.SetLook(id);
+                PlayerArt.SetLook(session.Hero.LookOrDefault);
+                if (!moving) playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
+                SaveNow();
+                inventoryView.RefreshHero();
+                RefreshHud();
+                ShowToast("모습을 바꿨어요!", 2f);
+            }, () => { });
+        }
+
         private void OpenSettings()
         {
             if (!CanOpenMenu) return;
+            SettingsOpened++;
             var full = FullVersionArea();
             settingsView.Show(settings, () =>
             {

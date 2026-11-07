@@ -61,7 +61,8 @@
    - 업데이트 안내 (#115): `UpdateNotices`(세이브 칸 notices) — 예전 세이브로 켠 사람(= 업데이트한 사람)만 타이틀에서 한 번 (`TitleScreen.ShowUpdateNotice`,
      `ConfirmDialog.ShowNotice` [확인] 하나). 새 게임은 모두 본 것으로 시작, 튜토리얼과 따로. 다음 업데이트 안내는 `UpdateNotices.All` 맨 뒤에 새 id로 (지금 1.2 동굴 · 1.3 인물 #213 — 이스터에그는 안내에 쓰지 않음)
    - 말을 잃어 가는 사람들 = NPC (#209, GDD 9-10): 맵 글자 N(바닥)·n(잔디) = 서는 자리 (칸 종류는 바닥·잔디, `FieldMap.NpcSpots`), FieldArea `npcs`를 맵 순서로. 데이터 `NpcData`(npcId, 출시 뒤 바꾸지 말 것) + 단계 `NpcStage`(조건 = 보스 처치·찾은 단어 수 → 말·움직임·빠르기 `pace` #211 — 1 = 보통, 성격에 맞게), 규칙 `NpcLines`·`NpcMotion`(순수), 화면 `FieldNpcs`·`FieldScreen.Npcs`. 세이브 칸 없음.
-     그림 Art/NinjaAdventure/Npcs/{npcId}.png (import_ninja_art.py NPC_SHEETS). 대사는 말풍선 한두 줄, 목표·보상·빨간 점 없음 (사용자). 데이터 기준 = `SampleDataBuilder.BuildNpcs`
+     그림 Art/NinjaAdventure/Npcs/{npcId}.png (import_ninja_art.py NPC_SHEETS). 대사는 말풍선 한두 줄, 목표·보상·빨간 점 없음 (사용자). 데이터 기준 = `SampleDataBuilder.BuildNpcs`.
+     인물 컷씬 (#234 숲 나무꾼): NpcData `entryLines`(그 지역에 처음 들어오면 달려와 알려 줌) · `bossThanksLines`·`exitCallLines`·`exitStoryLines`(보스 뒤 보스가 연 길 옆에서 배웅) → `FieldScreen.Cutscenes`, 한 번만 = WorldState 이벤트
    - 상점 가판대 (#210): 맵의 이어진 S 칸 = 가판대 하나 (`FieldMap.ShopBlocks`, 지금 3×2, 상인·이름표는 윗줄 가운데). 그림 Tiles/{테마}_Stall_back·front·roof.png (`python Tools/make_shop_stalls.py`, 차양은 주인공 위). ShopData `merchant`(NpcData — 첫 단계 움직임만)·`pitches`(호객 말, 규칙 `ShopPitch`). 새 지역 상점도 같은 모양으로
    - 보스 대사 (#207): BossEncounter `bossLine`·`heroLine`·`afterLine` (`SampleDataBuilder.SetBossLines`, 규칙 `BossLines.Intro`). 새 보스를 만들면 셋 다 필요 (BossLinesTests). 글 기준 = 스토리 문서
    - 누군가의 기록 (#201, 이스터에그 — 설계 `Docs/GameStory/누군가의기록_설계.md`): 단어장마다 기록 하나 (WordDatabase `journal`, ItemKind.Journal). 상자에서 얻어 도감에서 연다 (`DexView` → `JournalView`).
@@ -72,6 +73,7 @@
    - **수익화** (GDD 9-3): 산 상품(`Entitlements`, 정식판 id `com.arttechsoo.wordrpg.full` — 바꾸지 말 것)도 세이브가 아니라 PlayerPrefs.
      결제는 `IStore`(실제 `UnityIapStore` = Unity IAP 5 — 앱스토어·구글플레이, 상품 id 같음, 구매 복원 흐름은 스토어마다 다름 #149, 계정 이름 문구 `StoreLabels`, 테스트는 가짜 — `GameManager.StoreOverride`/`FieldScreen.Configure`).
      정식판이 필요한 지역은 FieldArea `requiresFullVersion` (숲·정글·동굴) → 입구에서 `PaywallView`, 어디서든 설정 > 정식판(보기·구매 복원).
+     정식판 특전 (#233): GameDatabase `fullVersionGift`(호기심 물약 3 · 특제 상처약 5) → `FullVersionGift.Claim` 세이브마다 한 번(WorldState 이벤트), 정식판이면 가방 > 주인공 [모습 바꾸기] (`FieldScreen.ChangeLook`).
      앱 버전(PlayerSettings.bundleVersion)은 앱스토어 버전과 같아야 함 (지금 main = **1.3 준비 중**, **1.3 출시·고침은 가지 `release-1.3`** — #212 사용자: 1.4로 나누지 않고 NPC·상점까지 1.3에. 가지는 내기 전과 2.0 코드를 넣기 전에 main까지 올림, 앱 버전 1.3 (#221 — AI 곡 포함, 사용자 결정). **1.2 고침은 가지 `release-1.2`**(태그 v1.2-build3에서 뜸 #164)에서. **1.1 출시·고침은 가지 `release-1.1`**에서 빌드하고
      고친 것은 main에도 합침 — main에서 1.1을 빌드하지 말 것. 1.0 심사 코드는 태그 v1.0-build3, 1.0을 고쳐 다시 내야 하면 그 태그에서 가지를 땀). 지원·개인정보 웹 페이지 = `gh-pages` 브랜치 (작업메모)
    - 새 단어장은 regionId·regionName·도감 보상 `rewards`(`DexReward` 한 줄 = 보상 id·이름·징표(종류 Keepsake)·골드·wordsNeeded(0 = 다 채웠을 때)·storyOrder(징표 진열장 순서) — #147. 보상 id는 세이브에 적히니 출시 뒤 바꾸지 말 것)를 지정해야 함 (RegionDataTests가 검사)
@@ -81,7 +83,7 @@
    - 샘으로 다른 지역 가기 (#216, GDD 9-11): 샘 옆 [확인] → 회복 + 다른 지역의 샘으로 (규칙 `SpringWarp`, 화면 `FieldScreen.Springs`·`SpringWarpView`, 쏙 들어갔다 나오는 연출·안내 `TutorialProgress.Spring` #217 — 이야기 글은 창에 쓰지 말 것, 사용자. 이야기 = 주인공 혼잣말 + 초원 어르신이 샘으로 뛰어드는 1회 컷씬 #223: NpcData `springLeapAfter`·`springLeapLines`, 규칙 `SpringLeap`, 세이브 `WorldState.events` — 한 번만 일어난 일 목록). 갈 곳 = 이미 본 샘(탐험 기록 — 세이브 칸 없음) + 정식판, 첫 보스(서고) 뒤에만 (#232 `SpringWarp.IsOpen`). 보스를 이긴 뒤 [돌아가기] 갈 곳 = FieldArea `returnAfterBoss` (서고 → 초원 #232). 샘은 지역마다 하나, 문·다리 밖 쉼터에 (SpringWarpTests). 새 지역은 FieldArea `storyOrder` 필수 (`SampleDataBuilder.SetStoryOrder`). 게임 안에서는 '샘'이라고만 — '이정표'는 큰 지역 안의 빠른 이동, 따로 (사용자)
    - 맵 글자 'L' = 사전 받침대: 보스가 있는 맵마다 쉼터에 하나, FieldArea `dictionaryName` 필수 (BossDictionaryTests). 하루 한 번 읽기 = `BossDictionary`
    - 맵 글자 'G' = 보스 방 문, 'K' = 열쇠 받침대 (#76): 보스가 있는 맵마다 G 한 덩어리(가운데 칸에 이름표)·K 하나 + FieldArea `bossKey`(종류 Key)·`bossGateWords`(40).
-     열쇠 + 그 단어장 단어 N개 발견 → [확인]으로 열림 (규칙 `BossGate`, 세이브 `WorldState.openedGates`). 열면 열쇠는 소지품에서 사라짐 (#147 — 받침대는 `BossGate.KeyTaken`, 예전 세이브는 불러올 때 `DiscardUsedKey`). 열쇠는 문 밖, 보스는 문 안에서만 닿아야 함 (BossGateDataTests)
+     열쇠 + 그 단어장 단어 N개 발견 → [확인]으로 열림 (규칙 `BossGate`, 세이브 `WorldState.openedGates`). 열면 열쇠는 소지품에서 사라짐 (#147 — 받침대는 `BossGate.KeyTaken`, 예전 세이브는 불러올 때 `DiscardUsedKey`). 열쇠는 문 밖, 보스는 문 안에서만 닿아야 함 (BossGateDataTests). 반딧돌 문 (#233, 동굴): K가 없고 반딧돌 I가 있으면 다 밝히는 순간 열림 (`BossGate.OpensWithStones`, 카메라 연출 `FieldScreen.OpenStoneGate`). 보스 그림 크기 = BossEncounter `fieldSize`(칸, #233)
    - 맵 글자 ':' = 잔디(걸을 수 있고 조우 없음). 출입구 연결(AreaExit)의 openedByBossOf = 그 지역 보스를 물리쳐야 열림 →
      보스를 이기면 FieldScreen이 카메라로 그 출입구를 보여 주는 연출(GateCutscene). 잠긴 길은 진짜 보스가 열어야 함 (GateDataTests)
    - 맵 원본은 SampleDataBuilder의 MeadowMap·LibraryMap·ForestMap·JungleMap·CaveMap 상수. 이미 있는 에셋은 Create Sample Data가 덮어쓰지 않으므로
@@ -96,7 +98,7 @@
    - 정글 맵 글자 (#80, 1.1): '>' '<' '^' 'v' 얕은 강(걸을 수 있음, 물살 방향으로 걸으면 빨라짐 — `FieldMap.StreamDirection/IsWithStream`) ·
      'J' 나루터(여기서 깊은 강 쪽으로 가면 뗏목 — `FieldWalker.Rafting`, 뗏목이 다니는 물 = 나루터에 이어진 물 `FieldMap.IsRaftWater`, 세이브 `WorldState.Rafting`.
      #121부터 2×2 나무 부두(뭍 한 줄 + 물 쪽 한 줄): 그림 Jungle_Dock_auto(물 쪽만 말뚝), 이름표·묶인 뗏목은 부두마다 하나 `FieldMap.DockGroup`·`MooringSpots`) ·
-     'Y' 레버 → 가장 가까운 'H' 덩굴 다리가 놓임(`FieldMap.BridgeOf`, 규칙 `Levers`, 세이브 pulledLevers) · 'U' 유적 돌벽 · ';' 유적 바닥 ·
+     'Y' 레버 → 가장 가까운 'H' 덩굴 다리가 놓임(`FieldMap.BridgeOf`, 규칙 `Levers`, 세이브 pulledLevers) · 물살 어귀 (#235): 뗏목으로 뗏목 물에 흘러드는 얕은 강을 3칸까지 거슬러 갔다가 밀려남 (규칙 `RaftCurrent`, `FieldWalker.Drift`, 화면 `FieldScreen.Jungle` UpdateRaftCurrent) · 'U' 유적 돌벽 · ';' 유적 바닥 ·
      'T' 단어 석판(세이브 solvedTablets) · 'A' 유적 제단(FieldArea `shrineCompanion` + `shrineWords` 60, 규칙 `Ruins`) ·
      'O' 동굴 입구 = 출입구(#115 — 'D'와 같이 Door·출입구 번호에 들어가고 그림만 3×3 동굴 `FieldMap.IsCaveMouth` · `FieldArt.CaveMouthProp`).
      정글 칸은 정글 테마에서만 (`FieldTiles` 표의 테마 칸 = `FieldThemes.Supports` — 다른 테마에 쓰려면 거기에 더하고 그림을 만듦). 칸 상태(끝난 모습·지나갈 수 있음)는 `CellState`,
@@ -120,7 +122,7 @@
    아이폰은 앱이 스스로 꺼지면 안 됨 → 종료는 `GameManager.CanQuit`일 때만.
    새 기능에 처음 하는 사람용 안내가 필요하면 `TutorialProgress`에 id를 더하고 그 상황에서 `GuideHints.Run` — 글은 한 줄,
    화면을 막지 않고, 손끝(Drag·Tap)·화살표로 보여 주고, 해 보면(DoneWhen) 끝 (GDD 7-1, #61).
-   화면을 멈추는 설명(`PauseTutorial`)은 사용자가 원한 곳만 (지금: 정글 첫 [선제공격] #79 · 처음 시작 환영과 첫 승리 뒤 목표 #124 · 제단 안내 #142 · 가방의 끼우기/기술 넣기 설명 #147 — `PauseTutorial.Tell`/`Run`, 시간을 멈추고 버튼이나 글을 눌러야 넘어감 #145).
+   화면을 멈추는 설명(`PauseTutorial`)은 사용자가 원한 곳만 (지금: 정글 첫 [선제공격] #79 · 처음 시작 환영과 첫 승리 뒤 목표 #124 · 제단 안내 #142 · 가방의 끼우기/기술 넣기 설명 #147 · 주인공 탭 (+숫자) = 성유물 강화 #233 — `PauseTutorial.Tell`/`Run`, 시간을 멈추고 버튼이나 글을 눌러야 넘어감 #145).
    처음 시작 흐름 (#124, `FieldScreen.Prologue`): (입장 영상을 아직 못 봤으면 — 새 게임·하던 세이브 모두 한 번 #131, 본 기록 `TutorialProgress.Intro`(1.2부터 intro_played — #138)는
    튜토리얼 다시 보기로 안 지워짐, 못 열면(`IntroCinematicView.Failed`) 기록 안 함, 설정 > [입장 영상 다시 보기] 필드·타이틀 · 영상 #129 `IntroCinematicView` — Resources/Video/intro.mp4 + 자막표 intro_captions.json,
    `python Tools/build_intro_video.py`가 Flow 컷들을 이어 만듦 — 자막은 스크립트의 CAPTIONS 표(#133 10줄), [건너뛰기]·뒤로가기) → 모습 고르기 → 환영 → 혼잣말 → 깃펜으로 떠오른 이름 → 걷기·달리기 →
@@ -223,7 +225,7 @@ Assets/
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
     UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투 + 보스 결정타 연출 + 전투 결산, 단독 연습 모드도 있음)
                         — 둘 다 partial로 나눔 (#93): FieldScreen.cs(상태·이동·입력) + .Places([확인] 장소)·.Jungle(정글 기믹)·.Battles(조우·전투 뒤·수련)·
-                        .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴)·.Cave(동굴 어둠·반딧돌 #112)·.RelicGuides(성유물 바꾸기·제단 안내 #142)·.Springs(샘: 회복·다른 지역으로 #216) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout·.Events(사건 연출: 사건 종류마다 Show… 함수 — #119)·.SkillFx(기술 연출: 몸짓·회복·보호막·특수 — #137).
+                        .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴)·.Cave(동굴 어둠·반딧돌 #112)·.RelicGuides(성유물 바꾸기·제단 안내 #142)·.Springs(샘: 회복·다른 지역으로 #216)·.Sparkles(아직 안 연 상자·열쇠 반짝임 #233) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout·.Events(사건 연출: 사건 종류마다 Show… 함수 — #119)·.SkillFx(기술 연출: 몸짓·회복·보호막·특수 — #137).
                         새 기능은 맞는 파일에, 기능 묶음이 커지면 새 partial 파일로,
                         DexView(도감) + JournalView(누군가의 기록 #201), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기), SpringWarpView(샘 이동: 지역 고르기 #216),
                         InventoryView(소지품: 주인공·성유물·아이템(넘치면 스크롤, 놓는 순서 `ItemData.BagOrder` #147)·징표) + HeroViews(HeroInfoPage·RelicPage·RelicSlotsRow·SkillRowView),

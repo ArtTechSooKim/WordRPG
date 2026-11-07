@@ -94,6 +94,7 @@ namespace WordRPG.Game
         private static Objective BossObjective(GameSession session, FieldArea area)
         {
             var gate = BossGate.State(area, session);
+            if (gate == BossGateState.NeedStones) return new Objective(ObjectiveKind.LightStones, null, area); // 반딧돌 문 (#233)
             if (gate == BossGateState.NeedKey)
             {
                 int stones = GlowStones.Stones(area).Count;

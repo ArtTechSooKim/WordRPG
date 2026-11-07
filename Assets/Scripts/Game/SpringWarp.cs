@@ -65,13 +65,17 @@ namespace WordRPG.Game
                 .OrderBy(area => area.StoryOrder).ToList();
         }
 
-        // 샘 길은 첫 보스(이야기 순서로 가장 앞 지역의 보스 = 서고의 까먹깨비)를 물리친 뒤에 열림 (#232 사용자: 그 전엔 서고와 초원을
+        // 샘 길은 첫 보스(이야기 순서로 가장 앞 지역의 보스 = 서고의 까먹대왕)를 물리친 뒤에 열림 (#232 사용자: 그 전엔 서고와 초원을
         // 오가다 샘 냄새로 먼저 알아 버려서, 보스 뒤 어르신이 샘 길을 알려 주는 이야기가 어색했음)
         public static bool IsOpen(IEnumerable<FieldArea> areas, WorldState world)
         {
-            var first = areas.Where(area => area != null && area.Boss != null).OrderBy(area => area.StoryOrder).FirstOrDefault();
+            var first = FirstBossArea(areas);
             return first == null || world.IsBossDefeated(first.BossId);
         }
+
+        // 이야기 순서로 가장 앞 보스가 있는 지역 (서고)
+        public static FieldArea FirstBossArea(IEnumerable<FieldArea> areas) =>
+            areas?.Where(area => area != null && area.Boss != null).OrderBy(area => area.StoryOrder).FirstOrDefault();
 
         private static bool HasSeenSpring(FieldArea area, WorldState world)
         {

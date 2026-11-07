@@ -64,6 +64,16 @@ namespace WordRPG.Field
         [Tooltip("뛰어들기 전에 하는 말 (말풍선 차례로, {이름} = 플레이어 이름)")]
         [SerializeField] private List<string> springLeapLines = new List<string>();
 
+        [Header("컷씬 (#234 — 숲 나무꾼)")]
+        [Tooltip("이 인물이 서 있는 지역에 처음 들어오면: 주인공이 다섯 칸 걸어 들어가고, 이 인물이 달려와 차례로 말한 뒤 제자리로 (보스를 물리치기 전에만). 비면 없음")]
+        [SerializeField] private List<string> entryLines = new List<string>();
+        [Tooltip("이 지역 보스를 물리친 뒤: 달려와서 하는 말 (그 자리에서)")]
+        [SerializeField] private List<string> bossThanksLines = new List<string>();
+        [Tooltip("이어서 보스가 연 길 옆으로 가서 하는 말 (주인공은 아직 제자리)")]
+        [SerializeField] private List<string> exitCallLines = new List<string>();
+        [Tooltip("주인공이 길 옆으로 온 뒤 하는 말. 끝나면 화면 밖으로 걸어가 제자리로")]
+        [SerializeField] private List<string> exitStoryLines = new List<string>();
+
         public string NpcId => npcId;
         public string DisplayName => displayName;
         public int FrameWidth => frameWidth;
@@ -72,6 +82,12 @@ namespace WordRPG.Field
         public FieldArea SpringLeapAfter => springLeapAfter;
         public bool LeapsIntoSpring => springLeapAfter != null;
         public IReadOnlyList<string> SpringLeapLines => springLeapLines;
+        public IReadOnlyList<string> EntryLines => entryLines;
+        public IReadOnlyList<string> BossThanksLines => bossThanksLines;
+        public IReadOnlyList<string> ExitCallLines => exitCallLines;
+        public IReadOnlyList<string> ExitStoryLines => exitStoryLines;
+        public bool BriefsOnEntry => entryLines != null && entryLines.Count > 0;
+        public bool SeesOffAfterBoss => bossThanksLines != null && bossThanksLines.Count > 0;
 
         // 샘플 데이터 생성 전용. 런타임에서는 호출하지 않는다
         public void Configure(string id, string name, int animalFrameWidth, IEnumerable<NpcStage> newStages)
@@ -80,6 +96,15 @@ namespace WordRPG.Field
             displayName = name;
             frameWidth = animalFrameWidth;
             stages = new List<NpcStage>(newStages);
+        }
+
+        // 샘플 데이터 생성 전용 (#234)
+        public void SetCutscenes(IEnumerable<string> entry, IEnumerable<string> thanks, IEnumerable<string> exitCall, IEnumerable<string> exitStory)
+        {
+            entryLines = new List<string>(entry);
+            bossThanksLines = new List<string>(thanks);
+            exitCallLines = new List<string>(exitCall);
+            exitStoryLines = new List<string>(exitStory);
         }
 
         // 샘플 데이터 생성 전용 (#223)

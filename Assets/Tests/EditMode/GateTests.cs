@@ -169,6 +169,32 @@ namespace WordRPG.Tests
             Assert.IsNotNull(forest.Shop, "숲 야영지 상점");
         }
 
+        // #233 사용자: 정글 동굴 입구는 빈칸두꺼비를 물리친 뒤 열림 (보스 방 열쇠가 강 너머라 동굴을 먼저 가게 됐음)
+        [Test]
+        public void CaveIsBehindTheJungleBoss()
+        {
+            var jungle = AssetDatabase.LoadAssetAtPath<FieldArea>("Assets/Data/Areas/jungle.asset");
+            var cave = AssetDatabase.LoadAssetAtPath<FieldArea>("Assets/Data/Areas/cave.asset");
+            var gates = FieldArea.GatesOpenedBy(jungle, Areas());
+            Assert.AreEqual(1, gates.Count, "빈칸두꺼비가 여는 길 하나");
+            Assert.AreSame(jungle, gates[0].Area);
+            Assert.AreSame(cave, gates[0].Exit.Target);
+            Assert.IsTrue(jungle.Map.IsCaveMouth(gates[0].Cell), "동굴 입구 'O'");
+            Assert.IsTrue(cave.Exits.All(exit => exit.OpenedByBossOf == null), "동굴에서 나오는 길은 늘 열림 (1.2 세이브로 동굴 안에 있던 사람)");
+        }
+
+        // #233 사용자 ㉟: 동굴 보스 방은 열쇠 대신 반딧돌 8개를 모두 밝히면 열림
+        [Test]
+        public void CaveBossRoomOpensWithTheEightGlowStones()
+        {
+            var cave = AssetDatabase.LoadAssetAtPath<FieldArea>("Assets/Data/Areas/cave.asset");
+            Assert.IsTrue(BossGate.OpensWithStones(cave));
+            Assert.AreEqual(8, GlowStones.Stones(cave).Count);
+            Assert.IsFalse(cave.Map.Find(FieldTile.Key).HasValue, "열쇠 받침대 없음");
+            foreach (var other in new[] { "library", "forest", "jungle" })
+                Assert.IsFalse(BossGate.OpensWithStones(AssetDatabase.LoadAssetAtPath<FieldArea>($"Assets/Data/Areas/{other}.asset")), other);
+        }
+
         // 시작 지역(없으면 초원)에서 출입구를 따라 target까지 갈 수 있는지.
         // ignoreLocks가 아니면 정상 진행대로: 갈 수 있는 지역의 보스를 물리치면 그 보스가 여는 문이 열리고, 다시 넓혀 본다
         // (서고 보스 → 숲, 숲 보스 → 정글처럼 이어지는 잠금, #80)

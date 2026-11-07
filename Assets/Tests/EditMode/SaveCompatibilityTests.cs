@@ -140,7 +140,9 @@ namespace WordRPG.Tests
             Assert.IsEmpty(loaded.LoadWarnings, string.Join(" / ", loaded.LoadWarnings));
             Assert.IsTrue(loaded.World.TryGetPosition("jungle", out var position));
             Assert.AreEqual(jungle.Map.Start, position);
-            Assert.IsTrue(loaded.World.IsExitOpen(jungle.GetExit(caveMouth)), "정글 보스를 이기기 전에도 동굴이 열려 있음");
+            Assert.IsFalse(loaded.World.IsExitOpen(jungle.GetExit(caveMouth)), "#233 사용자: 동굴은 빈칸두꺼비를 이긴 뒤에 열림 (예전엔 입장 조건 없음)");
+            loaded.World.MarkBossDefeated(jungle.BossId);
+            Assert.IsTrue(loaded.World.IsExitOpen(jungle.GetExit(caveMouth)));
             Assert.AreEqual(0, GlowStones.LitCount(cave, loaded.World), "밝힌 반딧돌 없음");
             Assert.AreSame(UpdateNotices.Cave, loaded.Notices.NextUnseen(), "업데이트한 사람 → 타이틀에 동굴 안내");
         }

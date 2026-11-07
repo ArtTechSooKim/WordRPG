@@ -30,6 +30,7 @@ namespace WordRPG.UI
             if (inBattle || transitioning || IsPanelOpen) return;
             npcs.Tick(dt, walker.Position, TalkingNpc);
             MaybeStartSpringLeap();
+            MaybeStartEntryCutscene(); // 처음 들어온 지역에서 인물이 달려와 알려 줌 (#234)
             UpdateShopPitch();
         }
 

@@ -26,6 +26,8 @@ namespace WordRPG.Game
         public const string Spring = "field_spring";
         public const string SpringArrived = "field_spring_arrived"; // 처음 샘으로 건너간 뒤 '정말 이어져 있었어!' (#223)
         public const string RelicSkills = "bag_relic_skills"; // 성유물 끼우기와 기술 넣기는 다른 일 — 성유물 안내 중에 설명 (#147 사용자)
+        public const string RelicStats = "bag_relic_stats"; // 성유물 안내 맨 앞: 주인공 탭의 공격 (+숫자) = 성유물이 올려 준 힘, 강화하면 커짐 (#233 사용자)
+        public const string IntensitySetting = "field_intensity_setting"; // 처음 강도 고르기가 나온 전투 뒤 '설정에서 전투 강도를 정할 수 있어요!' (#233 사용자)
         // #131 입장 영상(#129)을 본 기록 (사용자: 이미 하던 사람도 영상을 볼 수 있게) — 새 게임이든 하던 세이브든 못 본 사람은 필드에서 한 번.
         // 튜토리얼 다시 보기(Clear)로는 지우지 않음 — 다시 켤 때마다 영상이 나오지 않게 (그래서 All에도 없음)
         // #138 사용자 "아직 못 본 사람은 볼 수 있게": 1.1의 기록(intro_video)은 영상을 못 열어도 남아서 정말 봤는지 알 수 없음 → 1.2부터 새 id.
@@ -35,6 +37,7 @@ namespace WordRPG.Game
         public static readonly IReadOnlyList<string> All = new[]
         {
             Field, Confirm, Grass, Skill, Intensity, NewWord, Quiz, Potion, Preempt, Raft, CompanionTurn, GrassFight, Goal, Altar, RelicSkills, Spring, SpringArrived,
+            IntensitySetting, RelicStats,
             MenuBadges.Dex, MenuBadges.Training, MenuBadges.Bag, MenuBadges.Map, MenuBadges.Companion, MenuBadges.RelicNew, MenuBadges.RelicSwap
         };
 

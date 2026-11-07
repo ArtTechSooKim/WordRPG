@@ -28,6 +28,10 @@ namespace WordRPG.UI
             var page = inventoryView.Relics;
             bool OnRelics() => inventoryView.IsOpen && inventoryView.CurrentTab == BagTab.Relics;
 
+            // #233 사용자 ㉒: 바꾸는 법보다 먼저 '성유물이 무엇인지' — 주인공 탭의 공격 (+숫자)가 성유물이 올려 준 힘이고, 강화하면 커짐
+            if (!session.Tutorials.Has(TutorialProgress.RelicStats)) yield return ExplainRelicStats();
+            if (!inventoryView.IsOpen) yield break;
+
             if (!OnRelics())
             {
                 guide.Show(new GuideHints.Hint { Text = "[성유물] 탭을 눌러 보세요", Target = () => inventoryView.RelicsTabRect, Gesture = GuideHints.Gesture.Tap });
@@ -68,6 +72,29 @@ namespace WordRPG.UI
                 yield return null;
             }
             guide.Hide();
+        }
+
+        private IEnumerator ExplainRelicStats()
+        {
+            bool OnHero() => inventoryView.IsOpen && inventoryView.CurrentTab == BagTab.Hero;
+            if (!OnHero())
+            {
+                guide.Show(new GuideHints.Hint { Text = "[주인공] 탭을 눌러 보세요", Target = () => inventoryView.HeroTabRect, Gesture = GuideHints.Gesture.Tap });
+                while (inventoryView.IsOpen && !OnHero()) yield return null;
+            }
+            if (!OnHero()) yield break;
+            session.Tutorials.Mark(TutorialProgress.RelicStats);
+            SaveNow();
+            guide.Show(new GuideHints.Hint { Text = "공격 옆 (+숫자)를 보세요", Target = () => inventoryView.HeroPage.AttackRect });
+            yield return WaitUnscaled(1.6f);
+            guide.Hide();
+            pauseTutorial.BringToFront();
+            yield return pauseTutorial.Tell(new[]
+            {
+                "공격 옆 괄호 숫자는 끼운 성유물이 올려 준 힘이에요",
+                "제단에서 성유물을 강화하면 이 숫자가 커져요\n기술이 아니라 주인공이 세지는 거예요",
+                "이제 성유물을 바꿔 끼우는 법을 알아봐요"
+            });
         }
 
         // 성유물 끼우기와 기술 넣기는 다른 일 (#147 사용자)

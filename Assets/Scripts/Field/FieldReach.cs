@@ -42,6 +42,31 @@ namespace WordRPG.Field
             return cells;
         }
 
+        // from에서 goal까지 걸어서 가는 가장 짧은 길 (from은 빼고 goal까지). 갈 수 없으면 빈 목록 (#234 컷씬)
+        public static List<Vector2Int> PathTo(FieldMap map, Vector2Int from, Vector2Int goal, Func<Vector2Int, bool> canStand)
+        {
+            var path = new List<Vector2Int>();
+            if (from == goal) return path;
+            var cameFrom = new Dictionary<Vector2Int, Vector2Int> { [from] = from };
+            var queue = new Queue<Vector2Int>();
+            queue.Enqueue(from);
+            while (queue.Count > 0 && !cameFrom.ContainsKey(goal))
+            {
+                var cell = queue.Dequeue();
+                foreach (var step in Steps)
+                {
+                    var next = cell + step;
+                    if (cameFrom.ContainsKey(next) || !map.InBounds(next) || (next != goal && !canStand(next))) continue;
+                    cameFrom[next] = cell;
+                    queue.Enqueue(next);
+                }
+            }
+            if (!cameFrom.ContainsKey(goal)) return path;
+            for (var cell = goal; cell != from; cell = cameFrom[cell]) path.Add(cell);
+            path.Reverse();
+            return path;
+        }
+
         // from에서 걸어서 가장 가까운 목표 칸까지의 길 (#133 처음 하는 사람에게 풀숲 가는 길 보여 주기).
         // from은 빼고 다음 칸부터 목표 칸까지, 갈 수 없으면 빈 목록. 목표에 닿은 뒤 같은 방향으로 이어진 목표 칸을 extra칸까지 더 간다 (풀숲 안으로)
         public static List<Vector2Int> PathToNearest(FieldMap map, Vector2Int from, Func<Vector2Int, bool> canStand,

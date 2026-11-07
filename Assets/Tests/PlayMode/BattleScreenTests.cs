@@ -206,6 +206,8 @@ namespace WordRPG.Tests
             StringAssert.Contains(screen.Engine.Summary.WrongWords[0].English, defeatText);
 
             StringAssert.Contains("주인공이 쓰러졌다", AllText(screen.transform.Find("BattleCanvas/SafeArea/ResultPanel")));
+            Assert.IsNotEmpty(screen.LastDefeatAdvice, "#233 졌을 때 원인에 맞는 한 줄");
+            StringAssert.Contains(screen.LastDefeatAdvice, AllText(screen.transform.Find("BattleCanvas/SafeArea/ResultPanel")));
 
             // 재도전하면 주인공이 회복된다
             ActiveButton(screen.transform, "ResultButton_Primary").onClick.Invoke();

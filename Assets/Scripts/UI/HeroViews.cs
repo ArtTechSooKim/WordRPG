@@ -159,11 +159,13 @@ namespace WordRPG.UI
         private Image art, expFill;
         private Text nameText, levelText, nextText, description, effectLine1, effectLine2;
         private readonly Text[] statValues = new Text[3];
+        public RectTransform AttackRect => (RectTransform)statValues[1].transform.parent; // 공격 칸 — 성유물 안내가 가리킴 (#233)
         private readonly List<SkillRowView> skillRows = new List<SkillRowView>();
         private Action<int> onSlotClicked;
         private Button basicButton; // 기본 기술(휘두르기)을 다른 기술과 바꿨을 때만 [휘두르기 넣기] (#147)
 
         public Action PutBasicSkill { get; set; }
+        public Action ChangeLook { get; set; } // [모습 바꾸기] (#233 — 정식판이면 고르기 창, 아니면 정식판 안내)
 
         public static HeroInfoPage Create(RectTransform parent, float minX, float minY, float maxX, float maxY, Action<int> slotClicked)
         {
@@ -186,6 +188,8 @@ namespace WordRPG.UI
             art.rectTransform.sizeDelta = new Vector2(176, 176);
             art.rectTransform.anchoredPosition = new Vector2(28, -24);
             UiKit.IconImage("Face", art.transform, null, 0.08f, 0.08f, 0.92f, 0.92f);
+            var look = UiKit.MakeButton("ChangeLookButton", art.transform, "모습 바꾸기", Palette.Neutral, 24, 0.04f, 0.02f, 0.96f, 0.24f);
+            look.onClick.AddListener(() => ChangeLook?.Invoke());
 
             nameText = UiKit.Display(UiKit.Label("Name", box, "", 56, Palette.Text, 0.23f, 0.9f, 0.97f, 0.975f,
                 TextAnchor.MiddleLeft, FontStyle.Normal, true, 30));

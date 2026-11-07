@@ -63,7 +63,7 @@ namespace WordRPG.Field
 
         // rafting: 뗏목에 탄 채로 설 수 있는지 (뗏목은 강 물 위, 걸어서는 걸을 수 있는 칸)
         public bool CanStand(Vector2Int position, bool rafting) =>
-            rafting ? Map.IsRaftWater(position)
+            rafting ? Map.IsRaftWater(position) || RaftCurrent.Depth(Map, position) > 0 // 물살 어귀에서 저장됐어도 (#235)
                     : Map.IsWalkable(position) || (isCleared != null && Map.InBounds(position) && isCleared(position));
 
         public StepOutcome TryStep(Direction direction)
@@ -74,7 +74,7 @@ namespace WordRPG.Field
 
             if (Rafting)
             {
-                if (Map.IsRaftWater(target))
+                if (Map.IsRaftWater(target) || RaftCurrent.CanEnter(Map, Position, target)) // 빠른 물살 어귀로 거슬러 들어감 (#235)
                 {
                     Position = target;
                     return new StepOutcome(StepKind.Moved, target, tile);
@@ -110,6 +110,16 @@ namespace WordRPG.Field
 
         // [확인]으로 옆 칸을 쓸 때 그쪽을 바라보게
         public void Face(Direction direction) => Facing = direction;
+
+        // 뗏목이 물살에 밀려 한 칸 (#235). 바라보는 쪽은 그대로. 어귀 안이 아니면 아무것도 안 함
+        public bool Drift()
+        {
+            if (!Rafting) return false;
+            var next = RaftCurrent.Downstream(Map, Position);
+            if (!next.HasValue) return false;
+            Position = next.Value;
+            return true;
+        }
 
         // rafting: 뗏목에 탄 채로 (세이브에서 강 위로 돌아올 때)
         public void WarpTo(Vector2Int position, bool rafting = false)

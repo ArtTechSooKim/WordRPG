@@ -36,7 +36,8 @@ namespace WordRPG.Tests
         {
             var session = GameSession.NewGame(TestData.Hero(new MonsterStats(999, 5, 10), relics), 1);
             // 이 테스트와 상관없는 안내는 본 것으로
-            foreach (var id in new[] { TutorialProgress.Field, TutorialProgress.Confirm, TutorialProgress.Grass, TutorialProgress.GrassFight, TutorialProgress.Goal, TutorialProgress.RelicSkills })
+            foreach (var id in new[] { TutorialProgress.Field, TutorialProgress.Confirm, TutorialProgress.Grass, TutorialProgress.GrassFight, TutorialProgress.Goal,
+                         TutorialProgress.RelicSkills, TutorialProgress.RelicStats })
                 session.Tutorials.Mark(id);
             session.Record.RecordBattle(true, 1, 0);
             return session;
@@ -97,6 +98,27 @@ namespace WordRPG.Tests
             var hud = Hud(field);
             FindButton(hud, "BagButton").onClick.Invoke();
             yield return null;
+            // #233 사용자 ㉒: 바꾸는 법보다 먼저 주인공 탭의 공격 (+숫자) = 성유물이 올려 준 힘, 강화하면 커짐
+            if (field.Guide.IsShowing && field.Guide.CurrentText.Contains("[주인공] 탭"))
+            {
+                FindButton(hud.Find("InventoryView"), "TabHero").onClick.Invoke();
+                yield return null;
+            }
+            yield return WaitFor(() => field.PauseTutorial.IsShowing, 3f);
+            StringAssert.Contains("공격 옆 괄호 숫자", field.PauseTutorial.Message);
+            field.PauseTutorial.PressNext();
+            yield return null;
+            yield return null;
+            StringAssert.Contains("강화하면 이 숫자가 커져요", field.PauseTutorial.Message);
+            field.PauseTutorial.PressNext();
+            yield return null;
+            yield return null;
+            field.PauseTutorial.PressNext();
+            yield return null;
+            yield return null;
+            Assert.IsFalse(field.PauseTutorial.IsShowing);
+            Assert.IsTrue(session.Tutorials.Has(TutorialProgress.RelicStats), "다시 나오지 않음");
+
             FindButton(hud.Find("InventoryView"), "TabRelics").onClick.Invoke();
             yield return null;
             Cell(hud, 1).onClick.Invoke();

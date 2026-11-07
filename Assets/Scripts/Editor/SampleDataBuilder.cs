@@ -4,6 +4,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 using WordRPG.Field;
+using WordRPG.Game;
 using WordRPG.Heroes;
 using WordRPG.Items;
 using WordRPG.Monsters;
@@ -429,7 +430,7 @@ namespace WordRPG.EditorTools
             // 동굴엔 상점 없음 (#232 사용자: 동굴 속 가게는 이상함 — 샘 길도 있고 정글에 가게가 있음)
             SetFullVersionArea(cavePath); // 정식판에 포함 (추가 결제 없음)
             SetDictionary(cavePath, "동굴의 사전");
-            SetBossGate(cavePath, caveKey, 120); // 단어장을 같이 쓰니 앞 지역보다 많이 (#147 사용자: 숲 40 · 정글 80 · 유적 100 · 동굴 120)
+            SetBossGate(cavePath, caveKey, 120); // #233 사용자: 동굴은 열쇠·단어 대신 반딧돌을 모두 밝히면 열림 (맵에 K 없음 — BossGate.OpensWithStones). 열쇠 아이템은 예전 세이브에 남은 것을 치우려고 둠
             ConfigureAreaIfNew(cavePath, so =>
             {
                 Prop(so, "theme").enumValueIndex = (int)FieldTheme.Cave;
@@ -478,6 +479,11 @@ namespace WordRPG.EditorTools
                 "정글에 메아리가 돌아왔다.");
             SetBossLines(cavePath, "끝을 말하지 마… 끝나면 다시 아파질 테니까…", "끝맺는다고 모든 것이 사라지는 건 아니야.",
                 "마지막 문장이 완성됐다.\n'사막 아래의 첫 기록'이라는 말이 적혀 있다.");
+            // 필드의 보스 그림 크기 (#233 사용자: 작아서 위엄이 없음 → 보스 방에 꽉 차게. 빈칸두꺼비 6배, 말줄임덩굴 가로 5·세로 6배)
+            SetBossFieldSize(libraryPath, 5, 5);
+            SetBossFieldSize(forestPath, 5, 5);
+            SetBossFieldSize(junglePath, 6, 6);
+            SetBossFieldSize(cavePath, 5, 6);
             // 성유물 설명에 이야기 단서 (#207, 스토리 문서 7장). 설명을 사람이 고쳤으면 건드리지 않음
             SetRelicDescriptionIf("relic_quill", "펜촉이가 남긴 깃펜. 잉크를 뿌려 적을 한꺼번에 공격한다.",
                 "펜촉이가 남긴 깃펜. 손에 쥐면 잊고 있던 문장의 첫 글자가 떠오른다.");
@@ -490,12 +496,30 @@ namespace WordRPG.EditorTools
             SetExitsIfMismatch(meadowPath, (libraryPath, 0, null), (forestPath, 1, libraryPath));
             SetExitsIfMismatch(libraryPath, (meadowPath, 0, null));
             SetExitsIfMismatch(forestPath, (junglePath, 1, forestPath), (meadowPath, 1, null));
-            SetExitsIfMismatch(junglePath, (cavePath, 0, null), (forestPath, 0, null));
+            SetExitsIfMismatch(junglePath, (cavePath, 0, junglePath), (forestPath, 0, null)); // 동굴은 빈칸두꺼비 뒤 (#233 사용자: 열쇠보다 동굴을 먼저 가게 됨)
             SetExitsIfMismatch(cavePath, (junglePath, 0, null));
 
             AssetDatabase.SaveAssets();
             GameDatabaseBuilder.Refresh();
+            // 정식판 특전 (#233 사용자 ⑨): 호기심 물약 3 + 특제 상처약 5 — 세이브마다 한 번 (FullVersionGift)
+            SetFullVersionGift((curiousPotion, 3), (greatPotion, 5));
             Debug.Log("[WordRPG] 샘플 데이터 생성 완료 (기존 에셋은 유지)");
+        }
+
+        private static void SetFullVersionGift(params (ItemData item, int count)[] gift)
+        {
+            var database = AssetDatabase.LoadAssetAtPath<GameDatabase>(GameDatabaseBuilder.DatabasePath);
+            if (database == null) return;
+            var so = new SerializedObject(database);
+            var list = Prop(so, "fullVersionGift");
+            list.arraySize = gift.Length;
+            for (int i = 0; i < gift.Length; i++)
+            {
+                list.GetArrayElementAtIndex(i).FindPropertyRelative("item").objectReferenceValue = gift[i].item;
+                list.GetArrayElementAtIndex(i).FindPropertyRelative("count").intValue = gift[i].count;
+            }
+            so.ApplyModifiedPropertiesWithoutUndo();
+            AssetDatabase.SaveAssets();
         }
 
         // . 길  : 잔디(조우 없음)  , 풀숲(조우)  # 나무  ~ 물  F 회복의 샘  C 보물상자  E 성유물 제단  S 상점  P 시작 위치  D 출입구
@@ -808,7 +832,7 @@ namespace WordRPG.EditorTools
                 "#####::::C::::####::::::::::::::::################\n" +
                 "#####:::::::::####:::::::B::::::::################\n" +
                 "######:::::::#####:::::::::::::::#####:::::::#####\n" +
-                "#######:::::#######::::::::::::::###C::::::K::####\n" +
+                "#######:::::#######::::::::::::::###C:::::::::####\n" +
                 "########:::########::::::::::::#####:::::::::::###\n" +
                 "#########::#########::::::::::######:::::::::::###\n" +
                 "########:::#############:::##########:I:::::::####\n" +
@@ -954,6 +978,20 @@ namespace WordRPG.EditorTools
             var woodcutter = Npc("npc_woodcutter", "나무꾼", 0,
                 new NpcStage("길을 내가 잃었다, 아니 나를 길이…", NpcMotionKind.Wander, null, 0, 1.25f), // 허둥지둥
                 new NpcStage("이정표가 돌아왔군. 늪 너머 공터를 가 봐.", NpcMotionKind.Pace, forest));
+            // #234 사용자 ⑲: 숲에 처음 들어오면 달려와 상황을 알려 줌 · 헷갈너구리 뒤 정글 쪽 길 옆에서 배웅 (할머니 = 아라, 이스터에그 — 말로는 밝히지 않음)
+            woodcutter.SetCutscenes(
+                new[]
+                {
+                    "이보게, 거기! 잠깐 멈추게!",
+                    "이 숲에선 길을 잃기 쉬워. 헷갈너구리 녀석이 이정표를 몽땅 뒤섞어 놨거든.",
+                    "나도 벌써 사흘째 같은 자리를 맴돌고 있다네…",
+                    "녀석은 북쪽 공터에 숨어 있어. 공터 문은 잠겼는데, 열쇠가 숲 어딘가에 떨어져 있다더군.",
+                    "숲의 단어를 많이 찾을수록 힘이 붙을 걸세. 부디 이정표를 되찾아 주게!"
+                },
+                new[] { "이정표가 돌아왔군!", "고맙네. 덕분에 이제 길을 헷갈릴 일이 없겠어." },
+                new[] { "이 너머로 갈 생각인가?", "와서 들어 보게나. 이상한 메아리 소리가 들리지 않나?" },
+                new[] { "내 할머니가 메아리를 따라가다가 이 너머에서 실종되었다지…", "위험이 도사리고 있으니 조심하는 게 좋을 거야.", "행운을 빌겠네!" });
+            EditorUtility.SetDirty(woodcutter);
             var mule = Npc("npc_mule", "노새", 23,
                 new NpcStage("히힝… 입가에 사과 조각이 붙어 있다.", NpcMotionKind.Stand));
             var frog = Npc("npc_frog", "개구리", 16,
@@ -1043,6 +1081,15 @@ namespace WordRPG.EditorTools
             boss.FindPropertyRelative("bossLine").stringValue = bossLine;
             boss.FindPropertyRelative("heroLine").stringValue = heroLine;
             boss.FindPropertyRelative("afterLine").stringValue = afterLine;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void SetBossFieldSize(string areaPath, float width, float height)
+        {
+            var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);
+            if (area == null) return;
+            var so = new SerializedObject(area);
+            Prop(so, "boss").FindPropertyRelative("fieldSize").vector2Value = new Vector2(width, height);
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 

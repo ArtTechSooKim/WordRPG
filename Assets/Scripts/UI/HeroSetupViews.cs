@@ -25,7 +25,12 @@ namespace WordRPG.UI
         private Image[] preview;
         private Text lookName, note;
         private Action<string> chosen;
+        private Action cancelled;
+        private Text startLabel;
+        private Button closeButton;
         private float clock;
+
+        public bool CanCancel => cancelled != null; // 가방에서 연 '모습 바꾸기' (#233) — 처음 시작 때는 끝까지 골라야 함
 
         public static CharacterSelectView Create(Transform parent)
         {
@@ -51,8 +56,32 @@ namespace WordRPG.UI
             view.note = UiKit.Label("Note", root, "", 26, Palette.TextDim, 0, 0.12f, 1, 0.15f);
             var start = UiKit.MakeButton("CharacterStartButton", root, "이 모습으로 시작", Palette.Evolve, 52, 0.056f, 0.035f, 0.944f, 0.1f);
             start.onClick.AddListener(view.Confirm);
+            view.startLabel = UiKit.LabelOf(start);
+            // 모습 바꾸기 때만: 오른쪽 위 [닫기]
+            view.closeButton = UiKit.MakeButton("CharacterCloseButton", root, "닫기", Palette.Neutral, 36, 0.76f, 0.935f, 0.97f, 0.985f);
+            view.closeButton.onClick.AddListener(view.Cancel);
+            view.closeButton.gameObject.SetActive(false);
             view.Root.SetActive(false);
             return view;
+        }
+
+        // 정식판의 모습 바꾸기 (#233 사용자 ⑮): 같은 창, 버튼만 [이 모습으로 바꾸기] + [닫기]
+        public void ShowChange(IReadOnlyList<HeroLook> options, string current, Action<string> onChosen, Action onCancel)
+        {
+            Show(options, current, false, onChosen);
+            cancelled = onCancel;
+            startLabel.text = "이 모습으로 바꾸기";
+            closeButton.gameObject.SetActive(true);
+            Root.transform.SetAsLastSibling(); // 가방 위로
+        }
+
+        public void Cancel()
+        {
+            if (!IsOpen || cancelled == null) return;
+            var done = cancelled;
+            Root.SetActive(false);
+            cancelled = null;
+            done();
         }
 
         // updating: 1.0 세이브로 업데이트한 사람 (지금 모습이 골라져 있음)
@@ -62,6 +91,9 @@ namespace WordRPG.UI
             looks.AddRange(options);
             if (looks.Count == 0) looks.Add(new HeroLook(HeroLook.Fallback, "소년"));
             chosen = onChosen;
+            cancelled = null;
+            if (startLabel != null) startLabel.text = "이 모습으로 시작";
+            if (closeButton != null) closeButton.gameObject.SetActive(false);
             BuildCards();
             note.text = updating ? "업데이트로 모습과 이름을 정할 수 있게 됐어요 · 지금 모습이 골라져 있어요" : "";
             Root.SetActive(true);
@@ -97,6 +129,7 @@ namespace WordRPG.UI
         {
             if (!IsOpen || string.IsNullOrEmpty(Selected)) return;
             Root.SetActive(false);
+            cancelled = null;
             chosen?.Invoke(Selected);
         }
 

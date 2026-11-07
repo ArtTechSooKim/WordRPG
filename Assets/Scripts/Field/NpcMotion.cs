@@ -85,6 +85,17 @@ namespace WordRPG.Field
 
         public void Release() => Held = false;
 
+        // 컷씬이 직접 옮긴 뒤 그 칸에 선 것으로 (#234 — 달려왔다 돌아가는 나무꾼)
+        public void Teleport(Vector2Int cell, Direction face)
+        {
+            Cell = Previous = cell;
+            Walking = false;
+            StepProgress = 1f;
+            Facing = face;
+            Pose = NpcPose.None;
+            timer = Range(0.5f, 1.5f);
+        }
+
         public void Tick(float dt, Func<Vector2Int, bool> canStand)
         {
             if (hopT < 1f) hopT = Mathf.Min(1f, hopT + dt / HopSeconds);

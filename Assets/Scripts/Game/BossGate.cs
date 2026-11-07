@@ -9,8 +9,9 @@ namespace WordRPG.Game
         None,      // 이 지역엔 보스 방 문이 없음
         NeedKey,   // 열쇠를 아직 못 찾음 → "열쇠가 필요한 것 같다"
         NeedWords, // 열쇠는 있지만 이 지역 단어를 덜 발견함 → "보스를 상대하려면 새로운 단어로 힘을 모아야해"
-        Ready,     // 둘 다 갖춤 → [확인]하면 열림
-        Open       // 열었거나, 이미 보스를 물리침 (예전 세이브 — 다시 막지 않는다)
+        Ready,     // 둘 다 갖춤 → [확인]하면 열림 (반딧돌 문은 다 밝힌 순간 저절로)
+        Open,      // 열었거나, 이미 보스를 물리침 (예전 세이브 — 다시 막지 않는다)
+        NeedStones // 반딧돌 문 (#233, 동굴): 글자 반딧돌을 아직 다 못 밝힘
     }
 
     // 보스 방 문 (#76, 2026-10-16 사용자 결정): 맵에 숨겨 둔 열쇠(K)를 찾고 + 그 지역 단어를 40개 발견해야 보스 방(G)이 열린다.
@@ -21,6 +22,11 @@ namespace WordRPG.Game
         public static bool HasGate(FieldArea area) => area != null && area.Map.Find(FieldTile.Gate).HasValue;
 
         public static List<Vector2Int> Cells(FieldArea area) => area.Map.FindAll(FieldTile.Gate);
+
+        // 반딧돌 문 (#233 사용자 ㉟): 열쇠 받침대 'K'가 없고 글자 반딧돌 'I'가 있는 지역(동굴)은 반딧돌을 모두 밝히면 열림 — 단어 수 조건 없음.
+        // 열쇠 아이템(bossKey)은 예전 세이브에 남은 열쇠를 치우려고 그대로 둠 (문이 열리면 DiscardUsedKey)
+        public static bool OpensWithStones(FieldArea area) =>
+            HasGate(area) && !area.Map.Find(FieldTile.Key).HasValue && GlowStones.Stones(area).Count > 0;
 
         // 이 지역 단어장에서 발견한 단어 수 (도감 기준)
         public static int WordsFound(FieldArea area, GameSession session) =>
@@ -37,6 +43,7 @@ namespace WordRPG.Game
             if (!HasGate(area)) return BossGateState.None;
             if (session.World.IsGateOpened(area.AreaId) || (area.Boss != null && session.World.IsBossDefeated(area.BossId)))
                 return BossGateState.Open;
+            if (OpensWithStones(area)) return GlowStones.AllLit(area, session.World) ? BossGateState.Ready : BossGateState.NeedStones;
             if (!HasKey(area, session)) return BossGateState.NeedKey;
             if (WordsFound(area, session) < area.BossGateWords) return BossGateState.NeedWords;
             return BossGateState.Ready;
@@ -49,7 +56,7 @@ namespace WordRPG.Game
         {
             if (State(area, session) != BossGateState.Ready) return false;
             session.World.MarkGateOpened(area.AreaId);
-            session.Inventory.TryRemove(area.BossKey);
+            DiscardUsedKey(area, session); // 열쇠 문이면 쓴 열쇠, 반딧돌 문이면 예전에 주운 열쇠
             return true;
         }
 

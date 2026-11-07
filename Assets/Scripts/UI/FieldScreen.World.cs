@@ -33,6 +33,7 @@ namespace WordRPG.UI
                 bool done = CellState.IsDone(fieldArea, session, cell);
                 Tile tile;
                 if (kind == FieldTile.Door) tile = DoorTile(fieldArea, cell, lockedDoor(cell));
+                else if (kind == FieldTile.Boss && fieldArea.Boss != null && fieldArea.Boss.StandsBig) tile = TileFor(kind, true, fieldArea.Theme); // 바닥만 — 보스는 큰 그림으로 (DrawBigBoss)
                 else if (kind == FieldTile.Bridge) tile = BridgeTile(fieldArea.Theme, done, map.IsBridgeHorizontal(cell));
                 else if (kind == FieldTile.Decor) tile = DecorTile(fieldArea.Theme, FieldDecor.Variant(map, cell));
                 else if (FieldAutotile.IsAutotiled(kind) && AutoTile(fieldArea.Theme, kind, FieldAutotile.Mask(map, cell),
@@ -45,7 +46,37 @@ namespace WordRPG.UI
             cam.backgroundColor = ThemeLooks.Of(fieldArea.Theme).Outside;
             DrawProps(fieldArea);
             DrawStalls(fieldArea);
+            DrawBigBoss(fieldArea);
         }
+
+        // 보스 방에 크게 서 있는 보스 (#233 사용자 ㉞㊱: 작아서 위엄이 없음). 발밑 = B 칸 아래 변 가운데 → 위로 크게.
+        // 앞(아래)에서 다가가는 길은 가리지 않음. 주인공(10)보다 아래 9 — 동굴에선 어둠(14) 아래라 빛 안에서만 보임. 이기면 사라짐
+        private GameObject bigBoss;
+        public Transform BigBoss => bigBoss != null ? bigBoss.transform : null; // 테스트용
+
+        private void DrawBigBoss(FieldArea fieldArea)
+        {
+            if (bigBoss != null) Destroy(bigBoss);
+            bigBoss = null;
+            var boss = fieldArea.Boss;
+            var cell = fieldArea.Map.BossPosition;
+            if (boss == null || !boss.StandsBig || !cell.HasValue || boss.Species.Sprite == null || session.World.IsBossDefeated(fieldArea.BossId)) return;
+            bigBoss = new GameObject("BigBoss_" + boss.Species.SpeciesId, typeof(SpriteRenderer));
+            bigBoss.transform.SetParent(transform, false);
+            var renderer = bigBoss.GetComponent<SpriteRenderer>();
+            renderer.sprite = boss.Species.Sprite;
+            renderer.sortingOrder = 9;
+            var natural = renderer.sprite.bounds.size;
+            var size = boss.FieldSize;
+            bigBoss.transform.localScale = new Vector3(size.x / natural.x, size.y / natural.y, 1f);
+            var pivot = renderer.sprite.bounds.center; // 그림 가운데가 원점에서 얼마나 떨어졌는지 (보통 0)
+            bigBoss.transform.position = new Vector3(cell.Value.x + 0.5f - pivot.x * size.x / natural.x,
+                cell.Value.y + size.y / 2f - pivot.y * size.y / natural.y, 0f);
+        }
+
+        // 이름표를 붙일 높이 (칸 아래 변에서 몇 칸 위): 크게 선 보스는 머리 위
+        private float NameTagTop(Vector2Int cell) =>
+            area != null && area.Boss != null && area.Boss.StandsBig && cell == area.Map.BossPosition ? area.Boss.FieldSize.y : 1f;
 
         // 상점 가판대 (#210): 뒤 벽 → (상인 6) → 계산대 → (주인공 10) → 차양. 뒤로 지나가면 차양에 가려짐
         private readonly List<GameObject> stalls = new List<GameObject>();

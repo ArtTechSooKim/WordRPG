@@ -17,6 +17,10 @@ namespace WordRPG.Game
         [SerializeField] private List<FieldArea> areas = new List<FieldArea>();
         [SerializeField] private List<RelicData> relics = new List<RelicData>();
         [SerializeField] private List<CompanionData> companions = new List<CompanionData>(); // #77 동료
+        [Tooltip("정식판 특전 (#233): 정식판을 사면 세이브마다 한 번 받는 아이템 (FullVersionGift)")]
+        [SerializeField] private List<ItemGift> fullVersionGift = new List<ItemGift>();
+
+        public IReadOnlyList<ItemGift> FullVersionGift => fullVersionGift;
 
         public IReadOnlyList<MonsterSpecies> Monsters => monsters;
         public IReadOnlyList<ItemData> Items => items;

@@ -201,10 +201,12 @@ namespace WordRPG.UI
             resultTitle.color = victory ? Palette.Gold : fled ? Palette.TextDim : Palette.Bad;
             PlaceResult(resultTitle.rectTransform, ref y, 140f, 0f);
             string fainted = UiKit.WithJosa(hero.DisplayName, "이", "가");
+            bool defeat = !victory && !fled;
             resultSubtitle.text = victory ? (companionGrowth.Length > 0 ? $"{DefeatedLine()}\n{companionGrowth}" : DefeatedLine())
                 : fled ? "무사히 빠져나왔다 — 이번 전투 보상은 없어요"
-                : loopBattles ? $"{fainted} 쓰러졌다. 회복하고 다시 도전하자!" : $"{fainted} 쓰러졌다… 시작 지점으로 돌아간다.";
-            PlaceResult(resultSubtitle.rectTransform, ref y, victory && companionGrowth.Length > 0 ? 100f : 52f, ResultGap); // 동료 성장 한 줄이 붙으면 두 줄
+                : (loopBattles ? $"{fainted} 쓰러졌다. 회복하고 다시 도전하자!" : $"{fainted} 쓰러졌다… 시작 지점으로 돌아간다.")
+                  + $"\n<color=#A6B3D1>{DefeatAdviceLine()}</color>"; // 원인에 맞는 한 줄 (#233 사용자)
+            PlaceResult(resultSubtitle.rectTransform, ref y, (victory && companionGrowth.Length > 0) || defeat ? 100f : 52f, ResultGap); // 동료 성장·조언 한 줄이 붙으면 두 줄
 
             growthCard.gameObject.SetActive(victory);
             rewardRow.gameObject.SetActive(victory);
@@ -266,6 +268,22 @@ namespace WordRPG.UI
         }
 
         // "잉크 슬라임 · 낙서 박쥐를 물리쳤어요"
+        // 졌을 때 원인에 맞는 한 줄 (#233 사용자 ㉔ — 규칙 DefeatAdvice). 보스 기믹에 당했는지는 기믹을 넣을 때 채움
+        public string LastDefeatAdvice { get; private set; } // 테스트용
+
+        private string DefeatAdviceLine()
+        {
+            int strongest = 0;
+            foreach (var enemy in engine.Enemies)
+                if (enemy.Monster != null && enemy.Monster.Level > strongest) strongest = enemy.Monster.Level;
+            var hero = session.Hero;
+            var equipped = new List<OwnedRelic>();
+            for (int i = 0; i < hero.SlotCount; i++) equipped.Add(hero.SlotAt(i));
+            var cause = DefeatAdvice.Cause(hero.Level, strongest, false, DefeatAdvice.CanUpgradeAny(equipped, session.Inventory));
+            LastDefeatAdvice = DefeatAdvice.Line(cause);
+            return LastDefeatAdvice;
+        }
+
         private string DefeatedLine()
         {
             var names = new List<string>();

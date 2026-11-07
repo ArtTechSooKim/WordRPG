@@ -176,7 +176,8 @@ namespace WordRPG.UI
                                    || (pauseTutorial != null && pauseTutorial.IsShowing)
                                    || (tabletView != null && tabletView.IsOpen)
                                    || (stoneView != null && stoneView.IsOpen) || heroSetupRunning
-                                   || (introView != null && introView.IsOpen) || TesterMenuOpen;
+                                   || (introView != null && introView.IsOpen) || TesterMenuOpen
+                                   || (characterSelect != null && characterSelect.IsOpen);
         public PauseTutorial PauseTutorial => pauseTutorial;
         public bool IsPreemptRangeVisible => preemptRange != null && preemptRange.gameObject.activeSelf;
         public CompanionCutscene CompanionCutscene => companionCutscene;
@@ -306,16 +307,46 @@ namespace WordRPG.UI
             // 저장된 위치가 이 지역의 걸을 수 있는 칸(뗏목이었으면 강 위)이면 거기서, 아니면 시작 위치에서
             bool onRaft = session.World.Rafting;
             bool savedHere = session.World.TryGetPosition(area.AreaId, out var saved)
-                             && (onRaft ? map.IsRaftWater(saved) : map.IsWalkable(saved));
+                             && (onRaft ? map.IsRaftWater(saved) || RaftCurrent.Depth(map, saved) > 0 : map.IsWalkable(saved));
             EnterArea(area, savedHere ? saved : map.Start, savedHere && onRaft);
 
             if (!string.IsNullOrEmpty(statusMessage)) ShowToast(statusMessage, 3f);
+            if (entitlements != null) entitlements.Changed += GiveFullVersionGift;
+            GiveFullVersionGift(); // 이미 산 사람도 한 번 (#233)
             if (NeedsPrologue) StartCoroutine(Prologue()); // (못 본 입장 영상) → 모습·이름 → (새 게임이면 프롤로그) → 걷기 안내
             else if (showTutorials && !session.Tutorials.Has(TutorialProgress.Field)) StartCoroutine(FieldGuide());
             return true;
         }
 
-        private void OnDestroy() => Sound.SetAmbience(Ambience.None); // 타이틀로 나가면 환경음도 멈춤 (소리 오브젝트는 씬이 바뀌어도 남음)
+        private void OnDestroy()
+        {
+            Sound.SetAmbience(Ambience.None); // 타이틀로 나가면 환경음도 멈춤 (소리 오브젝트는 씬이 바뀌어도 남음)
+            if (entitlements != null) entitlements.Changed -= GiveFullVersionGift;
+        }
+
+        // 정식판 특전 (#233 사용자 ⑨): 사거나 되찾은 순간, 또는 이미 산 사람이 켰을 때 세이브마다 한 번
+        public int FullVersionGiftsGiven { get; private set; } // 테스트용
+
+        private void GiveFullVersionGift()
+        {
+            if (database == null || entitlements == null || session == null) return;
+            var given = FullVersionGift.Claim(session, entitlements.HasFullVersion, database.FullVersionGift);
+            if (given.Count == 0) return;
+            FullVersionGiftsGiven++;
+            SaveNow();
+            giftNotice = $"정식판 특전: {FullVersionGift.Describe(given)}를 받았어요!";
+            if (paywall == null || !paywall.IsOpen) ShowToast(TakeGiftNotice(), 3.5f); // 정식판 안내 창에서 샀으면 '열렸어요' 알림에 붙여서
+            RefreshHud();
+        }
+
+        private string giftNotice = "";
+
+        private string TakeGiftNotice()
+        {
+            string text = giftNotice;
+            giftNotice = "";
+            return text;
+        }
 
         private void Update()
         {
@@ -329,6 +360,7 @@ namespace WordRPG.UI
             PulseBadges();
             UpdateRoamers(Time.unscaledDeltaTime);
             UpdateNpcs(Time.unscaledDeltaTime);
+            UpdateSparkles(Time.unscaledDeltaTime); // 아직 [확인]하지 않은 상자·열쇠 반짝임 (#233)
             characterSelect.Tick(Time.unscaledDeltaTime);
             introView.Tick(Time.unscaledDeltaTime);
             streams.Tick(Time.deltaTime, walker.Position);
@@ -362,6 +394,7 @@ namespace WordRPG.UI
                     moving = false;
                     player.position = moveTo;
                     if (!OnStepFinished()) return;
+                    if (ContinueDrift()) return; // 물살에 밀리는 중이면 뗏목 물에 닿을 때까지 (#235)
                     // 계속 밀고 있으면 서지 않고 바로 다음 칸으로 (칸마다 한 프레임씩 멈칫하던 끊김 없애기)
                     var (next, run) = ReadMove();
                     if (next.HasValue && !IsPanelOpen)
@@ -377,6 +410,7 @@ namespace WordRPG.UI
                 return;
             }
 
+            if (UpdateRaftCurrent(Time.deltaTime)) return; // 어귀에 서 있으면 곧 물살에 밀림 (#235)
             interactCooldown -= Time.deltaTime;
             UpdateConfirmButton();
             UpdateGuide();
@@ -465,6 +499,12 @@ namespace WordRPG.UI
             if (bossArea == null) return;
             string target = exit.Target != null ? exit.Target.DisplayName : "저쪽";
             string boss = bossArea.Boss.Species.DisplayName;
+            if (bossArea == area)
+            {
+                // 이 지역 보스가 여는 길 (정글의 동굴 입구 #233): 주인공 혼잣말 한 줄 (사용자가 정한 말)
+                if (!bubble.IsVisible) bubble.Say($"여기는 {UiKit.WithJosa(boss, "을", "를")} 물리친 후 가 보자.", 2.5f);
+                return;
+            }
             string message = $"{UiKit.WithJosa(target, "으로", "로")} 가는 길이 덤불로 막혀 있다…\n" +
                              $"{bossArea.DisplayName}의 {UiKit.WithJosa(boss, "을", "를")} 물리치면 열릴 것 같다";
             if (ToastMessage != message) ShowToast(message, 3f);
@@ -516,6 +556,11 @@ namespace WordRPG.UI
                 return;
             }
             if (transitioning || preemptView.IsOpen || heroSetupRunning) return; // 모습·이름 고르기는 끝까지 (#124)
+            if (characterSelect.IsOpen && characterSelect.CanCancel)
+            {
+                characterSelect.Cancel(); // 가방에서 연 모습 바꾸기 (#233)
+                return;
+            }
             if (tabletView.IsOpen)
             {
                 if (!tabletBusy) CloseTablet();
@@ -710,6 +755,7 @@ namespace WordRPG.UI
         private void EnterArea(FieldArea newArea, Vector2Int position, bool rafting = false)
         {
             area = newArea;
+            OpenStoneGateIfAllLit(newArea); // 예전 세이브 (#233)
             var map = area.Map;
             walker = new FieldWalker(map, position, cell => IsDoorLocked(cell) || IsPaywalled(cell), cell => IsCleared(area, cell), rafting, npcs.IsOccupied);
             encounterCounter = new EncounterCounter(area.EncounterRate, area.MinStepsBetweenEncounters);
@@ -727,7 +773,7 @@ namespace WordRPG.UI
             session.World.Reveal(area.AreaId, map.Width, map.Height, position);
             BuildDarkness();
             minimap.SetArea(map, area.Theme, IsCellDone, cell => session.World.IsExplored(area.AreaId, cell));
-            nameTags.SetArea(area, IsDoorLocked);
+            nameTags.SetArea(area, IsDoorLocked, NameTagTop);
             RefreshNameTags();
             SnapPlayer();
             UpdateCamera();

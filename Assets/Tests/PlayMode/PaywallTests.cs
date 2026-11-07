@@ -81,6 +81,117 @@ namespace WordRPG.Tests
             GameSession.NewGame(TestData.Hero(new MonsterStats(100, 10, 10)).Set("basicSkill",
                 TestData.Skill("strike", SkillKind.Damage, SkillTarget.SingleEnemy, 5)), 1);
 
+        // #233 사용자 ⑨: 정식판을 사면 특전 (호기심 물약 3 + 특제 상처약 5) — '열렸어요' 알림에 같이, 세이브마다 한 번. 이미 산 사람은 켤 때 한 번
+        [UnityTest]
+        public IEnumerator BuyingGivesTheGiftOnceAndOwnersGetItOnStart()
+        {
+            var curious = TestData.Item("potion_curious").Set("displayName", "호기심 물약");
+            var great = TestData.Item("potion_great").Set("displayName", "특제 상처약");
+            // 목록 순서와 상관없이 이야기 순서로 가장 앞 정식판 지역(숲)을 안내 (#233: 예전엔 동굴이 나왔음)
+            var later = ScriptableObject.CreateInstance<FieldArea>().Set("areaId", "later").Set("displayName", "동굴")
+                .Set("map", "#####\n#P..#\n#####").Set("requiresFullVersion", true).Set("storyOrder", 9);
+            paid.Set("storyOrder", 3);
+            var database = ScriptableObject.CreateInstance<GameDatabase>();
+            database.ReplaceContents(new MonsterSpecies[0], new[] { curious, great }, new[] { later, home, paid });
+            database.Set("fullVersionGift", new List<ItemGift> { new ItemGift(curious, 3), new ItemGift(great, 5) });
+            var owned = new Entitlements();
+            var store = new FakeStore(owned);
+            var session = NewSession();
+            FieldScreen Make(GameSession s, Entitlements e)
+            {
+                var f = new GameObject("GiftField").AddComponent<FieldScreen>();
+                f.Configure(home, s, step: 0.05f, animScale: 0.01f, gameDatabase: database, purchaseStore: store, owned: e);
+                return f;
+            }
+
+            var field = Make(session, owned);
+            yield return null;
+            yield return null;
+            Assert.AreEqual(0, field.FullVersionGiftsGiven, "무료판은 없음");
+            var hud = field.transform.Find("FieldHud/SafeArea");
+            FindButton(hud, "SettingsButton").onClick.Invoke();
+            FindButton(hud, "FullVersionOfferButton").onClick.Invoke();
+            yield return null;
+            Assert.IsTrue(field.Paywall.IsOpen);
+            StringAssert.Contains("숲 너머의 모험", AllText(field.Paywall.Root.transform), "이야기 순서로 첫 정식판 지역");
+            StringAssert.Contains("특전: 호기심 물약 3개 · 특제 상처약 5개", AllText(field.Paywall.Root.transform), "안내 창에 특전");
+            store.NextBuy = StoreResult.Purchased;
+            FindButton(field.Paywall.Root.transform, "BuyButton").onClick.Invoke();
+            Assert.AreEqual(1, field.FullVersionGiftsGiven);
+            Assert.AreEqual(3, session.Inventory.GetCount(curious));
+            Assert.AreEqual(5, session.Inventory.GetCount(great));
+            StringAssert.Contains("정식판이 열렸어요", field.ToastMessage);
+            StringAssert.Contains("정식판 특전: 호기심 물약 3개 · 특제 상처약 5개를 받았어요", field.ToastMessage, "열렸어요 알림에 같이");
+            Object.Destroy(field.gameObject);
+            yield return null;
+
+            var again = Make(session, owned);
+            yield return null;
+            yield return null;
+            Assert.AreEqual(0, again.FullVersionGiftsGiven, "같은 세이브는 다시 안 받음");
+            Assert.AreEqual(3, session.Inventory.GetCount(curious));
+            Object.Destroy(again.gameObject);
+            yield return null;
+
+            // 이미 산 사람의 다른 세이브(또는 업데이트 전에 산 사람): 켤 때 한 번
+            var other = NewSession();
+            var owner = Make(other, owned);
+            yield return null;
+            yield return null;
+            Assert.AreEqual(1, owner.FullVersionGiftsGiven);
+            Assert.AreEqual(5, other.Inventory.GetCount(great));
+            StringAssert.Contains("정식판 특전", owner.ToastMessage);
+            Object.Destroy(owner.gameObject);
+            yield return null;
+        }
+
+        // #233 사용자 ⑮: 정식판이면 가방 > 주인공 탭의 [모습 바꾸기]로 언제든 8명 중 고름. 무료판은 정식판 안내
+        [UnityTest]
+        public IEnumerator FullVersionLetsTheHeroChangeLooks()
+        {
+            var owned = new Entitlements();
+            var store = new FakeStore(owned);
+            var session = GameSession.NewGame(TestData.Hero(new MonsterStats(100, 10, 10)).Set("looks", new List<HeroLook>
+            {
+                new HeroLook("boy", "소년"), new HeroLook("hunter", "사냥꾼"), new HeroLook("knight", "기사")
+            }), 1);
+            session.Hero.SetLook("boy");
+            var field = MakeField(session, store, owned);
+            yield return null;
+            yield return null;
+            var hud = field.transform.Find("FieldHud/SafeArea");
+            FindButton(hud, "BagButton").onClick.Invoke();
+            yield return null;
+            FindButton(hud.Find("InventoryView"), "ChangeLookButton").onClick.Invoke();
+            yield return null;
+            Assert.IsTrue(field.Paywall.IsOpen, "무료판은 정식판 안내");
+            StringAssert.Contains("모습 바꾸기", AllText(field.Paywall.Root.transform), "안내 창 특전 줄에");
+            Assert.IsFalse(field.CharacterSelect.IsOpen);
+            FindButton(field.Paywall.Root.transform, "LaterButton").onClick.Invoke();
+
+            owned.Grant(Entitlements.FullVersion);
+            yield return null;
+            FindButton(hud.Find("InventoryView"), "ChangeLookButton").onClick.Invoke();
+            yield return null;
+            Assert.IsTrue(field.CharacterSelect.IsOpen, "정식판은 고르기 창");
+            Assert.IsTrue(field.CharacterSelect.CanCancel);
+            StringAssert.Contains("이 모습으로 바꾸기", AllText(field.CharacterSelect.Root.transform));
+            field.HandleBack();
+            Assert.IsFalse(field.CharacterSelect.IsOpen, "뒤로가기 = 닫기");
+            Assert.AreEqual("boy", session.Hero.LookOrDefault, "닫으면 그대로");
+
+            FindButton(hud.Find("InventoryView"), "ChangeLookButton").onClick.Invoke();
+            yield return null;
+            field.CharacterSelect.Select("knight");
+            field.CharacterSelect.Confirm();
+            yield return null;
+            Assert.AreEqual("knight", session.Hero.LookOrDefault, "바꾼 모습");
+            Assert.IsFalse(field.CharacterSelect.IsOpen);
+            StringAssert.Contains("모습을 바꿨어요", field.ToastMessage);
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator EntranceAsksToBuyThenOpens()
         {

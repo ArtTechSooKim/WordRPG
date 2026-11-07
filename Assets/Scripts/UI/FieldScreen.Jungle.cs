@@ -214,6 +214,63 @@ namespace WordRPG.UI
                 bubble.Say("제단에 열쇠 그림이 새겨져 있다…\n강 건너 동쪽 기슭을 가리키는 것 같다", 6f);
         }
 
+        // 빠른 물살 어귀 (#235 사용자 ㉛): 뗏목으로 물살을 거슬러 3칸까지 들어갈 수 있지만, 멈추면(끝까지 가면 바로) 물살에 밀려 뗏목 물로 돌아옴.
+        // 밀리는 동안은 손을 써도 소용없음 — 뗏목 물에 닿으면 다시 움직일 수 있음
+        private const float DriftWaitIdle = 0.45f;  // 멈춘 뒤 밀리기 시작할 때까지
+        private const float DriftWaitDeep = 0.12f;  // 끝까지(3칸) 갔을 때
+        private const float DriftStepRatio = 0.55f; // 밀려 내려가는 빠르기 (뗏목 걸음 대비)
+        private bool drifting;
+        private float driftWait;
+        public int DriftSteps { get; private set; } // 테스트용
+        public bool IsDrifting => drifting;
+
+        private bool UpdateRaftCurrent(float dt)
+        {
+            int depth = walker.Rafting ? RaftCurrent.Depth(walker.Map, walker.Position) : 0;
+            if (depth == 0)
+            {
+                driftWait = 0f;
+                return false;
+            }
+            bool pushing = ReadMove().direction.HasValue;
+            driftWait += dt;
+            if (depth < RaftCurrent.MaxUpstream && pushing) return false; // 아직 더 거슬러 갈 수 있음 — 손을 쓰는 동안은 버팀
+            if (driftWait < (depth >= RaftCurrent.MaxUpstream ? DriftWaitDeep : DriftWaitIdle)) return depth >= RaftCurrent.MaxUpstream;
+            if (!drifting && !bubble.IsVisible) bubble.Say("물살이 너무 세다!", 1.4f);
+            StartDrift();
+            return true;
+        }
+
+        private bool ContinueDrift()
+        {
+            if (!drifting)
+            {
+                driftWait = 0f; // 한 칸 갈 때마다 기다림을 새로
+                return false;
+            }
+            if (walker.Rafting && RaftCurrent.Depth(walker.Map, walker.Position) > 0)
+            {
+                StartDrift();
+                return true;
+            }
+            drifting = false;
+            driftWait = 0f;
+            return false;
+        }
+
+        private void StartDrift()
+        {
+            if (!walker.Drift()) return;
+            drifting = true;
+            DriftSteps++;
+            moving = true;
+            running = false;
+            currentStep = stepDuration * RaftStepRatio * DriftStepRatio;
+            moveT = 0f;
+            moveFrom = player.position;
+            moveTo = CellCenter(walker.Position);
+        }
+
         // 뗏목에 타고 내림 (사용자: 직접 몰기): 폴짝 소리. 처음 타면 안내를 본 것으로
         private void Board(bool boarding)
         {

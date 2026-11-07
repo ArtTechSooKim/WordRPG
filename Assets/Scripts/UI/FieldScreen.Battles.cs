@@ -73,6 +73,7 @@ namespace WordRPG.UI
                 session.World.MarkBossDefeated(area.BossId);
                 var bossCell = walker.Map.BossPosition.Value;
                 tilemap.SetTile(new Vector3Int(bossCell.x, bossCell.y, 0), TileFor(FieldTile.Boss, true));
+                DrawBigBoss(area); // 크게 서 있던 보스도 사라짐 (#233)
                 var lectern = walker.Map.Find(FieldTile.Lectern);
                 if (lectern.HasValue && area.HasDictionary)
                     tilemap.SetTile(new Vector3Int(lectern.Value.x, lectern.Value.y, 0), TileFor(FieldTile.Lectern, true));
@@ -123,6 +124,8 @@ namespace WordRPG.UI
                 bubble.Say(afterLine, BossAfterLineSeconds);
                 yield return WaitUnscaled(BossAfterLineSeconds);
             }
+            var seer = area == bossArea ? BossSeer() : null; // 그 지역 인물이 배웅 (#234 숲 나무꾼) — 기술 배우기·돌아가기 묻기 전에
+            if (seer != null) yield return BossCutscene(seer, gates);
             if (document != null && !session.Hero.Knows(document))
             {
                 OfferDocument(document);
@@ -289,7 +292,7 @@ namespace WordRPG.UI
             cameraFocus = null;
             cutscene.HideLetterbox();
             DrawTiles(area, IsDoorLocked);
-            nameTags.SetArea(area, IsDoorLocked);
+            nameTags.SetArea(area, IsDoorLocked, NameTagTop);
             RefreshNameTags();
             player.gameObject.SetActive(true);
             hudCanvas.enabled = true;

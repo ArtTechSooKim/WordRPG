@@ -351,6 +351,15 @@ namespace WordRPG.UI
         public SkillLearnView LearnView => learnView;
         public RelicPage Relics => relicPage;                                      // 안내가 가리킬 곳 (#142)
         public RectTransform RelicsTabRect => (RectTransform)relicsTab.transform;
+        public RectTransform HeroTabRect => (RectTransform)heroTab.transform;
+        public Action ChangeLook { set => heroPage.ChangeLook = value; } // (#233)
+
+        // 모습을 바꾼 뒤 얼굴 다시
+        public void RefreshHero()
+        {
+            if (IsOpen && CurrentTab == BagTab.Hero) heroPage.Show(session.Hero);
+        }
+        public HeroInfoPage HeroPage => heroPage;
 
         private void SelectTab(BagTab tab) => SelectTab(tab, null);
 

@@ -68,7 +68,7 @@ namespace WordRPG.UI
             }
 
             var check = UiFonts.Bold.HasCharacter('✓') ? "✓" : "•";
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++) // 지역 단어·몬스터·성유물·앞으로의 지역·특전 (#233)
             {
                 var line = UiKit.Label($"Benefit_{i}", view.panel, "", 32, Palette.Text, 0, 1, 1, 1, TextAnchor.MiddleLeft,
                     FontStyle.Normal, true, 20);
