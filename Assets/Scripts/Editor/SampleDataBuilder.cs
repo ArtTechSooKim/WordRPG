@@ -483,6 +483,8 @@ namespace WordRPG.EditorTools
             SetGimmick("boss_forget_king", BossGimmick.Forget, "까먹대왕 앞에선 빨리 답하자! 크리티컬 시간이 지나면 정답을 까먹어");
             // 빈칸두꺼비 (#237 사용자 ㉝): 빈칸 울음 = 보호막을 깨고 다음 차례 문제 단어 글자의 25%를 빈칸으로
             SetGimmick("boss_blank_frog", BossGimmick.Blank, "빈칸 울음 뒤엔 단어에 빈칸이 생겨! 남은 글자로 떠올려 보자");
+            // 헷갈너구리 (#238 사용자 아이디어 1): 보기가 2초마다 자리를 섞음
+            SetGimmick("boss_muddle_raccoon", BossGimmick.Shuffle, "헷갈너구리는 2초마다 보기 자리를 바꿔! 흔들리면 잠깐 기다렸다 고르자");
             SetSkillFlags("frog_blank_croak", shattersShields: true, blanksWords: true);
             // 필드의 보스 그림 크기 (#233 사용자: 작아서 위엄이 없음 → 보스 방에 꽉 차게. 빈칸두꺼비 6배, 말줄임덩굴 가로 5·세로 6배)
             SetBossFieldSize(libraryPath, 5, 5);
@@ -1009,6 +1011,20 @@ namespace WordRPG.EditorTools
                 new NpcStage("강을 ___ 건너면 ___에 ___가 있어.", NpcMotionKind.Sit),
                 new NpcStage("강을 뗏목으로 건너면 동쪽 기슭에 열쇠가 있어.", NpcMotionKind.Pace, null, 60, 0.65f)); // 경건하게
             // #232 사용자: 움직임이 이상함 → 가만히 서 있고, 말을 걸면 바라보기만
+            // #238 사용자 ⑩: 정글에 처음 들어오면 순례자가 달려와 알려 줌 (사용자가 쓴 말 — 빈칸두꺼비가 글자를 삼켜 말에 빈칸. 맞춤법만 고침)
+            pilgrim.SetCutscenes(
+                new[]
+                {
+                    "숲을 지나온 건가? 그런 건가? 오랜만에 사람을 만나니 반갑네",
+                    "이 정글은 ___정글이야 아이고 이런.",
+                    "하얀 ___가 지나간 이후로 ___두꺼비가 폭주___ 내 말에도 자꾸 ___이 생겨.",
+                    "___의 할머니? 나도 몰라 ___ 없는데",
+                    "두꺼비는 북쪽 ___에 숨어 있어. 그 문을 열 열쇠는… 강 ___ 어딘가에.",
+                    "단_를 많이 __수록 내 말의 빈칸도 채워질 거야. 부탁하네! ____를 물리쳐줘",
+                    "아 ___ 이 ___에는 유적이 있어 자네라면 __의 수수께끼를 ___수도 있겠네"
+                },
+                new string[0], new string[0], new string[0]);
+            EditorUtility.SetDirty(pilgrim);
             var miner = Npc("npc_miner", "광부", 0,
                 new NpcStage("나가는 길은 저쪽으로 쭉 가서…", NpcMotionKind.Stand),
                 new NpcStage("동굴이 환해졌어! 다시 일할 수 있겠다!", NpcMotionKind.Stand, cave));

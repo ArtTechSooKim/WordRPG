@@ -38,6 +38,17 @@ namespace WordRPG.Tests
             Assert.AreEqual(BossGimmick.None, Species("forget_goblin").Gimmick, "보통 까먹깨비는 기믹 없음");
         }
 
+        // #238 사용자 아이디어 1: 헷갈너구리는 보기가 2초마다 자리를 섞음
+        [Test]
+        public void TheMuddleRaccoonShufflesTheChoices()
+        {
+            var raccoon = Species("boss_muddle_raccoon");
+            Assert.AreEqual(BossGimmick.Shuffle, raccoon.Gimmick);
+            StringAssert.Contains("2초", raccoon.GimmickHint);
+            var gimmicks = new[] { "boss_forget_king", "boss_muddle_raccoon", "boss_blank_frog" }.Select(id => Species(id).Gimmick).ToList();
+            CollectionAssert.AllItemsAreUnique(gimmicks, "보스마다 기믹이 다름 (사용자: 똑같아서 식상함)");
+        }
+
         // 서고 사서가 까먹대왕을 조심하라며 상처약 하나 (보스를 물리치기 전에만)
         [Test]
         public void TheLibrarianWarnsAboutTheKingAndGivesAPotion()

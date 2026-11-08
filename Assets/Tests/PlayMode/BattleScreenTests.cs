@@ -259,6 +259,51 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // #238 사용자 ㉑ 아이디어 1: 헷갈너구리와 싸울 땐 보기 버튼이 2초마다 자리를 섞음 (섞이기 직전에 흔들림). 누른 버튼 = 그 버튼의 보기
+        [UnityTest]
+        public IEnumerator TheMuddleRaccoonShufflesTheChoiceButtons()
+        {
+            var strike = TestData.Skill("strike", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var hero = Hero(new MonsterStats(100, 30, 10), strike);
+            var raccoon = TestData.Species("raccoon", new MonsterStats(999, 1, 50), new MonsterStats(0, 0, 0), strike)
+                .Set("displayName", "헷갈너구리").Set("gimmick", BossGimmick.Shuffle);
+            var go = new GameObject("BattleScreenUnderTest");
+            var screen = go.AddComponent<BattleScreen>();
+            screen.Configure(Table(raccoon), Words(), GameSession.NewGame(hero, 1), animScale: 0.01f,
+                config: new BattleConfig(answerTimeLimitSeconds: 8f, criticalTimeSeconds: 0.3f, criticalMultiplier: 1.5f, variance: 0f,
+                    expPerCorrectAnswer: 2));
+            yield return null;
+            yield return null;
+            var root = screen.transform;
+            yield return WaitFor(() =>
+            {
+                if (ActiveButton(root, "Choice_0") != null) return true;
+                (ActiveButton(root, "CardConfirmButton") ?? ActiveButton(root, "Intensity_0") ?? ActiveButton(root, "SkillButton_0"))?.onClick.Invoke();
+                return false;
+            }, 5f);
+            int correct = screen.Engine.CurrentQuestion.CorrectIndex;
+            var correctRect = (RectTransform)FindButton(root, $"Choice_{correct}").transform;
+            var before = correctRect.anchorMin;
+            var spots = new List<Vector2>();
+            for (int i = 0; i < 4; i++) spots.Add(((RectTransform)FindButton(root, $"Choice_{i}").transform).anchorMin);
+
+            yield return WaitFor(() => screen.ChoiceShuffles > 0, 4f);
+            Assert.AreEqual(1, screen.ChoiceShuffles, "2초가 지나면 섞임");
+            var after = new List<Vector2>();
+            for (int i = 0; i < 4; i++) after.Add(((RectTransform)FindButton(root, $"Choice_{i}").transform).anchorMin);
+            CollectionAssert.AreEquivalent(spots, after, "같은 네 자리를 서로 바꿈");
+            CollectionAssert.AreNotEqual(spots, after, "적어도 하나는 자리가 바뀜");
+            Assert.AreEqual(1, screen.GimmickHits);
+
+            FindButton(root, $"Choice_{correct}").onClick.Invoke(); // 옮겨 간 정답 버튼을 누르면 정답
+            yield return null;
+            yield return null;
+            Assert.AreEqual(correct, PickedChoiceOf(screen));
+            Assert.AreEqual(before, correctRect.anchorMin, "답한 뒤엔 제자리로");
+            Object.Destroy(go);
+            yield return null;
+        }
+
         private static int PickedChoiceOf(BattleScreen battle) =>
             (int)typeof(BattleScreen).GetField("pickedChoice", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(battle);
 

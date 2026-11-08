@@ -23,6 +23,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_PACK = r"F:\Unity\김수연습\Ninja Adventure - Asset Pack\Ninja Adventure - Asset Pack"
 OUT = os.path.join(ROOT, "Assets", "Resources", "Audio", "Sfx")
 FF = imageio_ffmpeg.get_ffmpeg_exe()
+# CC0 녹음 (#238): OpenGameArt '75 CC0 breaking / falling / hit sfx' (rubberduck) — 깃 밖 사본 (라이선스 페이지 사본도 그 위 폴더). 표의 폴더 칸에 이 값을 쓰면 .ogg를 그대로 읽음
+CC0 = os.path.join(ROOT, "Builds", "music_pilot", "glass", "pack75")
 
 SLASH, HIT, MAGIC, ELEMENT, BONUS, ALERT, BOUNCE = "Whoosh & Slash", "Hit & Impact", "Magic & Skill", "Elemental", "Bonus", "Alert", "Jump & Bounce"
 PEAK = -7.0  # 팩 소리들의 최고 음량과 같게
@@ -57,15 +59,19 @@ SOUNDS = {
     "skillguardtime": ([(MAGIC, "Magic4", 0, 0)], 0, PEAK),
     "skillguardseed": ([(BOUNCE, "Bounce5", 0, 0), (MAGIC, "Magic1", -8, 40)], 0, PEAK),
     # 필드 (기술이 아닌 소리도 같은 방식으로)
-    # 덩굴 다리가 한 칸씩 놓임 (#232 사용자: 예전 Spirit 소리는 유령 웃음 같음 → 덩굴이 뻗는 풀 소리). 칸마다 울려서 조금 작게
-    "vinegrow": ([(ELEMENT, "Grass2", 0, 0), (ELEMENT, "Grass", -6, 60)], 4500, -9.0),
+    # 덩굴 다리가 한 칸씩 놓임 (#232 사용자: 예전 Spirit 소리는 유령 웃음 같음 → #238 후보 D3: 나무 '탁' + 풀). 칸마다 울려서 조금 작게
+    "vinegrow": ([(CC0, "bfh1_wood_hit_01", -2, 0), (ELEMENT, "Grass2", -4, 20)], 0, -9.0),
+    # 일반 정답 타격 (#238 사용자 ③ 후보 A7): 크리티컬보다 가벼운 '탁' — 크리티컬은 기술 소리 + 쾅 그대로
+    "hitlight": ([(CC0, "bfh1_hit_03", 0, 0)], 0, -9.0),
+    # 강도 ×1.2·×1.5·×2 글자가 뜰 때 (#238 사용자 ㉕ 후보 B27): '띵' — 진짜 '쾅'은 맞을 때만
+    "intensityup": ([(BONUS, "PowerUp2", 0, 0)], 0, -8.0),
 }
 
 
 def build(name, layers, cut, peak, sounds):
     args, parts = [], []
     for i, (folder, file, gain, delay) in enumerate(layers):
-        args += ["-i", os.path.join(sounds, folder, file + ".wav")]
+        args += ["-i", os.path.join(CC0, file + ".ogg") if folder == CC0 else os.path.join(sounds, folder, file + ".wav")]
         parts.append(f"[{i}:a]aformat=sample_rates=44100:channel_layouts=mono,volume={gain}dB,adelay={delay}:all=1[a{i}]")
     mix = "".join(f"[a{i}]" for i in range(len(layers)))
     chain = f"{mix}amix=inputs={len(layers)}:duration=longest:normalize=0"

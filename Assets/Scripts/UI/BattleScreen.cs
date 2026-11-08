@@ -565,6 +565,10 @@ namespace WordRPG.UI
             bool? shownCritical = null;
             var forgetter = GimmickEnemy(BossGimmick.Forget); // 까먹대왕 (#236 사용자 ㉑ (가) — 보스전 문제마다)
             bool forgotten = false;
+            var shuffler = GimmickEnemy(BossGimmick.Shuffle); // 헷갈너구리 (#238): 보기가 2초마다 자리를 섞음
+            var homes = ChoiceAnchors();
+            float nextShuffle = ShuffleEvery;
+            bool shaking = false, shuffledOnce = false;
 
             while (pickedChoice == int.MinValue)
             {
@@ -584,6 +588,23 @@ namespace WordRPG.UI
                 }
                 timerFill.anchorMax = new Vector2(Mathf.Clamp01(1f - elapsed / limit), 1);
                 timerFillImage.color = critical ? Palette.Gold : (limit - elapsed < 3f ? Palette.Bad : Palette.Info);
+                if (shuffler != null)
+                {
+                    if (!shaking && elapsed >= nextShuffle - ShuffleWarning)
+                    {
+                        shaking = true;
+                        StartCoroutine(ShakeChoices(ShuffleWarning)); // 섞이기 직전 예고
+                    }
+                    if (elapsed >= nextShuffle)
+                    {
+                        ShuffleChoices();
+                        Sound.Play(Sfx.Flee, 1.3f); // 휙
+                        if (!shuffledOnce) GimmickHits++;
+                        shuffledOnce = true;
+                        shaking = false;
+                        nextShuffle += ShuffleEvery;
+                    }
+                }
                 if (forgetter != null && !forgotten && elapsed > battleConfig.CriticalTimeSeconds)
                 {
                     // 크리티컬 시간 안에 못 맞힘 → 정답 버튼이 사라지고 남은 건 모두 오답 (무조건 틀림)
@@ -598,6 +619,7 @@ namespace WordRPG.UI
             }
 
             if (forgotten) choiceButtons[question.CorrectIndex].gameObject.SetActive(true); // 답한 뒤엔 정답을 보여 줘서 배우게
+            if (shuffledOnce) RestoreChoiceAnchors(homes); // 다음 문제는 제자리부터
             foreach (var button in choiceButtons) button.interactable = false;
             onDone(elapsed);
         }
@@ -612,6 +634,64 @@ namespace WordRPG.UI
         }
 
         public int GimmickHits { get; private set; } // 이번 전투에서 보스 기믹에 당한 수 (패배 조언·테스트)
+
+        // 헷갈너구리 (#238): 보기 버튼의 자리(앵커)를 섞음 — 버튼마다 보기는 그대로라 누른 버튼 = 고른 보기
+        public const float ShuffleEvery = 2f, ShuffleWarning = 0.3f;
+        private readonly System.Random shuffleRng = new System.Random(); // 전투 규칙의 rng와 따로
+        public int ChoiceShuffles { get; private set; } // 테스트용
+
+        private (Vector2 min, Vector2 max)[] ChoiceAnchors()
+        {
+            var anchors = new (Vector2, Vector2)[choiceButtons.Count];
+            for (int i = 0; i < choiceButtons.Count; i++)
+            {
+                var rect = (RectTransform)choiceButtons[i].transform;
+                anchors[i] = (rect.anchorMin, rect.anchorMax);
+            }
+            return anchors;
+        }
+
+        private void RestoreChoiceAnchors((Vector2 min, Vector2 max)[] anchors)
+        {
+            for (int i = 0; i < choiceButtons.Count && i < anchors.Length; i++)
+            {
+                var rect = (RectTransform)choiceButtons[i].transform;
+                rect.anchorMin = anchors[i].min;
+                rect.anchorMax = anchors[i].max;
+                rect.localRotation = Quaternion.identity;
+            }
+        }
+
+        // 보이는 보기 버튼끼리 자리를 바꿈 — 적어도 한 쌍은 꼭 바뀌게 (한 바퀴 돌리기)
+        private void ShuffleChoices()
+        {
+            var shown = choiceButtons.FindAll(b => b.gameObject.activeSelf);
+            if (shown.Count < 2) return;
+            ChoiceShuffles++;
+            var spots = shown.ConvertAll(b => ((RectTransform)b.transform).anchorMin);
+            var tops = shown.ConvertAll(b => ((RectTransform)b.transform).anchorMax);
+            int shift = 1 + shuffleRng.Next(shown.Count - 1);
+            for (int i = 0; i < shown.Count; i++)
+            {
+                var rect = (RectTransform)shown[i].transform;
+                int to = (i + shift) % shown.Count;
+                rect.anchorMin = spots[to];
+                rect.anchorMax = tops[to];
+                rect.localRotation = Quaternion.identity;
+            }
+        }
+
+        private IEnumerator ShakeChoices(float seconds)
+        {
+            for (float t = 0f; t < seconds; t += Time.unscaledDeltaTime)
+            {
+                float angle = Mathf.Sin(t * 70f) * 2.5f;
+                foreach (var button in choiceButtons)
+                    if (button.gameObject.activeSelf) button.transform.localRotation = Quaternion.Euler(0f, 0f, angle);
+                yield return null;
+            }
+            foreach (var button in choiceButtons) button.transform.localRotation = Quaternion.identity;
+        }
 
         // 강도 2 이상일 때만: 배율 · 맞힌 칸(초록) · 맞힌 수/필요한 수
         private void RefreshChainBadge()

@@ -237,5 +237,19 @@ namespace WordRPG.Tests
             Assert.AreEqual("행운을 빌겠네!", woodcutter.ExitStoryLines.Last());
             Assert.AreEqual(1, forest.Npcs.Count(npc => npc.BriefsOnEntry), "숲에 알려 주는 인물은 하나");
         }
+
+        // #238 사용자 ⑩: 정글은 순례자가 (사용자가 쓴 7줄 — 빈칸두꺼비 탓에 말에 빈칸)
+        [Test]
+        public void TheJunglePilgrimBriefsOnEntry()
+        {
+            var jungle = AssetDatabase.LoadAssetAtPath<FieldArea>("Assets/Data/Areas/jungle.asset");
+            var pilgrim = jungle.Npcs.First(npc => npc.NpcId == "npc_pilgrim");
+            Assert.IsTrue(pilgrim.BriefsOnEntry);
+            Assert.AreEqual(7, pilgrim.EntryLines.Count);
+            Assert.AreEqual("숲을 지나온 건가? 그런 건가? 오랜만에 사람을 만나니 반갑네", pilgrim.EntryLines[0]);
+            Assert.IsTrue(pilgrim.EntryLines.All(line => line.Contains("_") || line == pilgrim.EntryLines[0]), "첫 줄 말고는 말에 빈칸");
+            Assert.IsFalse(pilgrim.SeesOffAfterBoss, "보스 뒤 배웅은 없음");
+            Assert.AreEqual(1, jungle.Npcs.Distinct().Count(npc => npc.BriefsOnEntry), "정글에 알려 주는 인물은 하나 (개구리는 아님)");
+        }
     }
 }

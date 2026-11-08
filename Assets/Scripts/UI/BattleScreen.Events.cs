@@ -103,10 +103,16 @@ namespace WordRPG.UI
             return 0.5f;
         }
 
-        // 맞는 소리 (#164): 막아 내면 막는 소리, 아니면 기술마다 다른 소리 + 크리티컬이면 크리티컬 소리를 겹침. 기술이 없는 피해는 기본 소리
+        // 맞는 소리 (#164): 막아 내면 막는 소리, 아니면 기술마다 다른 소리 + 크리티컬이면 크리티컬 소리를 겹침. 기술이 없는 피해는 기본 소리.
+        // #238 사용자 ③ (후보 A7): 아군의 일반 정답 타격은 가벼운 '탁' 하나 — 크리티컬과 소리가 같아 일반도 세게 때린 것 같았음
         private void PlayHitSound(BattleEvent e)
         {
             if (e.Amount <= 0) { Sound.Play(Sfx.Shield); return; }
+            if (e.Skill != null && !e.IsCritical && (e.Actor == null || e.Actor.IsPlayerSide))
+            {
+                Sound.Play(Sfx.HitLight);
+                return;
+            }
             Sound.Play(e.Skill != null ? SkillLooks.Of(e.Skill, e.Actor == null || e.Actor.IsPlayerSide).Sound : Sfx.Hit);
             if (e.IsCritical) Sound.Play(Sfx.Critical);
         }
@@ -119,7 +125,7 @@ namespace WordRPG.UI
             PlaySkillStart(e);
             if (!charged) return 0.5f;
             Float(e.Actor, $"×{FormatMultiplier(e.Multiplier)}!", Palette.Gold, 56);
-            Sound.Play(Sfx.Critical);
+            Sound.Play(Sfx.IntensityUp); // '띵' (#238 사용자 B27) — 진짜 '쾅'은 맞을 때만
             return 0.7f;
         }
 

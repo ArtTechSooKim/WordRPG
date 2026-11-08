@@ -22,7 +22,9 @@ namespace WordRPG.UI
         SkillSlash, SkillClaw, SkillHeavy, SkillThunder, SkillInk, SkillWater, SkillPlant, SkillWhip, SkillRock, SkillLight,
         SkillLetters, SkillHighlight, SkillSound, SkillSpore, SkillSwirl, SkillHealLeaf, SkillHealWater, SkillDrain,
         SkillGuardEcho, SkillGuardBook, SkillGuardTime, SkillGuardSeed, SkillHealLight,
-        VineGrow // 덩굴 다리가 놓임 (#232 — Tools/make_skill_sfx.py)
+        VineGrow,    // 덩굴 다리가 놓임 (#232·#238 — Tools/make_skill_sfx.py)
+        HitLight,    // 일반 정답 타격 — 가벼운 '탁' (#238 사용자 A7)
+        IntensityUp  // 강도 ×N 글자가 뜰 때 '띵' (#238 사용자 B27)
     }
 
     // 지역 환경음 (#193): BGM 밑에 깔리는 소리. 어느 지역이 어느 소리인지는 테마 표 ThemeLooks.
