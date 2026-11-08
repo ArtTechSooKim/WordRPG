@@ -180,6 +180,46 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // #236 사용자 ㉑ (가): 까먹대왕과 싸울 때는 문제마다 크리티컬 시간이 지나면 정답 버튼이 사라져 무조건 틀림 (유령 웃음 + '까먹었다!').
+        // 답한 뒤엔 정답을 다시 보여 줌
+        [UnityTest]
+        public IEnumerator TheForgetBossMakesTheAnswerVanishAfterTheCriticalTime()
+        {
+            var strike = TestData.Skill("strike", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var hero = Hero(new MonsterStats(100, 30, 10), strike);
+            var king = TestData.Species("king", new MonsterStats(999, 1, 50), new MonsterStats(0, 0, 0), strike)
+                .Set("displayName", "까먹대왕").Set("gimmick", BossGimmick.Forget);
+            var go = new GameObject("BattleScreenUnderTest");
+            var screen = go.AddComponent<BattleScreen>();
+            screen.Configure(Table(king), Words(), GameSession.NewGame(hero, 1), animScale: 0.01f,
+                config: new BattleConfig(answerTimeLimitSeconds: 5f, criticalTimeSeconds: 0.3f, criticalMultiplier: 1.5f, variance: 0f,
+                    expPerCorrectAnswer: 2));
+            yield return null;
+            yield return null;
+            var root = screen.transform;
+            yield return WaitFor(() =>
+            {
+                if (ActiveButton(root, "Choice_0") != null || ActiveButton(root, "Choice_1") != null) return true;
+                (ActiveButton(root, "CardConfirmButton") ?? ActiveButton(root, "Intensity_0") ?? ActiveButton(root, "SkillButton_0"))?.onClick.Invoke();
+                return false;
+            }, 5f);
+            int correct = screen.Engine.CurrentQuestion.CorrectIndex;
+            Assert.IsNotNull(ActiveButton(root, $"Choice_{correct}"), "처음엔 정답 버튼이 있음");
+
+            yield return new WaitForSecondsRealtime(0.6f);
+            Assert.IsNull(ActiveButton(root, $"Choice_{correct}"), "크리티컬 시간이 지나면 정답 버튼이 사라짐");
+            Assert.AreEqual(1, screen.GimmickHits);
+            StringAssert.Contains("까먹대왕 때문에 단어를 까먹었다", AllText(root));
+            int wrong = correct == 0 ? 1 : 0;
+            ActiveButton(root, $"Choice_{wrong}").onClick.Invoke();
+            yield return null;
+            Assert.AreEqual(wrong, PickedChoiceOf(screen), "남은 건 모두 오답");
+            Assert.IsNotNull(FindButton(root, $"Choice_{correct}"));
+            Assert.IsTrue(FindButton(root, $"Choice_{correct}").gameObject.activeSelf, "답한 뒤엔 정답을 다시 보여 줌");
+            Object.Destroy(go);
+            yield return null;
+        }
+
         private static int PickedChoiceOf(BattleScreen battle) =>
             (int)typeof(BattleScreen).GetField("pickedChoice", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(battle);
 

@@ -49,41 +49,14 @@ namespace WordRPG.UI
         // 정식판이 필요한 지역: 게임 데이터에서 (없으면 지금 지역의 출입구가 이어지는 곳에서)
         private FieldArea FullVersionArea()
         {
-            // 이야기 순서로 가장 앞 지역 (#233: 예전엔 목록 순서라 설정의 안내가 숲 대신 동굴로 나왔음)
-            FieldArea first = null;
-            if (database != null)
-                foreach (var candidate in database.Areas)
-                    if (candidate != null && candidate.RequiresFullVersion && (first == null || candidate.StoryOrder < first.StoryOrder)) first = candidate;
+            var first = PaywallOffer.FirstFullVersionArea(database != null ? database.Areas : null); // 이야기 순서로 가장 앞 (#233)
             if (first != null) return first;
             foreach (var exit in area.Exits)
                 if (exit.Target != null && exit.Target.RequiresFullVersion) return exit.Target;
             return null;
         }
 
-        // 안내 문구는 그 지역 데이터에서: 단어 수 · 몬스터·보스 · 성유물(상자·보스 보상)
-        private static PaywallOffer OfferFor(FieldArea target, GameDatabase gameDatabase)
-        {
-            var offer = new PaywallOffer { AreaName = target.DisplayName };
-            if (target.Words != null && target.Words.Words.Count > 0)
-                offer.Lines.Add($"{target.DisplayName} 지역 — 새 영단어 {target.Words.Words.Count}개");
-            var species = new HashSet<MonsterSpecies>();
-            if (target.Encounters != null)
-                foreach (var entry in target.Encounters.Entries)
-                    if (entry.Species != null) species.Add(entry.Species);
-            var boss = target.Boss;
-            offer.Lines.Add(boss != null ? $"새 몬스터 {species.Count}종과 보스 '{boss.Species.DisplayName}'" : $"새 몬스터 {species.Count}종");
-            var relics = new List<RelicData>();
-            foreach (var chest in target.ChestContents)
-                if (chest.Relic != null) relics.Add(chest.Relic);
-            if (boss?.RewardRelic != null) relics.Add(boss.RewardRelic);
-            if (relics.Count > 0)
-                offer.Lines.Add($"{target.DisplayName}의 성유물 {relics.Count}개 ({string.Join("·", relics.ConvertAll(r => r.DisplayName))})");
-            offer.Lines.Add("앞으로 추가될 지역도 모두");
-            string gift = gameDatabase != null ? FullVersionGift.Describe(gameDatabase.FullVersionGift) : "";
-            offer.Lines.Add(gift.Length > 0 ? $"특전: {gift} · 모습 바꾸기" : "특전: 모습 바꾸기 (8가지 중 언제든)"); // #233 사용자 ⑨⑮
-            foreach (var relic in relics) offer.Icons.Add(UiKit.RelicIcon(relic));
-            return offer;
-        }
+        private static PaywallOffer OfferFor(FieldArea target, GameDatabase gameDatabase) => PaywallOffer.For(target, gameDatabase);
 
         // 보스 방 문 (#76, 사용자가 정한 말): 열쇠가 없으면 / 단어가 모자라면 주인공 혼잣말, 다 갖췄으면 문이 열린다
         private void KnockGate()
@@ -206,11 +179,29 @@ namespace WordRPG.UI
             string name = boss.Species.DisplayName;
             if (session.World.IsBossDefeated(area.BossId))
             {
-                ShowToast($"{UiKit.WithJosa(name, "이", "가")} 있던 자리다.");
+                OfferRematch();
                 return;
             }
             var enemies = new List<MonsterInstance> { new MonsterInstance(boss.Species, boss.Level) };
             StartCoroutine(Encounter(enemies, BossLines.Intro(boss, session.Hero.DisplayName), true));
+        }
+
+        // 이긴 보스와 다시 싸우기 (#236 사용자 ㉓: 보스 기믹이 새로 생겼다는 업데이트를 보고 돌아올 수도 있음). 보상은 경험치·골드만
+        private bool rematchBattle;
+        public int Rematches { get; private set; } // 테스트용
+
+        private bool CanRematchHere => area.Boss != null && session.World.IsBossDefeated(area.BossId)
+                                       && walker.Map.BossPosition == walker.Position;
+
+        private void OfferRematch()
+        {
+            var boss = area.Boss;
+            string name = boss.Species.DisplayName;
+            returnDialog.Show($"{UiKit.WithJosa(name, "과", "와")} 다시 싸울까요?", "보상은 경험치와 골드만 받아요.", "다시 싸우기", false, () =>
+            {
+                var enemies = new List<MonsterInstance> { new MonsterInstance(boss.Species, boss.Level) };
+                StartCoroutine(Encounter(enemies, BossLines.Intro(boss, session.Hero.DisplayName), true, rematch: true));
+            }, "star_full", "그만두기");
         }
 
         // 강화·구매·장착 직후 저장하고 HUD(주인공·성유물·골드) 갱신

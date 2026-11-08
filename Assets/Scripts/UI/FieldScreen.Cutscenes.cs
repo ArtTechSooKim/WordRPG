@@ -23,6 +23,38 @@ namespace WordRPG.UI
         public bool IsCutsceneRunning => cutsceneRunning;
 
         public static string EntryEventId(NpcData npc) => "npc_entry:" + npc.NpcId;
+        public static string GiftEventId(NpcData npc) => "npc_gift:" + npc.NpcId;
+        private const int GiftNoticeRange = 2; // 이만큼 가까이 오면 말을 걺
+
+        // 선물 (#236 사서): 가까이 오면 한 번 — 말하고 아이템을 줌 (그 지역 보스를 물리치기 전에만)
+        private void MaybeStartGiftScene()
+        {
+            if (cutsceneRunning || springJumping || fieldTutorialRunning || NeedsPrologue || heroSetupRunning || moving) return;
+            foreach (var view in npcs.Views)
+            {
+                var data = view.Data;
+                if (data.GiftItem == null || session.World.HasEvent(GiftEventId(data))) continue;
+                if (data.GiftBeforeBossOf != null && data.GiftBeforeBossOf.Boss != null && session.World.IsBossDefeated(data.GiftBeforeBossOf.BossId)) continue;
+                var offset = view.Motion.Cell - walker.Position;
+                if (Mathf.Abs(offset.x) + Mathf.Abs(offset.y) > GiftNoticeRange) continue;
+                StartCoroutine(GiftScene(view));
+                return;
+            }
+        }
+
+        private IEnumerator GiftScene(NpcView npc)
+        {
+            BeginCutscene();
+            session.World.MarkEvent(GiftEventId(npc.Data));
+            FaceEachOther(npc);
+            yield return SayLines(npc, npc.Data.GiftLines);
+            session.Inventory.Add(npc.Data.GiftItem, npc.Data.GiftCount);
+            Sound.Play(Sfx.Coin);
+            string gift = npc.Data.GiftCount > 1 ? $"{npc.Data.GiftItem.DisplayName} {npc.Data.GiftCount}개를" : UiKit.WithJosa(npc.Data.GiftItem.DisplayName, "을", "를");
+            ShowToast($"{gift} 받았다!", 2.5f);
+            RefreshHud();
+            EndCutscene();
+        }
         public static string BossEventId(NpcData npc) => "npc_boss:" + npc.NpcId;
 
         // UpdateNpcs에서 (서 있을 때만): 처음 들어온 지역에 알려 줄 인물이 있으면

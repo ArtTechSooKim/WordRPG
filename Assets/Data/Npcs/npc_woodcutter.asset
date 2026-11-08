@@ -56,3 +56,7 @@ MonoBehaviour:
   - "\uC704\uD5D8\uC774 \uB3C4\uC0AC\uB9AC\uACE0 \uC788\uC73C\uB2C8 \uC870\uC2EC\uD558\uB294
     \uAC8C \uC88B\uC744 \uAC70\uC57C."
   - "\uD589\uC6B4\uC744 \uBE4C\uACA0\uB124!"
+  giftItem: {fileID: 0}
+  giftCount: 1
+  giftBeforeBossOf: {fileID: 0}
+  giftLines: []

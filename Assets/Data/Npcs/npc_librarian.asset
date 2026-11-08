@@ -33,3 +33,10 @@ MonoBehaviour:
   bossThanksLines: []
   exitCallLines: []
   exitStoryLines: []
+  giftItem: {fileID: 11400000, guid: 56596be176cf57541a9ab3caafeb386a, type: 2}
+  giftCount: 1
+  giftBeforeBossOf: {fileID: 11400000, guid: 2f0f21b4f39acf14fab8b7273b5e1a17, type: 2}
+  giftLines:
+  - "\uAE4C\uBA39\uB300\uC655\uC744 \uBB3C\uB9AC\uCE58\uB7EC \uAC00\uC694?"
+  - "\uAE4C\uBA39\uB300\uC655\uC740 \uB2E8\uC5B4\uB97C \uC78A\uAC8C \uD558\uB2C8\uAE4C
+    \uC870\uC2EC\uD574\uC694! \uC774\uAC70 \uAC00\uC838\uAC00\uC694."

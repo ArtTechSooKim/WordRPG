@@ -33,3 +33,7 @@ MonoBehaviour:
   bossThanksLines: []
   exitCallLines: []
   exitStoryLines: []
+  giftItem: {fileID: 0}
+  giftCount: 1
+  giftBeforeBossOf: {fileID: 0}
+  giftLines: []

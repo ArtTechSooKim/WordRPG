@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using WordRPG.Field;
 using WordRPG.Game;
+using WordRPG.Heroes;
+using WordRPG.Monsters;
 
 namespace WordRPG.UI
 {
@@ -14,6 +17,41 @@ namespace WordRPG.UI
         public string AreaName;
         public List<string> Lines = new List<string>();
         public List<Sprite> Icons = new List<Sprite>();
+
+        // 정식판이 필요한 지역 중 이야기 순서로 가장 앞 (숲) — #233: 예전엔 목록 순서라 동굴이 나왔음
+        public static FieldArea FirstFullVersionArea(IEnumerable<FieldArea> areas)
+        {
+            FieldArea first = null;
+            if (areas != null)
+                foreach (var candidate in areas)
+                    if (candidate != null && candidate.RequiresFullVersion && (first == null || candidate.StoryOrder < first.StoryOrder)) first = candidate;
+            return first;
+        }
+
+        // 안내 문구는 그 지역 데이터에서: 단어 수 · 몬스터·보스 · 성유물(상자·보스 보상) · 앞으로의 지역 · 특전 (필드·타이틀이 같이 씀)
+        public static PaywallOffer For(FieldArea target, GameDatabase gameDatabase)
+        {
+            var offer = new PaywallOffer { AreaName = target.DisplayName };
+            if (target.Words != null && target.Words.Words.Count > 0)
+                offer.Lines.Add($"{target.DisplayName} 지역 — 새 영단어 {target.Words.Words.Count}개");
+            var species = new HashSet<MonsterSpecies>();
+            if (target.Encounters != null)
+                foreach (var entry in target.Encounters.Entries)
+                    if (entry.Species != null) species.Add(entry.Species);
+            var boss = target.Boss;
+            offer.Lines.Add(boss != null ? $"새 몬스터 {species.Count}종과 보스 '{boss.Species.DisplayName}'" : $"새 몬스터 {species.Count}종");
+            var relics = new List<RelicData>();
+            foreach (var chest in target.ChestContents)
+                if (chest.Relic != null) relics.Add(chest.Relic);
+            if (boss?.RewardRelic != null) relics.Add(boss.RewardRelic);
+            if (relics.Count > 0)
+                offer.Lines.Add($"{target.DisplayName}의 성유물 {relics.Count}개 ({string.Join("·", relics.ConvertAll(r => r.DisplayName))})");
+            offer.Lines.Add("앞으로 추가될 지역도 모두");
+            string gift = gameDatabase != null ? FullVersionGift.Describe(gameDatabase.FullVersionGift) : "";
+            offer.Lines.Add(gift.Length > 0 ? $"특전: {gift} · 모습 바꾸기" : "특전: 모습 바꾸기 (8가지 중 언제든)"); // #233 사용자 ⑨⑮
+            foreach (var relic in relics) offer.Icons.Add(UiKit.RelicIcon(relic));
+            return offer;
+        }
     }
 
     public class PaywallView

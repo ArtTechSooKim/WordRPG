@@ -322,7 +322,8 @@ namespace WordRPG.UI
         private void UpdateConfirmButton()
         {
             bool ready = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot).HasValue
-                         || (!walker.Rafting && npcs.FindTalkable(walker.Position, walker.Facing, false) != null);
+                         || (!walker.Rafting && npcs.FindTalkable(walker.Position, walker.Facing, false) != null)
+                         || CanRematchHere; // 이긴 보스 자리 (#236)
             if (ready != confirmReady) SetConfirmReady(ready);
 
             // Ready면 숨 쉬듯 살짝, 부딪힌 직후에는 크게 깜빡

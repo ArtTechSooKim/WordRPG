@@ -521,6 +521,12 @@ namespace WordRPG.UI
             if (interactCooldown > 0f) return false;
             if (TryTalkToNpc(facingOnly: true)) return true;
             var direction = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot);
+            if (!direction.HasValue && CanRematchHere)
+            {
+                interactions++;
+                OfferRematch(); // 이긴 보스 자리에 서서 [확인] (#236)
+                return true;
+            }
             if (!direction.HasValue) return TryTalkToNpc(facingOnly: false);
             walker.Face(direction.Value);
             playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
@@ -656,7 +662,7 @@ namespace WordRPG.UI
             // 보스가 있던 자리를 밟으면 승리 뒤 글을 다시 (#207 — 전에 이긴 사람도 읽을 수 있게)
             if (tile == FieldTile.Boss && area.Boss != null && area.Boss.AfterLine.Length > 0 && session.World.IsBossDefeated(area.BossId))
             {
-                bubble.Say(area.Boss.AfterLine, BossAfterLineSeconds);
+                bubble.Say(area.Boss.AfterLine, BossAfterLineSeconds, "[확인]을 누르면 다시 싸울 수 있어요");
                 bubbleKeepUntil = Time.unscaledTime + 1.5f;
             }
             if (tile == FieldTile.Door)

@@ -144,7 +144,7 @@ namespace WordRPG.EditorTools
 
             // --- 보스: 잊혀진 서고 꼭대기의 까먹대왕. 강화 재료 3종 + 성유물 '기억의 성배' ---
             var forgetKing = Monster("boss_forget_king", "까먹대왕", "까먹깨비들의 우두머리. 서고의 기억을 몽땅 먹어 치우고 있다.", MonsterRole.Attacker,
-                new Color(0.15f, 0.6f, 0.55f), new MonsterStats(100, 14, 12), new MonsterStats(16, 3, 2), new[] { kingBonk, memoryDrain, amnesia }, // HP 2배 (#120)
+                new Color(0.15f, 0.6f, 0.55f), new MonsterStats(100, 14, 12), new MonsterStats(16, 3, 2), new[] { memoryDrain, amnesia }, // HP 2배 (#120). 깜빡 대방망이는 뺌 (#236 사용자: 보호막 깨기 없앰, 힘 모으기는 남김)
                 enemyExp: 25, enemyGold: 30,
                 drops: new[] { new ItemDrop(shinyInk, 1f), new ItemDrop(hardCover, 1f), new ItemDrop(sparkleDust, 1f) });
 
@@ -479,6 +479,8 @@ namespace WordRPG.EditorTools
                 "정글에 메아리가 돌아왔다.");
             SetBossLines(cavePath, "끝을 말하지 마… 끝나면 다시 아파질 테니까…", "끝맺는다고 모든 것이 사라지는 건 아니야.",
                 "마지막 문장이 완성됐다.\n'사막 아래의 첫 기록'이라는 말이 적혀 있다.");
+            // 보스 기믹 (#236 사용자 ㉑): 까먹대왕 = 보스전 문제마다 크리티컬 시간이 지나면 정답을 까먹음
+            SetGimmick("boss_forget_king", BossGimmick.Forget, "까먹대왕 앞에선 빨리 답하자! 크리티컬 시간이 지나면 정답을 까먹어");
             // 필드의 보스 그림 크기 (#233 사용자: 작아서 위엄이 없음 → 보스 방에 꽉 차게. 빈칸두꺼비 6배, 말줄임덩굴 가로 5·세로 6배)
             SetBossFieldSize(libraryPath, 5, 5);
             SetBossFieldSize(forestPath, 5, 5);
@@ -972,9 +974,13 @@ namespace WordRPG.EditorTools
                 new NpcStage("첫 글자가 생각났어요! 그다음은…", NpcMotionKind.Sit, null, 25),
                 new NpcStage("제 이름 두 글자가 생각났어요. 마지막 하나가 뭐였더라…", NpcMotionKind.Sit, null, 50), // #232 사용자
                 new NpcStage("이제 세 글자 다 썼어요!", NpcMotionKind.Wander, null, 75, 1.6f)); // 신나서 뛰어다님
+            // #236 사용자 ㉑: 까먹대왕을 조심하라며 상처약 하나 (사서 말투 — 존댓말)
+            var librarianGift = AssetDatabase.LoadAssetAtPath<ItemData>($"{Root}/Items/potion.asset");
             var librarian = Npc("npc_librarian", "사서", 0,
                 new NpcStage("쉿. 소리 내어 읽으면 도깨비들이 와요.", NpcMotionKind.Pace, null, 0, 0.55f), // 발소리를 죽여 살금살금
                 new NpcStage("서쪽 열람실 구석은 보셨나요?", NpcMotionKind.Pace, null, 40, 0.55f));
+            librarian.SetGift(librarianGift, 1, library, "까먹대왕을 물리치러 가요?", "까먹대왕은 단어를 잊게 하니까 조심해요! 이거 가져가요.");
+            EditorUtility.SetDirty(librarian);
             var woodcutter = Npc("npc_woodcutter", "나무꾼", 0,
                 new NpcStage("길을 내가 잃었다, 아니 나를 길이…", NpcMotionKind.Wander, null, 0, 1.25f), // 허둥지둥
                 new NpcStage("이정표가 돌아왔군. 늪 너머 공터를 가 봐.", NpcMotionKind.Pace, forest));
@@ -1081,6 +1087,16 @@ namespace WordRPG.EditorTools
             boss.FindPropertyRelative("bossLine").stringValue = bossLine;
             boss.FindPropertyRelative("heroLine").stringValue = heroLine;
             boss.FindPropertyRelative("afterLine").stringValue = afterLine;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void SetGimmick(string speciesId, BossGimmick gimmick, string hint)
+        {
+            var species = AssetDatabase.LoadAssetAtPath<MonsterSpecies>($"{Root}/Monsters/{speciesId}.asset");
+            if (species == null) return;
+            var so = new SerializedObject(species);
+            Prop(so, "gimmick").enumValueIndex = (int)gimmick;
+            Prop(so, "gimmickHint").stringValue = hint;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 

@@ -28,7 +28,6 @@ MonoBehaviour:
     attack: 3
     defense: 2
   skills:
-  - {fileID: 11400000, guid: 8c7a2777a5b5470c957ba80b844f3c93, type: 2}
   - {fileID: 11400000, guid: d959ca86eeb682240a0450da7c8514ce, type: 2}
   - {fileID: 11400000, guid: cf054c5798524f1a9df7372d93080960, type: 2}
   expReward: 25
@@ -44,4 +43,8 @@ MonoBehaviour:
     chance: 1
     count: 1
   trainingDummy: 0
+  gimmick: 1
+  gimmickHint: "\uAE4C\uBA39\uB300\uC655 \uC55E\uC5D0\uC120 \uBE68\uB9AC \uB2F5\uD558\uC790!
+    \uD06C\uB9AC\uD2F0\uCEEC \uC2DC\uAC04\uC774 \uC9C0\uB098\uBA74 \uC815\uB2F5\uC744
+    \uAE4C\uBA39\uC5B4"
   fleeTier: 2

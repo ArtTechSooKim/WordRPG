@@ -99,11 +99,12 @@ namespace WordRPG.Tests
             return (hit, hit.Target == SkillTarget.AllEnemies ? null : enemy);
         }
 
+        // #236 사용자: 보호막을 깨던 깜빡 대방망이는 뺌 — 힘을 모았다가 내리치는 기억상실만 남음 (대신 문제마다 크리티컬 시간이 지나면 정답을 까먹음)
         [Test]
-        public void KingHitsHardAndChargesABigBlow()
+        public void KingOnlyChargesABigBlow()
         {
             var r = Fight(UserLike, 0.95, 4, fast: true);
-            Assert.GreaterOrEqual(r.Bonk, 38f, $"Lv12(방어 41)에게도 한 방 40 안팎 — 평균 {r.Bonk:0.0}");
+            Assert.AreEqual(0f, r.Bonk, "깜빡 대방망이는 없음");
             Assert.That(r.Amnesia, Is.InRange(85f, 115f), $"기억상실은 100 안팎 — 평균 {r.Amnesia:0.0}");
         }
 

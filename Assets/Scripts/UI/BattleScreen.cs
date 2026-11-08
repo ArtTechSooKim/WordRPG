@@ -138,6 +138,7 @@ namespace WordRPG.UI
 
         // 보스 결정타 (#41, Figma 'Battle — 보스 결정타'): 하얀 번쩍임 · 느린 화면 동안 가장자리 어둡게 · '결정타!' 도장
         private bool bossBattle;
+        private bool rematchBattle; // 이긴 보스와 다시 싸우는 중 (#236)
         private Image finisherFlash, finisherShade;
         private Text finisherStamp;
         private int enemyAreaIndex = -1; // 결정타 동안 적 칸을 어두운 막 위로 올렸다가 되돌릴 자리
@@ -250,13 +251,15 @@ namespace WordRPG.UI
 
         // 필드에서 조우했을 때 한 판. 결과 화면의 버튼을 누르면 화면을 닫고 onFinished(Victory · Defeat · Fled)
         // intro: 전투 로그 첫 줄 (보스전 등). 비우면 "야생 몬스터 출현!". boss면 도망칠 수 없다
+        // rematch: 이긴 보스와 다시 싸움 (#236) — 보상은 경험치·골드만
         public void BeginBattle(List<MonsterInstance> enemies, WordDatabase wordBook, Action<BattlePhase> onFinished,
-            string intro = null, FieldTheme theme = FieldTheme.Meadow, bool boss = false)
+            string intro = null, FieldTheme theme = FieldTheme.Meadow, bool boss = false, bool rematch = false)
         {
             if (running) throw new InvalidOperationException("이미 전투 중입니다");
             if (!EnsureInitialized()) return;
             SetBackdrop(theme, boss);
             bossBattle = boss;
+            rematchBattle = rematch;
             ResetFinisher();
             words = wordBook;
             running = true;
@@ -358,6 +361,7 @@ namespace WordRPG.UI
                 session.StartBattleCombo(DateTime.UtcNow), canFlee: !bossBattle) { SureEscape = session.Effects.Quiet };
             fleeEvents = null;
             fleeQuizEvents = null;
+            GimmickHits = 0;
 
             ResetEnemyArea();
             foreach (var view in enemyViews) Destroy(view.Root.gameObject);
@@ -554,6 +558,8 @@ namespace WordRPG.UI
             float elapsed = 0f;
             string criticalHint = $"{hint}   ★ 크리티컬 찬스!";
             bool? shownCritical = null;
+            var forgetter = GimmickEnemy(BossGimmick.Forget); // 까먹대왕 (#236 사용자 ㉑ (가) — 보스전 문제마다)
+            bool forgotten = false;
 
             while (pickedChoice == int.MinValue)
             {
@@ -573,12 +579,34 @@ namespace WordRPG.UI
                 }
                 timerFill.anchorMax = new Vector2(Mathf.Clamp01(1f - elapsed / limit), 1);
                 timerFillImage.color = critical ? Palette.Gold : (limit - elapsed < 3f ? Palette.Bad : Palette.Info);
+                if (forgetter != null && !forgotten && elapsed > battleConfig.CriticalTimeSeconds)
+                {
+                    // 크리티컬 시간 안에 못 맞힘 → 정답 버튼이 사라지고 남은 건 모두 오답 (무조건 틀림)
+                    forgotten = true;
+                    GimmickHits++;
+                    choiceButtons[question.CorrectIndex].gameObject.SetActive(false);
+                    quizHint.text = $"<color=#FF8A80>이런 {forgetter.DisplayName} 때문에 단어를 까먹었다!</color>";
+                    Sound.Play(Sfx.EvolveLight); // 유령 웃음 (사용자가 들은 그 소리)
+                    Cue($"까먹음 {forgetter.DisplayName}");
+                }
                 yield return null;
             }
 
+            if (forgotten) choiceButtons[question.CorrectIndex].gameObject.SetActive(true); // 답한 뒤엔 정답을 보여 줘서 배우게
             foreach (var button in choiceButtons) button.interactable = false;
             onDone(elapsed);
         }
+
+        // 살아 있는 적 중 그 기믹을 가진 몬스터 (#236)
+        private MonsterInstance GimmickEnemy(BossGimmick gimmick)
+        {
+            if (engine == null) return null;
+            foreach (var enemy in engine.Enemies)
+                if (!enemy.IsDefeated && enemy.Monster != null && enemy.Monster.Species.Gimmick == gimmick) return enemy.Monster;
+            return null;
+        }
+
+        public int GimmickHits { get; private set; } // 이번 전투에서 보스 기믹에 당한 수 (패배 조언·테스트)
 
         // 강도 2 이상일 때만: 배율 · 맞힌 칸(초록) · 맞힌 수/필요한 수
         private void RefreshChainBadge()

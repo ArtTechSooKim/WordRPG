@@ -359,6 +359,46 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // #236 사용자 ㉓: 이긴 보스 자리에 서서 [확인] → 다시 싸우기 — 보상은 경험치·골드만 (성유물·재료는 다시 안 줌)
+        [UnityTest]
+        public IEnumerator ADefeatedBossCanBeFoughtAgainForExpAndGoldOnly()
+        {
+            var hero = Hero();
+            var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var ink = TestData.Item("ink").Set("displayName", "잉크");
+            var crown = TestData.Relic("crown", bite, new MonsterStats(0, 1, 0)).Set("displayName", "왕관");
+            var king = TestData.Species("king", new MonsterStats(40, 1, 50), new MonsterStats(0, 0, 0), bite)
+                .Set("displayName", "까먹대왕").Set("goldReward", 10).Set("drops", new List<ItemDrop> { new ItemDrop(ink, 1f) });
+            //   y=2 #.B.#  ← 보스 (2,2)
+            //   y=1 #.P.#
+            var lair = Area("lair", "보스 방", "#####\n#.B.#\n#.P.#\n#####", hero).Set("boss", new BossEncounter(king, 3, crown));
+            var session = GameSession.NewGame(Player(), 1);
+            session.World.MarkBossDefeated(lair.BossId);
+            var field = CreateField(lair, session);
+            yield return null;
+            yield return null;
+
+            yield return HoldStick(field, Direction.Up, () => field.PlayerCell == new Vector2Int(2, 2));
+            Assert.AreEqual(new Vector2Int(2, 2), field.PlayerCell, "이긴 보스 자리는 밟을 수 있음");
+            yield return PressConfirm(field);
+            yield return WaitFor(() => field.IsReturnDialogOpen, 2f);
+            StringAssert.Contains("까먹대왕과 다시 싸울까요", AllText(field));
+            StringAssert.Contains("경험치와 골드만", AllText(field));
+            int gold = session.Inventory.Gold;
+            VisibleButton(field, "DialogConfirmButton").onClick.Invoke();
+            yield return WaitFor(() => field.Battle.IsRunning, 3f);
+            yield return PlayUntilResult(field.Battle, answerCorrectly: true);
+            FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
+            yield return WaitFor(() => field.Rematches == 1, 3f);
+            Assert.AreEqual(1, field.Rematches);
+            Assert.Greater(session.Inventory.Gold, gold, "골드는 받음");
+            Assert.AreEqual(0, session.Inventory.GetCount(ink), "재료는 안 받음");
+            Assert.IsFalse(session.Hero.Owns(crown), "보스 성유물은 다시 안 줌");
+            StringAssert.Contains("다시 물리쳤다", field.ToastMessage);
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
         // #232 사용자: 서고 보스(까먹대왕)를 이기고 [돌아가기]를 고르면 초원 시작 지점으로 — 던전을 깨면 마을로 돌아가는 게 당연함
         [UnityTest]
         public IEnumerator DungeonBossVictoryReturnsToTheVillageStart()

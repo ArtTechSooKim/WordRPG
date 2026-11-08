@@ -67,11 +67,19 @@ namespace WordRPG.Monsters
         [Tooltip("수련용 허수아비: 맞아도 HP가 줄지 않는다 (피해 숫자는 그대로). 기술을 비워 두면 공격하지 않는다")]
         [SerializeField] private bool trainingDummy;
 
+        [Header("보스 기믹 (#236)")]
+        [Tooltip("Forget = 크리티컬 시간이 지나면 정답 버튼이 사라짐(까먹대왕) / Blank = 빈칸 울음 뒤 단어에 빈칸(빈칸두꺼비). 에셋에 번호로 저장 — 새 기믹은 맨 뒤")]
+        [SerializeField] private BossGimmick gimmick;
+        [Tooltip("이 몬스터의 기믹에 당해 졌을 때 결산에 나오는 한 줄 (DefeatAdvice)")]
+        [SerializeField] private string gimmickHint;
+
         [Header("도망 (#84)")]
         [Tooltip("약함 = 항상 도망 / 보통 = 1/4 확률로 단어 문제 / 강함 = 늘 단어 문제 (틀리면 차례를 놓침). 보스전은 원래 도망 불가")]
         [SerializeField] private FleeTier fleeTier = FleeTier.Weak;
 
         public FleeTier FleeTier => fleeTier;
+        public BossGimmick Gimmick => gimmick;
+        public string GimmickHint => gimmickHint ?? "";
         public string SpeciesId => speciesId;
         public string DisplayName => displayName;
         public string Description => description;

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using WordRPG.Items;
 
 namespace WordRPG.Field
 {
@@ -74,6 +75,13 @@ namespace WordRPG.Field
         [Tooltip("주인공이 길 옆으로 온 뒤 하는 말. 끝나면 화면 밖으로 걸어가 제자리로")]
         [SerializeField] private List<string> exitStoryLines = new List<string>();
 
+        [Header("선물 (#236 — 서고 사서가 까먹대왕을 조심하라며 상처약)")]
+        [Tooltip("주인공이 가까이(2칸) 오면 한 번: 말하고 이 아이템을 준다. 이 지역 보스를 물리치기 전에만. 비면 없음")]
+        [SerializeField] private ItemData giftItem;
+        [SerializeField] private int giftCount = 1;
+        [SerializeField] private FieldArea giftBeforeBossOf;
+        [SerializeField] private List<string> giftLines = new List<string>();
+
         public string NpcId => npcId;
         public string DisplayName => displayName;
         public int FrameWidth => frameWidth;
@@ -88,6 +96,10 @@ namespace WordRPG.Field
         public IReadOnlyList<string> ExitStoryLines => exitStoryLines;
         public bool BriefsOnEntry => entryLines != null && entryLines.Count > 0;
         public bool SeesOffAfterBoss => bossThanksLines != null && bossThanksLines.Count > 0;
+        public ItemData GiftItem => giftItem;
+        public int GiftCount => giftCount;
+        public FieldArea GiftBeforeBossOf => giftBeforeBossOf;
+        public IReadOnlyList<string> GiftLines => giftLines;
 
         // 샘플 데이터 생성 전용. 런타임에서는 호출하지 않는다
         public void Configure(string id, string name, int animalFrameWidth, IEnumerable<NpcStage> newStages)
@@ -105,6 +117,15 @@ namespace WordRPG.Field
             bossThanksLines = new List<string>(thanks);
             exitCallLines = new List<string>(exitCall);
             exitStoryLines = new List<string>(exitStory);
+        }
+
+        // 샘플 데이터 생성 전용 (#236)
+        public void SetGift(ItemData item, int count, FieldArea beforeBossOf, params string[] lines)
+        {
+            giftItem = item;
+            giftCount = count;
+            giftBeforeBossOf = beforeBossOf;
+            giftLines = new List<string>(lines);
         }
 
         // 샘플 데이터 생성 전용 (#223)

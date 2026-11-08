@@ -74,6 +74,37 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // #236 사용자 ㉑: 서고 사서가 가까이(2칸) 오면 까먹대왕을 조심하라며 상처약 하나 — 한 번만, 보스를 물리친 뒤엔 없음
+        //   y=1  #P.N#   시작 (1,1), 사서 (3,1)
+        [UnityTest]
+        public IEnumerator TheLibrarianHandsOverAPotionOnce()
+        {
+            var potion = TestData.Item("potion").Set("displayName", "상처약");
+            var npc = ScriptableObject.CreateInstance<NpcData>();
+            npc.Configure("npc_librarian", "사서", 0, new[] { new NpcStage("쉿.", NpcMotionKind.Stand) });
+            var library = ScriptableObject.CreateInstance<FieldArea>()
+                .Set("areaId", "lib_t").Set("displayName", "서고").Set("map", "#####\n#P.N#\n#####")
+                .Set("words", Words()).Set("npcs", new List<NpcData> { npc });
+            npc.SetGift(potion, 1, library, "까먹대왕을 물리치러 가요?", "이거 가져가요.");
+            var session = Session();
+            var field = new GameObject("GiftField").AddComponent<FieldScreen>();
+            field.Configure(library, session, step: 0.05f, animScale: 0.01f);
+            yield return WaitFor(() => session.Inventory.GetCount(potion) > 0, 3f);
+            Assert.AreEqual(1, session.Inventory.GetCount(potion), "상처약 하나");
+            Assert.IsTrue(session.World.HasEvent(FieldScreen.GiftEventId(npc)));
+            StringAssert.Contains("상처약을 받았다", field.ToastMessage);
+            yield return WaitFor(() => !field.IsCutsceneRunning, 2f);
+            Object.Destroy(field.gameObject);
+            yield return null;
+
+            var again = new GameObject("GiftField2").AddComponent<FieldScreen>();
+            again.Configure(library, session, step: 0.05f, animScale: 0.01f);
+            yield return new WaitForSecondsRealtime(0.4f);
+            Assert.AreEqual(1, session.Inventory.GetCount(potion), "한 번만");
+            Object.Destroy(again.gameObject);
+            yield return null;
+        }
+
         //   y=5  #####D####   정글 쪽 길 (5,5) — 보스가 염
         //   y=4  #........#
         //   y=3  #....B...#   보스 (5,3)

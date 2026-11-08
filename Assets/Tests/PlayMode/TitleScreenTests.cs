@@ -142,6 +142,39 @@ namespace WordRPG.Tests
         }
 
         // 안드로이드 뒤로가기: 설정을 닫고, 아무것도 없으면 끝낼지 물음
+        // #236 사용자 ⑭: 정식판을 처음부터 살 수 있게 타이틀 왼쪽 위에 작은 [정식판] — 이야기 순서로 첫 정식판 지역(숲)의 안내, 사면 숨김
+        [UnityTest]
+        public IEnumerator TitleOffersTheFullVersionUntilBought()
+        {
+            var words = ScriptableObject.CreateInstance<Words.WordDatabase>().Set("regionId", "t").Set("regionName", "숲");
+            words.ReplaceWords(TestData.SampleWords());
+            var cave = ScriptableObject.CreateInstance<Field.FieldArea>().Set("areaId", "cave").Set("displayName", "동굴")
+                .Set("map", "###\n#P#\n###").Set("words", words).Set("requiresFullVersion", true).Set("storyOrder", 5);
+            var forest = ScriptableObject.CreateInstance<Field.FieldArea>().Set("areaId", "forest").Set("displayName", "숲")
+                .Set("map", "###\n#P#\n###").Set("words", words).Set("requiresFullVersion", true).Set("storyOrder", 3);
+            database.ReplaceContents(new MonsterSpecies[0], new ItemData[0], new[] { cave, forest }, database.Relics);
+            var manager = StartManager();
+            bool? started = null;
+            var title = MakeTitle(newGame => started = newGame);
+            yield return null;
+            yield return null;
+            var root = title.transform;
+            Assert.IsTrue(title.IsFullVersionButtonVisible, "무료판이면 보임");
+
+            FindButton(root, "TitleFullVersionButton").onClick.Invoke();
+            Assert.IsTrue(title.Paywall.IsOpen);
+            StringAssert.Contains("숲 너머의 모험", AllText(title.Paywall.Root.transform), "이야기 순서로 첫 정식판 지역");
+            FindButton(root, "TapToStart").onClick.Invoke();
+            Assert.IsNull(started, "안내가 떠 있으면 화면을 눌러도 시작 안 함");
+            title.HandleBack();
+            Assert.IsFalse(title.Paywall.IsOpen, "뒤로가기 = 닫기");
+
+            manager.Entitlements.Grant(Entitlements.FullVersion);
+            Assert.IsFalse(title.IsFullVersionButtonVisible, "사면 숨김");
+            Object.Destroy(title.gameObject);
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator BackButtonClosesSettingsThenAsksToQuit()
         {

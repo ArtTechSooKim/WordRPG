@@ -30,6 +30,9 @@ namespace WordRPG.Battle
             Gold = gold;
             Items = items;
         }
+
+        // 이긴 보스와 다시 싸울 때 (#236 사용자 ㉓): 경험치·골드만 — 재료 드롭은 없음
+        public BattleReward WithoutItems() => new BattleReward(Exp, Gold, new List<RewardItem>());
     }
 
     public static class BattleRewardCalculator

@@ -18,7 +18,7 @@ namespace WordRPG.UI
     // 필드 > 전투: 조우 → 전투 화면을 덮고 결과 처리, 보스를 이긴 뒤(시작 지점·길 열림 연출), 지면 다시 일어남, 수련
     public partial class FieldScreen
     {
-        private IEnumerator Encounter(List<MonsterInstance> enemies = null, string intro = null, bool boss = false)
+        private IEnumerator Encounter(List<MonsterInstance> enemies = null, string intro = null, bool boss = false, bool rematch = false)
         {
             transitioning = true;
             Sound.Play(Sfx.Encounter);
@@ -37,8 +37,9 @@ namespace WordRPG.UI
             transitioning = false;
             inBattle = true;
             bossBattle = boss;
+            rematchBattle = rematch;
             HideToast();
-            battle.BeginBattle(enemies, area.Words, OnBattleFinished, intro, area.Theme, boss);
+            battle.BeginBattle(enemies, area.Words, OnBattleFinished, intro, area.Theme, boss, rematch);
         }
 
         private Music AreaMusic => ThemeLooks.Of(area.Theme).Music; // 테마 표 (#118)
@@ -65,6 +66,16 @@ namespace WordRPG.UI
             encounterCounter.Reset();
             bool wasBoss = bossBattle;
             bossBattle = false;
+            bool wasRematch = rematchBattle;
+            rematchBattle = false;
+            if (won && wasRematch)
+            {
+                // 다시 싸운 보스 (#236): 보상은 결산의 경험치·골드뿐 — 길·성유물·사전은 이미 받음
+                Rematches++;
+                ShowToast($"{UiKit.WithJosa(area.Boss.Species.DisplayName, "을", "를")} 다시 물리쳤다!", 2.5f);
+                RefreshHud();
+                return;
+            }
             // #124 처음 시작 흐름: 첫 승리 뒤 목표(까먹대왕)를 한 번
             if (won && !wasBoss && heroSetup && !session.Tutorials.Has(TutorialProgress.Goal)) StartCoroutine(GoalReminder());
 

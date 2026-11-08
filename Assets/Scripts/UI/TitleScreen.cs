@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using WordRPG.Field;
 using WordRPG.Game;
 
 namespace WordRPG.UI
@@ -27,6 +28,8 @@ namespace WordRPG.UI
         private Text tapLabel;
         private ConfirmDialog dialog;
         private SettingsView settingsView;
+        private PaywallView paywall;     // 정식판 안내 (#236)
+        private Button fullVersionButton; // 왼쪽 위 작은 [정식판] — 산 뒤에는 숨김
         private IntroCinematicView introView; // 설정 > [입장 영상 다시 보기] (#138)
         private readonly List<(RectTransform rt, float baseY, float phase)> floaters = new List<(RectTransform, float, float)>();
 
@@ -46,6 +49,7 @@ namespace WordRPG.UI
             }
             Build();
             Refresh();
+            if (manager.Entitlements != null) manager.Entitlements.Changed += RefreshFullVersionButton;
             Sound.PlayMusic(Music.Title);
             ShowUpdateNotice();
         }
@@ -66,7 +70,8 @@ namespace WordRPG.UI
         public void HandleBack()
         {
             if (dialog == null) return;
-            if (introView.IsOpen) introView.Skip();
+            if (paywall != null && paywall.IsOpen) paywall.Close();
+            else if (introView.IsOpen) introView.Skip();
             else if (dialog.IsOpen) dialog.Hide();
             else if (settingsView.IsOpen) settingsView.Hide();
             else if (GameManager.CanQuit)
@@ -175,12 +180,50 @@ namespace WordRPG.UI
             settingsRect.anchoredPosition = new Vector2(-24, -40);
             settingsButton.onClick.AddListener(OpenSettings);
 
+            // 정식판 미리 사기 (#236 사용자 ⑭: 막아 둘 이유가 없음 — 타이틀에 작게). 설정 버튼과 짝으로 왼쪽 위
+            fullVersionButton = UiKit.IconButton("TitleFullVersionButton", root, "star_full", "정식판", Palette.PanelLight, 0, 1, 0, 1);
+            var fullRect = (RectTransform)fullVersionButton.transform;
+            fullRect.pivot = new Vector2(0, 1);
+            fullRect.sizeDelta = new Vector2(120, 120);
+            fullRect.anchoredPosition = new Vector2(24, -40);
+            fullVersionButton.onClick.AddListener(OpenFullVersion);
+
             UiKit.Label("Footer", root, $"v{Application.version}   ·   글꼴 Jua · Noto Sans KR (SIL OFL 1.1)", 24, Palette.TextDim,
                 0, 0.01f, 1, 0.04f);
 
             dialog = ConfirmDialog.Create(root);
             settingsView = SettingsView.Create(root);
+            paywall = PaywallView.Create(root);
             introView = IntroCinematicView.Create(root);
+            RefreshFullVersionButton();
+        }
+
+        private void OnDestroy()
+        {
+            if (manager != null && manager.Entitlements != null) manager.Entitlements.Changed -= RefreshFullVersionButton;
+        }
+
+        public bool IsFullVersionButtonVisible => fullVersionButton != null && fullVersionButton.gameObject.activeSelf;
+        public PaywallView Paywall => paywall;
+
+        private FieldArea FullVersionArea() => PaywallOffer.FirstFullVersionArea(manager.Database != null ? manager.Database.Areas : null);
+
+        private void RefreshFullVersionButton()
+        {
+            if (fullVersionButton == null) return;
+            bool owned = manager.Entitlements != null && manager.Entitlements.HasFullVersion;
+            fullVersionButton.gameObject.SetActive(!owned && FullVersionArea() != null);
+        }
+
+        private void OpenFullVersion()
+        {
+            var target = FullVersionArea();
+            if (target == null || paywall.IsOpen) return;
+            paywall.Show(manager.Store, manager.Entitlements, PaywallOffer.For(target, manager.Database), () =>
+            {
+                RefreshFullVersionButton();
+                dialog.ShowNotice("정식판이 열렸어요!", $"{target.DisplayName}부터 모든 지역에 들어갈 수 있어요.\n특전은 게임을 시작하면 받아요.");
+            });
         }
 
         // 배경: 초원 타일로 그린 도트 풍경을 화면을 덮게 (도트 그대로) + 위(로고)·아래(버튼) 어둡게
@@ -294,7 +337,7 @@ namespace WordRPG.UI
         // 화면을 누르면: 저장이 있으면 이어하기, 없으면 새 게임
         private void OnTap()
         {
-            if (started || dialog.IsOpen || settingsView.IsOpen || introView.IsOpen) return;
+            if (started || dialog.IsOpen || settingsView.IsOpen || introView.IsOpen || paywall.IsOpen) return;
             if (manager.SaveBlocked) return; // 더 새 버전 앱의 기록 — 업데이트해야 이어할 수 있음
             Begin(!manager.HasSave);
         }

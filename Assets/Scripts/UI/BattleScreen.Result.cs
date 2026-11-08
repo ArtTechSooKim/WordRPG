@@ -35,6 +35,7 @@ namespace WordRPG.UI
             if (victory)
             {
                 reward = engine.CalculateReward();
+                if (rematchBattle) reward = reward.WithoutItems(); // 다시 싸운 보스는 경험치·골드만 (#236)
                 levels = BattleRewardCalculator.Apply(reward, hero, session.Inventory);
                 companionGrowth = GrowCompanion(reward);
             }
@@ -274,13 +275,18 @@ namespace WordRPG.UI
         private string DefeatAdviceLine()
         {
             int strongest = 0;
+            string gimmickHint = "";
             foreach (var enemy in engine.Enemies)
-                if (enemy.Monster != null && enemy.Monster.Level > strongest) strongest = enemy.Monster.Level;
+            {
+                if (enemy.Monster == null) continue;
+                if (enemy.Monster.Level > strongest) strongest = enemy.Monster.Level;
+                if (enemy.Monster.Species.GimmickHint.Length > 0) gimmickHint = enemy.Monster.Species.GimmickHint;
+            }
             var hero = session.Hero;
             var equipped = new List<OwnedRelic>();
             for (int i = 0; i < hero.SlotCount; i++) equipped.Add(hero.SlotAt(i));
-            var cause = DefeatAdvice.Cause(hero.Level, strongest, false, DefeatAdvice.CanUpgradeAny(equipped, session.Inventory));
-            LastDefeatAdvice = DefeatAdvice.Line(cause);
+            var cause = DefeatAdvice.Cause(hero.Level, strongest, GimmickHits > 0 && gimmickHint.Length > 0, DefeatAdvice.CanUpgradeAny(equipped, session.Inventory));
+            LastDefeatAdvice = DefeatAdvice.Line(cause, gimmickHint);
             return LastDefeatAdvice;
         }
 
