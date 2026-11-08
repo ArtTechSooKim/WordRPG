@@ -139,6 +139,8 @@ namespace WordRPG.UI
         // 보스 결정타 (#41, Figma 'Battle — 보스 결정타'): 하얀 번쩍임 · 느린 화면 동안 가장자리 어둡게 · '결정타!' 도장
         private bool bossBattle;
         private bool rematchBattle; // 이긴 보스와 다시 싸우는 중 (#236)
+        private readonly System.Random blankRng = new System.Random(); // 빈칸 자리 (전투 규칙의 rng와 따로 — #237)
+        public string ShownPrompt => quizPrompt != null ? quizPrompt.text : ""; // 테스트용
         private Image finisherFlash, finisherShade;
         private Text finisherStamp;
         private int enemyAreaIndex = -1; // 결정타 동안 적 칸을 어두운 막 위로 올렸다가 되돌릴 자리
@@ -533,15 +535,18 @@ namespace WordRPG.UI
         private IEnumerator AskQuestion(QuizQuestion question, Action<float> onDone)
         {
             ShowPanel(quizPanel);
-            quizPrompt.text = question.Prompt;
-            string hint = (quizHintPrefix ?? "") + (question.Direction == QuizDirection.EnglishToMeaning ? "이 단어의 뜻은?" : "알맞은 영단어는?");
+            bool blanked = engine != null && engine.WordsBlanked && !engine.IsFleeQuiz; // 빈칸 울음 다음 차례 (#237)
+            quizPrompt.text = blanked && question.Direction == QuizDirection.EnglishToMeaning ? WordBlanks.Mask(question.Prompt, blankRng) : question.Prompt;
+            string hint = (blanked ? "빈칸 단어 — " : "") + (quizHintPrefix ?? "") + (question.Direction == QuizDirection.EnglishToMeaning ? "이 단어의 뜻은?" : "알맞은 영단어는?");
+            if (blanked) GimmickHits++;
             for (int i = 0; i < choiceButtons.Count; i++)
             {
                 bool used = i < question.Choices.Count;
                 choiceButtons[i].gameObject.SetActive(used);
                 if (!used) continue;
                 var choiceLabel = UiKit.LabelOf(choiceButtons[i]);
-                choiceLabel.text = question.Choices[i];
+                // 한→영 문제는 영어 보기에 빈칸 (#237)
+                choiceLabel.text = blanked && question.Direction == QuizDirection.MeaningToEnglish ? WordBlanks.Mask(question.Choices[i], blankRng) : question.Choices[i];
                 choiceLabel.color = Palette.Text;
                 UiKit.SetColor(choiceButtons[i], Palette.Button);
                 choiceButtons[i].interactable = true;

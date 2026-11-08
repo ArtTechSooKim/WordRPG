@@ -481,6 +481,9 @@ namespace WordRPG.EditorTools
                 "마지막 문장이 완성됐다.\n'사막 아래의 첫 기록'이라는 말이 적혀 있다.");
             // 보스 기믹 (#236 사용자 ㉑): 까먹대왕 = 보스전 문제마다 크리티컬 시간이 지나면 정답을 까먹음
             SetGimmick("boss_forget_king", BossGimmick.Forget, "까먹대왕 앞에선 빨리 답하자! 크리티컬 시간이 지나면 정답을 까먹어");
+            // 빈칸두꺼비 (#237 사용자 ㉝): 빈칸 울음 = 보호막을 깨고 다음 차례 문제 단어 글자의 25%를 빈칸으로
+            SetGimmick("boss_blank_frog", BossGimmick.Blank, "빈칸 울음 뒤엔 단어에 빈칸이 생겨! 남은 글자로 떠올려 보자");
+            SetSkillFlags("frog_blank_croak", shattersShields: true, blanksWords: true);
             // 필드의 보스 그림 크기 (#233 사용자: 작아서 위엄이 없음 → 보스 방에 꽉 차게. 빈칸두꺼비 6배, 말줄임덩굴 가로 5·세로 6배)
             SetBossFieldSize(libraryPath, 5, 5);
             SetBossFieldSize(forestPath, 5, 5);
@@ -1087,6 +1090,16 @@ namespace WordRPG.EditorTools
             boss.FindPropertyRelative("bossLine").stringValue = bossLine;
             boss.FindPropertyRelative("heroLine").stringValue = heroLine;
             boss.FindPropertyRelative("afterLine").stringValue = afterLine;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void SetSkillFlags(string skillId, bool shattersShields, bool blanksWords)
+        {
+            var skill = AssetDatabase.LoadAssetAtPath<SkillData>($"{Root}/Skills/{skillId}.asset");
+            if (skill == null) return;
+            var so = new SerializedObject(skill);
+            Prop(so, "shattersShields").boolValue = shattersShields;
+            Prop(so, "blanksWords").boolValue = blanksWords;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 

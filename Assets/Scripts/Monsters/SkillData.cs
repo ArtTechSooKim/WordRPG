@@ -64,6 +64,10 @@ namespace WordRPG.Monsters
 
         [Tooltip("힘 모으기 (#120, 적 기술): 0이면 바로 씀. 1 이상이면 고른 차례엔 '힘을 모으고 있다'만 하고 그만큼 차례를 넘긴 뒤 발동 (보스의 큰 한 방)")]
         [SerializeField] private int chargeTurns;
+        [Tooltip("맞히면 대상의 보호막을 먼저 깨뜨림 (#237 빈칸 울음)")]
+        [SerializeField] private bool shattersShields;
+        [Tooltip("쓰면 다음 아군 차례의 문제 단어 글자 25%가 빈칸 (#237 빈칸 울음 — WordBlanks)")]
+        [SerializeField] private bool blanksWords;
 
         [Tooltip("이 스킬을 쓸 때 나오는 문제 유형. 강한 스킬일수록 어려운 '한→영'")]
         [SerializeField] private QuizDirection quizDirection = QuizDirection.EnglishToMeaning;
@@ -78,6 +82,8 @@ namespace WordRPG.Monsters
         public SkillTarget Target => target;
         public int Power => power;
         public int ChargeTurns => chargeTurns;
+        public bool ShattersShields => shattersShields;
+        public bool BlanksWords => blanksWords;
         public QuizDirection QuizDirection => quizDirection;
         public SkillFx Fx => fx;
 

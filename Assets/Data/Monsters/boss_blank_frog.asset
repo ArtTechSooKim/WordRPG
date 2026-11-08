@@ -48,4 +48,7 @@ MonoBehaviour:
     chance: 1
     count: 2
   trainingDummy: 0
+  gimmick: 2
+  gimmickHint: "\uBE48\uCE78 \uC6B8\uC74C \uB4A4\uC5D4 \uB2E8\uC5B4\uC5D0 \uBE48\uCE78\uC774
+    \uC0DD\uACA8! \uB0A8\uC740 \uAE00\uC790\uB85C \uB5A0\uC62C\uB824 \uBCF4\uC790"
   fleeTier: 2

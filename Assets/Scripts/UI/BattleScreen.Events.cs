@@ -59,6 +59,8 @@ namespace WordRPG.UI
                 case BattleEventType.Defeated: return ShowDefeated(e);
                 case BattleEventType.RoundStarted: return ShowRoundStarted(e);
                 case BattleEventType.Charging: return ShowCharging(e);
+                case BattleEventType.ShieldShattered: return ShowShieldShattered(e);
+                case BattleEventType.WordsBlanked: return ShowWordsBlanked(e);
                 default: return 0f; // Victory · Defeat · FleeBlocked
             }
         }
@@ -225,6 +227,27 @@ namespace WordRPG.UI
         }
 
         // 힘을 모으는 기술 (#120): 이번 차례는 힘만 모으고 다음 차례에 큰 한 방 — 보호막으로 대비할 틈
+        // 빈칸 울음에 보호막이 깨짐 (#237): 깨지는 연출 + 소리 (유리 소리는 사용자가 고르면 바꿈 ⑳)
+        private float ShowShieldShattered(BattleEvent e)
+        {
+            var s = shown[e.Target];
+            shown[e.Target] = (s.hp, 0);
+            Sync(e.Target);
+            Cue($"보호막 깨짐 {e.Target.DisplayName}");
+            StartCoroutine(Shatter(e.Target));
+            Sound.Play(Sfx.Shield);
+            Float(e.Target, "보호막이 깨졌다!", Palette.Bad, 44);
+            Log($"{e.Target.DisplayName}의 보호막이 깨졌다!");
+            return 0.5f;
+        }
+
+        private float ShowWordsBlanked(BattleEvent e)
+        {
+            Log("머릿속에 빈칸이 생겼다… 다음 문제 단어에 빈칸!");
+            Float(e.Actor, "빈칸!", Palette.Gold, 52);
+            return 0.4f;
+        }
+
         private float ShowCharging(BattleEvent e)
         {
             Log($"{UiKit.WithJosa(e.Actor.DisplayName, "이", "가")} 힘을 모으고 있다");

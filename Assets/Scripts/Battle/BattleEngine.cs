@@ -63,6 +63,9 @@ namespace WordRPG.Battle
         // 몰래 다니던 중 부딪힌 전투 (살금살금 물약이 남아 있음): 몬스터 등급과 상관없이 바로 도망 (#232 사용자 — 물약의 취지).
         // 보스전(CanFlee = false)은 그대로 막힘
         public bool SureEscape { get; set; }
+        // 빈칸 울음을 맞은 다음 아군 차례 (#237): 문제 단어 글자의 25%가 빈칸 — UI가 WordBlanks로 가림
+        public bool WordsBlanked => blankRound == Round;
+        private int blankRound = -1;
 
         // 도망 등급 = 살아 있는 적 중 가장 강한 등급
         public FleeTier EscapeTier
@@ -380,9 +383,20 @@ namespace WordRPG.Battle
             List<BattleEvent> events, float comboBonus = 0f, float intensity = 1f)
         {
             events.Add(BattleEvent.SkillUsed(user, skill, intensity));
+            if (skill.BlanksWords && !user.IsPlayerSide)
+            {
+                blankRound = Round + 1; // 적 차례가 끝나면 Round가 오름 → 바로 다음 아군 차례
+                events.Add(BattleEvent.WordsBlanked(user, skill));
+            }
 
             foreach (var target in ResolveTargets(user, skill, chosenTarget))
             {
+                if (skill.ShattersShields && target.Shield > 0)
+                {
+                    int broken = target.Shield;
+                    target.ClearShield();
+                    events.Add(BattleEvent.ShieldShattered(user, target, skill, broken));
+                }
                 switch (skill.Kind)
                 {
                     case SkillKind.Damage:

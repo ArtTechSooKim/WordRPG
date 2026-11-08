@@ -19,5 +19,8 @@ MonoBehaviour:
   kind: 0
   target: 1
   power: 120
+  chargeTurns: 0
+  shattersShields: 1
+  blanksWords: 1
   quizDirection: 0
   fx: 13

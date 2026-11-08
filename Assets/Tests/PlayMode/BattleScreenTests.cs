@@ -220,6 +220,45 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // #237 사용자 ㉝: 빈칸 울음을 맞은 다음 차례엔 문제 단어 글자의 25%가 빈칸 (s_cur_ty처럼)
+        [UnityTest]
+        public IEnumerator AfterTheBlankCroakTheNextWordHasBlanks()
+        {
+            var strike = TestData.Skill("strike", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var hero = Hero(new MonsterStats(500, 30, 10), strike);
+            var croak = TestData.Skill("croak", SkillKind.Damage, SkillTarget.AllEnemies, 1).Set("displayName", "빈칸 울음")
+                .Set("shattersShields", true).Set("blanksWords", true);
+            var frog = TestData.Species("frog", new MonsterStats(999, 1, 50), new MonsterStats(0, 0, 0), croak)
+                .Set("displayName", "빈칸두꺼비").Set("gimmick", BossGimmick.Blank);
+            var go = new GameObject("BattleScreenUnderTest");
+            var screen = go.AddComponent<BattleScreen>();
+            screen.Configure(Table(frog), Words(), GameSession.NewGame(hero, 1), animScale: 0.01f);
+            yield return null;
+            yield return null;
+            var root = screen.transform;
+            for (int turn = 0; turn < 2; turn++)
+            {
+                yield return WaitFor(() =>
+                {
+                    if (ActiveButton(root, "Choice_0") != null) return true;
+                    (ActiveButton(root, "CardConfirmButton") ?? ActiveButton(root, "Intensity_0") ?? ActiveButton(root, "SkillButton_0"))?.onClick.Invoke();
+                    return false;
+                }, 8f);
+                if (turn == 0)
+                {
+                    Assert.IsFalse(screen.ShownPrompt.Contains("_"), "처음엔 빈칸 없음");
+                    ActiveButton(root, "Choice_0").onClick.Invoke();
+                    yield return WaitFor(() => ActiveButton(root, "Choice_0") == null, 3f);
+                }
+            }
+            Assert.IsTrue(screen.Engine.WordsBlanked);
+            Assert.IsTrue(screen.ShownPrompt.Contains("_"), $"울음 다음 차례엔 빈칸: {screen.ShownPrompt}");
+            Assert.AreEqual(screen.Engine.CurrentQuestion.Prompt.Length, screen.ShownPrompt.Length, "글자 수는 그대로");
+            Assert.AreEqual(screen.Engine.CurrentQuestion.Prompt[0], screen.ShownPrompt[0], "첫 글자는 남김");
+            Object.Destroy(go);
+            yield return null;
+        }
+
         private static int PickedChoiceOf(BattleScreen battle) =>
             (int)typeof(BattleScreen).GetField("pickedChoice", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(battle);
 
