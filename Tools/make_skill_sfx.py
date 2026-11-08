@@ -29,6 +29,7 @@ CC0 = os.path.join(ROOT, "Builds", "music_pilot", "glass", "pack75")
 ICE = os.path.join(ROOT, "Builds", "music_pilot", "glass", "ice", "files", "IceShatters")
 # 얇은 유리처럼 높은 소리는 덜 깎음 (#239 — 사용자가 이 깎기로 듣고 고름)
 SOFT_TONE = "highshelf=f=3000:g=-6,lowpass=f=8000"
+GLASS_TONE = "highshelf=f=5000:g=-4,lowpass=f=11000"  # 유리 깨짐 (#242 사용자: SOFT_TONE은 너무 작고 '탁' 같음) — 반짝임(2~5kHz)은 두고 아주 높은 쇳소리만 조금
 
 SLASH, HIT, MAGIC, ELEMENT, BONUS, ALERT, BOUNCE = "Whoosh & Slash", "Hit & Impact", "Magic & Skill", "Elemental", "Bonus", "Alert", "Jump & Bounce"
 PEAK = -7.0  # 팩 소리들의 최고 음량과 같게
@@ -70,11 +71,13 @@ SOUNDS = {
     # 강도 ×1.2·×1.5·×2 글자가 뜰 때 (#238 사용자 ㉕ 후보 B27): '띵' — 진짜 '쾅'은 맞을 때만
     "intensityup": ([(BONUS, "PowerUp2", 0, 0)], 0, -8.0),
     # 보호막이 깨질 때 (#239 사용자 ⑳: 얇은 유리 glass_breaking_03 + 앞에 '저저적' 갈라지는 얼음 → #240: 금 간 뒤 0.7초에 깨짐
-    # → #241: 금 소리 앞을 잘라 '저 저 적' 대신 '저적'만 — 0.18초부터 = 둘째·셋째 금).
+    # → #241: 금 소리 앞을 잘라 '저 저 적' 대신 '저적'만 — 0.18초부터 = 둘째·셋째 금
+    # → #242 후보 H3: 너무 작고 '탁' 같음 → 크게(유리가 최고 음량) · GLASS_TONE · 유리 조각이 짤랑 떨어지는 꼬리).
     # 유리가 깨지는 때(700ms)를 바꾸면 BattleScreen.SkillFx의 ShatterDelay(유리 조각이 튀는 때)도 같이
     "shieldbreak": ([(ICE, "LedasLuzta5", -4, 0, "atrim=0.18:0.38,asetpts=PTS-STARTPTS,highpass=f=900,afade=t=in:d=0.005,afade=t=out:st=0.160:d=0.04"),
-                     (CC0, "bfh1_glass_breaking_03", 0, 700, "atrim=0:0.9,afade=t=out:st=0.78:d=0.12,highpass=f=700")],
-                    0, -8.0, {"tone": SOFT_TONE, "lift": False}),
+                     (CC0, "bfh1_glass_breaking_03", 0, 700, "atrim=0:0.9,afade=t=out:st=0.78:d=0.12,highpass=f=700"),
+                     (CC0, "bfh1_glass_falling_02", -6, 950, "atrim=0:0.82,afade=t=out:st=0.6:d=0.22,highpass=f=1200")],
+                    0, -5.0, {"tone": GLASS_TONE}),
     # 보호막이 막아 낼 때 (#239 사용자: 깨짐과 다른 소리 → #240 후보 E7 두꺼운 막 '둥') — 맞는 소리와 같이 나므로 작게
     "shieldabsorb": ([(HIT, "Impact4", 0, 0, "atrim=0:0.35,asetpts=PTS-STARTPTS,afade=t=out:st=0.250:d=0.1,lowpass=f=1800")], 0, -10.0),
 }
