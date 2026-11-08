@@ -308,9 +308,15 @@ namespace WordRPG.UI
         }
 
         // 보호막이 다 깎임: 조각이 사방으로 흩어지고 하얀 고리
+        // 깨짐 소리는 '저적' 금 간 뒤 0.7초에 쨍그랑 (#240 사용자) → 유리 조각도 그때 튐. 소리 표 Tools/make_skill_sfx.py shieldbreak의 700ms와 같이
+        private const float ShatterDelay = 0.7f;
+
         private IEnumerator Shatter(BattleUnit target)
         {
             if (!viewOf.TryGetValue(target, out var view)) yield break;
+            float wait = ShatterDelay * animationScale;
+            for (float t = 0f; t < wait; t += Time.unscaledDeltaTime) yield return null;
+            if (view == null || view.Root == null || root == null) yield break;
             var color = view.ShieldColor;
             var center = CenterOf(view);
             var local = Local(center);

@@ -69,13 +69,13 @@ SOUNDS = {
     "hitlight": ([(CC0, "bfh1_hit_03", 0, 0)], 0, -9.0),
     # 강도 ×1.2·×1.5·×2 글자가 뜰 때 (#238 사용자 ㉕ 후보 B27): '띵' — 진짜 '쾅'은 맞을 때만
     "intensityup": ([(BONUS, "PowerUp2", 0, 0)], 0, -8.0),
-    # 보호막이 깨질 때 (#239 사용자 ⑳: 얇은 유리 glass_breaking_03 + 앞에 '저저적' 갈라지는 얼음) — 임시 후보 C1, 고르면 바꿈
+    # 보호막이 깨질 때 (#239 사용자 ⑳: 얇은 유리 glass_breaking_03 + 앞에 '저저적' 갈라지는 얼음 → #240: 금 간 뒤 0.7초에 깨짐).
+    # 유리가 깨지는 때(700ms)를 바꾸면 BattleScreen.SkillFx의 ShatterDelay(유리 조각이 튀는 때)도 같이
     "shieldbreak": ([(ICE, "LedasLuzta5", -4, 0, "atrim=0:0.38,asetpts=PTS-STARTPTS,highpass=f=900,afade=t=out:st=0.340:d=0.04"),
-                     (CC0, "bfh1_glass_breaking_03", 0, 360, "atrim=0:0.9,afade=t=out:st=0.78:d=0.12,highpass=f=700")],
+                     (CC0, "bfh1_glass_breaking_03", 0, 700, "atrim=0:0.9,afade=t=out:st=0.78:d=0.12,highpass=f=700")],
                     0, -8.0, {"tone": SOFT_TONE, "lift": False}),
-    # 보호막이 막아 낼 때 (#239 사용자: 깨짐과 다른 소리) — 맞는 소리와 같이 나므로 작게. 임시 후보 E3 '팅', 고르면 바꿈
-    "shieldabsorb": ([(CC0, "bfh1_glass_hit_01", 0, 0, "atrim=0:0.4,asetpts=PTS-STARTPTS,afade=t=out:st=0.300:d=0.1,highpass=f=600")],
-                     0, -10.0, {"tone": SOFT_TONE}),
+    # 보호막이 막아 낼 때 (#239 사용자: 깨짐과 다른 소리 → #240 후보 E7 두꺼운 막 '둥') — 맞는 소리와 같이 나므로 작게
+    "shieldabsorb": ([(HIT, "Impact4", 0, 0, "atrim=0:0.35,asetpts=PTS-STARTPTS,afade=t=out:st=0.250:d=0.1,lowpass=f=1800")], 0, -10.0),
 }
 
 
