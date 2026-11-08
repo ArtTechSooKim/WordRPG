@@ -107,7 +107,8 @@ namespace WordRPG.UI
         // #238 사용자 ③ (후보 A7): 아군의 일반 정답 타격은 가벼운 '탁' 하나 — 크리티컬과 소리가 같아 일반도 세게 때린 것 같았음
         private void PlayHitSound(BattleEvent e)
         {
-            if (e.Amount <= 0) { Sound.Play(Sfx.Shield); return; }
+            // 보호막이 다 막았으면 맞는 소리 없이 막아 냄 소리만 (PlayHit — #239 사용자: 깨질 때와 다른 소리)
+            if (e.Amount <= 0) { if (e.Absorbed <= 0) Sound.Play(Sfx.Shield); return; }
             if (e.Skill != null && !e.IsCritical && (e.Actor == null || e.Actor.IsPlayerSide))
             {
                 Sound.Play(Sfx.HitLight);
@@ -159,8 +160,13 @@ namespace WordRPG.UI
             int boost = e.Actor != null && e.Actor.IsPlayerSide ? comboStep * 5 : 0;
             Float(e.Target, e.IsCritical ? $"크리티컬! {dmgText}" : dmgText,
                 e.Amount > 0 ? Palette.Bad : Palette.Info, (e.IsCritical ? 58 : 48) + boost);
-            Log(e.Absorbed > 0
-                ? $"{e.Target.DisplayName} 피해 {e.Amount} (보호막이 {e.Absorbed} 흡수" + (shieldBroke ? " — 보호막이 깨졌다!)" : ")")
+            // 보호막 추가 피해 (#239 사용자): 숫자 아래에 작게 — 보호막이 있어서 더 아팠다는 것
+            if (e.ShieldBonus > 0) Float(e.Target, $"보호막 추가 피해 +{e.ShieldBonus}", Palette.Gold, 34, drop: 80f);
+            string notes = (e.ShieldBonus > 0 ? $"보호막 추가 피해 +{e.ShieldBonus}" : "")
+                + (e.ShieldBonus > 0 && e.Absorbed > 0 ? ", " : "")
+                + (e.Absorbed > 0 ? $"보호막이 {e.Absorbed} 흡수" + (shieldBroke ? " — 보호막이 깨졌다!" : "") : "");
+            Log(notes.Length > 0
+                ? $"{e.Target.DisplayName} 피해 {e.Amount} ({notes})"
                 : $"{e.Target.DisplayName} 피해 {e.Amount}" + (e.IsCritical ? " — 크리티컬!" : ""));
             return 0.6f;
         }
@@ -233,7 +239,7 @@ namespace WordRPG.UI
         }
 
         // 힘을 모으는 기술 (#120): 이번 차례는 힘만 모으고 다음 차례에 큰 한 방 — 보호막으로 대비할 틈
-        // 빈칸 울음에 보호막이 깨짐 (#237): 깨지는 연출 + 소리 (유리 소리는 사용자가 고르면 바꿈 ⑳)
+        // 보호막을 깨는 기술 (#237 — #239부터 쓰는 기술 없음, 3장 사막용): 깨지는 연출 + 유리 소리
         private float ShowShieldShattered(BattleEvent e)
         {
             var s = shown[e.Target];
@@ -241,7 +247,7 @@ namespace WordRPG.UI
             Sync(e.Target);
             Cue($"보호막 깨짐 {e.Target.DisplayName}");
             StartCoroutine(Shatter(e.Target));
-            Sound.Play(Sfx.Shield);
+            Sound.Play(Sfx.ShieldBreak); // (#239)
             Float(e.Target, "보호막이 깨졌다!", Palette.Bad, 44);
             Log($"{e.Target.DisplayName}의 보호막이 깨졌다!");
             return 0.5f;

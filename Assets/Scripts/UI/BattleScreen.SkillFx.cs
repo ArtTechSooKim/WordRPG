@@ -110,11 +110,13 @@ namespace WordRPG.UI
             if (shieldBroke)
             {
                 Cue($"보호막 깨짐 {e.Target.DisplayName}");
+                Sound.Play(Sfx.ShieldBreak); // 유리 깨지는 소리 — 맞는 '퍽'은 기술 소리 (#239 사용자 ⑳)
                 StartCoroutine(Shatter(e.Target));
             }
             else
             {
                 Cue($"보호막 물결 {e.Target.DisplayName}");
+                Sound.Play(Sfx.ShieldAbsorb); // 막아 냄 — 깨질 때와 다른 소리 (#239 사용자)
                 StartCoroutine(Ripple(e.Target));
             }
         }

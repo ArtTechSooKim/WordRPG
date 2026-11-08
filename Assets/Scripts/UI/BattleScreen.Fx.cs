@@ -80,15 +80,15 @@ namespace WordRPG.UI
             Destroy(group.gameObject);
         }
 
-        // pop: 처음에 크게 찍혔다 줄어듦 (회복 숫자 — #137)
-        private void Float(BattleUnit unit, string text, Color color, int size, bool pop = false)
+        // pop: 처음에 크게 찍혔다 줄어듦 (회복 숫자 — #137), drop: 카드 가운데보다 이만큼 아래에서 떠오름 (숫자와 겹치지 않게 — #239)
+        private void Float(BattleUnit unit, string text, Color color, int size, bool pop = false, float drop = 0f)
         {
             Cue($"숫자 {unit?.DisplayName} {text} #{ColorUtility.ToHtmlStringRGB(color)} {size}");
             if (!viewOf.TryGetValue(unit, out var view)) return;
-            StartCoroutine(FloatRoutine(view.Root, text, color, size, pop));
+            StartCoroutine(FloatRoutine(view.Root, text, color, size, pop, drop));
         }
 
-        private IEnumerator FloatRoutine(RectTransform target, string text, Color color, int size, bool pop = false)
+        private IEnumerator FloatRoutine(RectTransform target, string text, Color color, int size, bool pop = false, float drop = 0f)
         {
             // 큰 숫자(보스 결정타)는 칸보다 커도 잘리지 않게 한 줄로 넘쳐 그린다
             var label = UiKit.Display(UiKit.OneLine(UiKit.Label("Float", root, text, size + 8, color, 0.5f, 0.5f, 0.5f, 0.5f,
@@ -99,7 +99,7 @@ namespace WordRPG.UI
             outline.effectColor = new Color(0, 0, 0, 0.85f);
             outline.effectDistance = new Vector2(3, -3);
 
-            Vector3 start = target.TransformPoint(target.rect.center);
+            Vector3 start = target.TransformPoint(target.rect.center) + Vector3.down * (drop * canvas.scaleFactor);
             float duration = 0.9f * animationScale;
             float t = 0f;
             while (t < duration)

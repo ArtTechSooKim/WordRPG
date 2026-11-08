@@ -24,7 +24,9 @@ namespace WordRPG.UI
         SkillGuardEcho, SkillGuardBook, SkillGuardTime, SkillGuardSeed, SkillHealLight,
         VineGrow,    // 덩굴 다리가 놓임 (#232·#238 — Tools/make_skill_sfx.py)
         HitLight,    // 일반 정답 타격 — 가벼운 '탁' (#238 사용자 A7)
-        IntensityUp  // 강도 ×N 글자가 뜰 때 '띵' (#238 사용자 B27)
+        IntensityUp, // 강도 ×N 글자가 뜰 때 '띵' (#238 사용자 B27)
+        ShieldBreak, // 보호막이 깨질 때: '저저적' 금 가는 소리 + 얇은 유리 (#239 사용자 — make_skill_sfx.py)
+        ShieldAbsorb // 보호막이 막아 낼 때 (깨지지 않음) — 깨짐과 다른 소리 (#239 사용자 — make_skill_sfx.py)
     }
 
     // 지역 환경음 (#193): BGM 밑에 깔리는 소리. 어느 지역이 어느 소리인지는 테마 표 ThemeLooks.

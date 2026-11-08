@@ -25,6 +25,10 @@ OUT = os.path.join(ROOT, "Assets", "Resources", "Audio", "Sfx")
 FF = imageio_ffmpeg.get_ffmpeg_exe()
 # CC0 녹음 (#238): OpenGameArt '75 CC0 breaking / falling / hit sfx' (rubberduck) — 깃 밖 사본 (라이선스 페이지 사본도 그 위 폴더). 표의 폴더 칸에 이 값을 쓰면 .ogg를 그대로 읽음
 CC0 = os.path.join(ROOT, "Builds", "music_pilot", "glass", "pack75")
+# CC0 녹음 (#239): OpenGameArt 'Ice breaking/shattering' (IgnasD) — 얼음이 갈라지는 '저저적'. 깃 밖 사본 (라이선스 페이지 사본은 ice 폴더)
+ICE = os.path.join(ROOT, "Builds", "music_pilot", "glass", "ice", "files", "IceShatters")
+# 얇은 유리처럼 높은 소리는 덜 깎음 (#239 — 사용자가 이 깎기로 듣고 고름)
+SOFT_TONE = "highshelf=f=3000:g=-6,lowpass=f=8000"
 
 SLASH, HIT, MAGIC, ELEMENT, BONUS, ALERT, BOUNCE = "Whoosh & Slash", "Hit & Impact", "Magic & Skill", "Elemental", "Bonus", "Alert", "Jump & Bounce"
 PEAK = -7.0  # 팩 소리들의 최고 음량과 같게
@@ -65,14 +69,30 @@ SOUNDS = {
     "hitlight": ([(CC0, "bfh1_hit_03", 0, 0)], 0, -9.0),
     # 강도 ×1.2·×1.5·×2 글자가 뜰 때 (#238 사용자 ㉕ 후보 B27): '띵' — 진짜 '쾅'은 맞을 때만
     "intensityup": ([(BONUS, "PowerUp2", 0, 0)], 0, -8.0),
+    # 보호막이 깨질 때 (#239 사용자 ⑳: 얇은 유리 glass_breaking_03 + 앞에 '저저적' 갈라지는 얼음) — 임시 후보 C1, 고르면 바꿈
+    "shieldbreak": ([(ICE, "LedasLuzta5", -4, 0, "atrim=0:0.38,asetpts=PTS-STARTPTS,highpass=f=900,afade=t=out:st=0.340:d=0.04"),
+                     (CC0, "bfh1_glass_breaking_03", 0, 360, "atrim=0:0.9,afade=t=out:st=0.78:d=0.12,highpass=f=700")],
+                    0, -8.0, {"tone": SOFT_TONE, "lift": False}),
+    # 보호막이 막아 낼 때 (#239 사용자: 깨짐과 다른 소리) — 맞는 소리와 같이 나므로 작게. 임시 후보 E3 '팅', 고르면 바꿈
+    "shieldabsorb": ([(CC0, "bfh1_glass_hit_01", 0, 0, "atrim=0:0.4,asetpts=PTS-STARTPTS,afade=t=out:st=0.300:d=0.1,highpass=f=600")],
+                     0, -10.0, {"tone": SOFT_TONE}),
 }
 
 
-def build(name, layers, cut, peak, sounds):
+def source(folder, file, sounds):
+    if folder in (CC0, ICE):
+        return os.path.join(folder, file + ".ogg")
+    return os.path.join(sounds, folder, file + ".wav")
+
+
+# 층 = (폴더, 파일, 크기 dB, 늦게 ms[, 그 층에만 거는 거르개 — 자르기·음높이·저음 빼기 등 ffmpeg 글])
+def build(name, layers, cut, peak, sounds, tone=None, lift=True):
     args, parts = [], []
-    for i, (folder, file, gain, delay) in enumerate(layers):
-        args += ["-i", os.path.join(CC0, file + ".ogg") if folder == CC0 else os.path.join(sounds, folder, file + ".wav")]
-        parts.append(f"[{i}:a]aformat=sample_rates=44100:channel_layouts=mono,volume={gain}dB,adelay={delay}:all=1[a{i}]")
+    for i, layer in enumerate(layers):
+        folder, file, gain, delay = layer[:4]
+        own = layer[4] + "," if len(layer) > 4 and layer[4] else ""
+        args += ["-i", source(folder, file, sounds)]
+        parts.append(f"[{i}:a]aformat=sample_rates=44100:channel_layouts=mono,{own}volume={gain}dB,adelay={delay}:all=1[a{i}]")
     mix = "".join(f"[a{i}]" for i in range(len(layers)))
     chain = f"{mix}amix=inputs={len(layers)}:duration=longest:normalize=0"
     if cut:
@@ -89,15 +109,17 @@ def build(name, layers, cut, peak, sounds):
     log = render(",volumedetect", ["-f", "null", "-"])
     found = float(re.search(r"max_volume: (-?[\d.]+) dB", log).group(1))
     path = os.path.join(OUT, name + ".wav")
-    chain = f",volume={peak - found:.2f}dB,{TONE}"
+    chain = f",volume={peak - found:.2f}dB,{tone or TONE}"
     after = float(re.search(r"max_volume: (-?[\d.]+) dB", render(chain + ",volumedetect", ["-f", "null", "-"])).group(1))
-    render(chain + f",volume={max(0.0, min(LIFT_MAX, peak - after)):.2f}dB", [path])
+    render(chain + (f",volume={max(0.0, min(LIFT_MAX, peak - after)):.2f}dB" if lift else ""), [path])
     return path
 
 
 if __name__ == "__main__":
     pack = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_PACK
     sounds = os.path.join(pack, "Audio", "Sounds")
-    for name, (layers, cut, peak) in SOUNDS.items():
-        path = build(name, layers, cut, peak, sounds)
+    for name, entry in SOUNDS.items():
+        layers, cut, peak = entry[:3]
+        options = entry[3] if len(entry) > 3 else {}  # {"tone": 높은음 깎기, "lift": False = 깎은 뒤 다시 올리지 않음}
+        path = build(name, layers, cut, peak, sounds, options.get("tone"), options.get("lift", True))
         print(f"{name}.wav  {os.path.getsize(path) / 44100 / 2:.2f}초  {os.path.getsize(path) // 1024}KB")

@@ -143,8 +143,9 @@ namespace WordRPG.Tests
                 "로그 주인공의 strike ×1.5!", "몸짓 Lunge 주인공", $"숫자 주인공 ×1.5! {Gold} 56", "소리 IntensityUp", "기다림 0.7",
                 // 콤보 2단계(Good!)라 아군 공격 숫자는 +10 크게
                 "HP 슬라임 28/0", "소리 SkillSlash", "소리 Critical", "효과 Slash 슬라임", "효과 Explosion 슬라임", $"숫자 슬라임 크리티컬! -12 {Bad} 68", "로그 슬라임 피해 12 — 크리티컬!", "기다림 0.6",
-                "HP 슬라임 28/0", "소리 Shield", "효과 Shield 슬라임", "보호막 물결 슬라임", $"숫자 슬라임 막음! {Info} 58", "로그 슬라임 피해 0 (보호막이 4 흡수)", "기다림 0.6",
-                "HP 슬라임 21/0", "소리 HitLight", "효과 Slash 슬라임", "보호막 물결 슬라임", $"숫자 슬라임 -7 {Bad} 58", "로그 슬라임 피해 7 (보호막이 3 흡수)", "기다림 0.6",
+                // #239 사용자: 막아 내는 소리는 깨질 때와 따로 — 다 막으면 그 소리만, 조금 뚫리면 맞는 소리 + 막아 냄
+                "HP 슬라임 28/0", "효과 Shield 슬라임", "보호막 물결 슬라임", "소리 ShieldAbsorb", $"숫자 슬라임 막음! {Info} 58", "로그 슬라임 피해 0 (보호막이 4 흡수)", "기다림 0.6",
+                "HP 슬라임 21/0", "소리 HitLight", "효과 Slash 슬라임", "보호막 물결 슬라임", "소리 ShieldAbsorb", $"숫자 슬라임 -7 {Bad} 58", "로그 슬라임 피해 7 (보호막이 3 흡수)", "기다림 0.6",
                 "로그 슬라임 쓰러졌다!", "소리 Faint", "효과 Smoke 슬라임", "기다림 0.5",
                 End());
             Assert.AreEqual("Good!", screen.LastComboText);
@@ -339,9 +340,11 @@ namespace WordRPG.Tests
                 BattleEvent.Damage(enemy, hero, Bite, 4, 2, false));
 
             AssertInOrder("보호막 막 주인공", "HP 주인공 100/5",
-                "HP 주인공 98/2", "보호막 물결 주인공", "로그 주인공 피해 2 (보호막이 3 흡수)",
-                "HP 주인공 94/0", "보호막 깨짐 주인공", "로그 주인공 피해 4 (보호막이 2 흡수 — 보호막이 깨졌다!)");
+                "HP 주인공 98/2", "보호막 물결 주인공", "소리 ShieldAbsorb", "로그 주인공 피해 2 (보호막이 3 흡수)",
+                "HP 주인공 94/0", "보호막 깨짐 주인공", "소리 ShieldBreak", "로그 주인공 피해 4 (보호막이 2 흡수 — 보호막이 깨졌다!)");
             Assert.AreEqual(1, cues.FindAll(c => c.StartsWith("보호막 깨짐")).Count);
+            Assert.AreEqual(1, cues.FindAll(c => c == "소리 ShieldBreak").Count, "#239 깨질 때만 유리 소리");
+            Assert.AreEqual(1, cues.FindAll(c => c == "소리 ShieldAbsorb").Count, "#239 막아 낼 때는 다른 소리 (깨질 땐 안 남)");
 
             var view = UnitView.Create(screen.transform, "AuraCard", 0f, 0f, 1f, 1f);
             view.Bind(hero);
@@ -349,6 +352,21 @@ namespace WordRPG.Tests
             Assert.IsTrue(ShieldAura(view).activeSelf, "보호막이 있으면 테두리");
             view.Sync(50, 0);
             Assert.IsFalse(ShieldAura(view).activeSelf, "다 깎이면 테두리도 꺼짐");
+        }
+
+        // 보호막 추가 피해 (#239 사용자 — 빈칸 울음): 숫자 아래에 '보호막 추가 피해 +40', 로그에도
+        [UnityTest]
+        public IEnumerator ShieldBonusDamageIsShownUnderTheNumber()
+        {
+            yield return Begin();
+            yield return Play(
+                BattleEvent.Shield(hero, hero, Guard, 30, false),
+                BattleEvent.Damage(enemy, hero, Bite, 18, 30, false, 40),
+                BattleEvent.Damage(enemy, hero, Bite, 7, 0, false));
+
+            AssertInOrder("HP 주인공 100/30", "HP 주인공 82/0", "보호막 깨짐 주인공", "소리 ShieldBreak",
+                "로그 주인공 피해 18 (보호막 추가 피해 +40, 보호막이 30 흡수 — 보호막이 깨졌다!)", "로그 주인공 피해 7");
+            Assert.AreEqual(1, cues.FindAll(c => c.StartsWith("숫자 주인공 보호막 추가 피해 +40")).Count, "보호막이 있을 때 한 번만");
         }
 
         private static GameObject ShieldAura(UnitView view)

@@ -9,7 +9,7 @@ namespace WordRPG.Battle
         QuizAnswered, // Correct, Mastery
         SkillUsed,    // Actor, Skill, Multiplier(공격 강도 배율, 기본 1)
         SkillFailed,  // Actor, Skill (오답이라 기술이 빗나감)
-        Damage,       // Actor, Target, Amount(HP 피해), Absorbed(보호막 흡수), IsCritical
+        Damage,       // Actor, Target, Amount(HP 피해), Absorbed(보호막 흡수), IsCritical, ShieldBonus(보호막 추가 피해 — #239)
         Heal,         // Actor, Target, Amount, IsCritical
         Shield,       // Actor, Target, Amount, IsCritical
         ItemUsed,     // Actor, Item, Amount(회복한 HP)
@@ -37,6 +37,7 @@ namespace WordRPG.Battle
         public ItemData Item { get; private set; }
         public int Amount { get; private set; }
         public int Absorbed { get; private set; }
+        public int ShieldBonus { get; private set; } // 보호막이 있어서 더 들어간 피해 (#239 — Amount + Absorbed에 들어 있음)
         public bool IsCritical { get; private set; }
         public bool Correct { get; private set; }
         public MasteryChange Mastery { get; private set; }
@@ -54,8 +55,9 @@ namespace WordRPG.Battle
         public static BattleEvent SkillFailed(BattleUnit actor, SkillData skill) =>
             new BattleEvent(BattleEventType.SkillFailed) { Actor = actor, Skill = skill };
 
-        public static BattleEvent Damage(BattleUnit actor, BattleUnit target, SkillData skill, int amount, int absorbed, bool critical) =>
-            new BattleEvent(BattleEventType.Damage) { Actor = actor, Target = target, Skill = skill, Amount = amount, Absorbed = absorbed, IsCritical = critical };
+        public static BattleEvent Damage(BattleUnit actor, BattleUnit target, SkillData skill, int amount, int absorbed, bool critical, int shieldBonus = 0) =>
+            new BattleEvent(BattleEventType.Damage)
+                { Actor = actor, Target = target, Skill = skill, Amount = amount, Absorbed = absorbed, IsCritical = critical, ShieldBonus = shieldBonus };
 
         public static BattleEvent Heal(BattleUnit actor, BattleUnit target, SkillData skill, int amount, bool critical) =>
             new BattleEvent(BattleEventType.Heal) { Actor = actor, Target = target, Skill = skill, Amount = amount, IsCritical = critical };

@@ -401,8 +401,10 @@ namespace WordRPG.Battle
                 {
                     case SkillKind.Damage:
                         int damage = BattleFormulas.Damage(skill.Power, user.Attack, target.Defense, critical, config, rng, comboBonus, intensity);
-                        target.ReceiveDamage(damage, out int hpDamage, out int absorbed);
-                        events.Add(BattleEvent.Damage(user, target, skill, hpDamage, absorbed, critical));
+                        // 보호막 추가 피해 (#239 사용자): 보호막이 있는 대상은 더 아픔 — 보호막은 깨지지 않고 그대로 먼저 막음
+                        int shieldBonus = skill.ShieldBonusDamage > 0 && target.Shield > 0 ? skill.ShieldBonusDamage : 0;
+                        target.ReceiveDamage(damage + shieldBonus, out int hpDamage, out int absorbed);
+                        events.Add(BattleEvent.Damage(user, target, skill, hpDamage, absorbed, critical, shieldBonus));
                         if (target.IsDefeated) events.Add(BattleEvent.Defeated(target));
                         break;
 

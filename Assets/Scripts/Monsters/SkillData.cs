@@ -64,8 +64,10 @@ namespace WordRPG.Monsters
 
         [Tooltip("힘 모으기 (#120, 적 기술): 0이면 바로 씀. 1 이상이면 고른 차례엔 '힘을 모으고 있다'만 하고 그만큼 차례를 넘긴 뒤 발동 (보스의 큰 한 방)")]
         [SerializeField] private int chargeTurns;
-        [Tooltip("맞히면 대상의 보호막을 먼저 깨뜨림 (#237 빈칸 울음)")]
+        [Tooltip("맞히면 대상의 보호막을 먼저 깨뜨림 (#237 — #239 사용자: 보호막을 없애는 능력은 3장 사막에서. 지금 쓰는 기술 없음)")]
         [SerializeField] private bool shattersShields;
+        [Tooltip("대상에게 보호막이 있으면 피해를 이만큼 더 줌 (#239 사용자: 빈칸 울음 40). 보호막은 그대로 먼저 막음")]
+        [SerializeField] private int shieldBonusDamage;
         [Tooltip("쓰면 다음 아군 차례의 문제 단어 글자 25%가 빈칸 (#237 빈칸 울음 — WordBlanks)")]
         [SerializeField] private bool blanksWords;
 
@@ -83,6 +85,7 @@ namespace WordRPG.Monsters
         public int Power => power;
         public int ChargeTurns => chargeTurns;
         public bool ShattersShields => shattersShields;
+        public int ShieldBonusDamage => shieldBonusDamage;
         public bool BlanksWords => blanksWords;
         public QuizDirection QuizDirection => quizDirection;
         public SkillFx Fx => fx;

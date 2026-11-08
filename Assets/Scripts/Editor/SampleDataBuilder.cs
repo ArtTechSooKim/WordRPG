@@ -297,7 +297,7 @@ namespace WordRPG.EditorTools
             // 빈칸두꺼비 숫자는 #88 시뮬레이션으로 맞춤 (아라와 함께 정답률 80%면 10라운드쯤, 혼자·정답률 60%면 도전)
             var tongueLash = Skill("frog_tongue_lash", "혀 날름", "긴 혀를 잔뜩 말아 힘을 모았다가 힘껏 후려친다.", SkillKind.Damage, SkillTarget.SingleEnemy, 270, QuizDirection.EnglishToMeaning,
                 chargeTurns: 1); // 보스가 뒤로 갈수록 세게 (#147)
-            var blankCroak = Skill("frog_blank_croak", "빈칸 울음", "개굴! 울음소리에 머릿속이 하얗게 빈칸이 된다.", SkillKind.Damage, SkillTarget.AllEnemies, 120, QuizDirection.EnglishToMeaning);
+            var blankCroak = Skill("frog_blank_croak", "빈칸 울음", "개굴! 울음소리에 머릿속이 하얗게 빈칸이 된다. 보호막이 있으면 피해가 40 더 크다.", SkillKind.Damage, SkillTarget.AllEnemies, 120, QuizDirection.EnglishToMeaning);
             var gulp = Skill("frog_gulp", "꿀꺽 삼키기", "석판의 글자를 꿀꺽 삼켜 HP를 회복한다.", SkillKind.Heal, SkillTarget.Self, 10, QuizDirection.EnglishToMeaning);
             var tailLizard = Monster("tail_lizard", "말꼬리 도마뱀", "남의 말꼬리를 잡고 늘어지는 도마뱀. 정글 풀숲을 재빠르게 누빈다.", MonsterRole.Attacker,
                 new Color(0.5f, 0.75f, 0.35f), new MonsterStats(28, 14, 10), new MonsterStats(5, 3, 2), new[] { tailGrab },
@@ -485,7 +485,9 @@ namespace WordRPG.EditorTools
             SetGimmick("boss_blank_frog", BossGimmick.Blank, "빈칸 울음 뒤엔 단어에 빈칸이 생겨! 남은 글자로 떠올려 보자");
             // 헷갈너구리 (#238 사용자 아이디어 1): 보기가 2초마다 자리를 섞음
             SetGimmick("boss_muddle_raccoon", BossGimmick.Shuffle, "헷갈너구리는 2초마다 보기 자리를 바꿔! 흔들리면 잠깐 기다렸다 고르자");
-            SetSkillFlags("frog_blank_croak", shattersShields: true, blanksWords: true);
+            // #239 사용자: 보호막 깨기('흡수')는 너무 일찍 나옴 → 3장 사막에서. 대신 보호막이 있으면 피해 40 더
+            SetSkillFlags("frog_blank_croak", shattersShields: false, blanksWords: true, shieldBonusDamage: 40);
+            SetSkillDescription("frog_blank_croak", "개굴! 울음소리에 머릿속이 하얗게 빈칸이 된다. 보호막이 있으면 피해가 40 더 크다.");
             // 필드의 보스 그림 크기 (#233 사용자: 작아서 위엄이 없음 → 보스 방에 꽉 차게. 빈칸두꺼비 6배, 말줄임덩굴 가로 5·세로 6배)
             SetBossFieldSize(libraryPath, 5, 5);
             SetBossFieldSize(forestPath, 5, 5);
@@ -1109,13 +1111,23 @@ namespace WordRPG.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void SetSkillFlags(string skillId, bool shattersShields, bool blanksWords)
+        private static void SetSkillFlags(string skillId, bool shattersShields, bool blanksWords, int shieldBonusDamage = 0)
         {
             var skill = AssetDatabase.LoadAssetAtPath<SkillData>($"{Root}/Skills/{skillId}.asset");
             if (skill == null) return;
             var so = new SerializedObject(skill);
             Prop(so, "shattersShields").boolValue = shattersShields;
             Prop(so, "blanksWords").boolValue = blanksWords;
+            Prop(so, "shieldBonusDamage").intValue = shieldBonusDamage;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void SetSkillDescription(string skillId, string description)
+        {
+            var skill = AssetDatabase.LoadAssetAtPath<SkillData>($"{Root}/Skills/{skillId}.asset");
+            if (skill == null) return;
+            var so = new SerializedObject(skill);
+            Prop(so, "description").stringValue = description;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
