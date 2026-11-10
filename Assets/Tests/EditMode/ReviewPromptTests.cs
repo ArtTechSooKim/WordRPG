@@ -7,7 +7,7 @@ using WordRPG.Heroes;
 
 namespace WordRPG.Tests
 {
-    // 후기 부탁 (#252 사용자: 동굴 보스를 물리친 뒤)
+    // 후기 (#252·#254 사용자: 동굴 보스를 물리친 뒤 애플 기본 창 + 설정의 링크)
     public class ReviewPromptTests
     {
         private static GameDatabase Database() => AssetDatabase.LoadAssetAtPath<GameDatabase>("Assets/Data/GameDatabase.asset");

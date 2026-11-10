@@ -7,7 +7,7 @@ using WordRPG.Game;
 
 namespace WordRPG.UI
 {
-    // 설정 (Figma '설정 — 왼손 모드 (#215)'): 소리(배경 음악·효과음), 전투 강도, 진동, 왼손 모드, [튜토리얼 다시 보기] [입장 영상 다시 보기](#138), [처음부터 다시 하기], 정식판, 정보.
+    // 설정 (Figma '설정 — 후기 남기기 (#254)'): 소리(배경 음악·효과음), 전투 강도, 진동, 왼손 모드, [튜토리얼 다시 보기] [입장 영상 다시 보기](#138), [처음부터 다시 하기], 정식판, 정보.
     // 정식판 칸 (#63, 앱스토어 심사 대비): 언제든 [정식판 보기](정식판 안내 창)와 [구매 복원] — 숲 입구까지 가지 않아도 살 수 있고 되찾을 수 있다.
     // 값을 바꿀 때마다 onSettingsChanged로 저장. 처음부터는 실수로 지우지 않게 확인 창을 두 번 거쳐야 onDeleteSave
     // ('설정 — 처음부터 1차/2차 확인 (#37)')
@@ -109,9 +109,13 @@ namespace WordRPG.UI
                 0.035f, 0.1f, 0.965f, 0.38f, TextAnchor.MiddleLeft, FontStyle.Normal, true, 18);
 #if WORDRPG_TESTER || UNITY_EDITOR
             // 테스터 메뉴 (#229): 테스트 빌드(TestFlight)에만 — 앱스토어 빌드에는 이 버튼이 없음
-            view.testerButton = UiKit.MakeButton("TesterMenuButton", info, "테스터 메뉴", Palette.Neutral, 32, 0.6f, 0.38f, 0.965f, 0.72f);
+            view.testerButton = UiKit.MakeButton("TesterMenuButton", info, "테스터 메뉴", Palette.Neutral, 32, 0.23f, 0.38f, 0.585f, 0.72f);
             view.testerButton.onClick.AddListener(view.OpenTester);
 #endif
+
+            // 후기 (#254): 눌렀을 때만 스토어의 후기 쓰는 화면으로 (앱이 먼저 묻는 건 애플 기본 창만 — ReviewPrompt)
+            var review = UiKit.MakeButton("ReviewButton", info, "후기 남기기", Palette.Neutral, 32, 0.6f, 0.38f, 0.965f, 0.72f);
+            review.onClick.AddListener(ReviewPrompt.OpenStorePage);
 
             var close = UiKit.MakeButton("SettingsCloseButton", root, "닫기", Palette.Neutral, 44, 0.05f, 0.015f, 0.95f, 0.095f);
             close.onClick.AddListener(view.Hide);

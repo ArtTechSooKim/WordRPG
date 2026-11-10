@@ -867,7 +867,7 @@ def build_tiles(pack):
         "Altar": over(stone, gem),
         "Shop": over(stone, stall),
         "Boss": over(stone, boss, scale=3),
-        "Boss_done": stone.copy(),  # 사전은 쉼터 받침대로 옮겨져 빈자리 (#45)
+        "Boss_done": rug.copy(),  # 사전은 쉼터 받침대로 옮겨져 빈자리 (#45). 보석이 놓이는 자리 — 둘레 카펫과 이어지게 (#254 사용자)
         "Lectern": lectern(stone, False),
         "Lectern_done": lectern(stone, True),
         "Gate": keyhole[1],  # 서고 돌바닥에 어울리는 옅은 블록

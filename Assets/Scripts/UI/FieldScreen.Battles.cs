@@ -78,7 +78,7 @@ namespace WordRPG.UI
                 Rematches++;
                 ShowToast($"{UiKit.WithJosa(area.Boss.Species.DisplayName, "을", "를")} 다시 물리쳤다!", 2.5f);
                 RefreshHud();
-                if (ReviewDue(area)) StartCoroutine(WhileAfterBoss(AskForReview(area))); // 전에 이긴 사람(예전 세이브)은 아직 안 물어봤음
+                if (ReviewPrompt.Due(area, session)) StartCoroutine(WhileAfterBoss(AskForReview(area))); // 전에 이긴 사람(예전 세이브)은 아직 안 물어봤음
                 return;
             }
             // #124 처음 시작 흐름: 첫 승리 뒤 목표(까먹대왕)를 한 번
@@ -153,29 +153,23 @@ namespace WordRPG.UI
                 OfferDocument(document);
                 while (learnView.IsOpen) yield return null;
             }
-            if (ReviewDue(bossArea)) yield return AskForReview(bossArea); // 물을 때만 기다림 — 괜히 한 프레임 늦추면 그 사이 걸어가서 '돌아갈까요?'가 걸음 도중에 뜸
             while (inBattle || transitioning || IsPanelOpen) yield return null;
             // 서고 보스 뒤엔 초원 시작 지점으로 (#232 사용자: 던전을 깨고 돌아가면 당연히 마을 — 어르신 샘 이야기도 거기서)
             var home = bossArea.ReturnAfterBoss;
-            if (area != bossArea || (home == area && walker.Position == walker.Map.Start)) yield break; // 이미 다른 지역이나 시작 지점이면 묻지 않음
-            returnDialog.Show(BossDefeatedTitle, $"{home.DisplayName} 시작 지점으로 돌아갈까요?", "돌아가기", false,
-                () => StartCoroutine(ReturnToStart(home)), "star_full", "여기 있기");
+            if (area == bossArea && !(home == area && walker.Position == walker.Map.Start)) // 이미 다른 지역이나 시작 지점이면 묻지 않음
+                returnDialog.Show(BossDefeatedTitle, $"{home.DisplayName} 시작 지점으로 돌아갈까요?", "돌아가기", false,
+                    () => StartCoroutine(ReturnToStart(home)), "star_full", "여기 있기");
+            if (ReviewPrompt.Due(bossArea, session)) yield return AskForReview(bossArea); // 물을 때만 기다림 — 괜히 한 프레임 늦추면 그 사이 걸어가서 '돌아갈까요?'가 걸음 도중에 뜸
         }
 
-        // 후기 부탁 (#252 사용자): 보스를 이긴 소식·말을 다 본 뒤 한 번. 규칙 = ReviewPrompt
-        public System.Action<string> UrlOpener { get; set; } = Application.OpenURL; // 테스트에서 바꿈
-
-        private bool ReviewDue(FieldArea bossArea) => area == bossArea && ReviewPrompt.Due(bossArea, session);
-
+        // 후기 (#252·#254 사용자): 보스를 이긴 소식과 돌아가기 묻기까지 다 끝난 뒤 애플 기본 창을 한 번 — 창끼리 겹치지 않게. 규칙 = ReviewPrompt
         private IEnumerator AskForReview(FieldArea bossArea)
         {
             while (inBattle || transitioning || IsPanelOpen) yield return null;
-            if (!ReviewDue(bossArea)) yield break;
+            if (!ReviewPrompt.Due(bossArea, session)) yield break;
             session.World.MarkEvent(ReviewPrompt.EventId);
             SaveNow();
-            returnDialog.Show("여기까지 함께해 주셔서 고마워요!", "게임이 어땠는지 후기를 남겨 주시면\n큰 힘이 돼요.", "후기 남기기", false,
-                () => UrlOpener(ReviewPrompt.Url(Application.platform)), "star_full", "나중에");
-            while (returnDialog.IsOpen) yield return null;
+            ReviewPrompt.NativeRequest();
         }
 
         private const string BossDefeatedTitle = "보스를 물리쳤다!";

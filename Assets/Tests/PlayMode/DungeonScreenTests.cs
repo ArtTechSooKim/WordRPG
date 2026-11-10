@@ -156,38 +156,74 @@ namespace WordRPG.Tests
             yield return null;
         }
 
-        // #252 사용자: 후기를 부탁하는 지역의 보스를 이기면 창 → [후기 남기기] = 스토어 링크. 세이브에 기록되어 한 번만
+        // #252·#254 사용자: 후기를 부탁하는 지역의 보스를 이기면 돌아가기 묻기까지 끝난 뒤 애플 기본 창을 한 번 (앱이 만든 창은 없음)
         [UnityTest]
-        public IEnumerator BeatingTheCaveBossAsksForAReviewAndOpensTheLink()
+        public IEnumerator BeatingTheCaveBossRequestsTheStoreReviewAfterTheDialogs()
         {
-            var hero = Hero();
-            var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
-            var king = TestData.Species("king", new MonsterStats(40, 1, 50), new MonsterStats(0, 0, 0), bite).Set("displayName", "말줄임덩굴");
-            var area = Area("lair", "보스 방", "#####\n#.B.#\n#.P.#\n#####", hero).Set("boss", new BossEncounter(king, 3)).Set("asksReviewAfterBoss", true);
-            var session = GameSession.NewGame(Player(), 1);
-            var field = CreateField(area, session);
+            int asked = 0;
+            var original = ReviewPrompt.NativeRequest;
+            ReviewPrompt.NativeRequest = () => asked++;
+            try
+            {
+                var hero = Hero();
+                var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+                var king = TestData.Species("king", new MonsterStats(40, 1, 50), new MonsterStats(0, 0, 0), bite).Set("displayName", "말줄임덩굴");
+                //   y=3 #.B.#
+                //   y=2 #...#  ← 시작 지점이 아닌 곳에서 싸움 (돌아갈지 묻는 창이 먼저)
+                //   y=1 #.P.#
+                var area = Area("lair", "보스 방", "#####\n#.B.#\n#...#\n#.P.#\n#####", hero).Set("boss", new BossEncounter(king, 3)).Set("asksReviewAfterBoss", true);
+                var session = GameSession.NewGame(Player(), 1);
+                var field = CreateField(area, session);
+                yield return null;
+                yield return null;
+
+                yield return HoldStick(field, Direction.Up, () => field.PlayerCell.y >= 2);
+                yield return FaceStick(field, Direction.Up);
+                yield return PressConfirm(field);
+                yield return WaitFor(() => field.Battle.IsRunning);
+                yield return PlayUntilResult(field.Battle, answerCorrectly: true);
+                FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
+                yield return WaitFor(() => field.IsReturnDialogOpen, 3f);
+                Assert.IsTrue(field.IsReturnDialogOpen);
+                StringAssert.Contains("돌아갈까요", AllText(field), "앱이 만든 후기 창 없이 돌아가기 묻기만");
+                Assert.AreEqual(0, asked, "창이 겹치지 않게 아직");
+
+                VisibleButton(field, "DialogCancelButton").onClick.Invoke();
+                yield return WaitFor(() => asked == 1, 2f);
+                Assert.AreEqual(1, asked, "돌아가기 묻기가 끝나면 애플 기본 창");
+                Assert.IsTrue(session.World.HasEvent(ReviewPrompt.EventId), "물어본 것을 기록");
+                Object.Destroy(field.gameObject);
+                yield return null;
+            }
+            finally
+            {
+                ReviewPrompt.NativeRequest = original;
+            }
+        }
+
+        // #254 사용자: 후기를 쓰는 링크는 설정의 버튼으로 (사람이 직접 눌렀을 때만)
+        [UnityTest]
+        public IEnumerator SettingsHasAWriteAReviewButton()
+        {
             string opened = null;
-            field.UrlOpener = url => opened = url;
-            yield return null;
-            yield return null;
-
-            yield return FaceStick(field, Direction.Up);
-            yield return PressConfirm(field);
-            yield return WaitFor(() => field.Battle.IsRunning);
-            yield return PlayUntilResult(field.Battle, answerCorrectly: true);
-            FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
-            yield return WaitFor(() => field.IsReturnDialogOpen, 3f);
-            Assert.IsTrue(field.IsReturnDialogOpen, "후기 부탁 창");
-            StringAssert.Contains("후기를 남겨", AllText(field));
-            Assert.IsNull(opened, "누르기 전엔 열지 않음");
-            Assert.IsTrue(session.World.HasEvent(ReviewPrompt.EventId), "물어본 것을 기록");
-
-            VisibleButton(field, "DialogConfirmButton").onClick.Invoke();
-            Assert.AreEqual(ReviewPrompt.Url(Application.platform), opened);
-            yield return new WaitForSecondsRealtime(0.3f);
-            Assert.IsFalse(field.IsReturnDialogOpen, "닫힘 (시작 지점이면 돌아갈지도 묻지 않음)");
-            Object.Destroy(field.gameObject);
-            yield return null;
+            var original = ReviewPrompt.OpenUrl;
+            ReviewPrompt.OpenUrl = url => opened = url;
+            try
+            {
+                var field = CreateField(Area("town", "마을", "###\n#P#\n###", Hero()), GameSession.NewGame(Player(), 1));
+                yield return null;
+                yield return null;
+                var hud = field.transform.Find("FieldHud/SafeArea");
+                FindButton(hud, "SettingsButton").onClick.Invoke();
+                ActiveButton(hud.Find("SettingsView"), "ReviewButton").onClick.Invoke();
+                Assert.AreEqual(ReviewPrompt.Url(Application.platform), opened);
+                Object.Destroy(field.gameObject);
+                yield return null;
+            }
+            finally
+            {
+                ReviewPrompt.OpenUrl = original;
+            }
         }
 
         [UnityTest]
