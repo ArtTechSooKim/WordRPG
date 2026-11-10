@@ -345,7 +345,7 @@ namespace WordRPG.UI
             confirmGlow.enabled = ready;
         }
 
-        // 이름표를 지역에 맞게 다시 만듦: 잠긴 출입구는 '· 잠김', 이긴 보스의 모래시계는 '· 다시 싸우기' (#251)
+        // 이름표를 지역에 맞게 다시 만듦: 잠긴 출입구는 '· 잠김', 이긴 보스의 보석은 '· 다시 싸우기' (#251)
         private void BuildNameTags() => nameTags.SetArea(area, IsDoorLocked, NameTagTop, cell => session.World.IsBossDefeated(area.BossId));
 
         // 가까운 오브젝트 이름표만 보이게 (연 문·놓인 다리는 감춤)

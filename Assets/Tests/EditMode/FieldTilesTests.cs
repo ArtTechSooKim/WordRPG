@@ -75,7 +75,7 @@ namespace WordRPG.Tests
                 if (d.Interactive) Assert.IsFalse(d.Walkable, $"{d.Tile}: [확인] 칸은 막힌 칸");
                 if (d.RoamerWalkable) Assert.IsTrue(d.Walkable, $"{d.Tile}: 몬스터가 걷는 칸은 주인공도 걸음");
                 if (d.OpensWhenDone) Assert.IsTrue(d.HasDoneLook, $"{d.Tile}: 끝나면 열리는 칸은 끝난 모습이 있음");
-                if (d.Tile == FieldTile.Boss) Assert.IsFalse(d.OpensWhenDone, "이긴 보스 자리는 모래시계가 남아 막힘 — 옆에서 [확인]으로 다시 싸움 (#251)");
+                if (d.Tile == FieldTile.Boss) Assert.IsFalse(d.OpensWhenDone, "이긴 보스 자리는 보석이 남아 막힘 — 옆에서 [확인]으로 다시 싸움 (#251)");
                 if (d.IsCamp) Assert.IsTrue(d.Interactive, $"{d.Tile}: 쉼터 물건은 [확인] 칸");
                 bool dynamicName = d.Tile == FieldTile.Boss || d.Tile == FieldTile.Door; // 보스 이름 · 도착 지역 이름
                 if (d.HasNameTag && !dynamicName) Assert.IsNotEmpty(d.Label, $"{d.Tile}: 이름표 글자가 없음");

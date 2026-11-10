@@ -474,6 +474,7 @@ namespace WordRPG.EditorTools
             SetStoryOrder(forestPath, 3);
             SetStoryOrder(junglePath, 4);
             SetStoryOrder(cavePath, 5);
+            SetAsksReview(cavePath); // 동굴 보스를 이긴 뒤 후기 부탁 (#252)
             // 보스 대사 (#207, 스토리 문서 5장)
             SetBossLines(libraryPath, "잊어버리면… 아플 일도 없어!", "기억을 돌려줘! 아픈 기억도 우리 것이야.",
                 "책 속의 글자가 돌아왔다.\n하지만 몇 페이지는 누군가 일부러 뜯어냈다.");
@@ -1083,6 +1084,15 @@ namespace WordRPG.EditorTools
             existing.Configure(id, name, animalFrameWidth, stages);
             EditorUtility.SetDirty(existing);
             return existing;
+        }
+
+        private static void SetAsksReview(string areaPath)
+        {
+            var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);
+            if (area == null) return;
+            var so = new SerializedObject(area);
+            Prop(so, "asksReviewAfterBoss").boolValue = true;
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void SetStoryOrder(string areaPath, int order)

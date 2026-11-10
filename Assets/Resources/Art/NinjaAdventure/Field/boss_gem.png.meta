@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 3ee34bdd3445bae439a869dd29698a8a
+guid: d9d2cab2b1c80aa4f8605cc64974aed3
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 771417062282680460
-    second: boss_hourglass_0
+      213: 8021694410916002222
+    second: boss_gem_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,7 +126,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: boss_hourglass_0
+      name: boss_gem_0
       rect:
         serializedVersion: 2
         x: 0
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c88d8032bbf94ba00800000000000000
-      internalID: 771417062282680460
+      spriteID: ea97263e098c25f60800000000000000
+      internalID: 8021694410916002222
       vertices: []
       indices: 
       edges: []

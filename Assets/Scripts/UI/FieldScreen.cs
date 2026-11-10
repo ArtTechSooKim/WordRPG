@@ -627,7 +627,7 @@ namespace WordRPG.UI
             }
         }
 
-        // 지나갈 수 있게 된 칸 — [확인]할 것도 없다: 연 보스 방 문(#76), 놓인 다리 (쓰러뜨린 보스 자리는 모래시계가 남아 [확인]으로 다시 싸움 #251)
+        // 지나갈 수 있게 된 칸 — [확인]할 것도 없다: 연 보스 방 문(#76), 놓인 다리 (쓰러뜨린 보스 자리는 보석이 남아 [확인]으로 다시 싸움 #251)
         private bool IsClearedBossSpot(Vector2Int cell) => IsCleared(area, cell);
 
         private bool IsCleared(FieldArea fieldArea, Vector2Int cell) => CellState.IsPassable(fieldArea, session, cell);

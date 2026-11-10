@@ -144,14 +144,48 @@ namespace WordRPG.Tests
             yield return WaitFor(() => field.Bubble.ShowsText);
             StringAssert.Contains("책 속의 글자가 돌아왔다", field.Bubble.Text, "이긴 뒤 머리 위에");
 
-            // 보스 자리의 모래시계에 부딪히면 다시 나옴 (전에 이긴 사람도 읽을 수 있음 — #251부터 밟을 수 없어서)
+            // 보스 자리의 보석에 부딪히면 다시 나옴 (전에 이긴 사람도 읽을 수 있음 — #251부터 밟을 수 없어서)
             yield return new WaitForSecondsRealtime(0.5f);
             field.Bubble.Hide();
             yield return HoldStick(field, Direction.Up, () => field.Bubble.ShowsText, 1f);
-            Assert.AreEqual(new Vector2Int(2, 1), field.PlayerCell, "모래시계는 막힘");
+            Assert.AreEqual(new Vector2Int(2, 1), field.PlayerCell, "보석은 막힘");
             Assert.IsTrue(field.Bubble.ShowsText, "부딪히면 글이 보임");
             StringAssert.Contains("책 속의 글자가 돌아왔다", field.Bubble.Text);
 
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
+        // #252 사용자: 후기를 부탁하는 지역의 보스를 이기면 창 → [후기 남기기] = 스토어 링크. 세이브에 기록되어 한 번만
+        [UnityTest]
+        public IEnumerator BeatingTheCaveBossAsksForAReviewAndOpensTheLink()
+        {
+            var hero = Hero();
+            var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var king = TestData.Species("king", new MonsterStats(40, 1, 50), new MonsterStats(0, 0, 0), bite).Set("displayName", "말줄임덩굴");
+            var area = Area("lair", "보스 방", "#####\n#.B.#\n#.P.#\n#####", hero).Set("boss", new BossEncounter(king, 3)).Set("asksReviewAfterBoss", true);
+            var session = GameSession.NewGame(Player(), 1);
+            var field = CreateField(area, session);
+            string opened = null;
+            field.UrlOpener = url => opened = url;
+            yield return null;
+            yield return null;
+
+            yield return FaceStick(field, Direction.Up);
+            yield return PressConfirm(field);
+            yield return WaitFor(() => field.Battle.IsRunning);
+            yield return PlayUntilResult(field.Battle, answerCorrectly: true);
+            FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
+            yield return WaitFor(() => field.IsReturnDialogOpen, 3f);
+            Assert.IsTrue(field.IsReturnDialogOpen, "후기 부탁 창");
+            StringAssert.Contains("후기를 남겨", AllText(field));
+            Assert.IsNull(opened, "누르기 전엔 열지 않음");
+            Assert.IsTrue(session.World.HasEvent(ReviewPrompt.EventId), "물어본 것을 기록");
+
+            VisibleButton(field, "DialogConfirmButton").onClick.Invoke();
+            Assert.AreEqual(ReviewPrompt.Url(Application.platform), opened);
+            yield return new WaitForSecondsRealtime(0.3f);
+            Assert.IsFalse(field.IsReturnDialogOpen, "닫힘 (시작 지점이면 돌아갈지도 묻지 않음)");
             Object.Destroy(field.gameObject);
             yield return null;
         }
@@ -199,14 +233,14 @@ namespace WordRPG.Tests
             Assert.IsTrue(session.Hero.Owns(crown));
             Assert.IsTrue(session.Hero.IsEquipped(session.Hero.Find(crown)), "빈 칸이 있으면 바로 끼움");
 
-            CollectionAssert.Contains(field.VisibleNameTags, "까먹대왕 · 다시 싸우기", "쓰러뜨린 보스 자리엔 모래시계와 이름표가 남음 (#251)");
-            Assert.IsNotNull(field.BossHourglass, "모래시계가 보임");
+            CollectionAssert.Contains(field.VisibleNameTags, "까먹대왕 · 다시 싸우기", "쓰러뜨린 보스 자리엔 보석과 이름표가 남음 (#251)");
+            Assert.IsNotNull(field.BossGem, "보석이 보임");
 
             // 시작 지점에 선 채로 이겼으면 돌아갈지 묻지 않음 (#60)
             yield return new WaitForSecondsRealtime(0.3f);
             Assert.IsFalse(field.IsReturnDialogOpen, "이미 시작 지점이면 묻지 않음");
 
-            // 모래시계는 막힌 물건 (#251): 옆에서 [확인]이면 다시 싸울지 묻기 — 바로 전투는 아님, 걸어 들어갈 수 없음
+            // 보석은 막힌 물건 (#251): 옆에서 [확인]이면 다시 싸울지 묻기 — 바로 전투는 아님, 걸어 들어갈 수 없음
             yield return new WaitForSecondsRealtime(0.7f);
             yield return PressConfirm(field);
             yield return new WaitForSecondsRealtime(0.2f);
@@ -402,7 +436,7 @@ namespace WordRPG.Tests
             yield return null;
         }
 
-        // #236 사용자 ㉓ · #251: 이긴 보스 자리의 모래시계 옆에서 [확인] → 다시 싸우기 — 보상은 경험치·골드만 (성유물·재료는 다시 안 줌)
+        // #236 사용자 ㉓ · #251: 이긴 보스 자리의 보석 옆에서 [확인] → 다시 싸우기 — 보상은 경험치·골드만 (성유물·재료는 다시 안 줌)
         [UnityTest]
         public IEnumerator ADefeatedBossCanBeFoughtAgainForExpAndGoldOnly()
         {
@@ -421,10 +455,10 @@ namespace WordRPG.Tests
             yield return null;
             yield return null;
 
-            Assert.IsNotNull(field.BossHourglass, "모래시계가 보임");
+            Assert.IsNotNull(field.BossGem, "보석이 보임");
             CollectionAssert.Contains(field.VisibleNameTags, "까먹대왕 · 다시 싸우기");
             yield return FaceStick(field, Direction.Up);
-            Assert.AreEqual(new Vector2Int(2, 1), field.PlayerCell, "모래시계는 막힘");
+            Assert.AreEqual(new Vector2Int(2, 1), field.PlayerCell, "보석은 막힘");
             yield return PressConfirm(field);
             yield return WaitFor(() => field.IsReturnDialogOpen, 2f);
             StringAssert.Contains("까먹대왕과 다시 싸울까요", AllText(field));

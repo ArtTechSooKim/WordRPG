@@ -112,7 +112,7 @@ namespace WordRPG.Tests
             yield return new WaitForSecondsRealtime(0.6f);
             yield return PressConfirm(field);
             Assert.IsTrue(field.Bubble.IsVisible);
-            // 쓰러뜨린 보스 자리엔 모래시계가 남아 막힘 (#251)
+            // 쓰러뜨린 보스 자리엔 보석이 남아 막힘 (#251)
             yield return HoldStick(field, Direction.Up, () => field.IsMoving);
             Assert.IsFalse(field.Bubble.IsVisible, "걷기 시작하면 말풍선은 사라짐");
             yield return HoldStick(field, Direction.Left, () => field.PlayerCell.x <= 1, 1f);

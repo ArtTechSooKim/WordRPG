@@ -44,7 +44,7 @@ namespace WordRPG.UI
             {
                 var center = CellCenter(cell);
                 if (Mathf.Abs(center.x - view.x) > halfWidth || Mathf.Abs(center.y - view.y) > halfHeight) continue;
-                if (IsCellDone(cell) != (area.Map.Get(cell) == FieldTile.Boss)) continue; // 보스 칸만 반대로 — 이긴 뒤 남은 모래시계가 반짝임 (#251)
+                if (IsCellDone(cell) != (area.Map.Get(cell) == FieldTile.Boss)) continue; // 보스 칸만 반대로 — 이긴 뒤 남은 보석이 반짝임 (#251)
                 if (nextSparkle.TryGetValue(cell, out var at) && now < at) continue;
                 nextSparkle[cell] = now + SparkleEvery + (float)sparkleRng.NextDouble() * 0.8f;
                 var offset = new Vector3((float)sparkleRng.NextDouble() * 0.5f - 0.25f, (float)sparkleRng.NextDouble() * 0.4f - 0.05f, 0f);

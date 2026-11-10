@@ -187,11 +187,11 @@ namespace WordRPG.UI
         }
 
         // 이긴 보스와 다시 싸우기 (#236 사용자 ㉓: 보스 기믹이 새로 생겼다는 업데이트를 보고 돌아올 수도 있음). 보상은 경험치·골드만.
-        // 보스 자리에 남은 모래시계 옆에서 [확인] (#251 사용자: 정글·동굴은 넓은 풀밭의 한 칸을 밟아야 해서 찾을 수 없었음 → 막히는 물건으로)
+        // 보스 자리에 남은 보석 옆에서 [확인] (#251 사용자: 정글·동굴은 넓은 풀밭의 한 칸을 밟아야 해서 찾을 수 없었음 → 막히는 물건으로)
         private bool rematchBattle;
         public int Rematches { get; private set; } // 테스트용
 
-        // 모래시계에 부딪히면 승리 뒤 글을 다시 (#207 — 전에 이긴 사람도 읽을 수 있게. #251부터 밟을 수 없어서 부딪힐 때)
+        // 보석에 부딪히면 승리 뒤 글을 다시 (#207 — 전에 이긴 사람도 읽을 수 있게. #251부터 밟을 수 없어서 부딪힐 때)
         private void SayBossAfterLine()
         {
             if (bubble.IsVisible || area.Boss == null || area.Boss.AfterLine.Length == 0 || !session.World.IsBossDefeated(area.BossId)) return;
