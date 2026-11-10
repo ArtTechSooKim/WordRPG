@@ -94,7 +94,7 @@ namespace WordRPG.UI
                 if (lectern.HasValue && area.HasDictionary)
                     tilemap.SetTile(new Vector3Int(lectern.Value.x, lectern.Value.y, 0), TileFor(FieldTile.Lectern, true));
                 minimap.Redraw();
-                BuildNameTags(); // '· 다시 싸우기' (#251)
+                BuildNameTags(); // '의 기억 · 다시 싸우기' (#251·#255)
                 RefreshNameTags();
                 string name = area.Boss.Species.DisplayName;
                 var relic = session.GrantRelic(area.Boss.RewardRelic);

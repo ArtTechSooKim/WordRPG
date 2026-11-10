@@ -269,7 +269,7 @@ namespace WordRPG.Tests
             Assert.IsTrue(session.Hero.Owns(crown));
             Assert.IsTrue(session.Hero.IsEquipped(session.Hero.Find(crown)), "빈 칸이 있으면 바로 끼움");
 
-            CollectionAssert.Contains(field.VisibleNameTags, "까먹대왕 · 다시 싸우기", "쓰러뜨린 보스 자리엔 보석과 이름표가 남음 (#251)");
+            CollectionAssert.Contains(field.VisibleNameTags, "까먹대왕의 기억 · 다시 싸우기", "쓰러뜨린 보스 자리엔 보석과 이름표가 남음 (#251)");
             Assert.IsNotNull(field.BossGem, "보석이 보임");
 
             // 시작 지점에 선 채로 이겼으면 돌아갈지 묻지 않음 (#60)
@@ -492,12 +492,12 @@ namespace WordRPG.Tests
             yield return null;
 
             Assert.IsNotNull(field.BossGem, "보석이 보임");
-            CollectionAssert.Contains(field.VisibleNameTags, "까먹대왕 · 다시 싸우기");
+            CollectionAssert.Contains(field.VisibleNameTags, "까먹대왕의 기억 · 다시 싸우기");
             yield return FaceStick(field, Direction.Up);
             Assert.AreEqual(new Vector2Int(2, 1), field.PlayerCell, "보석은 막힘");
             yield return PressConfirm(field);
             yield return WaitFor(() => field.IsReturnDialogOpen, 2f);
-            StringAssert.Contains("까먹대왕과 다시 싸울까요", AllText(field));
+            StringAssert.Contains("까먹대왕의 기억 속으로 들어갈까요", AllText(field));
             StringAssert.Contains("경험치와 골드만", AllText(field));
             int gold = session.Inventory.Gold;
             VisibleButton(field, "DialogConfirmButton").onClick.Invoke();

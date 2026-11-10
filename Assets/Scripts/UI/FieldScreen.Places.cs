@@ -187,7 +187,8 @@ namespace WordRPG.UI
         }
 
         // 이긴 보스와 다시 싸우기 (#236 사용자 ㉓: 보스 기믹이 새로 생겼다는 업데이트를 보고 돌아올 수도 있음). 보상은 경험치·골드만.
-        // 보스 자리에 남은 보석 옆에서 [확인] (#251 사용자: 정글·동굴은 넓은 풀밭의 한 칸을 밟아야 해서 찾을 수 없었음 → 막히는 물건으로)
+        // 보스 자리에 남은 보석 옆에서 [확인] (#251 사용자: 정글·동굴은 넓은 풀밭의 한 칸을 밟아야 해서 찾을 수 없었음 → 막히는 물건으로).
+        // 보석 = 기억의 결정 (#255 사용자, 스토리 문서): 돌아갈 곳이 없어 굳은 보스 자신의 기억. 그 기억 속에서 싸움을 다시 겪는 것이라 성유물은 나오지 않음
         private bool rematchBattle;
         public int Rematches { get; private set; } // 테스트용
 
@@ -203,7 +204,7 @@ namespace WordRPG.UI
         {
             var boss = area.Boss;
             string name = boss.Species.DisplayName;
-            returnDialog.Show($"{UiKit.WithJosa(name, "과", "와")} 다시 싸울까요?", "보상은 경험치와 골드만 받아요.", "다시 싸우기", false, () =>
+            returnDialog.Show($"{name}의 기억 속으로 들어갈까요?", "보상은 경험치와 골드만 받아요.", "다시 싸우기", false, () =>
             {
                 var enemies = new List<MonsterInstance> { new MonsterInstance(boss.Species, boss.Level) };
                 StartCoroutine(Encounter(enemies, BossLines.Intro(boss, session.Hero.DisplayName), true, rematch: true));
