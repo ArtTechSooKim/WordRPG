@@ -401,6 +401,10 @@ namespace WordRPG.EditorTools
                 new Color(0.35f, 0.6f, 0.35f), new MonsterStats(116, 32, 13), new MonsterStats(16, 5, 1), new[] { vineSlam, ellipsisSpore, swallowSentence }, // HP·기술 #147
                 enemyExp: 90, enemyGold: 120,
                 drops: new[] { new ItemDrop(glowMoss, 1f, 3), new ItemDrop(vineFiber, 1f, 2), new ItemDrop(shinyInk, 1f, 2), new ItemDrop(hardCover, 1f, 2), new ItemDrop(sparkleDust, 1f, 2) });
+            // 말줄임덩굴이 키우는 덩굴 (#246 사용자: Lv5 · HP 50 · 약함 — 광역에 한 번에). 경험치·골드 없음
+            var vineTap = Skill("vine_minion_tap", "덩굴 톡", "가느다란 덩굴로 톡 때린다.", SkillKind.Damage, SkillTarget.SingleEnemy, 30, QuizDirection.EnglishToMeaning);
+            Monster("vine_minion", "덩굴", "말줄임덩굴이 순식간에 뻗어 낸 가는 덩굴. 약하지만 금세 다시 자란다.", MonsterRole.Attacker,
+                new Color(0.45f, 0.7f, 0.4f), new MonsterStats(50, 6, 1), new MonsterStats(0, 0, 0), new[] { vineTap }, enemyExp: 0, enemyGold: 0);
             var caveEncounters = Encounters("cave_field", 1, 2,
                 new EncounterTable.Entry(blinkGhost, 15, 17, 10),
                 new EncounterTable.Entry(chewLarva, 15, 18, 8),
@@ -482,11 +486,14 @@ namespace WordRPG.EditorTools
             // 보스 기믹 (#236 사용자 ㉑): 까먹대왕 = 보스전 문제마다 크리티컬 시간이 지나면 정답을 까먹음
             SetGimmick("boss_forget_king", BossGimmick.Forget, "까먹대왕 앞에선 빨리 답하자! 크리티컬 시간이 지나면 정답을 까먹어");
             // 빈칸두꺼비 (#237 사용자 ㉝): 빈칸 울음 = 보호막을 깨고 다음 차례 문제 단어 글자의 25%를 빈칸으로
-            SetGimmick("boss_blank_frog", BossGimmick.Blank, "빈칸 울음 뒤엔 단어에 빈칸이 생겨! 남은 글자로 떠올려 보자");
+            SetGimmick("boss_blank_frog", BossGimmick.Blank, "빈칸두꺼비 앞에선 단어에 빈칸이 생겨! 남은 글자로 떠올려 보자");
+            // 말줄임덩굴 (#246 사용자): 매 차례 덩굴이 없으면 양옆에 덩굴
+            SetGimmick("boss_ellipsis_vine", BossGimmick.Overgrow, "덩굴은 쓰러뜨려도 다시 자라! 광역 공격으로 한 번에 쓸어 버리자");
+            SetMinion("boss_ellipsis_vine", "vine_minion", 5);
             // 헷갈너구리 (#238 사용자 아이디어 1): 보기가 2초마다 자리를 섞음
             SetGimmick("boss_muddle_raccoon", BossGimmick.Shuffle, "헷갈너구리는 2초마다 보기 자리를 바꿔! 흔들리면 잠깐 기다렸다 고르자");
             // #239 사용자: 보호막 깨기('흡수')는 너무 일찍 나옴 → 3장 사막에서. 대신 보호막이 있으면 피해 40 더
-            SetSkillFlags("frog_blank_croak", shattersShields: false, blanksWords: true, shieldBonusDamage: 40);
+            SetSkillFlags("frog_blank_croak", shattersShields: false, shieldBonusDamage: 40);
             SetSkillDescription("frog_blank_croak", "개굴! 울음소리에 머릿속이 하얗게 빈칸이 된다. 보호막이 있으면 피해가 40 더 크다.");
             // 필드의 보스 그림 크기 (#233 사용자: 작아서 위엄이 없음 → 보스 방에 꽉 차게. 빈칸두꺼비 6배, 말줄임덩굴 가로 5·세로 6배)
             SetBossFieldSize(libraryPath, 5, 5);
@@ -1111,13 +1118,12 @@ namespace WordRPG.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void SetSkillFlags(string skillId, bool shattersShields, bool blanksWords, int shieldBonusDamage = 0)
+        private static void SetSkillFlags(string skillId, bool shattersShields, int shieldBonusDamage = 0)
         {
             var skill = AssetDatabase.LoadAssetAtPath<SkillData>($"{Root}/Skills/{skillId}.asset");
             if (skill == null) return;
             var so = new SerializedObject(skill);
             Prop(so, "shattersShields").boolValue = shattersShields;
-            Prop(so, "blanksWords").boolValue = blanksWords;
             Prop(so, "shieldBonusDamage").intValue = shieldBonusDamage;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
@@ -1138,6 +1144,17 @@ namespace WordRPG.EditorTools
             var so = new SerializedObject(species);
             Prop(so, "gimmick").enumValueIndex = (int)gimmick;
             Prop(so, "gimmickHint").stringValue = hint;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void SetMinion(string speciesId, string minionId, int level)
+        {
+            var species = AssetDatabase.LoadAssetAtPath<MonsterSpecies>($"{Root}/Monsters/{speciesId}.asset");
+            var minion = AssetDatabase.LoadAssetAtPath<MonsterSpecies>($"{Root}/Monsters/{minionId}.asset");
+            if (species == null || minion == null) return;
+            var so = new SerializedObject(species);
+            Prop(so, "minion").objectReferenceValue = minion;
+            Prop(so, "minionLevel").intValue = level;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -1380,7 +1397,7 @@ namespace WordRPG.EditorTools
             ["lamp_firefly_swarm"] = SkillFx.Light, ["lamp_glow_flash"] = SkillFx.Light,
             ["gem_letter_shower"] = SkillFx.Letters, ["gem_letter_echo"] = SkillFx.Letters, ["doc_fill_blank"] = SkillFx.Letters,
             ["doc_highlight_sweep"] = SkillFx.Highlight, ["doc_finish_sentence"] = SkillFx.Heavy,
-            ["whip_vine_lash"] = SkillFx.Plant, ["whip_thorn_storm"] = SkillFx.Plant,
+            ["whip_vine_lash"] = SkillFx.Plant, ["vine_minion_tap"] = SkillFx.Plant, ["whip_thorn_storm"] = SkillFx.Plant,
             ["ara_pebble"] = SkillFx.Rock,
             ["lantern_wisdom_light"] = SkillFx.HealLight, ["lumi_healing_light"] = SkillFx.HealLight,
             ["grail_recall"] = SkillFx.HealLight, ["grail_blessing"] = SkillFx.HealLight,

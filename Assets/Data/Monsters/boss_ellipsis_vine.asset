@@ -51,4 +51,9 @@ MonoBehaviour:
     chance: 1
     count: 2
   trainingDummy: 0
+  gimmick: 4
+  gimmickHint: "\uB369\uAD74\uC740 \uC4F0\uB7EC\uB728\uB824\uB3C4 \uB2E4\uC2DC \uC790\uB77C!
+    \uAD11\uC5ED \uACF5\uACA9\uC73C\uB85C \uD55C \uBC88\uC5D0 \uC4F8\uC5B4 \uBC84\uB9AC\uC790"
+  minion: {fileID: 11400000, guid: 783b3c94694a00f4bb6129731d400f3a, type: 2}
+  minionLevel: 5
   fleeTier: 2

@@ -93,7 +93,7 @@ namespace WordRPG.UI
             {
                 float seconds = Mathf.Clamp(0.8f + line.Length * 0.07f, 1f, 3f);
                 bubble.Speak(elder.Body, elder.Data.DisplayName, NpcLines.Render(line, session.Hero.DisplayName), seconds + 0.3f);
-                yield return WaitUnscaled(seconds);
+                yield return WaitLine(seconds);
             }
             bubble.Hide();
 

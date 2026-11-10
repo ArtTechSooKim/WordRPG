@@ -296,6 +296,47 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // 동굴 입구처럼 맵 가운데 있는 큰 그림은 치우치지 않게 그림 한가운데를 비춤 (#244 사용자)
+        [UnityTest]
+        public IEnumerator GateRevealCentersTheCaveMouth()
+        {
+            var hero = Hero();
+            var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var king = TestData.Species("king", new MonsterStats(40, 1, 50), new MonsterStats(0, 0, 0), bite)
+                .Set("displayName", "까먹대왕");
+            var town = Area("town", "마을", "#####\n#.O.#\n#...#\n#.P.#\n##D##", hero);
+            var cave = Area("cave", "동굴", "###\n#P#\n#D#", hero).Set("theme", FieldTheme.Forest);
+            var lair = Area("lair", "보스 방", "#####\n#.B.#\n#.P.#\n##D##", hero).Set("theme", FieldTheme.Library)
+                .Set("boss", new BossEncounter(king, 3));
+            town.Set("exits", new List<AreaExit> { new AreaExit(cave, 0, lair), new AreaExit(lair, 0) });
+            cave.Set("exits", new List<AreaExit> { new AreaExit(town, 0) });
+            lair.Set("exits", new List<AreaExit> { new AreaExit(town, 1) });
+            var database = ScriptableObject.CreateInstance<GameDatabase>();
+            database.ReplaceContents(new[] { hero, king }, new ItemData[0], new[] { town, cave, lair });
+            var session = GameSession.NewGame(Player(), 1);
+            var field = CreateField(town, session, database);
+            yield return null;
+            yield return null;
+
+            yield return HoldStick(field, Direction.Down, () => field.IsMoving);
+            yield return WaitFor(() => field.CurrentArea == lair && !field.IsInBattle);
+            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
+            yield return WaitFor(() => !field.IsMoving);
+            yield return FaceStick(field, Direction.Up);
+            yield return PressConfirm(field);
+            yield return WaitFor(() => field.Battle.IsRunning);
+            yield return PlayUntilResult(field.Battle, answerCorrectly: true);
+            FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
+            yield return WaitFor(() => field.IsRevealingGate);
+            yield return WaitFor(() => !field.IsInBattle && !field.IsRevealingGate);
+
+            Assert.AreEqual(new Vector2Int(2, 3), field.RevealedGates[0].Cell);
+            Assert.Less(Vector2.Distance(field.LastGateCamera, new Vector2(2.5f, 4.75f)), 0.01f, "동굴 그림의 한가운데가 화면 가운데");
+
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
         // 같은 이름의 버튼이 여러 창에 있으므로(끝내기 창·돌아가기 창) 지금 보이는 것
         private static UnityEngine.UI.Button VisibleButton(FieldScreen field, string name)
         {

@@ -72,6 +72,9 @@ namespace WordRPG.Monsters
         [SerializeField] private BossGimmick gimmick;
         [Tooltip("이 몬스터의 기믹에 당해 졌을 때 결산에 나오는 한 줄 (DefeatAdvice)")]
         [SerializeField] private string gimmickHint;
+        [Tooltip("Overgrow 기믹이 양옆에 키우는 몬스터 (#246 말줄임덩굴의 덩굴)")]
+        [SerializeField] private MonsterSpecies minion;
+        [SerializeField] private int minionLevel = 5;
 
         [Header("도망 (#84)")]
         [Tooltip("약함 = 항상 도망 / 보통 = 1/4 확률로 단어 문제 / 강함 = 늘 단어 문제 (틀리면 차례를 놓침). 보스전은 원래 도망 불가")]
@@ -79,6 +82,8 @@ namespace WordRPG.Monsters
 
         public FleeTier FleeTier => fleeTier;
         public BossGimmick Gimmick => gimmick;
+        public MonsterSpecies Minion => minion;
+        public int MinionLevel => minionLevel;
         public string GimmickHint => gimmickHint ?? "";
         public string SpeciesId => speciesId;
         public string DisplayName => displayName;

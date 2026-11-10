@@ -29,6 +29,7 @@ namespace WordRPG.Battle
     {
         private readonly List<BattleUnit> party = new List<BattleUnit>();
         private readonly List<BattleUnit> enemies = new List<BattleUnit>();
+        private const int MinionSlots = 2; // 보스 양옆 (#246)
         private readonly List<MasteryChange> masteryChanges = new List<MasteryChange>();
         private readonly Dictionary<BattleUnit, int> enemyHeals = new Dictionary<BattleUnit, int>(); // 적마다 이번 전투에서 회복한 횟수 (#88)
         private readonly Dictionary<BattleUnit, (SkillData skill, int turnsLeft)> charging =
@@ -63,9 +64,16 @@ namespace WordRPG.Battle
         // 몰래 다니던 중 부딪힌 전투 (살금살금 물약이 남아 있음): 몬스터 등급과 상관없이 바로 도망 (#232 사용자 — 물약의 취지).
         // 보스전(CanFlee = false)은 그대로 막힘
         public bool SureEscape { get; set; }
-        // 빈칸 울음을 맞은 다음 아군 차례 (#237): 문제 단어 글자의 25%가 빈칸 — UI가 WordBlanks로 가림
-        public bool WordsBlanked => blankRound == Round;
-        private int blankRound = -1;
+        // 빈칸두꺼비와 싸우는 동안 늘 (#237 → #245 사용자: 빈칸 울음 뒤만이 아니라 다른 보스 기믹처럼): 문제 단어 글자의 25%가 빈칸 — UI가 WordBlanks로 가림
+        public bool WordsBlanked
+        {
+            get
+            {
+                foreach (var enemy in enemies)
+                    if (!enemy.IsDefeated && enemy.Monster != null && enemy.Monster.Species.Gimmick == BossGimmick.Blank) return true;
+                return false;
+            }
+        }
 
         // 도망 등급 = 살아 있는 적 중 가장 강한 등급
         public FleeTier EscapeTier
@@ -282,7 +290,8 @@ namespace WordRPG.Battle
         {
             if (Phase != BattlePhase.Victory) throw new InvalidOperationException("승리했을 때만 보상이 있습니다");
             var defeated = new List<MonsterInstance>();
-            foreach (var enemy in enemies) defeated.Add(enemy.Monster);
+            foreach (var enemy in enemies)
+                if (!enemy.IsSummoned) defeated.Add(enemy.Monster); // 자라난 덩굴은 보상 없음 — 다시 자라므로 벌이가 되지 않게 (#246)
             return BattleRewardCalculator.Calculate(defeated, CorrectAnswers, config, rng, party[0].Level);
         }
 
@@ -310,7 +319,9 @@ namespace WordRPG.Battle
         {
             foreach (var enemy in enemies) enemy.ClearShield();
 
-            foreach (var enemy in enemies)
+            var acting = new List<BattleUnit>(enemies); // 이번에 자란 덩굴은 다음 차례부터
+            GrowMinions(events);
+            foreach (var enemy in acting)
             {
                 if (enemy.IsDefeated || enemy.Skills.Count == 0) continue;
                 if (FirstAlive(party) == null) return;
@@ -338,6 +349,41 @@ namespace WordRPG.Battle
                 }
                 if (skill.Kind == SkillKind.Heal) enemyHeals[enemy] = HealsUsed(enemy) + 1;
                 ExecuteSkill(enemy, skill, ChooseEnemyTarget(enemy, skill), false, events);
+            }
+        }
+
+        // 말줄임덩굴 (#246 사용자): 매 차례 덩굴이 하나도 없으면 양옆(1번·2번 자리)에 덩굴이 자람. 보스는 그 차례에도 그대로 행동
+        private void GrowMinions(List<BattleEvent> events)
+        {
+            BattleUnit grower = null;
+            foreach (var enemy in enemies)
+            {
+                if (enemy.IsDefeated) continue;
+                if (enemy.IsSummoned) return; // 덩굴이 남아 있음
+                if (enemy.Monster != null && enemy.Monster.Species.Gimmick == BossGimmick.Overgrow && enemy.Monster.Species.Minion != null) grower = enemy;
+            }
+            if (grower == null) return;
+            var species = grower.Monster.Species;
+            var grown = new List<BattleUnit>();
+            for (int slot = 1; slot <= MinionSlots; slot++)
+            {
+                var unit = new BattleUnit(new MonsterInstance(species.Minion, species.MinionLevel), false, slot, summoned: true);
+                enemies.Add(unit); // 쓰러진 덩굴은 목록에 남아도 됨 (쓰러진 칸은 아무도 고르지 않음)
+                grown.Add(unit);
+            }
+            events.Add(BattleEvent.MinionsGrown(grower, grown));
+        }
+
+        // 부른 보스가 쓰러지면 덩굴도 시듦 (#246) — 남은 덩굴을 때리지 않아도 이김
+        private void WitherMinions(List<BattleEvent> events)
+        {
+            foreach (var enemy in enemies)
+                if (!enemy.IsSummoned && !enemy.IsDefeated) return;
+            foreach (var enemy in enemies)
+            {
+                if (!enemy.IsSummoned || enemy.IsDefeated) continue;
+                enemy.ReceiveDamage(enemy.Hp + enemy.Shield, out _, out _);
+                events.Add(BattleEvent.Defeated(enemy));
             }
         }
 
@@ -383,11 +429,6 @@ namespace WordRPG.Battle
             List<BattleEvent> events, float comboBonus = 0f, float intensity = 1f)
         {
             events.Add(BattleEvent.SkillUsed(user, skill, intensity));
-            if (skill.BlanksWords && !user.IsPlayerSide)
-            {
-                blankRound = Round + 1; // 적 차례가 끝나면 Round가 오름 → 바로 다음 아군 차례
-                events.Add(BattleEvent.WordsBlanked(user, skill));
-            }
 
             foreach (var target in ResolveTargets(user, skill, chosenTarget))
             {
@@ -453,6 +494,7 @@ namespace WordRPG.Battle
 
         private bool CheckBattleEnd(List<BattleEvent> events)
         {
+            WitherMinions(events);
             if (FirstAlive(enemies) == null)
             {
                 Phase = BattlePhase.Victory;

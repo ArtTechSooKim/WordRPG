@@ -294,7 +294,7 @@ namespace WordRPG.UI
         {
             var names = new List<string>();
             foreach (var enemy in engine.Enemies)
-                if (!names.Contains(enemy.DisplayName)) names.Add(enemy.DisplayName);
+                if (!enemy.IsSummoned && !names.Contains(enemy.DisplayName)) names.Add(enemy.DisplayName);
             if (names.Count == 0) return "";
             string last = UiKit.WithJosa(names[names.Count - 1], "을", "를");
             names[names.Count - 1] = last;

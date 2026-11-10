@@ -14,6 +14,7 @@ namespace WordRPG.Battle
         public bool IsPlayerSide { get; }
         public int Index { get; } // 같은 편 안에서의 위치 (UI 배치용)
         public int Shield { get; private set; }
+        public bool IsSummoned { get; } // 전투 중에 자라난 적 (#246 덩굴) — 보상이 없고, 부른 보스가 쓰러지면 같이 시듦
 
         public string DisplayName => Combatant.DisplayName;
         public int Level => Combatant.Level;
@@ -24,11 +25,12 @@ namespace WordRPG.Battle
         public IReadOnlyList<SkillData> Skills => Combatant.Skills;
         public bool IsDefeated => Combatant.IsFainted;
 
-        public BattleUnit(ICombatant combatant, bool isPlayerSide, int index)
+        public BattleUnit(ICombatant combatant, bool isPlayerSide, int index, bool summoned = false)
         {
             Combatant = combatant;
             IsPlayerSide = isPlayerSide;
             Index = index;
+            IsSummoned = summoned;
         }
 
         // 보호막이 먼저 흡수하고 남은 만큼 HP가 깎인다

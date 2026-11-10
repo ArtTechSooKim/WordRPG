@@ -123,7 +123,8 @@ namespace WordRPG.UI
         private IEnumerator Monologue(string line, float seconds)
         {
             bubble.Say(line, seconds + 0.5f);
-            yield return new WaitForSecondsRealtime(seconds * animationScale);
+            yield return WaitLine(seconds);
+            if (lineSkipped) bubble.Hide();
         }
 
         // 고른 모습으로 필드 주인공·HUD 얼굴을 다시 그림 (전투·가방·타이틀은 PlayerArt를 그때그때 씀)
@@ -177,7 +178,7 @@ namespace WordRPG.UI
             var pulse = StartCoroutine(PulseObjective());
             yield return pauseTutorial.Tell(new[]
             {
-                $"목표는 {goal.Destination.DisplayName}의 {UiKit.WithJosa(boss.DisplayName, "을", "를")} 물리치는 것입니다!\n미니맵 아래 목표 한 줄이 길을 알려 줘요."
+                $"목표는 {goal.Destination.DisplayName}의 {UiKit.WithJosa(boss.DisplayName, "을", "를")} 물리치는 것입니다!\n미니맵 아래에 목표가 있으니 잘 확인해주세요!"
             });
             StopCoroutine(pulse);
             ObjectivePulsing = false;

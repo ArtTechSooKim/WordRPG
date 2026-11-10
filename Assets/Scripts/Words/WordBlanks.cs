@@ -4,7 +4,7 @@ using System.Text;
 
 namespace WordRPG.Words
 {
-    // 빈칸 울음 (#236 사용자 ㉝, 빈칸두꺼비): 영어 단어 글자의 25%를 '_'로 — 남은 글자로 무슨 단어인지 떠올리게.
+    // 빈칸두꺼비의 기믹 (#236 사용자 ㉝): 영어 단어 글자의 25%를 '_'로 — 남은 글자로 무슨 단어인지 떠올리게.
     // 예: security → s_cur_ty. 첫 글자는 남기고, 글자(알파벳)만 가림 (띄어쓰기·하이픈은 그대로), 적어도 한 글자는 가림 (두 글자 이상일 때)
     public static class WordBlanks
     {
@@ -30,6 +30,19 @@ namespace WordRPG.Words
             var masked = new StringBuilder(word);
             for (int i = 0; i < blanks; i++) masked[letters[i]] = Blank;
             return masked.ToString();
+        }
+
+        // 답한 뒤 채운 단어 (#245 사용자): 가렸던 글자에만 색을 입힘 (Unity 서식 글자). 가린 글자가 없으면 단어 그대로
+        public static string Filled(string word, string masked, string colorHex)
+        {
+            if (string.IsNullOrEmpty(word) || masked == null || masked.Length != word.Length) return word ?? "";
+            var filled = new StringBuilder();
+            for (int i = 0; i < word.Length; i++)
+            {
+                if (masked[i] == Blank && word[i] != Blank) filled.Append($"<color=#{colorHex}>{word[i]}</color>");
+                else filled.Append(word[i]);
+            }
+            return filled.ToString();
         }
     }
 }

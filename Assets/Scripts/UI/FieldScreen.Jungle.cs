@@ -71,6 +71,7 @@ namespace WordRPG.UI
                     Sound.Play(Sfx.VineGrow); // 풀이 뻗는 소리 (#232 사용자: 예전 소리는 유령 웃음 같았음)
                     yield return WaitUnscaled(0.22f);
                 }
+                Sound.PlayJingle(Sfx.GateOpen); // 새 지역이 열릴 때와 같은 소리 — 신기한 걸 발견했다는 걸 알려 줌 (#245 사용자)
                 ShowToast("덩굴 다리가 놓였다!", 2.5f);
                 yield return WaitUnscaled(0.7f);
                 yield return PanCamera(null, 0.5f);

@@ -65,21 +65,25 @@ SOUNDS = {
     "skillguardseed": ([(BOUNCE, "Bounce5", 0, 0), (MAGIC, "Magic1", -8, 40)], 0, PEAK),
     # 필드 (기술이 아닌 소리도 같은 방식으로)
     # 덩굴 다리가 한 칸씩 놓임 (#232 사용자: 예전 Spirit 소리는 유령 웃음 같음 → #238 후보 D3: 나무 '탁' + 풀). 칸마다 울려서 조금 작게
-    "vinegrow": ([(CC0, "bfh1_wood_hit_01", -2, 0), (ELEMENT, "Grass2", -4, 20)], 0, -9.0),
+    "vinegrow": ([(CC0, "bfh1_wood_hit_01", -2, 0), (ELEMENT, "Grass2", -4, 20)], 0, -3.0),  # #245 사용자: 작음 (-9 → -3)
     # 일반 정답 타격 (#238 사용자 ③ 후보 A7): 크리티컬보다 가벼운 '탁' — 크리티컬은 기술 소리 + 쾅 그대로
-    "hitlight": ([(CC0, "bfh1_hit_03", 0, 0)], 0, -9.0),
+    "hitlight": ([(CC0, "bfh1_hit_03", 0, 0)], 0, -5.0),  # #245 사용자: 조금 더 크게 (-9 → -5)
     # 강도 ×1.2·×1.5·×2 글자가 뜰 때 (#238 사용자 ㉕ 후보 B27): '띵' — 진짜 '쾅'은 맞을 때만
     "intensityup": ([(BONUS, "PowerUp2", 0, 0)], 0, -8.0),
     # 보호막이 깨질 때 (#239 사용자 ⑳: 얇은 유리 glass_breaking_03 + 앞에 '저저적' 갈라지는 얼음 → #240: 금 간 뒤 0.7초에 깨짐
     # → #241: 금 소리 앞을 잘라 '저 저 적' 대신 '저적'만 — 0.18초부터 = 둘째·셋째 금
     # → #242 후보 H3: 너무 작고 '탁' 같음 → 크게(유리가 최고 음량) · GLASS_TONE · 유리 조각이 짤랑 떨어지는 꼬리).
     # 유리가 깨지는 때(700ms)를 바꾸면 BattleScreen.SkillFx의 ShatterDelay(유리 조각이 튀는 때)도 같이
-    "shieldbreak": ([(ICE, "LedasLuzta5", -4, 0, "atrim=0.18:0.38,asetpts=PTS-STARTPTS,highpass=f=900,afade=t=in:d=0.005,afade=t=out:st=0.160:d=0.04"),
-                     (CC0, "bfh1_glass_breaking_03", 0, 700, "atrim=0:0.9,afade=t=out:st=0.78:d=0.12,highpass=f=700"),
+    "shieldbreak": ([(ICE, "LedasLuzta5", -8, 0, "atrim=0.18:0.38,asetpts=PTS-STARTPTS,highpass=f=900,afade=t=in:d=0.005,afade=t=out:st=0.160:d=0.04"),
+                     (CC0, "bfh1_glass_breaking_03", 0, 700, "atrim=0:0.9,afade=t=out:st=0.78:d=0.12,highpass=f=700,acompressor=threshold=0.04:ratio=5:attack=1:release=70:makeup=3"),
                      (CC0, "bfh1_glass_falling_02", -6, 950, "atrim=0:0.82,afade=t=out:st=0.6:d=0.22,highpass=f=1200")],
-                    0, -5.0, {"tone": GLASS_TONE}),
+                    0, -1.5, {"tone": GLASS_TONE}),  # #245 사용자: 오히려 작음 → 유리 압축 + 최고 음량 -5 → -1.5
     # 보호막이 막아 낼 때 (#239 사용자: 깨짐과 다른 소리 → #240 후보 E7 두꺼운 막 '둥') — 맞는 소리와 같이 나므로 작게
-    "shieldabsorb": ([(HIT, "Impact4", 0, 0, "atrim=0:0.35,asetpts=PTS-STARTPTS,afade=t=out:st=0.250:d=0.1,lowpass=f=1800")], 0, -10.0),
+    "shieldabsorb": ([(HIT, "Impact4", 0, 0, "atrim=0:0.35,asetpts=PTS-STARTPTS,afade=t=out:st=0.250:d=0.1,lowpass=f=1800")], 0, -5.0),  # #245 사용자: 작음 (-10 → -5)
+    # 살금살금 물약 (#245 사용자: 유령 소리 대신 은밀한 '스스슥') — 임시 후보 S1, 고르면 바꿈
+    "sneakpotion": ([(ELEMENT, "Grass", 8, 0, "atrim=0:0.16,asetpts=PTS-STARTPTS,afade=t=out:st=0.100:d=0.06,highpass=f=500"),
+                     (ELEMENT, "Grass", 5, 130, "atrim=0:0.16,asetpts=PTS-STARTPTS,afade=t=out:st=0.100:d=0.06,highpass=f=500"),
+                     (ELEMENT, "Grass", 2, 260, "atrim=0:0.16,asetpts=PTS-STARTPTS,afade=t=out:st=0.100:d=0.06,highpass=f=500")], 0, -9.0),
 }
 
 

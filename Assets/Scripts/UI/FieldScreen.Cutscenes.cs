@@ -17,7 +17,9 @@ namespace WordRPG.UI
         private const float NpcWalkStep = 0.26f;   // 인물이 걸을 때
         private const float NpcRunStep = 0.13f;    // 인물이 달려올 때
         private const int RunInFrom = 9;           // 보스 뒤: 주인공에게서 걸어서 이만큼 떨어진 곳(화면 밖)에서 달려옴
+        private const float MinLineSeconds = 0.15f; // 막 뜬 말은 이만큼 지나야 [확인]으로 넘어감 (연타에 못 읽고 지나가지 않게)
         private bool cutsceneRunning;
+        private bool lineSkip, lineSkipped;        // [확인]을 눌렀다 · 방금 말을 [확인]으로 넘겼다 (#245)
 
         public int CutscenesPlayed { get; private set; } // 테스트용
         public bool IsCutsceneRunning => cutsceneRunning;
@@ -113,15 +115,12 @@ namespace WordRPG.UI
             FaceEachOther(npc);
             yield return SayLines(npc, npc.Data.BossThanksLines);
 
-            // 보스가 연 길 옆으로
+            // 보스가 연 길 옆으로 — 부르는 말은 옆에서 하고, 주인공이 바로 뒤따라 같이 감 (#245 사용자: 인물 혼자 멀리 가면 말하다가 화면 밖으로 사라짐)
             var gate = gates.Find(g => g.Area == area);
             if (gate.Area != null && TrySpotsBeside(gate.Cell, out var npcSpot, out var heroSpot))
             {
-                yield return WalkNpc(npc, FieldReach.PathTo(walker.Map, npc.Motion.Cell, npcSpot, CutsceneCanStand), NpcWalkStep);
-                npc.Motion.Hold(FacingToward(heroSpot - npcSpot));
-                npcs.Redraw(npc);
                 yield return SayLines(npc, npc.Data.ExitCallLines);
-                yield return WalkHero(FieldReach.PathTo(walker.Map, walker.Position, heroSpot, cell => CutsceneCanStand(cell) && cell != npc.Motion.Cell));
+                yield return WalkTogether(npc, npcSpot, heroSpot);
                 FaceEachOther(npc);
             }
             yield return SayLines(npc, npc.Data.ExitStoryLines);
@@ -134,6 +133,38 @@ namespace WordRPG.UI
             npc.Motion.Release();
             npcs.Redraw(npc);
             EndCutscene();
+        }
+
+        // 인물이 앞서고 주인공이 한 칸 뒤를 따라 같이 걷는다 (카메라는 주인공을 따라가므로 인물이 화면 안에 남음).
+        // 인물이 먼 쪽 자리로 가고 주인공은 가는 길에 있는 가까운 쪽에 서며, 주인공이 서 있는 칸으로는 인물이 오지 않음 (#245 사용자: 겹침)
+        private IEnumerator WalkTogether(NpcView npc, Vector2Int npcSpot, Vector2Int heroSpot)
+        {
+            var start = npc.Motion.Cell;
+            if ((npcSpot - start).sqrMagnitude < (heroSpot - start).sqrMagnitude) (npcSpot, heroSpot) = (heroSpot, npcSpot);
+            if (npcSpot == walker.Position) (npcSpot, heroSpot) = (heroSpot, npcSpot);
+
+            var npcRoad = FieldReach.PathTo(walker.Map, start, npcSpot, CutsceneCanStand);
+            var heroRoad = new List<Vector2Int>();
+            if (walker.Position != heroSpot)
+            {
+                if ((start - walker.Position).sqrMagnitude == 1) // 인물이 지나간 칸을 그대로 (도착 칸 앞까지, 내 자리를 지나면 거기서 멈춤)
+                {
+                    heroRoad.Add(start);
+                    for (int i = 0; i < npcRoad.Count - 1 && heroRoad[heroRoad.Count - 1] != heroSpot; i++) heroRoad.Add(npcRoad[i]);
+                }
+                var last = heroRoad.Count > 0 ? heroRoad[heroRoad.Count - 1] : walker.Position;
+                heroRoad.AddRange(FieldReach.PathTo(walker.Map, last, heroSpot, cell => walker.CanStand(cell) && cell != npcSpot));
+            }
+
+            bool heroArrived = false;
+            IEnumerator HeroWalk()
+            {
+                yield return WalkHero(heroRoad, NpcWalkStep); // 같은 빠르기 — 앞사람을 따라잡아 겹치지 않게
+                heroArrived = true;
+            }
+            StartCoroutine(HeroWalk());
+            yield return WalkNpc(npc, npcRoad, NpcWalkStep);
+            while (!heroArrived) yield return null;
         }
 
         private void BeginCutscene()
@@ -233,13 +264,34 @@ namespace WordRPG.UI
                 string text = NpcLines.Render(line, session.Hero.DisplayName);
                 float seconds = Mathf.Clamp(0.9f + text.Length * 0.075f, 1.4f, 4f);
                 bubble.Speak(npc.Body, npc.Data.DisplayName, text, seconds + 0.4f);
-                yield return WaitUnscaled(seconds);
+                yield return WaitLine(seconds);
             }
             bubble.Hide();
         }
 
+        // 말 한 줄을 기다림: 시간이 다 되거나 [확인]을 누르면 끝 (#245 사용자: 성격 급한 사람은 한 줄씩 넘기게). 그동안 [확인] 버튼이 켜져 있음
+        private IEnumerator WaitLine(float seconds)
+        {
+            lineSkip = lineSkipped = false;
+            SetConfirmReady(true);
+            float start = Time.unscaledTime;
+            float end = start + seconds * animationScale, earliest = start + MinLineSeconds * animationScale;
+            while (Time.unscaledTime < end)
+            {
+                bool pressed = lineSkip || ConfirmKeyPressed();
+                lineSkip = false;
+                if (pressed && Time.unscaledTime >= earliest)
+                {
+                    lineSkipped = true;
+                    break;
+                }
+                yield return null;
+            }
+            SetConfirmReady(false);
+        }
+
         // 주인공을 길대로 한 칸씩 (걷는 그림, 탐험 기록·미니맵도). 칸 조우·출입구는 없음
-        private IEnumerator WalkHero(List<Vector2Int> path)
+        private IEnumerator WalkHero(List<Vector2Int> path, float step = HeroStep)
         {
             int frame = 0;
             foreach (var cell in path)
@@ -248,7 +300,7 @@ namespace WordRPG.UI
                 var from = CellCenter(walker.Position);
                 var to = CellCenter(cell);
                 walker.Face(direction);
-                for (float t = 0f; t < 1f; t += Time.unscaledDeltaTime / (HeroStep * animationScale))
+                for (float t = 0f; t < 1f; t += Time.unscaledDeltaTime / (step * animationScale))
                 {
                     player.position = Vector3.Lerp(from, to, t);
                     playerRenderer.sprite = PlayerArt.Get(direction, frame + (t < 0.5f ? 0 : 1));

@@ -105,13 +105,48 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // #245 사용자: 대사는 [확인]을 누르면 한 줄씩 넘어감 (성격 급한 사람들)
+        [UnityTest]
+        public IEnumerator ConfirmSkipsToTheNextLine()
+        {
+            var potion = TestData.Item("potion").Set("displayName", "상처약");
+            var npc = ScriptableObject.CreateInstance<NpcData>();
+            npc.Configure("npc_librarian", "사서", 0, new[] { new NpcStage("쉿.", NpcMotionKind.Stand) });
+            var library = ScriptableObject.CreateInstance<FieldArea>()
+                .Set("areaId", "lib_s").Set("displayName", "서고").Set("map", "#####\n#P.N#\n#####")
+                .Set("words", Words()).Set("npcs", new List<NpcData> { npc });
+            npc.SetGift(potion, 1, library, "첫째 줄이에요.", "둘째 줄이에요.");
+            var field = new GameObject("SkipField").AddComponent<FieldScreen>();
+            field.Configure(library, Session(), step: 0.05f, animScale: 1f);
+            yield return WaitFor(() => field.IsCutsceneRunning, 3f);
+            yield return WaitFor(() => field.Bubble.IsVisible && field.Bubble.FromNpc, 3f);
+            string first = field.Bubble.Text;
+            yield return new WaitForSecondsRealtime(0.25f);
+            Assert.IsTrue(field.ConfirmReady, "말하는 동안 [확인]이 켜짐");
+            yield return PressConfirm(field);
+            yield return WaitFor(() => field.Bubble.Text != first, 0.4f);
+            Assert.AreNotEqual(first, field.Bubble.Text, "한 줄 표시 시간(1.4초)보다 빨리 다음 줄로");
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
         //   y=5  #####D####   정글 쪽 길 (5,5) — 보스가 염
         //   y=4  #........#
         //   y=3  #....B...#   보스 (5,3)
         //   y=2  #....P...#   시작 (5,2)
         //   y=1  #.......N#   나무꾼 (8,1)
         [UnityTest]
-        public IEnumerator AfterTheBossTheWoodcutterSeesTheHeroOffAtTheNewPath()
+        public IEnumerator AfterTheBossTheWoodcutterSeesTheHeroOffAtTheNewPath() =>
+            BossCutscene("##########\n#####D####\n#........#\n#....B...#\n#....P...#\n#.......N#\n##########", new Vector2Int(6, 4));
+
+        // #245 사용자: 겹침 — 주인공이 이미 길 옆(인물이 갈 자리)에 서 있으면 주인공은 그대로, 인물이 반대쪽으로
+        //   y=4  #...P....#   시작 (4,4)
+        //   y=3  #...B....#   보스 (4,3)
+        [UnityTest]
+        public IEnumerator TheWoodcutterNeverWalksIntoTheHero() =>
+            BossCutscene("##########\n#####D####\n#...P....#\n#...B....#\n#........#\n#.......N#\n##########", new Vector2Int(4, 4), Direction.Down, asksToReturn: false); // 시작 지점 그대로라 돌아갈지 묻지 않음 (#60)
+
+        private IEnumerator BossCutscene(string map, Vector2Int heroEnds, Direction faceBoss = Direction.Up, bool asksToReturn = true)
         {
             var npc = Woodcutter();
             var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
@@ -120,7 +155,7 @@ namespace WordRPG.Tests
                 .Set("map", "#####\n#.D.#\n#.P.#\n#####").Set("words", Words());
             var woods = ScriptableObject.CreateInstance<FieldArea>()
                 .Set("areaId", "woods_b").Set("displayName", "숲").Set("words", Words())
-                .Set("map", "##########\n#####D####\n#........#\n#....B...#\n#....P...#\n#.......N#\n##########")
+                .Set("map", map)
                 .Set("boss", new BossEncounter(raccoon, 3)).Set("npcs", new List<NpcData> { npc });
             woods.Set("exits", new List<AreaExit> { new AreaExit(jungle, 0, woods) });
             jungle.Set("exits", new List<AreaExit> { new AreaExit(woods, 0) });
@@ -133,7 +168,7 @@ namespace WordRPG.Tests
             yield return null;
             yield return null;
 
-            yield return FaceStick(field, Direction.Up);
+            yield return FaceStick(field, faceBoss);
             yield return PressConfirm(field);
             yield return WaitFor(() => field.Battle.IsRunning, 3f);
             yield return PlayUntilResult(field.Battle, answerCorrectly: true);
@@ -141,12 +176,20 @@ namespace WordRPG.Tests
             yield return WaitFor(() => field.IsCutsceneRunning, 8f);
             Assert.IsTrue(field.IsCutsceneRunning, "보스를 이기면 나무꾼 컷씬");
             Assert.IsFalse(field.IsReturnDialogOpen, "돌아가기 묻기는 컷씬 뒤");
-            yield return WaitFor(() => !field.IsCutsceneRunning, 10f);
-            Assert.AreEqual(new Vector2Int(6, 4), field.PlayerCell, "주인공은 길 옆으로");
+            for (float t = 0; t < 10f && field.IsCutsceneRunning; t += Time.unscaledDeltaTime)
+            {
+                if (field.Bubble.IsVisible && field.Bubble.FromNpc) Assert.AreNotEqual(field.PlayerCell, field.Npcs.Views[0].Motion.Cell, "말할 때 겹쳐 있지 않음");
+                yield return null;
+            }
+            Assert.IsFalse(field.IsCutsceneRunning);
+            Assert.AreEqual(heroEnds, field.PlayerCell, "주인공은 길 옆으로");
             Assert.AreEqual(new Vector2Int(8, 1), field.Npcs.Views[0].Motion.Cell, "나무꾼은 제자리로");
             Assert.IsTrue(session.World.HasEvent(FieldScreen.BossEventId(npc)));
-            yield return WaitFor(() => field.IsReturnDialogOpen, 5f);
-            Assert.IsTrue(field.IsReturnDialogOpen, "그다음 돌아가기 묻기");
+            if (asksToReturn)
+            {
+                yield return WaitFor(() => field.IsReturnDialogOpen, 5f);
+                Assert.IsTrue(field.IsReturnDialogOpen, "그다음 돌아가기 묻기");
+            }
             Object.Destroy(field.gameObject);
             yield return null;
         }

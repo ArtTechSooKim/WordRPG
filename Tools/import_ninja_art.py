@@ -41,6 +41,7 @@ MONSTERS = {
     "tangle_spider": ("Actor/Monsters/SpiderRed/SpriteSheet.png", 16),   # 엉킴거미
     "ink_newt": ("Actor/Monsters/AxolotBlue/SpriteSheet.png", 16),       # 먹물도롱뇽 (먹물 웅덩이에 숨었다 튀어나옴)
     "boss_ellipsis_vine": ("Actor/Boss/GiantBamboo/Idle.png", 62),       # 말줄임덩굴
+    "vine_minion": ("Actor/Boss/GiantBamboo/Idle.png", 62),              # 말줄임덩굴이 키우는 덩굴 (#246 — 같은 그림)
 }
 # 같은 그림을 다른 색으로 (채널별 곱) — 먹물도롱뇽 = 서고 잉크 웅덩이 같은 남보라
 MONSTER_TINTS = {

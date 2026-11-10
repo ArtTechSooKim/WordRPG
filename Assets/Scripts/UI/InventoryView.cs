@@ -488,7 +488,7 @@ namespace WordRPG.UI
             if (item.IsEffectItem)
             {
                 if (!session.UseEffectItem(item)) return;
-                Sound.Play(Sfx.EvolveLight);
+                Sound.Play(item.Effect == ItemEffect.Quiet ? Sfx.SneakPotion : Sfx.EvolveLight); // 살금살금은 은밀한 '스스슥' (#245 사용자: 유령 소리 같음)
                 onChanged?.Invoke();
                 CollectItems();
                 ShowMaterial(Mathf.Min(selectedMaterial, Mathf.Max(0, materials.Count - 1)));

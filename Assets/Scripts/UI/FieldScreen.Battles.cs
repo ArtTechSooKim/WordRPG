@@ -133,7 +133,8 @@ namespace WordRPG.UI
             if (afterLine.Length > 0 && area == bossArea)
             {
                 bubble.Say(afterLine, BossAfterLineSeconds);
-                yield return WaitUnscaled(BossAfterLineSeconds);
+                yield return WaitLine(BossAfterLineSeconds);
+                if (lineSkipped) bubble.Hide();
             }
             var seer = area == bossArea ? BossSeer() : null; // 그 지역 인물이 배웅 (#234 숲 나무꾼) — 기술 배우기·돌아가기 묻기 전에
             if (seer != null) yield return BossCutscene(seer, gates);
@@ -262,8 +263,9 @@ namespace WordRPG.UI
             DrawTiles(gate.Area, cell => cell == gate.Cell || IsDoorLocked(gate.Area, cell));
             var gateCenter = CellCenter(gate.Cell);
             var approach = ApproachDirection(gate.Area.Map, gate.Cell);
-            // 출입구는 대개 맵 끝에 있으므로 카메라는 출입구보다 몇 칸 안쪽을 비춘다 (맵 밖 빈 곳이 덜 보이게)
-            var focus = gateCenter - approach * 3f;
+            // 출입구는 대개 맵 끝에 있으므로 카메라는 출입구보다 몇 칸 안쪽을 비춘다 (맵 밖 빈 곳이 덜 보이게).
+            // 동굴 입구는 맵 가운데의 큰 그림이라 그림 한가운데를 비춘다 (#244 사용자)
+            var focus = gate.Area.Map.IsCaveMouth(gate.Cell) ? CaveMouthMiddle(gate.Cell) : gateCenter - approach * 3f;
             cameraFocus = focus - approach * 4f;
             cutscene.ShowLetterbox(gate.Area.DisplayName);
             yield return cutscene.Fade(1f, 0f, 0.35f * animationScale);
@@ -311,6 +313,9 @@ namespace WordRPG.UI
             yield return cutscene.Fade(1f, 0f, 0.35f * animationScale);
             Destroy(cutscene.gameObject);
         }
+
+        // 동굴 입구 그림의 눈에 보이는 부분 한가운데: 그림은 3×3칸이고 칸 아래쪽에서 위로 놓이며, 맨 아래 반 칸은 투명
+        private static Vector3 CaveMouthMiddle(Vector2Int door) => new Vector3(door.x + 0.5f, door.y + 1.75f, 0f);
 
         // 출입구로 걸어 들어가는 방향 (출입구 옆 걸을 수 있는 칸 → 출입구). 카메라가 그 길을 따라 다가간다
         private static Vector3 ApproachDirection(FieldMap map, Vector2Int door)

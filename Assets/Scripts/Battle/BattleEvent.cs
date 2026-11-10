@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using WordRPG.Items;
 using WordRPG.Monsters;
 using WordRPG.Words;
@@ -14,6 +15,7 @@ namespace WordRPG.Battle
         Shield,       // Actor, Target, Amount, IsCritical
         ItemUsed,     // Actor, Item, Amount(회복한 HP)
         Defeated,     // Target
+        MinionsGrown, // Actor, Summoned(자라난 덩굴들) — 말줄임덩굴 기믹 (#246)
         RoundStarted, // Round
         Victory,
         Defeat,
@@ -24,7 +26,6 @@ namespace WordRPG.Battle
         FleeFailed,   // Actor — 도망 문제를 틀려 차례를 놓침 (#84)
         Charging,     // Actor, Skill — 힘을 모으는 기술(SkillData.ChargeTurns)이라 이번 차례는 힘만 모음, 다음 차례에 발동 (#120)
         ShieldShattered, // Actor, Target, Skill, Amount(깨진 보호막) — 보호막을 깨는 기술(#237 빈칸 울음)이 맞기 전에
-        WordsBlanked  // Actor, Skill — 다음 아군 차례의 문제 단어에 빈칸 (#237)
     }
 
     // 전투 로직이 만들어내는 사건 기록. UI는 이 목록을 순서대로 연출만 한다
@@ -37,6 +38,7 @@ namespace WordRPG.Battle
         public ItemData Item { get; private set; }
         public int Amount { get; private set; }
         public int Absorbed { get; private set; }
+        public IReadOnlyList<BattleUnit> Summoned { get; private set; } // MinionsGrown (#246)
         public int ShieldBonus { get; private set; } // 보호막이 있어서 더 들어간 피해 (#239 — Amount + Absorbed에 들어 있음)
         public bool IsCritical { get; private set; }
         public bool Correct { get; private set; }
@@ -68,6 +70,9 @@ namespace WordRPG.Battle
         public static BattleEvent ItemUsed(BattleUnit actor, ItemData item, int healed) =>
             new BattleEvent(BattleEventType.ItemUsed) { Actor = actor, Target = actor, Item = item, Amount = healed };
 
+        public static BattleEvent MinionsGrown(BattleUnit actor, IReadOnlyList<BattleUnit> summoned) =>
+            new BattleEvent(BattleEventType.MinionsGrown) { Actor = actor, Summoned = summoned };
+
         public static BattleEvent Defeated(BattleUnit target) =>
             new BattleEvent(BattleEventType.Defeated) { Target = target };
 
@@ -92,8 +97,6 @@ namespace WordRPG.Battle
         public static BattleEvent ShieldShattered(BattleUnit actor, BattleUnit target, SkillData skill, int amount) =>
             new BattleEvent(BattleEventType.ShieldShattered) { Actor = actor, Target = target, Skill = skill, Amount = amount };
 
-        public static BattleEvent WordsBlanked(BattleUnit actor, SkillData skill) =>
-            new BattleEvent(BattleEventType.WordsBlanked) { Actor = actor, Skill = skill };
 
         public static BattleEvent Victory() => new BattleEvent(BattleEventType.Victory);
 

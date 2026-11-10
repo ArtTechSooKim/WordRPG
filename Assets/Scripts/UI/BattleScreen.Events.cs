@@ -56,11 +56,11 @@ namespace WordRPG.UI
                 case BattleEventType.Heal: return ShowHeal(e);
                 case BattleEventType.Shield: return ShowShield(e);
                 case BattleEventType.ItemUsed: return ShowItemUsed(e);
+                case BattleEventType.MinionsGrown: return ShowMinionsGrown(e);
                 case BattleEventType.Defeated: return ShowDefeated(e);
                 case BattleEventType.RoundStarted: return ShowRoundStarted(e);
                 case BattleEventType.Charging: return ShowCharging(e);
                 case BattleEventType.ShieldShattered: return ShowShieldShattered(e);
-                case BattleEventType.WordsBlanked: return ShowWordsBlanked(e);
                 default: return 0f; // Victory · Defeat · FleeBlocked
             }
         }
@@ -164,7 +164,7 @@ namespace WordRPG.UI
             if (e.ShieldBonus > 0) Float(e.Target, $"보호막 추가 피해 +{e.ShieldBonus}", Palette.Gold, 34, drop: 80f);
             string notes = (e.ShieldBonus > 0 ? $"보호막 추가 피해 +{e.ShieldBonus}" : "")
                 + (e.ShieldBonus > 0 && e.Absorbed > 0 ? ", " : "")
-                + (e.Absorbed > 0 ? $"보호막이 {e.Absorbed} 흡수" + (shieldBroke ? " — 보호막이 깨졌다!" : "") : "");
+                + (e.Absorbed > 0 ? $"보호막이 {e.Absorbed} 막음" + (shieldBroke ? " — 보호막이 깨졌다!" : "") : "");
             Log(notes.Length > 0
                 ? $"{e.Target.DisplayName} 피해 {e.Amount} ({notes})"
                 : $"{e.Target.DisplayName} 피해 {e.Amount}" + (e.IsCritical ? " — 크리티컬!" : ""));
@@ -211,6 +211,41 @@ namespace WordRPG.UI
             return 0.6f;
         }
 
+        // 말줄임덩굴 (#246 사용자): 양옆 자리의 쓰러진 덩굴 카드를 새 카드로
+        private float ShowMinionsGrown(BattleEvent e)
+        {
+            Cue($"덩굴 자람 {e.Summoned.Count}");
+            Log("덩굴이 순식간에 늘어났다!");
+            Float(e.Actor, "덩굴이 순식간에 늘어났다!", Palette.Gold, 44);
+            Sound.Play(Sfx.VineGrow);
+            GimmickHits++;
+            foreach (var unit in e.Summoned)
+            {
+                PlaceMinion(unit);
+                PlayFx(unit, Fx.Leaf, 1.4f);
+            }
+            return 0.9f;
+        }
+
+        private void PlaceMinion(BattleUnit unit)
+        {
+            string cardName = $"Enemy_{unit.Index}";
+            var old = enemyViews.Find(v => v.Root.name == cardName);
+            if (old != null)
+            {
+                enemyViews.Remove(old);
+                foreach (var key in new List<BattleUnit>(viewOf.Keys))
+                    if (viewOf[key] == old) viewOf.Remove(key);
+                Destroy(old.Root.gameObject);
+            }
+            float left = unit.Index == 1 ? 0f : 2f / 3f; // 보스는 가운데 칸
+            var view = UnitView.Create(enemyArea, cardName, left, 0, left + 1f / 3f, 1);
+            view.Bind(unit);
+            enemyViews.Add(view);
+            viewOf[unit] = view;
+            shown[unit] = (unit.MaxHp, 0);
+        }
+
         private float ShowDefeated(BattleEvent e)
         {
             Log($"{e.Target.DisplayName} 쓰러졌다!");
@@ -251,13 +286,6 @@ namespace WordRPG.UI
             Float(e.Target, "보호막이 깨졌다!", Palette.Bad, 44);
             Log($"{e.Target.DisplayName}의 보호막이 깨졌다!");
             return 0.5f;
-        }
-
-        private float ShowWordsBlanked(BattleEvent e)
-        {
-            Log("머릿속에 빈칸이 생겼다… 다음 문제 단어에 빈칸!");
-            Float(e.Actor, "빈칸!", Palette.Gold, 52);
-            return 0.4f;
         }
 
         private float ShowCharging(BattleEvent e)

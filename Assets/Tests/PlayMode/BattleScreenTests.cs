@@ -222,12 +222,12 @@ namespace WordRPG.Tests
 
         // #237 사용자 ㉝: 빈칸 울음을 맞은 다음 차례엔 문제 단어 글자의 25%가 빈칸 (s_cur_ty처럼)
         [UnityTest]
-        public IEnumerator AfterTheBlankCroakTheNextWordHasBlanks()
+        public IEnumerator TheFrogBlanksEveryWordAndFillsItAfterTheAnswer()
         {
             var strike = TestData.Skill("strike", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
             var hero = Hero(new MonsterStats(500, 30, 10), strike);
             var croak = TestData.Skill("croak", SkillKind.Damage, SkillTarget.AllEnemies, 1).Set("displayName", "빈칸 울음")
-                .Set("shattersShields", true).Set("blanksWords", true);
+                .Set("shieldBonusDamage", 40);
             var frog = TestData.Species("frog", new MonsterStats(999, 1, 50), new MonsterStats(0, 0, 0), croak)
                 .Set("displayName", "빈칸두꺼비").Set("gimmick", BossGimmick.Blank);
             var go = new GameObject("BattleScreenUnderTest");
@@ -236,25 +236,57 @@ namespace WordRPG.Tests
             yield return null;
             yield return null;
             var root = screen.transform;
-            for (int turn = 0; turn < 2; turn++)
+            yield return WaitFor(() =>
             {
-                yield return WaitFor(() =>
-                {
-                    if (ActiveButton(root, "Choice_0") != null) return true;
-                    (ActiveButton(root, "CardConfirmButton") ?? ActiveButton(root, "Intensity_0") ?? ActiveButton(root, "SkillButton_0"))?.onClick.Invoke();
-                    return false;
-                }, 8f);
-                if (turn == 0)
-                {
-                    Assert.IsFalse(screen.ShownPrompt.Contains("_"), "처음엔 빈칸 없음");
-                    ActiveButton(root, "Choice_0").onClick.Invoke();
-                    yield return WaitFor(() => ActiveButton(root, "Choice_0") == null, 3f);
-                }
-            }
-            Assert.IsTrue(screen.Engine.WordsBlanked);
-            Assert.IsTrue(screen.ShownPrompt.Contains("_"), $"울음 다음 차례엔 빈칸: {screen.ShownPrompt}");
-            Assert.AreEqual(screen.Engine.CurrentQuestion.Prompt.Length, screen.ShownPrompt.Length, "글자 수는 그대로");
-            Assert.AreEqual(screen.Engine.CurrentQuestion.Prompt[0], screen.ShownPrompt[0], "첫 글자는 남김");
+                if (ActiveButton(root, "Choice_0") != null) return true;
+                (ActiveButton(root, "CardConfirmButton") ?? ActiveButton(root, "Intensity_0") ?? ActiveButton(root, "SkillButton_0"))?.onClick.Invoke();
+                return false;
+            }, 8f);
+            Assert.IsTrue(screen.Engine.WordsBlanked, "첫 차례부터 (#245)");
+            string word = screen.Engine.CurrentQuestion.Prompt;
+            Assert.IsTrue(screen.ShownPrompt.Contains("_"), $"빈칸: {screen.ShownPrompt}");
+            Assert.AreEqual(word.Length, screen.ShownPrompt.Length, "글자 수는 그대로");
+            Assert.AreEqual(word[0], screen.ShownPrompt[0], "첫 글자는 남김");
+
+            ActiveButton(root, "Choice_0").onClick.Invoke();
+            yield return null;
+            yield return null;
+            Assert.IsFalse(screen.ShownPrompt.Contains("_"), $"답하면 채워 보여 줌: {screen.ShownPrompt}");
+            StringAssert.Contains("<color=", screen.ShownPrompt, "채운 글자에 색");
+            Object.Destroy(go);
+            yield return null;
+        }
+
+        // #246 사용자: 말줄임덩굴 — 보스 차례가 지나면 양옆에 덩굴 카드 (보스는 가운데 그대로)
+        [UnityTest]
+        public IEnumerator VinesAppearOnBothSidesOfTheBoss()
+        {
+            var strike = TestData.Skill("strike", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var hero = Hero(new MonsterStats(5000, 30, 10), strike);
+            var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var sprout = TestData.Species("sprout", new MonsterStats(50, 1, 0), new MonsterStats(0, 0, 0), bite).Set("displayName", "덩굴");
+            var vine = TestData.Species("vine", new MonsterStats(999, 1, 50), new MonsterStats(0, 0, 0), bite)
+                .Set("displayName", "말줄임덩굴").Set("gimmick", BossGimmick.Overgrow).Set("minion", sprout).Set("minionLevel", 5);
+            var go = new GameObject("BattleScreenUnderTest");
+            var screen = go.AddComponent<BattleScreen>();
+            screen.Configure(Table(vine), Words(), GameSession.NewGame(hero, 1), animScale: 0.01f);
+            yield return null;
+            yield return null;
+            var root = screen.transform;
+            yield return WaitFor(() =>
+            {
+                if (ActiveButton(root, "Enemy_1") != null) return true;
+                (ActiveButton(root, "Choice_1") ?? ActiveButton(root, "CardConfirmButton") ?? ActiveButton(root, "Intensity_0") ?? ActiveButton(root, "SkillButton_0"))?.onClick.Invoke();
+                return false;
+            }, 10f);
+            var left = ActiveButton(root, "Enemy_1");
+            var right = ActiveButton(root, "Enemy_2");
+            Assert.IsNotNull(left, "왼쪽 덩굴");
+            Assert.IsNotNull(right, "오른쪽 덩굴");
+            Assert.AreEqual(0f, ((RectTransform)left.transform).anchorMin.x, 0.01f);
+            Assert.AreEqual(2f / 3f, ((RectTransform)right.transform).anchorMin.x, 0.01f);
+            Assert.AreEqual(1f / 3f, ((RectTransform)ActiveButton(root, "Enemy_0").transform).anchorMin.x, 0.01f, "보스는 가운데");
+            Assert.Greater(screen.GimmickHits, 0, "패배 조언에 쓰임");
             Object.Destroy(go);
             yield return null;
         }

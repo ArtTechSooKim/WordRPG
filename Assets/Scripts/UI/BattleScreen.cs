@@ -535,7 +535,7 @@ namespace WordRPG.UI
         private IEnumerator AskQuestion(QuizQuestion question, Action<float> onDone)
         {
             ShowPanel(quizPanel);
-            bool blanked = engine != null && engine.WordsBlanked && !engine.IsFleeQuiz; // 빈칸 울음 다음 차례 (#237)
+            bool blanked = engine != null && engine.WordsBlanked && !engine.IsFleeQuiz; // 빈칸두꺼비와 싸우는 동안 (#237·#245)
             quizPrompt.text = blanked && question.Direction == QuizDirection.EnglishToMeaning ? WordBlanks.Mask(question.Prompt, blankRng) : question.Prompt;
             string hint = (blanked ? "빈칸 단어 — " : "") + (quizHintPrefix ?? "") + (question.Direction == QuizDirection.EnglishToMeaning ? "이 단어의 뜻은?" : "알맞은 영단어는?");
             if (blanked) GimmickHits++;
@@ -620,8 +620,18 @@ namespace WordRPG.UI
 
             if (forgotten) choiceButtons[question.CorrectIndex].gameObject.SetActive(true); // 답한 뒤엔 정답을 보여 줘서 배우게
             if (shuffledOnce) RestoreChoiceAnchors(homes); // 다음 문제는 제자리부터
+            if (blanked) ShowFilledWords(question);
             foreach (var button in choiceButtons) button.interactable = false;
             onDone(elapsed);
+        }
+
+        // 답했으면 빈칸을 채워 보여 줌 (#245 사용자) — 영어 문제는 채운 글자를 금색으로, 보기는 표시(✓ ×)가 붙으므로 단어 그대로
+        private void ShowFilledWords(QuizQuestion question)
+        {
+            if (question.Direction == QuizDirection.EnglishToMeaning)
+                quizPrompt.text = WordBlanks.Filled(question.Prompt, quizPrompt.text, ColorUtility.ToHtmlStringRGB(Palette.Gold));
+            else
+                for (int i = 0; i < question.Choices.Count; i++) UiKit.LabelOf(choiceButtons[i]).text = question.Choices[i];
         }
 
         // 살아 있는 적 중 그 기믹을 가진 몬스터 (#236)

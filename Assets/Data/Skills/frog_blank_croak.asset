@@ -23,6 +23,5 @@ MonoBehaviour:
   chargeTurns: 0
   shattersShields: 0
   shieldBonusDamage: 40
-  blanksWords: 1
   quizDirection: 0
   fx: 13

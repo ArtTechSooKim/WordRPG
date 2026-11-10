@@ -68,8 +68,6 @@ namespace WordRPG.Monsters
         [SerializeField] private bool shattersShields;
         [Tooltip("대상에게 보호막이 있으면 피해를 이만큼 더 줌 (#239 사용자: 빈칸 울음 40). 보호막은 그대로 먼저 막음")]
         [SerializeField] private int shieldBonusDamage;
-        [Tooltip("쓰면 다음 아군 차례의 문제 단어 글자 25%가 빈칸 (#237 빈칸 울음 — WordBlanks)")]
-        [SerializeField] private bool blanksWords;
 
         [Tooltip("이 스킬을 쓸 때 나오는 문제 유형. 강한 스킬일수록 어려운 '한→영'")]
         [SerializeField] private QuizDirection quizDirection = QuizDirection.EnglishToMeaning;
@@ -86,7 +84,6 @@ namespace WordRPG.Monsters
         public int ChargeTurns => chargeTurns;
         public bool ShattersShields => shattersShields;
         public int ShieldBonusDamage => shieldBonusDamage;
-        public bool BlanksWords => blanksWords;
         public QuizDirection QuizDirection => quizDirection;
         public SkillFx Fx => fx;
 

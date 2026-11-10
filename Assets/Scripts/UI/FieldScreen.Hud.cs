@@ -224,7 +224,7 @@ namespace WordRPG.UI
             confirmGlow.color = new Color(Palette.Gold.r, Palette.Gold.g, Palette.Gold.b, 0.5f);
             confirmImage = UiKit.Pill(UiKit.Panel("Pad_Confirm", area, Color.white, 0.5f, 0.5f, 0.5f, 0.5f));
             confirmImage.rectTransform.sizeDelta = new Vector2(180, 180);
-            UiKit.AddButton(confirmImage).onClick.AddListener(() => confirmRequested = true);
+            UiKit.AddButton(confirmImage).onClick.AddListener(() => { confirmRequested = true; lineSkip = true; });
             confirmRing = UiKit.Outline(UiKit.Panel("Ring", confirmImage.transform, new Color(1f, 1f, 1f, 0.9f)), 32, 2);
             confirmRing.gameObject.AddComponent<AutoPill>();
             confirmRing.raycastTarget = false;
