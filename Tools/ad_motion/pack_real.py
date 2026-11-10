@@ -1,8 +1,9 @@
 """광고용 실제 시간 장면 묶기 (#159): AdCapture.RealClips가 찍은 프레임 → 찍힌 시각 그대로 30fps 영상 + zip.
 
-    python Tools/ad_motion/pack_real.py   (pip install imageio-ffmpeg)
+    python Tools/ad_motion/pack_real.py [폴더]   (pip install imageio-ffmpeg)
 
 Builds/ad/real/{장면}/f0000.jpg + times.txt → Builds/ad/real_{장면}.mp4, Builds/ad/real_kit.zip
+폴더를 주면 (#259 보스 기믹 = Builds/ad/gimmick) → Builds/ad/{폴더 이름}_{장면}.mp4 (zip 없음)
 """
 import glob
 import os
@@ -14,7 +15,8 @@ import imageio_ffmpeg
 
 sys.stdout.reconfigure(encoding="utf-8")
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SRC = os.path.join(ROOT, "Builds", "ad", "real")
+SRC = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else os.path.join(ROOT, "Builds", "ad", "real")
+PREFIX = os.path.basename(os.path.normpath(SRC))
 OUT = os.path.join(ROOT, "Builds", "ad")
 
 names = []
@@ -31,13 +33,15 @@ for name in sorted(d for d in os.listdir(SRC) if os.path.isdir(os.path.join(SRC,
             d = (times[i + 1] - times[i]) if i + 1 < len(times) else 1 / 30
             f.write(f"file '{path.replace(os.sep, '/')}'\nduration {max(d, 0.001):.4f}\n")
         f.write(f"file '{frames[-1].replace(os.sep, '/')}'\n")
-    mp4 = os.path.join(OUT, f"real_{name}.mp4")
+    mp4 = os.path.join(OUT, f"{PREFIX}_{name}.mp4")
     subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), "-nostdin", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", listing,
                     "-vf", "fps=30", "-c:v", "libx264", "-crf", "17", "-preset", "medium", "-pix_fmt", "yuv420p", mp4], check=True)
     os.remove(listing)
     names.append(mp4)
     print(name, len(frames), "frames", f"{times[-1]:.2f}s", f"{len(frames) / max(times[-1], 0.01):.1f}fps", os.path.getsize(mp4) // 1024, "KB")
 
+if PREFIX != "real":
+    sys.exit(0)
 with zipfile.ZipFile(os.path.join(OUT, "real_kit.zip"), "w", zipfile.ZIP_STORED) as z:
     for path in names:
         z.write(path, os.path.basename(path))

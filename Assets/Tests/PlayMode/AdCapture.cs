@@ -259,9 +259,9 @@ namespace WordRPG.Tests
             rawTimes.Add(ClipTime);
         }
 
-        private void FlushClip(string name)
+        private void FlushClip(string name, string root = null)
         {
-            string dir = Path.Combine(RealOut, name);
+            string dir = Path.Combine(root ?? RealOut, name);
             Directory.CreateDirectory(dir);
             var times = new StringBuilder();
             for (int i = 0; i < rawFrames.Count; i++)
@@ -482,6 +482,209 @@ namespace WordRPG.Tests
             Sound.Recorder = null;
             File.WriteAllText(Path.Combine(RealOut, "marks.txt"), marks.ToString());
             File.WriteAllText(Path.Combine(RealOut, "sfx.txt"), sfx.ToString());
+            advCam.targetTexture = null;
+            Object.Destroy(advRt);
+            Object.Destroy(advTex);
+            Object.Destroy(advCam.gameObject);
+        }
+
+        // ---- 보스 기믹 장면 (#259, 광고 시안 9 — 1.3): 실제 보스전을 실제 시간 그대로 (RealClips와 같은 방식)
+        // 까먹대왕 정답 사라짐 · 헷갈너구리 보기 섞기 · 빈칸두꺼비 빈칸 · 말줄임덩굴 덩굴
+        // Builds/ad/gimmick/{장면}/f0000.jpg + times.txt + marks.txt·sfx.txt → python Tools/ad_motion/pack_real.py Builds/ad/gimmick
+        private static string GimmickOut => Path.Combine(Application.dataPath, "..", "Builds", "ad", "gimmick");
+
+        private static GameSession BossSession(GameDatabase db, HeroData heroData, string areaId, int level, bool withAra)
+        {
+            var session = GameSession.NewGame(heroData, level);
+            foreach (var id in new[] { TutorialProgress.Field, TutorialProgress.Confirm, TutorialProgress.Grass, TutorialProgress.Skill,
+                         TutorialProgress.Intensity, TutorialProgress.NewWord, TutorialProgress.Quiz, TutorialProgress.Potion })
+                session.Tutorials.Mark(id);
+            for (int i = 0; i < 6; i++) session.Record.RecordBattle(true, 3, 0);
+            if (withAra) session.SetPartyCompanion(session.AddCompanion(AssetDatabase.LoadAssetAtPath<CompanionData>("Assets/Data/Companions/ara.asset")));
+            var area = db.FindArea(areaId);
+            StudyAll(session, area.Words);
+            session.World.SetPosition(areaId, area.Map.Start);
+            return session;
+        }
+
+        // 보스전을 열고 카메라 캔버스로 (적이 하나라 적 고르기 이동이 없음)
+        private IEnumerator OpenBossBattle(GameDatabase db, string areaId, GameSession session, Action<FieldScreen> opened)
+        {
+            var area = db.FindArea(areaId);
+            var field = OpenField(area, session, db);
+            yield return new WaitForSecondsRealtime(0.5f);
+            var boss = area.Boss;
+            field.Battle.BeginBattle(new List<MonsterInstance> { new MonsterInstance(boss.Species, boss.Level) }, area.Words, _ => { }, "보스 출현!", area.Theme, boss: true);
+            yield return WaitFor(() => field.Battle.Engine != null && field.Battle.Engine.Phase == BattlePhase.ChoosingSkill, 20f);
+            yield return new WaitForSecondsRealtime(0.4f);
+            CanvasesToCamera(advCam);
+            yield return null;
+            opened(field);
+        }
+
+        // 원하는 문제가 나올 때까지 정답으로 넘김 (찍지 않음). 주인공·보스 HP는 절반 아래로 안 내려가게
+        private static IEnumerator UntilQuestion(BattleScreen battle, GameSession session, Func<Words.QuizQuestion, bool> want)
+        {
+            for (float end = Time.realtimeSinceStartup + 120f; Time.realtimeSinceStartup < end;)
+            {
+                var engine = battle.Engine;
+                if (session.Hero.CurrentHp * 2 < session.Hero.Stats.MaxHp) session.Hero.RestoreFully();
+                if (engine != null && engine.Enemies[0].Hp * 2 < engine.Enemies[0].MaxHp) engine.Enemies[0].Combatant.Heal(engine.Enemies[0].MaxHp);
+                if (engine != null && engine.Phase == BattlePhase.AnsweringQuiz && engine.CurrentQuestion != null)
+                {
+                    if (!engine.IsFleeQuiz && want(engine.CurrentQuestion)) yield break;
+                    ActiveButton(battle.transform, $"Choice_{engine.CurrentQuestion.CorrectIndex}")?.onClick.Invoke();
+                    yield return new WaitForSecondsRealtime(0.1f);
+                }
+                else if (engine != null && engine.Phase == BattlePhase.ChoosingSkill) ChooseSkill(battle);
+                yield return null;
+            }
+            Assert.Fail("원하는 문제가 나오지 않음");
+        }
+
+        private IEnumerator GrabFor(float seconds)
+        {
+            for (float end = Time.realtimeSinceStartup + seconds; Time.realtimeSinceStartup < end;)
+            {
+                yield return null;
+                Grab();
+            }
+        }
+
+        [UnityTest]
+        [Timeout(1200000)]
+        public IEnumerator BossGimmicks()
+        {
+            var db = AssetDatabase.LoadAssetAtPath<GameDatabase>("Assets/Data/GameDatabase.asset");
+            var heroData = AssetDatabase.LoadAssetAtPath<HeroData>("Assets/Data/Hero/hero.asset");
+            if (Directory.Exists(GimmickOut)) Directory.Delete(GimmickOut, true);
+            Directory.CreateDirectory(GimmickOut);
+            advCam = new GameObject("Main Camera", typeof(Camera)) { tag = "MainCamera" }.GetComponent<Camera>();
+            advCam.clearFlags = CameraClearFlags.SolidColor;
+            advCam.backgroundColor = Color.black;
+            advRt = new RenderTexture(W, H, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+            advCam.targetTexture = advRt;
+            advTex = new Texture2D(W, H, TextureFormat.RGB24, false);
+            marks = new StringBuilder();
+            var sfx = new StringBuilder();
+            string clip = "";
+            bool vineGrew = false;
+            Sound.Recorder = (s, _) =>
+            {
+                sfx.AppendLine($"{clip}\t{ClipTime:F3}\t{s.ToString().ToLowerInvariant()}");
+                if (s == Sfx.VineGrow) vineGrew = true;
+            };
+            FieldScreen field = null;
+
+            // 1) 까먹대왕: 크리티컬 시간이 지나면 정답 버튼이 사라짐 — 답하지 않고 기다림
+            {
+                clip = "forget";
+                var session = BossSession(db, heroData, "library", 16, false);
+                yield return OpenBossBattle(db, "library", session, f => field = f);
+                var battle = field.Battle;
+                yield return UntilQuestion(battle, session, q => true);
+                BeginClip();
+                var question = battle.Engine.CurrentQuestion;
+                var correct = FindButton(battle.transform, $"Choice_{question.CorrectIndex}");
+                Mark(clip, $"question word={question.Word.English} correct={question.CorrectIndex}");
+                float stopAt = float.MaxValue;
+                for (float end = Time.realtimeSinceStartup + 8f; Time.realtimeSinceStartup < end && Time.realtimeSinceStartup < stopAt;)
+                {
+                    yield return null;
+                    Grab();
+                    if (stopAt == float.MaxValue && !correct.gameObject.activeSelf)
+                    {
+                        Mark(clip, "vanished");
+                        stopAt = Time.realtimeSinceStartup + 1.6f;
+                    }
+                }
+                Assert.AreNotEqual(float.MaxValue, stopAt, "정답 버튼이 사라져야 함");
+                FlushClip(clip, GimmickOut);
+                Object.Destroy(field.gameObject);
+                yield return null;
+                yield return null;
+            }
+
+            // 2) 헷갈너구리: 2초마다 보기 자리가 섞임 (직전에 흔들림)
+            {
+                clip = "shuffle";
+                var session = BossSession(db, heroData, "forest", 20, false);
+                yield return OpenBossBattle(db, "forest", session, f => field = f);
+                var battle = field.Battle;
+                yield return UntilQuestion(battle, session, q => true);
+                BeginClip();
+                Mark(clip, $"question word={battle.Engine.CurrentQuestion.Word.English}");
+                int before = battle.ChoiceShuffles;
+                float stopAt = float.MaxValue;
+                for (float end = Time.realtimeSinceStartup + 6f; Time.realtimeSinceStartup < end && Time.realtimeSinceStartup < stopAt;)
+                {
+                    yield return null;
+                    Grab();
+                    if (stopAt == float.MaxValue && battle.ChoiceShuffles > before)
+                    {
+                        Mark(clip, "shuffled");
+                        stopAt = Time.realtimeSinceStartup + 1.0f;
+                    }
+                }
+                Assert.AreNotEqual(float.MaxValue, stopAt, "보기가 섞여야 함");
+                FlushClip(clip, GimmickOut);
+                Object.Destroy(field.gameObject);
+                yield return null;
+                yield return null;
+            }
+
+            // 3) 빈칸두꺼비: 영어 단어에 빈칸 → 맞히면 채워진 글자가 금색으로 (긴 단어가 나올 때까지 넘김)
+            {
+                clip = "blank";
+                var session = BossSession(db, heroData, "jungle", 25, true);
+                yield return OpenBossBattle(db, "jungle", session, f => field = f);
+                var battle = field.Battle;
+                yield return UntilQuestion(battle, session, q => q.Direction == Words.QuizDirection.EnglishToMeaning && q.Prompt.Length >= 7);
+                BeginClip();
+                var question = battle.Engine.CurrentQuestion;
+                Mark(clip, $"question word={question.Word.English} meaning={question.Word.Meaning} correct={question.CorrectIndex}");
+                yield return GrabFor(1.3f);
+                ActiveButton(battle.transform, $"Choice_{question.CorrectIndex}").onClick.Invoke();
+                Mark(clip, "answered");
+                yield return GrabFor(1.8f);
+                FlushClip(clip, GimmickOut);
+                Object.Destroy(field.gameObject);
+                yield return null;
+                yield return null;
+            }
+
+            // 4) 말줄임덩굴: 첫 문제를 맞힌 뒤 보스 차례에 양옆으로 덩굴이 자람 (주인공 혼자 — 바로 보스 차례)
+            {
+                clip = "vine";
+                var session = BossSession(db, heroData, "cave", 28, false);
+                yield return OpenBossBattle(db, "cave", session, f => field = f);
+                var battle = field.Battle;
+                yield return UntilQuestion(battle, session, q => true);
+                vineGrew = false;
+                BeginClip();
+                Mark(clip, $"question word={battle.Engine.CurrentQuestion.Word.English}");
+                yield return GrabFor(0.5f);
+                ActiveButton(battle.transform, $"Choice_{battle.Engine.CurrentQuestion.CorrectIndex}").onClick.Invoke();
+                Mark(clip, "answered");
+                float stopAt = float.MaxValue;
+                for (float end = Time.realtimeSinceStartup + 9f; Time.realtimeSinceStartup < end && Time.realtimeSinceStartup < stopAt;)
+                {
+                    yield return null;
+                    Grab();
+                    if (stopAt == float.MaxValue && vineGrew)
+                    {
+                        Mark(clip, "grew");
+                        stopAt = Time.realtimeSinceStartup + 1.8f;
+                    }
+                }
+                Assert.AreNotEqual(float.MaxValue, stopAt, "덩굴이 자라야 함");
+                FlushClip(clip, GimmickOut);
+                Object.Destroy(field.gameObject);
+            }
+
+            Sound.Recorder = null;
+            File.WriteAllText(Path.Combine(GimmickOut, "marks.txt"), marks.ToString());
+            File.WriteAllText(Path.Combine(GimmickOut, "sfx.txt"), sfx.ToString());
             advCam.targetTexture = null;
             Object.Destroy(advRt);
             Object.Destroy(advTex);
