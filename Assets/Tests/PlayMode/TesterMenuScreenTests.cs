@@ -26,6 +26,56 @@ namespace WordRPG.Tests
             return field;
         }
 
+        // #251 사용자: 레벨 내리기 · 금 10,000 단위 · 살금살금 상시 · 무료 상태로 (특전을 다시 받음)
+        [UnityTest]
+        public IEnumerator TesterMenuLowersLevelSneaksAndGoesFree()
+        {
+            var database = AssetDatabase.LoadAssetAtPath<GameDatabase>("Assets/Data/GameDatabase.asset");
+            var session = GameSession.NewGame(AssetDatabase.LoadAssetAtPath<HeroData>("Assets/Data/Hero/hero.asset"), 8);
+            var owned = new Entitlements();
+            owned.Grant(Entitlements.FullVersion);
+            TesterBuild.Enabled = true;
+            var meadow = TesterTools.StoryAreas(database.Areas).First();
+            var field = new GameObject("TesterUnderTest").AddComponent<FieldScreen>();
+            field.Configure(meadow, session, () => { }, step: 0.05f, animScale: 0.01f, gameDatabase: database, owned: owned);
+            yield return null;
+            yield return null;
+            Assert.AreEqual(1, field.FullVersionGiftsGiven, "이미 산 사람의 특전");
+            var hud = field.transform.Find("FieldHud/SafeArea");
+            FindButton(hud, "SettingsButton").onClick.Invoke();
+            ActiveButton(hud.Find("SettingsView"), "TesterMenuButton").onClick.Invoke();
+            var menu = field.TesterMenu;
+            var root = menu.Root.transform;
+
+            ActiveButton(root, "TesterLevelDown").onClick.Invoke();
+            Assert.AreEqual(8 - TesterTools.LevelStep, session.Hero.Level);
+            StringAssert.Contains($"레벨 8 → {8 - TesterTools.LevelStep}", menu.Message);
+
+            int gold = session.Inventory.Gold;
+            ActiveButton(root, "TesterGold").onClick.Invoke();
+            Assert.AreEqual(gold + 10000, session.Inventory.Gold);
+            StringAssert.Contains("10,000", AllText(root));
+
+            StringAssert.Contains("살금살금 상시", AllText(root));
+            ActiveButton(root, "TesterQuiet").onClick.Invoke();
+            Assert.IsTrue(session.Effects.Quiet);
+            StringAssert.Contains("살금살금 끄기", AllText(root));
+            ActiveButton(root, "TesterQuiet").onClick.Invoke();
+            Assert.IsFalse(session.Effects.Quiet);
+
+            StringAssert.Contains("무료 상태로", AllText(root));
+            ActiveButton(root, "TesterFree").onClick.Invoke();
+            Assert.IsFalse(owned.HasFullVersion);
+            Assert.IsTrue(owned.TesterFree);
+            StringAssert.Contains("정식판으로", AllText(root));
+            ActiveButton(root, "TesterFree").onClick.Invoke();
+            Assert.IsTrue(owned.HasFullVersion);
+            Assert.AreEqual(2, field.FullVersionGiftsGiven, "무료 상태에서 돌아오면 특전을 다시 받음");
+
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator TesterMenuLevelsUpFindsWordsAndSkipsToARegion()
         {

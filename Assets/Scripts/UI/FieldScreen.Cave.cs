@@ -143,6 +143,9 @@ namespace WordRPG.UI
             if (lit) StartCoroutine(LightUpStone(stoneCell));
         }
 
+        private const float LastStoneLightSeconds = 0.7f; // 마지막 돌의 빛이 퍼지는 모습을 보는 시간
+        private const float AllLitLineSeconds = 2.4f;     // '모두 밝혔다' 말 — [확인]이면 바로 보스 방 문으로
+
         // 밝힌 순간: 돌이 푸른 구슬로 바뀌고 반짝 + 빛이 둘레 6칸까지 퍼져 나감. 모두 밝히면 동굴 전체가 은은하게
         private IEnumerator LightUpStone(Vector2Int cell)
         {
@@ -154,25 +157,28 @@ namespace WordRPG.UI
             Sound.Play(Sfx.Evolve);
             AfterFieldChange();
             if (!AllStonesLit()) yield break;
-            yield return WaitUnscaled(1f);
+
+            // 마지막 돌 (#251 사용자: [확인]을 막 누르면 옆 돌의 말로 바뀌어 이상하게 넘어감 — 완료했을 때 [확인]이면 바로 보스 방이 열리는 모습):
+            // 그동안은 [확인]이 다른 것을 누르지 않음
+            transitioning = true;
+            if (moving) SnapPlayer();
+            yield return WaitUnscaled(LastStoneLightSeconds);
             Sound.PlayJingle(Sfx.DexComplete);
             darkness.Refresh();
-            bubble.Say("반딧돌을 모두 밝혔다!\n동굴 천장의 반딧불이 깨어났다", 4f);
-            bool gotRelic = stoneRelic != null;
-            if (gotRelic)
+            bubble.Say("반딧돌을 모두 밝혔다!\n동굴 천장의 반딧불이 깨어났다", AllLitLineSeconds + 0.4f);
+            yield return WaitLine(AllLitLineSeconds);
+            bubble.Hide();
+            if (BossGate.OpensWithStones(area) && BossGate.State(area, session) == BossGateState.Ready) yield return OpenStoneGate();
+            transitioning = false;
+
+            // 모두 밝힌 보상 (#115): 문이 열리는 모습을 본 뒤 성유물 (상자에서 얻을 때와 같은 알림)
+            if (stoneRelic != null)
             {
-                // 모두 밝힌 보상 (#115): 반딧불이 깨어난 뒤 성유물 (상자에서 얻을 때와 같은 알림)
                 var relic = stoneRelic;
                 stoneRelic = null;
-                yield return WaitUnscaled(1.6f);
                 Sound.Play(Sfx.Evolve);
                 ShowToast($"성유물 '{relic.Data.DisplayName}'을(를) 손에 넣었다!\n" + RelicHint(relic), 3.5f);
                 RefreshHud();
-            }
-            if (BossGate.OpensWithStones(area) && BossGate.State(area, session) == BossGateState.Ready)
-            {
-                yield return WaitUnscaled(gotRelic ? 3.5f : 2f); // 성유물 알림을 먼저 읽게
-                yield return OpenStoneGate();
             }
         }
 

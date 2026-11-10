@@ -179,19 +179,25 @@ namespace WordRPG.UI
             string name = boss.Species.DisplayName;
             if (session.World.IsBossDefeated(area.BossId))
             {
-                OfferRematch();
+                if (!afterBossRunning) OfferRematch(); // 이긴 직후의 알림·컷씬이 끝나기 전엔 안 열림 (연타)
                 return;
             }
             var enemies = new List<MonsterInstance> { new MonsterInstance(boss.Species, boss.Level) };
             StartCoroutine(Encounter(enemies, BossLines.Intro(boss, session.Hero.DisplayName), true));
         }
 
-        // 이긴 보스와 다시 싸우기 (#236 사용자 ㉓: 보스 기믹이 새로 생겼다는 업데이트를 보고 돌아올 수도 있음). 보상은 경험치·골드만
+        // 이긴 보스와 다시 싸우기 (#236 사용자 ㉓: 보스 기믹이 새로 생겼다는 업데이트를 보고 돌아올 수도 있음). 보상은 경험치·골드만.
+        // 보스 자리에 남은 모래시계 옆에서 [확인] (#251 사용자: 정글·동굴은 넓은 풀밭의 한 칸을 밟아야 해서 찾을 수 없었음 → 막히는 물건으로)
         private bool rematchBattle;
         public int Rematches { get; private set; } // 테스트용
 
-        private bool CanRematchHere => area.Boss != null && session.World.IsBossDefeated(area.BossId)
-                                       && walker.Map.BossPosition == walker.Position;
+        // 모래시계에 부딪히면 승리 뒤 글을 다시 (#207 — 전에 이긴 사람도 읽을 수 있게. #251부터 밟을 수 없어서 부딪힐 때)
+        private void SayBossAfterLine()
+        {
+            if (bubble.IsVisible || area.Boss == null || area.Boss.AfterLine.Length == 0 || !session.World.IsBossDefeated(area.BossId)) return;
+            bubble.Say(area.Boss.AfterLine, BossAfterLineSeconds, "[확인]을 누르면 다시 싸울 수 있어요");
+            bubbleKeepUntil = Time.unscaledTime + 1.5f;
+        }
 
         private void OfferRematch()
         {

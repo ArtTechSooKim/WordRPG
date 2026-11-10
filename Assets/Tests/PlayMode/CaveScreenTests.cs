@@ -200,6 +200,53 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // #251 사용자: 반딧돌을 다 밝히면 [확인]으로 바로 보스 방이 열리는 모습 — 그동안 [확인]이 옆 돌을 다시 누르지 않고, 성유물은 문이 열린 뒤에
+        [UnityTest]
+        public IEnumerator LastGlowStoneGoesStraightToTheOpeningBossGate()
+        {
+            var rows = new List<string>(Map().Split('\n'));
+            var gateRow = rows[13 - 8].ToCharArray(); // y = 8
+            gateRow[20] = 'G';
+            rows[13 - 8] = new string(gateRow);
+            var bossRow = rows[13 - 10].ToCharArray(); // y = 10
+            bossRow[20] = 'B';
+            rows[13 - 10] = new string(bossRow);
+            var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var king = TestData.Species("vine", new MonsterStats(40, 1, 50), new MonsterStats(0, 0, 0), bite).Set("displayName", "말줄임덩굴");
+            var lamp = TestData.Relic("relic_lamp", bite, new MonsterStats(1, 0, 0)).Set("displayName", "반딧돌 등잔");
+            var area = Area(roaming: false, map: string.Join("\n", rows)).Set("boss", new BossEncounter(king, 3)).Set("glowStoneRelic", lamp);
+            var session = Session();
+            for (int i = 0; i < 5; i++) session.Vocabulary.Discover(area.Words.Words[i].Id, System.DateTime.UtcNow.AddDays(-1));
+            var field = new GameObject("CaveField").AddComponent<FieldScreen>();
+            field.Configure(area, session, step: 0.05f, animScale: 0.3f, tutorials: false);
+            yield return null;
+            yield return HoldStick(field, Direction.Up, () => field.PlayerCell.y >= 6);
+            yield return FaceStick(field, Direction.Left);
+            yield return PressConfirm(field);
+            var question = field.StoneQuestion;
+            ActiveButton(field.transform, $"StoneChoice_{question.CorrectIndex}").onClick.Invoke();
+            yield return null;
+            ActiveButton(field.transform, "StoneDone").onClick.Invoke();
+
+            yield return WaitFor(() => field.Bubble.IsVisible && field.Bubble.Text.Contains("모두 밝혔다"), 3f);
+            StringAssert.Contains("모두 밝혔다", field.Bubble.Text);
+            Assert.IsTrue(field.IsInBattle, "그동안은 다른 것이 눌리지 않음");
+            Assert.AreEqual(0, field.StoneGatesOpened);
+            yield return new WaitForSecondsRealtime(0.12f);
+            yield return PressConfirm(field);
+            yield return null;
+            Assert.AreEqual(1, field.StoneGatesOpened, "[확인]이면 바로 문이 열리는 장면");
+            Assert.IsFalse(field.Bubble.IsVisible, "옆 돌의 말로 바뀌지 않음");
+            Assert.IsTrue(BossGate.IsOpen(area, session));
+            StringAssert.DoesNotContain("손에 넣었다", field.ToastMessage ?? "", "성유물 알림은 문이 열린 뒤에");
+
+            yield return WaitFor(() => !field.IsInBattle, 5f);
+            Assert.IsFalse(field.IsInBattle);
+            StringAssert.Contains("손에 넣었다", field.ToastMessage);
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator GlowStoneNeedsWordsYouHaveSeen()
         {

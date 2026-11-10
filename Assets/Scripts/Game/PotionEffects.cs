@@ -29,6 +29,10 @@ namespace WordRPG.Game
             if (NewWordsLeft > 0) NewWordsLeft--;
         }
 
+#if WORDRPG_TESTER || UNITY_EDITOR
+        public void TesterSetQuietSteps(int steps) => QuietStepsLeft = steps > 0 ? steps : 0; // 테스터 메뉴 [살금살금 상시] (#251)
+#endif
+
         // 한 걸음. 이번 걸음으로 효과가 끝났으면 true
         public bool TakeStep()
         {

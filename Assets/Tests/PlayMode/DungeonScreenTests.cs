@@ -144,13 +144,12 @@ namespace WordRPG.Tests
             yield return WaitFor(() => field.Bubble.ShowsText);
             StringAssert.Contains("책 속의 글자가 돌아왔다", field.Bubble.Text, "이긴 뒤 머리 위에");
 
-            // 보스가 있던 자리를 밟으면 다시 나옴 (전에 이긴 사람도 읽을 수 있음)
+            // 보스 자리의 모래시계에 부딪히면 다시 나옴 (전에 이긴 사람도 읽을 수 있음 — #251부터 밟을 수 없어서)
             yield return new WaitForSecondsRealtime(0.5f);
             field.Bubble.Hide();
-            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
-            yield return WaitFor(() => !field.IsMoving);
-            Assert.AreEqual(new Vector2Int(2, 2), field.PlayerCell);
-            Assert.IsTrue(field.Bubble.ShowsText, "보스 자리에서 글이 보임");
+            yield return HoldStick(field, Direction.Up, () => field.Bubble.ShowsText, 1f);
+            Assert.AreEqual(new Vector2Int(2, 1), field.PlayerCell, "모래시계는 막힘");
+            Assert.IsTrue(field.Bubble.ShowsText, "부딪히면 글이 보임");
             StringAssert.Contains("책 속의 글자가 돌아왔다", field.Bubble.Text);
 
             Object.Destroy(field.gameObject);
@@ -200,21 +199,24 @@ namespace WordRPG.Tests
             Assert.IsTrue(session.Hero.Owns(crown));
             Assert.IsTrue(session.Hero.IsEquipped(session.Hero.Find(crown)), "빈 칸이 있으면 바로 끼움");
 
-            CollectionAssert.DoesNotContain(field.VisibleNameTags, "까먹대왕", "쓰러뜨린 보스는 이름표도 사라짐");
+            CollectionAssert.Contains(field.VisibleNameTags, "까먹대왕 · 다시 싸우기", "쓰러뜨린 보스 자리엔 모래시계와 이름표가 남음 (#251)");
+            Assert.IsNotNull(field.BossHourglass, "모래시계가 보임");
 
             // 시작 지점에 선 채로 이겼으면 돌아갈지 묻지 않음 (#60)
             yield return new WaitForSecondsRealtime(0.3f);
             Assert.IsFalse(field.IsReturnDialogOpen, "이미 시작 지점이면 묻지 않음");
 
-            // 다시 [확인]을 눌러도 전투 없음 — 보스가 있던 자리는 빈자리라 걸어 들어갈 수 있다 (#45)
+            // 모래시계는 막힌 물건 (#251): 옆에서 [확인]이면 다시 싸울지 묻기 — 바로 전투는 아님, 걸어 들어갈 수 없음
             yield return new WaitForSecondsRealtime(0.7f);
             yield return PressConfirm(field);
             yield return new WaitForSecondsRealtime(0.2f);
             Assert.IsFalse(field.IsInBattle);
+            Assert.IsTrue(field.IsReturnDialogOpen, "다시 싸울지 묻기");
             Assert.AreEqual(1, session.Record.BattlesWon);
-            yield return HoldStick(field, Direction.Up, () => field.IsMoving);
-            yield return WaitFor(() => !field.IsMoving);
-            Assert.AreEqual(new Vector2Int(2, 2), field.PlayerCell, "보스가 있던 칸에 설 수 있음");
+            VisibleButton(field, "DialogCancelButton").onClick.Invoke();
+            yield return null;
+            yield return FaceStick(field, Direction.Up);
+            Assert.AreEqual(new Vector2Int(2, 1), field.PlayerCell, "보스가 있던 칸은 막혀 있음");
 
             Object.Destroy(field.gameObject);
             yield return null;
@@ -400,7 +402,7 @@ namespace WordRPG.Tests
             yield return null;
         }
 
-        // #236 사용자 ㉓: 이긴 보스 자리에 서서 [확인] → 다시 싸우기 — 보상은 경험치·골드만 (성유물·재료는 다시 안 줌)
+        // #236 사용자 ㉓ · #251: 이긴 보스 자리의 모래시계 옆에서 [확인] → 다시 싸우기 — 보상은 경험치·골드만 (성유물·재료는 다시 안 줌)
         [UnityTest]
         public IEnumerator ADefeatedBossCanBeFoughtAgainForExpAndGoldOnly()
         {
@@ -419,8 +421,10 @@ namespace WordRPG.Tests
             yield return null;
             yield return null;
 
-            yield return HoldStick(field, Direction.Up, () => field.PlayerCell == new Vector2Int(2, 2));
-            Assert.AreEqual(new Vector2Int(2, 2), field.PlayerCell, "이긴 보스 자리는 밟을 수 있음");
+            Assert.IsNotNull(field.BossHourglass, "모래시계가 보임");
+            CollectionAssert.Contains(field.VisibleNameTags, "까먹대왕 · 다시 싸우기");
+            yield return FaceStick(field, Direction.Up);
+            Assert.AreEqual(new Vector2Int(2, 1), field.PlayerCell, "모래시계는 막힘");
             yield return PressConfirm(field);
             yield return WaitFor(() => field.IsReturnDialogOpen, 2f);
             StringAssert.Contains("까먹대왕과 다시 싸울까요", AllText(field));

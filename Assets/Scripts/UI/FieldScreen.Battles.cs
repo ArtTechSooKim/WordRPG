@@ -21,6 +21,9 @@ namespace WordRPG.UI
         private IEnumerator Encounter(List<MonsterInstance> enemies = null, string intro = null, bool boss = false, bool rematch = false)
         {
             transitioning = true;
+            // #251 사용자: 튜토리얼이 나오는 중에 전투에 들어가면 이상해짐 — 안내·말풍선을 치움. 못 끝낸 안내는 본 것으로 치지 않아 전투 뒤 그 상황에서 다시 나옴
+            guide.Hide();
+            bubble.Hide();
             Sound.Play(Sfx.Encounter);
             Sound.PlayBattleMusic(area.Theme, boss);
             flash.gameObject.SetActive(true);
@@ -49,6 +52,7 @@ namespace WordRPG.UI
         {
             bool won = outcome == BattlePhase.Victory;
             inBattle = false;
+            guide.Hide(); // 전투 안에서 띄운 안내가 필드에 남지 않게 (#251)
             var foughtRoamer = battleRoamer;
             battleRoamer = null;
             if (foughtRoamer != null && roaming != null)
@@ -89,6 +93,7 @@ namespace WordRPG.UI
                 if (lectern.HasValue && area.HasDictionary)
                     tilemap.SetTile(new Vector3Int(lectern.Value.x, lectern.Value.y, 0), TileFor(FieldTile.Lectern, true));
                 minimap.Redraw();
+                BuildNameTags(); // '· 다시 싸우기' (#251)
                 RefreshNameTags();
                 string name = area.Boss.Species.DisplayName;
                 var relic = session.GrantRelic(area.Boss.RewardRelic);
@@ -126,15 +131,19 @@ namespace WordRPG.UI
             if (gates.Count > 0) yield return RevealGates(gates, message);
             else
             {
+                transitioning = true; // 이 소식·말을 보는 동안 [확인]은 넘기기만 (#251 사용자: 막 누르면 다른 것이 눌려 이상하게 넘어감)
                 ShowToast(message, 4.5f);
-                yield return WaitUnscaled(2.5f); // 받은 성유물·사전 소식을 먼저 읽게
+                yield return WaitLine(2.5f); // 받은 성유물·사전 소식을 먼저 읽게
+                transitioning = false;
             }
             string afterLine = bossArea.Boss.AfterLine; // 되찾은 것 + 다음 단서 한 줄 (#207)
             if (afterLine.Length > 0 && area == bossArea)
             {
+                transitioning = true;
                 bubble.Say(afterLine, BossAfterLineSeconds);
                 yield return WaitLine(BossAfterLineSeconds);
                 if (lineSkipped) bubble.Hide();
+                transitioning = false;
             }
             var seer = area == bossArea ? BossSeer() : null; // 그 지역 인물이 배웅 (#234 숲 나무꾼) — 기술 배우기·돌아가기 묻기 전에
             if (seer != null) yield return BossCutscene(seer, gates);
@@ -305,7 +314,7 @@ namespace WordRPG.UI
             cameraFocus = null;
             cutscene.HideLetterbox();
             DrawTiles(area, IsDoorLocked);
-            nameTags.SetArea(area, IsDoorLocked, NameTagTop);
+            BuildNameTags();
             RefreshNameTags();
             player.gameObject.SetActive(true);
             hudCanvas.enabled = true;

@@ -1134,6 +1134,7 @@ def build_jungle(pack, themes, autos, template, lectern, key_stand, keyhole, big
     os.makedirs(field, exist_ok=True)
     save_if_changed(log_raft(planks), os.path.join(field, "raft.png"))
     save_if_changed(flow_streaks(), os.path.join(field, "ripple.png"))
+    save_if_changed(boss_hourglass(pack), os.path.join(field, "boss_hourglass.png"))  # 이긴 보스 자리의 모래시계 (#251)
 
 
 # ------------------------------------------------------------------ 1.2 어두운 밀림 동굴 (#112, GDD 9-7)
@@ -1354,6 +1355,24 @@ def jungle_dock_atlas(water, planks):
     for mask in range(256):
         atlas.paste(cell(auto_normalize(mask)), ((mask % 16) * 16, (mask // 16) * 16))
     return atlas, cell(0)
+
+
+def boss_hourglass(pack):
+    # 이긴 보스 자리에 남는 물건 (#251): 팩의 모래시계(시간을 되돌려 다시 싸움) + 돌 받침, 한 칸. 부딪히는 물건으로 보이게 칸을 꽉 채움
+    # (후보 8가지를 지역 바닥 4종 위에서 비교 — 이게 어느 바닥에서나 가장 잘 보임)
+    image = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    image.alpha_composite(pack.image("Items/Object/Hourglass.png"), (0, 0))
+    outline, top, face = (40, 38, 54, 255), (190, 192, 204, 255), (118, 118, 138, 255)
+    for x in range(3, 13):
+        image.putpixel((x, 11), outline)
+        image.putpixel((x, 15), outline)
+        image.putpixel((x, 12), top)
+        image.putpixel((x, 13), face)
+        image.putpixel((x, 14), face)
+    for y in range(12, 15):
+        image.putpixel((2, y), outline)
+        image.putpixel((13, y), outline)
+    return image
 
 
 def log_raft(planks):

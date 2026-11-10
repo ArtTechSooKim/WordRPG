@@ -126,6 +126,37 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // #251 사용자: 튜토리얼이 나오는 중에 전투에 들어가면 이상해짐 → 전투에 들어가면 안내·말풍선을 치우고, 끝나면 다시
+        [UnityTest]
+        public IEnumerator HintsAndBubbleStepAsideForABattleAndComeBackAfter()
+        {
+            var session = NewSession();
+            session.Tutorials.Mark(TutorialProgress.Field);
+            session.Tutorials.Mark(TutorialProgress.Skill);
+            session.Tutorials.Mark(TutorialProgress.NewWord);
+            session.Tutorials.Mark(TutorialProgress.Quiz);
+            session.Tutorials.Mark(TutorialProgress.Intensity); // 강도 설정 안내는 [설정]을 열 때까지 떠 있음
+            var field = CreateField(session, enemyHp: 5);
+            yield return null;
+            yield return WaitFor(() => field.Guide.IsShowing, 2f);
+            StringAssert.Contains("전투 강도", field.Guide.CurrentText);
+
+            yield return HoldStick(field, Direction.Up, () => field.Battle.IsRunning, 3f);
+            Assert.IsTrue(field.Battle.IsRunning);
+            StringAssert.DoesNotContain("전투 강도", field.Guide.CurrentText, "전투 중엔 필드 안내를 치움");
+            Assert.IsTrue(session.Tutorials.Has(TutorialProgress.Grass), "풀숲 혼잣말이 나왔던 걸음");
+            Assert.IsFalse(field.Bubble.IsVisible, "말풍선도 치움");
+
+            yield return PlayUntilResult(field.Battle, answerCorrectly: true);
+            FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
+            yield return WaitFor(() => !field.IsInBattle);
+            yield return WaitFor(() => field.Guide.IsShowing && field.Guide.CurrentText.Contains("전투 강도"), 2f);
+            StringAssert.Contains("전투 강도", field.Guide.CurrentText, "전투가 끝나면 다시");
+            Assert.IsFalse(session.Tutorials.Has(TutorialProgress.IntensitySetting), "아직 안 본 것으로");
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
         // 풀숲 혼잣말 · 목표 한 줄 · 첫 전투 뒤 [도감] 빨간 점 → 열면 꺼짐 · '✓ 저장'
         [UnityTest]
         public IEnumerator GrassLineObjectiveBadgeAndSaveMark()

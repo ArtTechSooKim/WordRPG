@@ -24,7 +24,8 @@ namespace WordRPG.Game
     public static class TesterTools
     {
         public const int LevelStep = 5;
-        public const int GoldStep = 1000;
+        public const int GoldStep = 10000;          // #251 사용자: 10,000 단위로
+        public const int AlwaysQuietSteps = 999999; // 살금살금 상시 (#251): 끝나지 않는 걸음 수 (물약과 같은 규칙을 그대로 씀, 알약에 숫자로 보임)
         public const int MaterialStep = 10;
         public const int WordStep = 25;
 
@@ -42,7 +43,34 @@ namespace WordRPG.Game
             return gained;
         }
 
+        // 주인공과 동료 모두 levels만큼 내림 (1에서 멈춤, 경험치 0) + HP 회복 (#251 사용자). 반환 = 주인공이 내린 레벨 수
+        public static int LevelDown(GameSession session, int levels = LevelStep)
+        {
+            int before = session.Hero.Level;
+            session.Hero.TesterSetLevel(before - levels);
+            foreach (var companion in session.Companions) companion.TesterSetLevel(companion.Level - levels);
+            session.RestoreHero();
+            return before - session.Hero.Level;
+        }
+
         public static void GiveGold(GameSession session, int amount = GoldStep) => session.Inventory.AddGold(amount);
+
+        public static bool IsAlwaysQuiet(GameSession session) => session.Effects.QuietStepsLeft > AlwaysQuietSteps / 2;
+
+        // 살금살금 상시 켜기·끄기 (#251 사용자). 반환 = 켜졌는지
+        public static bool ToggleAlwaysQuiet(GameSession session)
+        {
+            bool on = !IsAlwaysQuiet(session);
+            session.Effects.TesterSetQuietSteps(on ? AlwaysQuietSteps : 0);
+            return on;
+        }
+
+        // 무료 상태로 (#251 사용자: 이미 산 계정이라 무료 상태 화면과 사는 과정을 볼 수 없음). 이 세이브의 특전 받은 기록도 지워서 다시 사면 받음
+        public static void GoFree(GameSession session, Entitlements owned)
+        {
+            session.World.TesterForgetEvent(FullVersionGift.EventId);
+            owned.SetTesterFree(true);
+        }
 
         // 성유물 강화 재료(ItemKind.Material) 종류마다 count개. 반환 = 재료 종류 수
         public static int GiveMaterials(GameSession session, IEnumerable<ItemData> items, int count = MaterialStep)
@@ -96,6 +124,40 @@ namespace WordRPG.Game
                 if (session.Vocabulary.Discover(word.Id, nowUtc)) found++;
             }
             return found;
+        }
+    }
+
+    // 테스터 메뉴 [무료 상태로]일 때만 결제 없이 산 것처럼 (#251): 이미 산 계정은 진짜 결제 창으로 다시 살 수 없음. 무료 상태가 아니면 진짜 스토어 그대로
+    public class TesterFreeStore : IStore
+    {
+        private readonly IStore real;
+        private readonly Entitlements owned;
+
+        public TesterFreeStore(IStore real, Entitlements owned)
+        {
+            this.real = real;
+            this.owned = owned;
+        }
+
+        public bool IsReady => owned.TesterFree || real.IsReady;
+        public string FullVersionPrice => real.FullVersionPrice;
+
+        public void BuyFullVersion(Action<StoreResult> done)
+        {
+            if (!FinishFree(StoreResult.Purchased, done)) real.BuyFullVersion(done);
+        }
+
+        public void Restore(Action<StoreResult> done)
+        {
+            if (!FinishFree(StoreResult.Restored, done)) real.Restore(done);
+        }
+
+        private bool FinishFree(StoreResult result, Action<StoreResult> done)
+        {
+            if (!owned.TesterFree) return false;
+            owned.SetTesterFree(false);
+            done?.Invoke(result);
+            return true;
         }
     }
 }

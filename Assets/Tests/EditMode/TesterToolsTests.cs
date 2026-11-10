@@ -51,6 +51,90 @@ namespace WordRPG.Tests
             Assert.AreEqual(LevelCurve.MaxLevel, top.Hero.Level);
         }
 
+        // #251 사용자: 레벨 줄이기
+        [Test]
+        public void LevelDownLowersHeroAndCompanionsButNotBelowOne()
+        {
+            var session = NewSession(12);
+            var companion = session.AddCompanion(Database().Companions.First());
+            TesterTools.LevelUp(session);
+            int hero = session.Hero.Level, friend = companion.Level;
+            session.Hero.GainExp(1);
+            session.Hero.TakeDamage(1);
+
+            Assert.AreEqual(TesterTools.LevelStep, TesterTools.LevelDown(session));
+            Assert.AreEqual(hero - TesterTools.LevelStep, session.Hero.Level);
+            Assert.AreEqual(Math.Max(1, friend - TesterTools.LevelStep), companion.Level, "동료도 같이");
+            Assert.AreEqual(0, session.Hero.Exp, "그 레벨의 처음");
+            Assert.AreEqual(session.Hero.Stats.MaxHp, session.Hero.CurrentHp, "낮아진 최대 HP에 맞음");
+
+            var low = NewSession(3);
+            Assert.AreEqual(2, TesterTools.LevelDown(low), "1에서 멈춤");
+            Assert.AreEqual(1, low.Hero.Level);
+            Assert.AreEqual(0, TesterTools.LevelDown(low));
+        }
+
+        // #251 사용자: 살금살금을 상시로
+        [Test]
+        public void AlwaysQuietLastsUntilTurnedOff()
+        {
+            var session = NewSession();
+            Assert.IsFalse(TesterTools.IsAlwaysQuiet(session));
+            Assert.IsTrue(TesterTools.ToggleAlwaysQuiet(session));
+            for (int i = 0; i < 2000; i++) Assert.IsFalse(session.Effects.TakeStep(), "걸어도 끝나지 않음");
+            Assert.IsTrue(session.Effects.Quiet);
+            Assert.IsTrue(TesterTools.IsAlwaysQuiet(session));
+            Assert.IsFalse(TesterTools.ToggleAlwaysQuiet(session));
+            Assert.IsFalse(session.Effects.Quiet);
+        }
+
+        private class CountingStore : IStore
+        {
+            public int Buys, Restores;
+            public bool IsReady => false;
+            public string FullVersionPrice => null;
+            public void BuyFullVersion(Action<StoreResult> done) { Buys++; done?.Invoke(StoreResult.Failed); }
+            public void Restore(Action<StoreResult> done) { Restores++; done?.Invoke(StoreResult.NothingToRestore); }
+        }
+
+        // #251 사용자: 이미 산 계정으로 무료 상태를 볼 수 있게 — 앱을 다시 켜도 유지, 사면 결제 없이 돌아오고 특전을 다시 받음
+        [Test]
+        public void FreeStateHidesTheFullVersionUntilBoughtAgain()
+        {
+            var session = NewSession();
+            var gift = Database().FullVersionGift;
+            var owned = new Entitlements();
+            owned.Grant(Entitlements.FullVersion);
+            Assert.Greater(FullVersionGift.Claim(session, owned.HasFullVersion, gift).Count, 0);
+
+            TesterTools.GoFree(session, owned);
+            Assert.IsFalse(owned.HasFullVersion);
+            Assert.IsTrue(owned.TesterFree);
+            Assert.IsFalse(FullVersionGift.Claimed(session), "다시 사면 특전을 받음");
+            Assert.IsFalse(owned.Grant(Entitlements.FullVersion), "앱을 켤 때 스토어 기록이 들어와도 무료 상태 그대로");
+            Assert.IsFalse(owned.HasFullVersion);
+
+            var reopened = Entitlements.FromStorage(owned.ToStorage());
+            Assert.IsTrue(reopened.TesterFree, "앱을 다시 켜도 유지");
+            Assert.IsFalse(reopened.HasFullVersion);
+
+            var real = new CountingStore();
+            var store = new TesterFreeStore(real, owned);
+            Assert.IsTrue(store.IsReady, "진짜 스토어 연결과 상관없이 살 수 있음");
+            StoreResult? result = null;
+            store.BuyFullVersion(r => result = r);
+            Assert.AreEqual(StoreResult.Purchased, result);
+            Assert.AreEqual(0, real.Buys, "무료 상태에서는 실제 결제 없음");
+            Assert.IsTrue(owned.HasFullVersion);
+            Assert.IsFalse(owned.TesterFree);
+            Assert.Greater(FullVersionGift.Claim(session, owned.HasFullVersion, gift).Count, 0, "특전을 다시 받음");
+
+            store.BuyFullVersion(null);
+            store.Restore(null);
+            Assert.AreEqual(1, real.Buys, "무료 상태가 끝나면 진짜 스토어로");
+            Assert.AreEqual(1, real.Restores);
+        }
+
         [Test]
         public void GoldAndMaterialsOnlyUpgradeMaterials()
         {

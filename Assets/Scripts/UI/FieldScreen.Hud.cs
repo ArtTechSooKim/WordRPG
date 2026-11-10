@@ -322,8 +322,7 @@ namespace WordRPG.UI
         private void UpdateConfirmButton()
         {
             bool ready = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot).HasValue
-                         || (!walker.Rafting && npcs.FindTalkable(walker.Position, walker.Facing, false) != null)
-                         || CanRematchHere; // 이긴 보스 자리 (#236)
+                         || (!walker.Rafting && npcs.FindTalkable(walker.Position, walker.Facing, false) != null);
             if (ready != confirmReady) SetConfirmReady(ready);
 
             // Ready면 숨 쉬듯 살짝, 부딪힌 직후에는 크게 깜빡
@@ -346,7 +345,10 @@ namespace WordRPG.UI
             confirmGlow.enabled = ready;
         }
 
-        // 가까운 오브젝트 이름표만 보이게 (쓰러뜨린 보스는 감춤)
+        // 이름표를 지역에 맞게 다시 만듦: 잠긴 출입구는 '· 잠김', 이긴 보스의 모래시계는 '· 다시 싸우기' (#251)
+        private void BuildNameTags() => nameTags.SetArea(area, IsDoorLocked, NameTagTop, cell => session.World.IsBossDefeated(area.BossId));
+
+        // 가까운 오브젝트 이름표만 보이게 (연 문·놓인 다리는 감춤)
         // 말풍선이 떠 있는 동안은 이름표를 숨긴다 (말풍선과 겹치지 않게)
         private void RefreshNameTags() =>
             nameTags.Refresh(walker.Position, cell => bubble.IsVisible || IsCleared(area, cell)

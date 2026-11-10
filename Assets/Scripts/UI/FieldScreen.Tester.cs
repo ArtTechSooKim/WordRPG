@@ -30,7 +30,7 @@ namespace WordRPG.UI
             {
                 settingsView.Hide();
                 StartCoroutine(TesterTravel(target));
-            });
+            }, entitlements);
         }
 
         // 건너뛴 지역의 시작 지점으로: 어두워짐 → 그 지역을 새로 그림(이긴 보스·열린 길) → 밝아짐

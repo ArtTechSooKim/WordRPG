@@ -480,6 +480,7 @@ namespace WordRPG.UI
                     break;
                 case StepKind.BlockedByObject:
                     confirmHint = 0.8f; // 부딪히면 쓰지 않고 [확인] 버튼만 깜빡여 알려 준다
+                    if (outcome.TargetTile == FieldTile.Boss) SayBossAfterLine();
                     break;
                 case StepKind.BlockedByGate:
                     if (!IsDoorLocked(outcome.Target) && IsPaywalled(outcome.Target))
@@ -521,12 +522,6 @@ namespace WordRPG.UI
             if (interactCooldown > 0f) return false;
             if (TryTalkToNpc(facingOnly: true)) return true;
             var direction = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot);
-            if (!direction.HasValue && CanRematchHere)
-            {
-                interactions++;
-                OfferRematch(); // 이긴 보스 자리에 서서 [확인] (#236)
-                return true;
-            }
             if (!direction.HasValue) return TryTalkToNpc(facingOnly: false);
             walker.Face(direction.Value);
             playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
@@ -632,7 +627,7 @@ namespace WordRPG.UI
             }
         }
 
-        // 지나갈 수 있게 된 칸 — [확인]할 것도 없다: 쓰러뜨린 보스 자리(사전은 쉼터 받침대로 옮겨짐, #45), 연 보스 방 문(#76)
+        // 지나갈 수 있게 된 칸 — [확인]할 것도 없다: 연 보스 방 문(#76), 놓인 다리 (쓰러뜨린 보스 자리는 모래시계가 남아 [확인]으로 다시 싸움 #251)
         private bool IsClearedBossSpot(Vector2Int cell) => IsCleared(area, cell);
 
         private bool IsCleared(FieldArea fieldArea, Vector2Int cell) => CellState.IsPassable(fieldArea, session, cell);
@@ -657,12 +652,6 @@ namespace WordRPG.UI
             if (tile == FieldTile.Dock && showTutorials && !session.Tutorials.Has(TutorialProgress.Raft) && !bubble.IsVisible)
             {
                 bubble.Say("뗏목이 묶여 있다.\n물 쪽으로 가면 탈 수 있을 것 같다", 3.5f);
-                bubbleKeepUntil = Time.unscaledTime + 1.5f;
-            }
-            // 보스가 있던 자리를 밟으면 승리 뒤 글을 다시 (#207 — 전에 이긴 사람도 읽을 수 있게)
-            if (tile == FieldTile.Boss && area.Boss != null && area.Boss.AfterLine.Length > 0 && session.World.IsBossDefeated(area.BossId))
-            {
-                bubble.Say(area.Boss.AfterLine, BossAfterLineSeconds, "[확인]을 누르면 다시 싸울 수 있어요");
                 bubbleKeepUntil = Time.unscaledTime + 1.5f;
             }
             if (tile == FieldTile.Door)
@@ -779,7 +768,7 @@ namespace WordRPG.UI
             session.World.Reveal(area.AreaId, map.Width, map.Height, position);
             BuildDarkness();
             minimap.SetArea(map, area.Theme, IsCellDone, cell => session.World.IsExplored(area.AreaId, cell));
-            nameTags.SetArea(area, IsDoorLocked, NameTagTop);
+            BuildNameTags();
             RefreshNameTags();
             SnapPlayer();
             UpdateCamera();

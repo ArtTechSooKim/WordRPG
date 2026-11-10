@@ -50,14 +50,38 @@ namespace WordRPG.UI
         }
 
         // 보스 방에 크게 서 있는 보스 (#233 사용자 ㉞㊱: 작아서 위엄이 없음). 발밑 = B 칸 아래 변 가운데 → 위로 크게.
-        // 앞(아래)에서 다가가는 길은 가리지 않음. 주인공(10)보다 아래 9 — 동굴에선 어둠(14) 아래라 빛 안에서만 보임. 이기면 사라짐
-        private GameObject bigBoss;
+        // 앞(아래)에서 다가가는 길은 가리지 않음. 주인공(10)보다 아래 9 — 동굴에선 어둠(14) 아래라 빛 안에서만 보임. 이기면 사라지고 모래시계가 남음
+        private GameObject bigBoss, bossHourglass;
+        private static Sprite hourglassSprite;
         public Transform BigBoss => bigBoss != null ? bigBoss.transform : null; // 테스트용
+        public Transform BossHourglass => bossHourglass != null ? bossHourglass.transform : null; // 테스트용
+
+        // 이긴 보스 자리에 남는 모래시계 (#251 사용자: 다시 도전을 잘 보이게 — 부딪히는 물건을 남겨 옆에서 [확인]). 칸은 그대로 보스 칸 (FieldTiles: 이겨도 막힘)
+        private void DrawBossHourglass(FieldArea fieldArea)
+        {
+            if (bossHourglass != null) Destroy(bossHourglass);
+            bossHourglass = null;
+            var cell = fieldArea.Map.BossPosition;
+            if (fieldArea.Boss == null || !cell.HasValue || !session.World.IsBossDefeated(fieldArea.BossId)) return;
+            if (hourglassSprite == null)
+            {
+                var texture = Resources.Load<Texture2D>("Art/NinjaAdventure/Field/boss_hourglass");
+                if (texture == null) return;
+                hourglassSprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 16);
+            }
+            bossHourglass = new GameObject("BossHourglass", typeof(SpriteRenderer));
+            bossHourglass.transform.SetParent(transform, false);
+            var renderer = bossHourglass.GetComponent<SpriteRenderer>();
+            renderer.sprite = hourglassSprite;
+            renderer.sortingOrder = 9;
+            bossHourglass.transform.position = CellCenter(cell.Value);
+        }
 
         private void DrawBigBoss(FieldArea fieldArea)
         {
             if (bigBoss != null) Destroy(bigBoss);
             bigBoss = null;
+            DrawBossHourglass(fieldArea);
             var boss = fieldArea.Boss;
             var cell = fieldArea.Map.BossPosition;
             if (boss == null || !boss.StandsBig || !cell.HasValue || boss.Species.Sprite == null || session.World.IsBossDefeated(fieldArea.BossId)) return;
@@ -76,7 +100,7 @@ namespace WordRPG.UI
 
         // 이름표를 붙일 높이 (칸 아래 변에서 몇 칸 위): 크게 선 보스는 머리 위
         private float NameTagTop(Vector2Int cell) =>
-            area != null && area.Boss != null && area.Boss.StandsBig && cell == area.Map.BossPosition ? area.Boss.FieldSize.y : 1f;
+            area != null && area.Boss != null && area.Boss.StandsBig && cell == area.Map.BossPosition && !session.World.IsBossDefeated(area.BossId) ? area.Boss.FieldSize.y : 1f;
 
         // 상점 가판대 (#210): 뒤 벽 → (상인 6) → 계산대 → (주인공 10) → 차양. 뒤로 지나가면 차양에 가려짐
         private readonly List<GameObject> stalls = new List<GameObject>();

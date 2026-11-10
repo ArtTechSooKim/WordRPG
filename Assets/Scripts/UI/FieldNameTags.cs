@@ -51,8 +51,8 @@ namespace WordRPG.UI
         }
 
         // 지역이 바뀌면 이름표를 다시 만든다 (이름이 없는 칸 — 연결 안 된 출입구 등 — 은 건너뜀).
-        // lockedDoor: 잠긴 출입구는 '숲 · 잠김'처럼 표시
-        public void SetArea(FieldArea area, Func<Vector2Int, bool> lockedDoor = null, Func<Vector2Int, float> top = null)
+        // lockedDoor: 잠긴 출입구는 '숲 · 잠김'처럼 표시. rematch: 다시 싸울 수 있는 보스 칸은 '보스 · 다시 싸우기' (#251)
+        public void SetArea(FieldArea area, Func<Vector2Int, bool> lockedDoor = null, Func<Vector2Int, float> top = null, Func<Vector2Int, bool> rematch = null)
         {
             topOf = top;
             foreach (var tag in tags) UnityEngine.Object.Destroy(tag.Root.gameObject);
@@ -62,11 +62,12 @@ namespace WordRPG.UI
                 string name = area.LandmarkName(cell);
                 if (string.IsNullOrEmpty(name)) continue;
                 if (area.Map.Get(cell) == FieldTile.Door && lockedDoor != null && lockedDoor(cell)) name += " · 잠김";
+                if (area.Map.Get(cell) == FieldTile.Boss && rematch != null && rematch(cell)) name += " · 다시 싸우기";
                 tags.Add(MakeTag(cell, name));
             }
         }
 
-        // 걸음이 끝날 때마다: 가까운 이름표만 보이게. hidden = 지금은 감출 칸 (쓰러뜨린 보스)
+        // 걸음이 끝날 때마다: 가까운 이름표만 보이게. hidden = 지금은 감출 칸 (연 문 등)
         public void Refresh(Vector2Int player, Func<Vector2Int, bool> hidden)
         {
             foreach (var tag in tags)

@@ -220,6 +220,8 @@ namespace WordRPG.UI
             var target = roaming.PreemptTarget(walker.Position);
             if (target == null) return;
             if (moving) SnapPlayer();
+            guide.Hide(); // 선제공격 문제도 전투의 시작 — 안내·말풍선을 치움 (#251)
+            bubble.Hide();
             var quiz = new TrainingQuizProvider(preemptBooks, session.Vocabulary, battle.MasteryRules, TrainingMode.All, rng);
             var question = quiz.NextQuestion(QuizDirection.EnglishToMeaning);
             preemptPrompt.SetActive(false);

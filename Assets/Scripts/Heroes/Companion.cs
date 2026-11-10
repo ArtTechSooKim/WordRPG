@@ -46,6 +46,15 @@ namespace WordRPG.Heroes
             return levelsGained;
         }
 
+#if WORDRPG_TESTER || UNITY_EDITOR
+        // 테스터 메뉴 [레벨 -5] (#251): 그 레벨의 처음으로 (경험치 0). HP는 부르는 쪽이 회복
+        public void TesterSetLevel(int level)
+        {
+            Level = Math.Max(1, Math.Min(level, LevelCurve.MaxLevel));
+            Exp = 0;
+        }
+#endif
+
         public int TakeDamage(int amount)
         {
             int dealt = Math.Min(Math.Max(0, amount), CurrentHp);

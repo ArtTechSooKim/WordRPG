@@ -132,6 +132,10 @@ namespace WordRPG.Game
             if (!events.Contains(eventId)) events.Add(eventId);
         }
 
+#if WORDRPG_TESTER || UNITY_EDITOR
+        public void TesterForgetEvent(string eventId) => events?.Remove(eventId); // 테스터 메뉴 [무료 상태로] — 특전을 다시 받게 (#251)
+#endif
+
         // 그 지역 사전을 마지막으로 읽은 날 ("yyyy-MM-dd", 없으면 null)
         public string DictionaryReadDay(string area)
         {

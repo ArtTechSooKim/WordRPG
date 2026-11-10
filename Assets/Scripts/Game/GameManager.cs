@@ -131,6 +131,9 @@ namespace WordRPG.Game
         {
             var store = new UnityIapStore(Entitlements);
             store.Connect();
+#if WORDRPG_TESTER || UNITY_EDITOR
+            if (TesterBuild.Enabled) return new TesterFreeStore(store, Entitlements); // 테스터 메뉴 [무료 상태로]일 때만 결제 없이 (#251)
+#endif
             return store;
         }
 

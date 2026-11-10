@@ -17,7 +17,8 @@ namespace WordRPG.UI
         private const float NpcWalkStep = 0.26f;   // 인물이 걸을 때
         private const float NpcRunStep = 0.13f;    // 인물이 달려올 때
         private const int RunInFrom = 9;           // 보스 뒤: 주인공에게서 걸어서 이만큼 떨어진 곳(화면 밖)에서 달려옴
-        private const float MinLineSeconds = 0.15f; // 막 뜬 말은 이만큼 지나야 [확인]으로 넘어감 (연타에 못 읽고 지나가지 않게)
+        private const float MinLineSeconds = 0.25f; // 막 뜬 말은 이만큼 지나야 [확인]으로 넘어감 (연타에 못 읽고 지나가지 않게)
+        private const float AfterLineCooldown = 0.4f; // 말이 끝나고 조작이 돌아온 뒤 이만큼은 [확인]이 옆 물건을 누르지 않음 (#251 사용자: 막 누르면 이상하게 넘어감)
         private bool cutsceneRunning;
         private bool lineSkip, lineSkipped;        // [확인]을 눌렀다 · 방금 말을 [확인]으로 넘겼다 (#245)
 
@@ -288,6 +289,7 @@ namespace WordRPG.UI
                 yield return null;
             }
             SetConfirmReady(false);
+            interactCooldown = Mathf.Max(interactCooldown, AfterLineCooldown * animationScale);
         }
 
         // 주인공을 길대로 한 칸씩 (걷는 그림, 탐험 기록·미니맵도). 칸 조우·출입구는 없음

@@ -96,7 +96,7 @@ namespace WordRPG.Game
             }
         }
 
-        // 원래 막힌 칸이지만 이제 지나갈 수 있는 칸: 쓰러뜨린 보스 자리(사전은 쉼터로 옮겨짐, #45) · 연 보스 방 문(#76) · 놓인 덩굴 다리(#80)
+        // 원래 막힌 칸이지만 이제 지나갈 수 있는 칸: 연 보스 방 문(#76) · 놓인 덩굴 다리(#80)
         // — 어느 칸이 그런지는 FieldTiles 표의 OpensWhenDone (#116)
         public static bool IsPassable(FieldArea area, GameSession session, Vector2Int cell) =>
             FieldTiles.Of(area.Map.Get(cell)).OpensWhenDone && IsDone(area, session, cell);

@@ -13,7 +13,7 @@ namespace WordRPG.Field
         Use = 1 << 2,           // 걸을 수는 없고 옆에서 [확인] (FieldMap.IsInteractive)
         NameTag = 1 << 3,       // 2칸 안이면 이름표 (FieldInteraction.HasNameTag)
         DoneLook = 1 << 4,      // 끝난 모습이 따로 있음 — 연 상자·당긴 레버… (CellState.IsDone, 그림 _done, 미니맵)
-        OpensWhenDone = 1 << 5, // 끝나면 지나갈 수 있음 — 쓰러뜨린 보스 자리·연 문·놓인 다리 (CellState.IsPassable)
+        OpensWhenDone = 1 << 5, // 끝나면 지나갈 수 있음 — 연 문·놓인 다리 (CellState.IsPassable). 쓰러뜨린 보스 자리는 모래시계가 남아 계속 막힘 (#251)
         Camp = 1 << 6           // 쉼터 물건 — 동굴에서 빛을 내고(CaveLight) 꾸밈이 피해 감(FieldDecor)
     }
 
@@ -79,7 +79,7 @@ namespace WordRPG.Field
             new TileDefinition(FieldTile.Altar,     "E",    Use | Tag | Camp,              "성유물 제단"),
             new TileDefinition(FieldTile.Shop,      "S",    Use | Tag | Camp,              "상점"),
             new TileDefinition(FieldTile.Door,      "DO",   Walk | Tag),                   // 이름표 = 도착 지역 이름
-            new TileDefinition(FieldTile.Boss,      "B",    Use | Tag | Done | Opens),     // 이름표 = 보스 이름
+            new TileDefinition(FieldTile.Boss,      "B",    Use | Tag | Done),             // 이름표 = 보스 이름. 이겨도 막힌 칸 — 모래시계가 남아 옆에서 [확인] = 다시 싸우기 (#251)
             new TileDefinition(FieldTile.Lawn,      ":n",   Walk | Roam),                  // 잔디 — 조우 없음
             new TileDefinition(FieldTile.Lectern,   "L",    Use | Tag | Done | Camp,       "빈 받침대"),
             new TileDefinition(FieldTile.Gate,      "G",    Use | Tag | Done | Opens,      "보스 방 문"),
