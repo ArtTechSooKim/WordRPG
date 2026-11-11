@@ -42,8 +42,8 @@ def panels(path):
     text(d, (cx, 776), "외워지는 영단어", 44, WHITE)
     # 오른쪽: 게임 소개 · 안내
     cx = W - PANEL_W // 2
-    for i, s in enumerate(["단어를 맞히면 공격!", "다양한 스킬로 전투", "숲과 강, 동굴을 모험", "보스마다 다른 함정"]):  # 마지막 줄 = 1.3 (#259)
-        text(d, (cx, 310 + i * 76), s, 44, WHITE)
+    for i, s in enumerate(["단어를 맞히면 공격!", "다양한 스킬로 전투", "숲과 강, 동굴을 모험"]):  # 보스 기믹은 넣지 않음 (#260 사용자: 스포)
+        text(d, (cx, 350 + i * 76), s, 44, WHITE)
     d.rounded_rectangle((cx - 270, 600, cx + 270, 696), 48, fill=GOLD)
     font = ImageFont.truetype(FONT, 46)
     d.text((cx, 648), "앱스토어에서 무료로 시작", font=font, fill=NAVY, anchor="mm")
