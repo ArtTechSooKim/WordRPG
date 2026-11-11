@@ -38,7 +38,7 @@
 ------------------------------------------------------------------
  [처음 한 번] 올림 열쇠 — Claude가 만들어 둠 (2026-11-03)
 ------------------------------------------------------------------
- 위치: F:\_WordRPG_keys  (wordrpg-upload.keystore + android-upload.properties)
+ 위치: F:\WordRPG_builds\keys  (wordrpg-upload.keystore + android-upload.properties)
  - 저장소에 절대 넣지 말 것. F:\GameProject 안에도 두지 말 것 (거기도 별개 Git 저장소)
  - 다른 곳(USB·개인 클라우드)에 한 벌 더 보관. 잃어버려도 구글에 요청해 올림 열쇠를 바꿀 수 있지만 며칠 걸림
  - 비밀번호는 properties 파일에만 있음. 화면·문서·커밋에 출력하지 말 것
@@ -49,17 +49,17 @@
 ------------------------------------------------------------------
  1. ProjectSettings의 AndroidBundleVersionCode를 +1 (올릴 때마다 전보다 커야 함. 처음 = 1)
  2. 복사본에 복사 (사용자 프로젝트의 플랫폼을 바꾸지 않으려고):
-    robocopy F:\GameProject\WordRPG F:\_WordRPG_androidcopy /MIR
+    robocopy F:\GameProject\WordRPG F:\WordRPG_builds\android /MIR
       /XD Library Temp Logs Builds .git UserSettings obj _캡처 *-utc Licensed _소리후보_새단어
       /XF .git AuthKey_* *.p8 *.pdf *.keystore *.jks
     (Licensed = 유료 소리. 복사본에 이미 있으니 지우지 않게 뺌. 복사본을 새로 만들면 main 폴더에서 Assets/Resources/Audio/Licensed를 복사)
  3. 빌드 (복사본에서, Git Bash):
-    export WORDRPG_ANDROID_KEYS="F:/_WordRPG_keys/android-upload.properties"
-    "C:/Program Files/Unity/Hub/Editor/6000.3.11f1/Editor/Unity.exe" -batchmode -quit -projectPath "F:/_WordRPG_androidcopy"
+    export WORDRPG_ANDROID_KEYS="F:/WordRPG_builds/keys/android-upload.properties"
+    "C:/Program Files/Unity/Hub/Editor/6000.3.11f1/Editor/Unity.exe" -batchmode -quit -projectPath "F:/WordRPG_builds/android"
       -buildTarget Android -executeMethod WordRPG.EditorTools.MobileBuild.BuildAndroidAab -logFile build-android.log
-    → F:/_WordRPG_androidcopy/Builds/Android/WordRPG-1.2.aab
+    → F:/WordRPG_builds/android/Builds/Android/WordRPG-1.2.aab
     휴대폰에 바로 깔아 볼 APK는 BuildAndroidApk (열쇠가 없어도 됨, 스토어에는 못 올림. 스토어 밖 설치라 결제가 안 되어 숲부터는 못 들어감)
- 4. 검사: python Tools/check_android_bundle.py F:/_WordRPG_androidcopy/Builds/Android/WordRPG-1.2.aab
+ 4. 검사: python Tools/check_android_bundle.py F:/WordRPG_builds/android/Builds/Android/WordRPG-1.2.aab
     (패키지 · 대상 API 36 · 게임 표시 · 뒤로 가기 · 결제 권한 · 64비트 · 16KB 페이지 · 크기)
  5. 콘솔 > 테스트 > 내부 테스트 > 새 버전 → AAB 올리기 (처음은 직접. 나중에 서비스 계정을 만들면 Claude가 자동으로)
 
