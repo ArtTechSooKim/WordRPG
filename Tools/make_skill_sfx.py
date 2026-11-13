@@ -84,6 +84,9 @@ SOUNDS = {
     "sneakpotion": ([(ELEMENT, "Grass", 8, 0, "atrim=0:0.16,asetpts=PTS-STARTPTS,afade=t=out:st=0.100:d=0.06,highpass=f=500"),
                      (ELEMENT, "Grass", 5, 130, "atrim=0:0.16,asetpts=PTS-STARTPTS,afade=t=out:st=0.100:d=0.06,highpass=f=500"),
                      (ELEMENT, "Grass", 2, 260, "atrim=0:0.16,asetpts=PTS-STARTPTS,afade=t=out:st=0.100:d=0.06,highpass=f=500")], 0, -6.5),  # #247 사용자: 조금 더 크게
+    # 빈칸두꺼비 혀 날름 힘 모으기 (#266 사용자: 유령 소리 같음 → #270 후보 F2): 물방울을 굵게 늦춘 '꾸르륵' 두 번 — 목이 울림. 힘 모으기 연출(0.9초) 안에 끝남
+    "frogcharge": ([(ELEMENT, "Bubble", 0, 0, "asetrate=44100*0.6,aresample=44100,atrim=0:0.45,asetpts=PTS-STARTPTS,afade=t=out:st=0.33:d=0.12"),
+                    (ELEMENT, "Bubble", -3, 260, "asetrate=44100*0.55,aresample=44100,atrim=0:0.5,asetpts=PTS-STARTPTS,afade=t=out:st=0.38:d=0.12")], 0, -9.0),
 }
 
 

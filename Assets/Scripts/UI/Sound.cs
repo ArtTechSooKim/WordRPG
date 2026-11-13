@@ -27,7 +27,8 @@ namespace WordRPG.UI
         IntensityUp, // 강도 ×N 글자가 뜰 때 '띵' (#238 사용자 B27)
         ShieldBreak, // 보호막이 깨질 때: '저저적' 금 가는 소리 + 얇은 유리 (#239 사용자 — make_skill_sfx.py)
         ShieldAbsorb, // 보호막이 막아 낼 때 (깨지지 않음) — 깨짐과 다른 소리 (#239 사용자 — make_skill_sfx.py)
-        SneakPotion  // 살금살금 물약을 마실 때 '스스슥' (#245 사용자 — make_skill_sfx.py)
+        SneakPotion, // 살금살금 물약을 마실 때 '스스슥' (#245 사용자 — make_skill_sfx.py)
+        FrogCharge   // 빈칸두꺼비가 혀 날름 힘을 모을 때 '꾸르륵' (#270 사용자 F2 — 유령 웃음 대신, make_skill_sfx.py)
     }
 
     // 지역 환경음 (#193): BGM 밑에 깔리는 소리. 어느 지역이 어느 소리인지는 테마 표 ThemeLooks.

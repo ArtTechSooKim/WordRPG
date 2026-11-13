@@ -292,7 +292,7 @@ namespace WordRPG.UI
         {
             Log($"{UiKit.WithJosa(e.Actor.DisplayName, "이", "가")} 힘을 모으고 있다");
             Float(e.Actor, "힘을 모은다!", Palette.Gold, 48);
-            Sound.Play(Sfx.EvolveLight);
+            Sound.Play(SkillLooks.ChargeSound(e.Skill)); // 기술마다 (#270 — 빈칸두꺼비는 '꾸르륵')
             PlayFx(e.Actor, Fx.Sparkle, 1.5f, 1.3f);
             return 0.9f;
         }

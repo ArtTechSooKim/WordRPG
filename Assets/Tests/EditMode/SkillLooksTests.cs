@@ -33,6 +33,16 @@ namespace WordRPG.Tests
         }
 
         // 기술 연출 종류마다 자기 소리 (#164 사용자: "모든 스킬 이펙트에 사운드도 따로") — 파일이 있는지는 AudioArtTests,
+        // 힘 모으기 소리 (#270 사용자): 빈칸두꺼비 혀 날름은 '꾸르륵'(F2), 나머지(까먹대왕 기억상실)는 유령 웃음 그대로
+        [Test]
+        public void ChargeSoundIsTheFrogsGurgleOnlyForTheTongueLash()
+        {
+            var skills = AllSkills();
+            Assert.AreEqual(WordRPG.UI.Sfx.FrogCharge, SkillLooks.ChargeSound(skills.Single(s => s.SkillId == "frog_tongue_lash")));
+            Assert.AreEqual(WordRPG.UI.Sfx.EvolveLight, SkillLooks.ChargeSound(skills.Single(s => s.SkillId == "boss_amnesia")));
+            Assert.AreEqual(WordRPG.UI.Sfx.EvolveLight, SkillLooks.ChargeSound(null));
+        }
+
         // 기본 '맞는 소리'는 기술이 없는 피해에만
         [Test]
         public void EveryKindOfLookHasItsOwnSound()

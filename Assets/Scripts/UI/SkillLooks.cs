@@ -100,5 +100,14 @@ namespace WordRPG.UI
 
         public static SkillLook Of(SkillData skill, bool playerSide) => Table[Resolve(skill, playerSide)];
         public static SkillLook Of(SkillFx fx) => Table[fx];
+
+        // 힘 모으기(#120) 소리: 기본은 유령 웃음 — 까먹대왕 기억상실에 맞음. 다른 소리가 어울리는 기술만 여기에 (#270 사용자)
+        private static readonly Dictionary<string, Sfx> ChargeSounds = new Dictionary<string, Sfx>
+        {
+            ["frog_tongue_lash"] = Sfx.FrogCharge, // 빈칸두꺼비: 목이 울리는 '꾸르륵' (F2)
+        };
+
+        public static Sfx ChargeSound(SkillData skill) =>
+            skill != null && ChargeSounds.TryGetValue(skill.SkillId, out var sound) ? sound : Sfx.EvolveLight;
     }
 }
