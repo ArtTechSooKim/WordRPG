@@ -521,11 +521,11 @@ namespace WordRPG.UI
         {
             if (interactCooldown > 0f) return false;
             if (TryTalkToNpc(facingOnly: true)) return true;
-            var direction = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot);
+            var direction = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot, bossBody);
             if (!direction.HasValue) return TryTalkToNpc(facingOnly: false);
             walker.Face(direction.Value);
             playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
-            var cell = walker.Position + direction.Value.ToOffset();
+            var cell = FieldInteraction.TargetCell(walker.Position, direction.Value, bossBody); // 보스 몸 어느 칸이든 보스 (#267)
             interactions++;
             Interact(walker.Map.Get(cell), cell);
             return true;
@@ -752,7 +752,8 @@ namespace WordRPG.UI
             area = newArea;
             OpenStoneGateIfAllLit(newArea); // 예전 세이브 (#233)
             var map = area.Map;
-            walker = new FieldWalker(map, position, cell => IsDoorLocked(cell) || IsPaywalled(cell), cell => IsCleared(area, cell), rafting, npcs.IsOccupied);
+            walker = new FieldWalker(map, position, cell => IsDoorLocked(cell) || IsPaywalled(cell), cell => IsCleared(area, cell), rafting,
+                cell => npcs.IsOccupied(cell) || bossBody.Blocks(walker.Position, cell)); // 크게 선 보스의 몸도 막힘 (#267)
             encounterCounter = new EncounterCounter(area.EncounterRate, area.MinStepsBetweenEncounters);
             if (FirstFightPending) encounterCounter.GuaranteeWithin(EncounterCounter.FirstFightGrassSteps); // #133
             session.World.SetPosition(area.AreaId, position, rafting);

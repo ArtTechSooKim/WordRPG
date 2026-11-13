@@ -124,8 +124,8 @@ namespace WordRPG.UI
         private bool SpringGuideDue()
         {
             if (session.Tutorials.Has(TutorialProgress.Spring)) return false;
-            var direction = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot);
-            return direction.HasValue && walker.Map.Get(walker.Position + direction.Value.ToOffset()) == FieldTile.Fountain
+            var direction = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot, bossBody);
+            return direction.HasValue && walker.Map.Get(FieldInteraction.TargetCell(walker.Position, direction.Value, bossBody)) == FieldTile.Fountain
                                       && SpringDestinations().Count > 0;
         }
 

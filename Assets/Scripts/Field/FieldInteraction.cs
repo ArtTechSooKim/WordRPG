@@ -14,16 +14,26 @@ namespace WordRPG.Field
 
         // 확인 버튼으로 쓸 방향: 바라보는 칸이 우선, 아니면 옆 칸(위·아래·왼·오른 순). 쓸 것이 없으면 null.
         // cleared: 이제는 쓸 것이 없는 칸 (쓰러뜨린 보스 자리) — 건너뛴다
-        public static Direction? FindTarget(FieldMap map, Vector2Int position, Direction facing, Func<Vector2Int, bool> cleared = null)
+        // bossBody: 크게 선 보스의 몸 (#267) — 몸 어느 칸이든 보스로 친다. 쓸 칸은 TargetCell로
+        public static Direction? FindTarget(FieldMap map, Vector2Int position, Direction facing, Func<Vector2Int, bool> cleared = null,
+            BossBody bossBody = null)
         {
             if (map == null) throw new ArgumentNullException(nameof(map));
-            bool Usable(Vector2Int cell) => FieldMap.IsInteractive(map.Get(cell)) && (cleared == null || !cleared(cell));
+            bool Usable(Vector2Int cell) => (bossBody != null && bossBody.Contains(cell))
+                                            || (FieldMap.IsInteractive(map.Get(cell)) && (cleared == null || !cleared(cell)));
             if (Usable(position + facing.ToOffset())) return facing;
             foreach (var direction in SideOrder)
             {
                 if (Usable(position + direction.ToOffset())) return direction;
             }
             return null;
+        }
+
+        // FindTarget으로 고른 방향에서 실제로 쓸 칸: 보스 몸이면 B 칸 (#267)
+        public static Vector2Int TargetCell(Vector2Int position, Direction direction, BossBody bossBody = null)
+        {
+            var cell = position + direction.ToOffset();
+            return bossBody != null ? bossBody.Resolve(cell) : cell;
         }
 
         // 이름표를 다는 칸: 제단·상점·샘·보스·출입구(동굴 입구 'O'도)·보스 방 문·열쇠, 정글의 레버·석판·유적 제단·나루터 (#80), 동굴의 글자 반딧돌 (#112).

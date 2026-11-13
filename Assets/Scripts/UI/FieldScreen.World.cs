@@ -81,10 +81,13 @@ namespace WordRPG.UI
         {
             if (bigBoss != null) Destroy(bigBoss);
             bigBoss = null;
+            bossBody = BossBody.None;
             DrawBossGem(fieldArea);
             var boss = fieldArea.Boss;
             var cell = fieldArea.Map.BossPosition;
             if (boss == null || !boss.StandsBig || !cell.HasValue || boss.Species.Sprite == null || session.World.IsBossDefeated(fieldArea.BossId)) return;
+            // 그림에 보이는 몸 전체가 보스 (#267): 걸어 들어갈 수 없고, 어느 칸이든 옆에서 [확인]
+            bossBody = BossBody.Of(fieldArea.Map, cell.Value, boss.FieldSize, BossBody.VisiblePart(boss.Species.Sprite));
             bigBoss = new GameObject("BigBoss_" + boss.Species.SpeciesId, typeof(SpriteRenderer));
             bigBoss.transform.SetParent(transform, false);
             var renderer = bigBoss.GetComponent<SpriteRenderer>();
@@ -97,6 +100,10 @@ namespace WordRPG.UI
             bigBoss.transform.position = new Vector3(cell.Value.x + 0.5f - pivot.x * size.x / natural.x,
                 cell.Value.y + size.y / 2f - pivot.y * size.y / natural.y, 0f);
         }
+
+        // 크게 선 보스의 몸 (#267) — 쓰러뜨렸거나 크게 서지 않으면 비어 있음
+        private BossBody bossBody = BossBody.None;
+        public IReadOnlyCollection<Vector2Int> BossBodyCells => bossBody.Cells; // 테스트용
 
         // 이름표를 붙일 높이 (칸 아래 변에서 몇 칸 위): 크게 선 보스는 머리 위
         private float NameTagTop(Vector2Int cell) =>

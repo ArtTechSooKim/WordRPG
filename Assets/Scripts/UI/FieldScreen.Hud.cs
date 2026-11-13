@@ -321,7 +321,7 @@ namespace WordRPG.UI
 
         private void UpdateConfirmButton()
         {
-            bool ready = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot).HasValue
+            bool ready = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot, bossBody).HasValue
                          || (!walker.Rafting && npcs.FindTalkable(walker.Position, walker.Facing, false) != null);
             if (ready != confirmReady) SetConfirmReady(ready);
 

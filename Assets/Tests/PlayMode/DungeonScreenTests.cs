@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -224,6 +225,54 @@ namespace WordRPG.Tests
             {
                 ReviewPrompt.OpenUrl = original;
             }
+        }
+
+        // #267 사용자: 크게 선 보스(빈칸두꺼비 6칸)인데 [확인]은 B 한 칸이라 어떻게 도전하는지 몰랐음
+        // → 그림에 보이는 몸 어느 칸이든 막히고, 옆에서 [확인]이면 보스전. 이기면 몸이 없어져 걸을 수 있음
+        [UnityTest]
+        public IEnumerator BigBossCanBeChallengedFromAnyPartOfItsBody()
+        {
+            var hero = Hero();
+            var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var texture = new Texture2D(16, 16);
+            texture.SetPixels(Enumerable.Repeat(Color.white, 16 * 16).ToArray());
+            texture.Apply();
+            var frog = TestData.Species("frog", new MonsterStats(40, 1, 50), new MonsterStats(0, 0, 0), bite)
+                .Set("displayName", "빈칸두꺼비").Set("sprite", Sprite.Create(texture, new Rect(0, 0, 16, 16), new Vector2(0.5f, 0.5f), 16));
+            //   y=3  #.P.....#   ← 시작 (2,3) — 오른쪽 (3,3)은 보스 몸 (B 칸 아님)
+            //   y=2  #...B...#   ← 보스 (4,2), 그림 3×3 = 가로 3..5 · 세로 2..4
+            var area = Area("lair", "보스 방", "#########\n#.......#\n#.......#\n#.P.....#\n#...B...#\n#.......#\n#########", hero)
+                .Set("boss", new BossEncounter(frog, 3).Set("fieldSize", new Vector2(3, 3))).Set("theme", FieldTheme.Forest);
+            var session = GameSession.NewGame(Player(), 1);
+            var field = CreateField(area, session);
+            yield return null;
+            yield return null;
+
+            Assert.IsNotNull(field.BigBoss, "크게 서 있음");
+            Assert.AreEqual(9, field.BossBodyCells.Count);
+            CollectionAssert.Contains(field.BossBodyCells, new Vector2Int(3, 3));
+
+            yield return FaceStick(field, Direction.Right);
+            Assert.AreEqual(new Vector2Int(2, 3), field.PlayerCell, "몸으로는 걸어 들어갈 수 없음");
+            Assert.IsFalse(field.IsInBattle, "부딪히기만 해서는 싸우지 않음");
+            yield return PressConfirm(field);
+            yield return WaitFor(() => field.Battle.IsRunning);
+            Assert.AreSame(frog, field.Battle.Engine.Enemies[0].Monster.Species, "옆구리에서 [확인]해도 보스전");
+
+            yield return PlayUntilResult(field.Battle, answerCorrectly: true);
+            FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
+            yield return WaitFor(() => !field.IsInBattle);
+            Assert.IsTrue(session.World.IsBossDefeated("lair:boss"));
+            Assert.IsNull(field.BigBoss);
+            Assert.AreEqual(0, field.BossBodyCells.Count, "쓰러뜨리면 몸이 없어짐");
+
+            yield return new WaitForSecondsRealtime(0.7f);
+            yield return HoldStick(field, Direction.Right, () => field.IsMoving);
+            yield return WaitFor(() => !field.IsMoving);
+            Assert.AreEqual(new Vector2Int(3, 3), field.PlayerCell, "몸이 있던 곳을 걸을 수 있음");
+
+            Object.Destroy(field.gameObject);
+            yield return null;
         }
 
         [UnityTest]
