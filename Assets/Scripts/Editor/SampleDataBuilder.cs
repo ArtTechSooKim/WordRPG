@@ -46,7 +46,7 @@ namespace WordRPG.EditorTools
                 new Color(0.95f, 0.45f, 0.25f), ItemKind.Consumable, 240);
             var quietPotion = Item("potion_quiet", "살금살금 물약", "마시면 100걸음 동안 몬스터를 만나지 않는다. 필드에서 쓸 수 있다.",
                 new Color(0.45f, 0.75f, 0.85f), ItemKind.Consumable, effect: ItemEffect.Quiet, effectAmount: 100);
-            var curiousPotion = Item("potion_curious", "호기심 물약", "마시면 전투 문제에 새 단어만 10개 나온다. 필드에서 쓸 수 있다.",
+            var curiousPotion = Item("potion_curious", "호기심 물약", "마시면 전투 문제에 새 단어만 10개 나온다. 보스전에선 듣지 않는다. 필드에서 쓸 수 있다.", // #265
                 new Color(1f, 0.82f, 0.3f), ItemKind.Consumable, effect: ItemEffect.NewWords, effectAmount: 10);
             // #232 사용자: 숲은 특제 상처약까지, 효과 물약 두 가지는 정글 상점부터 (값도 밸런스로 올림)
             var forestPotions = new[] { new ShopEntry(potion, 30), new ShopEntry(largePotion, 90), new ShopEntry(greatPotion, 180) };

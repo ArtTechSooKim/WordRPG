@@ -14,8 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: WordRPG::WordRPG.Items.ItemData
   itemId: potion_curious
   displayName: "\uD638\uAE30\uC2EC \uBB3C\uC57D"
-  description: "\uB9C8\uC2DC\uBA74 \uC804\uD22C \uBB38\uC81C\uC5D0 \uC0C8 \uB2E8\uC5B4\uB9CC
-    10\uAC1C \uB098\uC628\uB2E4. \uD544\uB4DC\uC5D0\uC11C \uC4F8 \uC218 \uC788\uB2E4."
+  description: "\uB9C8\uC2DC\uBA74 \uC804\uD22C \uBB38\uC81C\uC5D0 \uC0C8 \uB2E8\uC5B4\uB9CC 10\uAC1C \uB098\uC628\uB2E4. \uBCF4\uC2A4\uC804\uC5D0\uC120 \uB4E3\uC9C0 \uC54A\uB294\uB2E4. \uD544\uB4DC\uC5D0\uC11C \uC4F8 \uC218 \uC788\uB2E4."
   kind: 1
   icon: {fileID: 0}
   placeholderColor: {r: 1, g: 0.82, b: 0.3, a: 1}

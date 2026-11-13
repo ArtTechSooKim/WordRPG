@@ -44,7 +44,7 @@
    - 아이템·성유물·몬스터·지역을 새로 만들면 `WordRPG > Data > Refresh Game Database` 실행 (안 하면 세이브에서 불러올 수 없음, DataIntegrityTests가 잡음)
    - 성유물은 시작·보물상자(ChestContent.relic)·보스(BossEncounter.rewardRelic)·반딧돌 보상(FieldArea.glowStoneRelic) 중 하나에서 얻을 수 있어야 하고, 강화 재료는 적 드롭·상자에서 얻을 수 있어야 함.
      상점은 회복 아이템과 효과 물약만 판다 (강화 재료는 안 팜) — 사용자 결정 (TownTests가 검사). 효과 물약 (#146, 정글 상점부터 #232 — 숲은 특제 상처약까지, 동굴은 상점 없음): ItemData `effect`(`ItemEffect` — 에셋에 번호로 저장, 새 효과는 맨 뒤)·`effectAmount` →
-     가방에서 `GameSession.UseEffectItem` → `PotionEffects`(세이브 칸 newWordsLeft·quietStepsLeft): 호기심 물약 = `WordQuizService` wantNewWord(새 단어가 실제로 나올 때만 줄어듦) · 살금살금 물약 = 걸음 수 + `RoamingMonsters.Quiet`. 알약은 `FieldScreen.RefreshEffects`
+     가방에서 `GameSession.UseEffectItem` → `PotionEffects`(세이브 칸 newWordsLeft·quietStepsLeft): 호기심 물약 = `WordQuizService` wantNewWord(새 단어가 실제로 나올 때만 줄어듦, 보스전·다시 싸우기에선 쉼 `PotionEffects.WantsNewWord` #265 — 새 단어는 뜻 카드 뒤에 물어서) · 살금살금 물약 = 걸음 수 + `RoamingMonsters.Quiet`. 알약은 `FieldScreen.RefreshEffects`
    - 기술문서(ItemKind.SkillDocument)는 taughtSkill이 있어야 하고 상자·보스(BossEncounter.rewardItem)에서 얻을 수 있어야 함 (SkillDocumentDataTests).
      전투 기술 = 기본 기술 자리(휘두르기 — 바꿀 수 있음 #147: `Hero.BasicSeat`·`PutBackBasicSkill`, 세이브 칸 basicSeat, 공격 기술은 하나 남김 `CanReplace`) + 기술 칸 3개(성유물 기술·기술문서 기술), 세이브에는 칸 순서를 키 문자열로 저장
    - 이미 출시된 id는 바꾸지 말 것. SaveData에 필드 추가는 자유(예전 세이브는 기본값), 기존 필드 의미를 바꿀 때만 version 올리고 변환.

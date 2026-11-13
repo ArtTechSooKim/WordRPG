@@ -126,6 +126,40 @@ namespace WordRPG.Tests
             Assert.AreEqual(5, saved.NewWordsLeft, "새 단어가 없으면 안 줄어듦");
         }
 
+        // #265 사용자: 새 단어는 뜻 카드를 보여 준 뒤 묻기 때문에 보스전에서 물약이 들으면 답을 다 알고 싸움 → 보스전에서는 쉼
+        [Test]
+        public void CuriousPotionRestsDuringBossBattles()
+        {
+            var words = new List<WordEntry>
+            {
+                new WordEntry("", "abandon", "버리다", "v"), new WordEntry("", "acquire", "얻다", "v"), new WordEntry("", "obtain", "손에 넣다", "v"),
+                new WordEntry("", "budget", "예산", "n"), new WordEntry("", "reason", "이유", "n"), new WordEntry("", "offer", "제안", "n"),
+            };
+            var progress = new VocabularyProgress();
+            var now = new DateTime(2026, 11, 14, 0, 0, 0, DateTimeKind.Utc);
+            foreach (var seen in words.Take(2)) // 오답 노트 둘 — 물약이 쉬면 평소대로 이 단어가 먼저
+            {
+                progress.Discover(seen.Id, now);
+                progress.RecordAnswer(seen.Id, false, now, new MasteryRules());
+            }
+            var effects = new PotionEffects(newWords: 3);
+            Assert.IsTrue(effects.WantsNewWord(bossBattle: false));
+            Assert.IsFalse(effects.WantsNewWord(bossBattle: true));
+            Assert.IsFalse(new PotionEffects().WantsNewWord(bossBattle: false), "물약을 안 마셨으면 평소대로");
+
+            bool boss = true;
+            var quiz = new WordQuizService(words, progress, new MasteryRules(), new System.Random(1), utcNow: () => now,
+                wantNewWord: () => effects.WantsNewWord(boss), newWordTaken: effects.SpendNewWord);
+            var question = quiz.NextQuestion(QuizDirection.EnglishToMeaning);
+            Assert.IsFalse(question.IsNewWord, "보스전: 오답 노트 단어가 평소대로 먼저");
+            quiz.SubmitAnswer(question, true);
+            Assert.AreEqual(3, effects.NewWordsLeft, "보스전에서는 남은 수가 그대로");
+
+            boss = false; // 다음 보통 전투에서 다시 들음
+            Assert.IsTrue(quiz.NextQuestion(QuizDirection.EnglishToMeaning).IsNewWord);
+            Assert.AreEqual(2, effects.NewWordsLeft);
+        }
+
         private static (RoamingMonsters roaming, Roamer roamer) OneMonsterNear()
         {
             var map = FieldMap.Parse(new string('#', 30) + "\n#P" + new string(':', 18) + "," + new string(':', 8) + "#\n" + new string('#', 30)); // 몬스터는 시작에서 먼 서식지에

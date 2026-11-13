@@ -134,5 +134,30 @@ namespace WordRPG.Tests
             Assert.AreEqual(2, session.Effects.NewWordsLeft, "새 단어 하나 씀");
             Object.Destroy(field.gameObject);
         }
+
+        // #265 사용자: 보스전(다시 싸우기 포함)에서는 호기심 물약이 쉼 — 문제를 내도 남은 수가 그대로
+        [UnityTest]
+        public IEnumerator CuriousPotionRestsInBossBattle()
+        {
+            var session = Session();
+            session.Inventory.Add(curious);
+            var field = CreateField(session);
+            yield return null;
+            yield return null;
+            yield return DrinkFromBag(field, curious, session);
+            Assert.AreEqual(3, session.Effects.NewWordsLeft);
+
+            var boss = TestData.Species("boss_test", new MonsterStats(9999, 1, 50), new MonsterStats(0, 0, 0), TestData.Skill("bite3", SkillKind.Damage, SkillTarget.SingleEnemy, 1));
+            field.Battle.BeginBattle(new List<MonsterInstance> { new MonsterInstance(boss, 1) }, area.Words, _ => { }, null, area.Theme, boss: true);
+            var root = field.Battle.transform;
+            yield return WaitFor(() => ActiveButton(root, "SkillButton_0") != null, 5f);
+            ActiveButton(root, "SkillButton_0").onClick.Invoke();
+            yield return null;
+            ActiveButton(root, "Intensity_0")?.onClick.Invoke();
+            yield return WaitFor(() => field.Battle.Engine.CurrentQuestion != null, 5f);
+            Assert.IsNotNull(field.Battle.Engine.CurrentQuestion);
+            Assert.AreEqual(3, session.Effects.NewWordsLeft, "보스전에서는 안 줄어듦");
+            Object.Destroy(field.gameObject);
+        }
     }
 }

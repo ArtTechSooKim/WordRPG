@@ -24,6 +24,10 @@ namespace WordRPG.Game
             else if (item.Effect == ItemEffect.Quiet) QuietStepsLeft += item.EffectAmount;
         }
 
+        // 이번 문제를 새 단어로 낼지. 보스전(다시 싸우기 포함)에서는 쉼 — 남은 수는 그대로 다음 전투로 (#265 사용자:
+        // 새 단어는 뜻 카드를 보여 준 뒤 묻기 때문에, 물약을 마시고 보스와 싸우면 답을 다 알고 싸우게 됨)
+        public bool WantsNewWord(bool bossBattle) => !bossBattle && NewWordsLeft > 0;
+
         public void SpendNewWord()
         {
             if (NewWordsLeft > 0) NewWordsLeft--;
