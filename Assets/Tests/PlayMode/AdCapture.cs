@@ -51,6 +51,14 @@ namespace WordRPG.Tests
                 "grail_blessing", "leaf_world_breath", "gourd_spring", "boss_memory_drain", "flute_echo_wall", "tortoise_encyclo_wall", "hourglass_rewind", "seed_period_grove" }),
         };
 
+        // 달려드는 몸짓 전후 비교 (#269 사용자: 몬스터가 다가갔다 돌아오는 게 몸통박치기가 아니라 그루밍 같음) → Builds/ad/lunge
+        // 적 기술은 적 카드가 주인공에게, hero_ 기술은 주인공이 적에게. 묶기 = 스크래치 스크립트 (전후 나란히)
+        private static string LungeOut => Path.Combine(Application.dataPath, "..", "Builds", "ad", "lunge");
+        private static readonly (string area, FieldTheme theme, string[] enemies, string[] skills)[] LungeGroups =
+        {
+            ("jungle", FieldTheme.Jungle, new[] { "tail_lizard", "batchim_kappa" }, new[] { "lizard_tail_grab", "bat_scratch", "raccoon_tail_slam", "hero_swing" }),
+        };
+
         private static SkillData Skill(string id) => AssetDatabase.LoadAssetAtPath<SkillData>($"Assets/Data/Skills/{id}.asset");
 
         // ---- 모험 장면 (#158): 정글에서 아라와 걷기 · 뗏목 · 동굴 · 선제공격 → Builds/ad/adventure/{장면}/f0000.jpg + marks.txt
@@ -698,8 +706,11 @@ namespace WordRPG.Tests
         }
 
         // 기술의 대상대로 사건을 만듦. 숫자는 위력에 맞춘 표시용 (엔진을 돌리지 않음)
-        private static BattleEvent[] Events(SkillData skill, BattleUnit hero, BattleUnit ara, BattleUnit a, BattleUnit b, bool allowCrit = true)
+        private static BattleEvent[] Events(SkillData skill, BattleUnit hero, BattleUnit ara, BattleUnit a, BattleUnit b, bool allowCrit = true,
+            bool enemyActs = false)
         {
+            if (enemyActs) // 적 카드가 주인공에게 (#269)
+                return new[] { BattleEvent.SkillUsed(a, skill), BattleEvent.Damage(a, hero, skill, Mathf.Max(5, skill.Power / 4), 0, false) };
             var actor = skill.SkillId.StartsWith("ara_") ? ara : hero;
             var list = new List<BattleEvent> { BattleEvent.SkillUsed(actor, skill) };
             int amount = Mathf.RoundToInt(skill.Power * 1.5f);
@@ -731,7 +742,13 @@ namespace WordRPG.Tests
         [Timeout(1200000)]
         public IEnumerator SkillSoundReel() => CaptureSkills(SoundOut, SoundGroups, false);
 
-        private IEnumerator CaptureSkills(string outDir, (string area, FieldTheme theme, string[] enemies, string[] skills)[] groups, bool allowCrit)
+        [UnityTest]
+        [Timeout(1200000)]
+        public IEnumerator LungeReel() => CaptureSkills(LungeOut, LungeGroups, false, enemySkills: true);
+
+        // enemySkills: hero_·ara_가 아닌 기술은 적 카드가 쓴다 (#269)
+        private IEnumerator CaptureSkills(string outDir, (string area, FieldTheme theme, string[] enemies, string[] skills)[] groups, bool allowCrit,
+            bool enemySkills = false)
         {
             var db = AssetDatabase.LoadAssetAtPath<GameDatabase>("Assets/Data/GameDatabase.asset");
             var heroData = AssetDatabase.LoadAssetAtPath<HeroData>("Assets/Data/Hero/hero.asset");
@@ -806,7 +823,8 @@ namespace WordRPG.Tests
                     frameNow = 0;
                     Time.captureDeltaTime = 1f / Fps;
                     bool done = false;
-                    battle.StartCoroutine(Then(battle.PlayEventsForTest(Events(skill, hero, ara, a, b, allowCrit)), () => done = true));
+                    bool byEnemy = enemySkills && !id.StartsWith("hero_") && !id.StartsWith("ara_");
+                    battle.StartCoroutine(Then(battle.PlayEventsForTest(Events(skill, hero, ara, a, b, allowCrit, byEnemy)), () => done = true));
                     int tail = 0;
                     float deltaSeen = 0f;
                     for (int n = 0; n < MaxFrames && tail < 8; n++)

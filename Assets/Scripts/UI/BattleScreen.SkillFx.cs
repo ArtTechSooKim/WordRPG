@@ -500,25 +500,57 @@ namespace WordRPG.UI
             cardMotion.Remove(card);
         }
 
-        // 맞힐 상대 쪽으로 달려갔다(조금 커짐) 잠깐 머문 뒤 돌아옴 — 머무는 동안 맞는 효과가 나옴
+        // 맞힐 상대 쪽으로 '탁' (#269 사용자: 다가갔다 돌아오는 게 몸통박치기가 아니라 그루밍 같음 — 탁 치는 느낌):
+        // 살짝 뒤로 움츠림 → 점점 빨라지며 달려들어 부딪힌 순간 툭 커지고 살짝 되튐 → 바로 돌아옴.
+        // 부딪히는 때는 예전과 같은 0.22초 — 맞는 효과·숫자·소리와 맞물림 (예전: 서서히 멈추며 다가가 0.3초 머묾 = 쓰다듬는 느낌)
         private IEnumerator Lunge(RectTransform card, Vector3 toward)
         {
             var home = card.anchoredPosition;
             var parent = (RectTransform)card.parent;
             Vector2 delta = parent.InverseTransformVector(toward - card.TransformPoint(card.rect.center));
             Vector2 offset = delta.normalized * Mathf.Min(delta.magnitude * 0.45f, 280f);
-            float go = 0.22f * animationScale, hold = 0.3f * animationScale, back = 0.2f * animationScale;
-            for (float t = 0f; t < go + hold + back; t += Time.unscaledDeltaTime)
+            float windup = 0.12f * animationScale, strike = 0.1f * animationScale, impact = 0.16f * animationScale, back = 0.2f * animationScale;
+            float total = windup + strike + impact + back;
+            for (float t = 0f; t < total; t += Time.unscaledDeltaTime)
             {
                 if (card == null) yield break;
-                float k = t < go ? 1f - (1f - t / go) * (1f - t / go) : t < go + hold ? 1f : 1f - (t - go - hold) / Mathf.Max(0.0001f, back);
+                var (k, scale) = LungePose(t, windup, strike, impact, back);
                 card.anchoredPosition = home + offset * k;
-                card.localScale = Vector3.one * (1f + 0.06f * k);
+                card.localScale = Vector3.one * scale;
                 yield return null;
             }
             if (card == null) yield break;
             card.anchoredPosition = home;
             card.localScale = Vector3.one;
+        }
+
+        private const float LungeWindup = 0.12f; // 움츠리는 거리 (달려가는 거리의 비율)
+
+        // t초일 때 달려든 정도(0 = 제자리, 1 = 부딪힌 자리, 음수 = 뒤로 움츠림)와 크기
+        private static (float k, float scale) LungePose(float t, float windup, float strike, float impact, float back)
+        {
+            if (t < windup)
+            {
+                float u = t / Mathf.Max(0.0001f, windup);
+                return (-LungeWindup * Mathf.Sin(u * Mathf.PI * 0.5f), 1f - 0.05f * u); // 뒤로 움츠리며 살짝 작아짐
+            }
+            t -= windup;
+            if (t < strike)
+            {
+                float u = t / Mathf.Max(0.0001f, strike);
+                return (Mathf.Lerp(-LungeWindup, 1f, u * u), 0.95f + 0.07f * u); // 점점 빨라짐 — 부딪히는 순간이 가장 빠름
+            }
+            t -= strike;
+            if (t < impact)
+            {
+                float u = t / Mathf.Max(0.0001f, impact);
+                float recoil = 0.1f * Mathf.Sin(Mathf.Min(1f, u * 2f) * Mathf.PI); // 부딪혀 살짝 되튐
+                return (1f - recoil, 1.02f + 0.12f * Mathf.Exp(-u * 6f));         // 부딪힌 순간 툭 커졌다 가라앉음
+            }
+            t -= impact;
+            float e = Mathf.Clamp01(t / Mathf.Max(0.0001f, back));
+            e = 1f - (1f - e) * (1f - e); // 처음엔 빠르게, 제자리에 부드럽게
+            return (1f - e, Mathf.Lerp(1.02f + 0.12f * Mathf.Exp(-6f), 1f, e));
         }
 
         // 제자리에서 살짝 부풀었다 돌아옴 (마법진을 그리는 몸짓)
