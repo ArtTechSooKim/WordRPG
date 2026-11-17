@@ -4,25 +4,28 @@ using UnityEngine;
 using UnityEngine.UI;
 using WordRPG.Field;
 using WordRPG.Game;
+using WordRPG.Words;
 
 namespace WordRPG.UI
 {
     // 필드 > 처음 시작 (#124 사용자 — 테스터 "갑자기 초원에 떨어져 당황", 스토리 = Docs/GameStory 프롤로그):
     // (입장 영상을 아직 못 봤으면 맨 먼저 #129 — #131부터 하던 사람도 한 번) →
-    // 모습 고르기(8명) → 환영 → 혼잣말 "내 이름조차 기억나지 않아" → 깃펜으로 떠오른 이름 → 걷기·달리기 →
+    // 외울 단어장 고르기(#273 — 새 게임만) → 모습 고르기(8명) → 환영 → 혼잣말 "내 이름조차 기억나지 않아" → 깃펜으로 떠오른 이름 → 걷기·달리기 →
     // (#133 분신이 풀숲으로 걸어 들어가는 모습 →) "풀숲으로 가서 몬스터와 싸워 보세요" → 첫 승리 뒤 목표(까먹대왕) 한 번.
-    // 1.0 세이브로 업데이트한 사람은 영상 → 모습·이름만 한 번
+    // 1.0 세이브로 업데이트한 사람은 영상 → 모습·이름만 한 번 (단어장은 수능·내신 그대로)
     public partial class FieldScreen
     {
         private const float WayGhostStep = 0.13f; // 풀숲 가는 길을 보여 주는 분신이 한 칸 가는 시간 (달리기쯤)
 
         private CharacterSelectView characterSelect;
+        private CourseSelectView courseSelect; // #273 외울 단어장 고르기 — 모습 고르기 앞
         private NameEntryView nameEntry;
         private IntroCinematicView introView;
         private Image heroFace; // HUD 주인공 얼굴 (모습을 바꾸면 다시 그림)
         private bool heroSetupRunning;
 
         public CharacterSelectView CharacterSelect => characterSelect;
+        public CourseSelectView CourseSelect => courseSelect;
         public NameEntryView NameEntry => nameEntry;
         public IntroCinematicView Intro => introView;
         public bool IsHeroSetupRunning => heroSetupRunning;
@@ -30,8 +33,10 @@ namespace WordRPG.UI
         public int WayToGrassTiles { get; private set; }  // 그때 분신이 걸은 칸 수 (테스트용)
         public int WayGhostTrails { get; private set; }   // 그때 분신이 남긴 잔상 수 (테스트용)
 
-        // 필드에 들어올 때 처음 시작 흐름이 필요한지: 모습·이름을 아직 안 정했거나 입장 영상을 아직 못 봄
-        private bool NeedsPrologue => heroSetup && (session.NeedsHeroSetup || WantsIntro);
+        // 필드에 들어올 때 처음 시작 흐름이 필요한지: 단어장·모습·이름을 아직 안 정했거나 입장 영상을 아직 못 봄
+        private bool NeedsPrologue => heroSetup && (CourseChoicePending || session.NeedsHeroSetup || WantsIntro);
+        // 고를 단어장이 있을 때만 묻는다 (단어장 데이터가 없으면 기본 단어 그대로 — 세이브는 빈 칸, 다시 불러오면 수능·내신)
+        private bool CourseChoicePending => session.NeedsCourseChoice && database != null && database.Courses.Count > 0;
         private bool WantsIntro => playIntro && !session.Tutorials.Has(TutorialProgress.Intro);
         // 아직 한 번도 싸워 보지 않은 처음 하는 사람 — 풀숲 두 번째 칸에서 반드시 몬스터 (#133, EnterArea)
         private bool FirstFightPending => heroSetup && session.Record.BattlesFought == 0;
@@ -39,6 +44,7 @@ namespace WordRPG.UI
         private void BuildHeroSetup()
         {
             characterSelect = CharacterSelectView.Create(hudRoot);
+            courseSelect = CourseSelectView.Create(hudRoot);
             nameEntry = NameEntryView.Create(hudRoot);
             introView = IntroCinematicView.Create(hudRoot); // 맨 위 (#129)
         }
@@ -60,6 +66,7 @@ namespace WordRPG.UI
                 MarkIntroSeen(); // 못 열었으면 다음에 다시 (#138)
             }
 
+            if (CourseChoicePending) yield return ChooseCourse();
             if (session.NeedsHeroSetup) yield return ChooseLookAndName(fresh);
             Sound.PlayMusic(AreaMusic);
 
@@ -84,6 +91,23 @@ namespace WordRPG.UI
                 if (introView.Failed) ShowToast("영상을 열 수 없어요. 잠시 뒤에 다시 해 보세요", 3f);
                 MarkIntroSeen();
             });
+        }
+
+        // 외울 단어장 고르기 (#273 사용자, GDD 9-12): 새 게임에서 한 번, 나중에 바꾸지 않음. 단어장 데이터가 없으면 기본(수능·내신)으로
+        private IEnumerator ChooseCourse()
+        {
+            var courses = database.Courses;
+            WordCourse picked = null;
+            bool done = false;
+            Sound.PlayMusic(Music.HeroSelect); // 모습 고르기와 같은 음악으로 이어짐
+            courseSelect.Show(courses, database.BaseWordBooks(), course =>
+            {
+                picked = course;
+                done = true;
+            });
+            while (!done) yield return null;
+            session.ChooseCourse(picked);
+            SaveNow();
         }
 
         private IEnumerator ChooseLookAndName(bool fresh)

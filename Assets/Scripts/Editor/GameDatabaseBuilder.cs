@@ -10,7 +10,7 @@ using WordRPG.Monsters;
 
 namespace WordRPG.EditorTools
 {
-    // 프로젝트의 모든 MonsterSpecies·ItemData·RelicData·FieldArea를 GameDatabase에 모은다.
+    // 프로젝트의 모든 MonsterSpecies·ItemData·RelicData·FieldArea·CompanionData·WordCourse를 GameDatabase에 모은다.
     // 아이템·성유물·지역을 새로 만들면 이 메뉴를 실행할 것 (안 하면 세이브에서 불러올 수 없음 — 테스트가 잡아냄)
     public static class GameDatabaseBuilder
     {
@@ -24,6 +24,8 @@ namespace WordRPG.EditorTools
             var areas = LoadAll<FieldArea>().OrderBy(a => a.AreaId).ToList();
             var relics = LoadAll<RelicData>().OrderBy(r => r.RelicId).ToList();
             var companions = LoadAll<CompanionData>().OrderBy(c => c.CompanionId).ToList();
+            var courses = LoadAll<WordRPG.Words.WordCourse>().OrderBy(c => c.Order).ThenBy(c => c.CourseId).ToList(); // #273
+            WarnDuplicates(courses.Select(c => c.CourseId), "단어장");
             WarnDuplicates(monsters.Select(m => m.SpeciesId), "몬스터");
             WarnDuplicates(relics.Select(r => r.RelicId), "성유물");
             WarnDuplicates(items.Select(i => i.ItemId), "아이템");
@@ -36,10 +38,10 @@ namespace WordRPG.EditorTools
                 database = ScriptableObject.CreateInstance<GameDatabase>();
                 AssetDatabase.CreateAsset(database, DatabasePath);
             }
-            database.ReplaceContents(monsters, items, areas, relics, companions);
+            database.ReplaceContents(monsters, items, areas, relics, companions, courses);
             EditorUtility.SetDirty(database);
             AssetDatabase.SaveAssets();
-            Debug.Log($"[WordRPG] GameDatabase 갱신: 몬스터 {monsters.Count}, 아이템 {items.Count}, 성유물 {relics.Count}, 지역 {areas.Count}, 동료 {companions.Count}");
+            Debug.Log($"[WordRPG] GameDatabase 갱신: 몬스터 {monsters.Count}, 아이템 {items.Count}, 성유물 {relics.Count}, 지역 {areas.Count}, 동료 {companions.Count}, 단어장 {courses.Count}");
             return database;
         }
 

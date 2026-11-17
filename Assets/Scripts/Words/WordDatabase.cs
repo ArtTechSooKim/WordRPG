@@ -61,7 +61,21 @@ namespace WordRPG.Words
         public string RegionName => regionName;
         public IReadOnlyList<DexReward> Rewards => rewards;
         public ItemData Journal => journal;
-        public IReadOnlyList<WordEntry> Words => words;
+
+        // 지역에서 나오는 단어: 고른 단어장(#273 WordCourses.Active)이 이 단어장을 대신하면 그 단어장의 단어.
+        // 전투·도감·보스 문·사전·석판·반딧돌·수련이 모두 이것을 쓴다
+        public IReadOnlyList<WordEntry> Words
+        {
+            get
+            {
+                var course = WordCourses.Active;
+                var replacement = course != null ? course.BookFor(this) : null;
+                return replacement != null ? replacement.words : words;
+            }
+        }
+
+        // 이 에셋에 든 단어 그대로 (단어장을 골라도 바뀌지 않음) — 누군가의 기록 문장(#201), 단어장 고르는 화면
+        public IReadOnlyList<WordEntry> OwnWords => words;
 
         // 샘플 데이터 생성 전용. 런타임에서는 호출하지 않는다
         public void ConfigureRegion(string id, string displayName, IEnumerable<DexReward> newRewards)

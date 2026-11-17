@@ -4,6 +4,7 @@ using WordRPG.Field;
 using WordRPG.Heroes;
 using WordRPG.Items;
 using WordRPG.Monsters;
+using WordRPG.Words;
 
 namespace WordRPG.Game
 {
@@ -17,6 +18,7 @@ namespace WordRPG.Game
         [SerializeField] private List<FieldArea> areas = new List<FieldArea>();
         [SerializeField] private List<RelicData> relics = new List<RelicData>();
         [SerializeField] private List<CompanionData> companions = new List<CompanionData>(); // #77 동료
+        [SerializeField] private List<WordCourse> courses = new List<WordCourse>(); // #273 처음에 고르는 단어장 (order 순)
         [Tooltip("정식판 특전 (#233): 정식판을 사면 세이브마다 한 번 받는 아이템 (FullVersionGift)")]
         [SerializeField] private List<ItemGift> fullVersionGift = new List<ItemGift>();
 
@@ -27,6 +29,32 @@ namespace WordRPG.Game
         public IReadOnlyList<FieldArea> Areas => areas;
         public IReadOnlyList<RelicData> Relics => relics;
         public IReadOnlyList<CompanionData> Companions => companions ?? (IReadOnlyList<CompanionData>)new List<CompanionData>();
+
+        public IReadOnlyList<WordCourse> Courses => courses ?? (IReadOnlyList<WordCourse>)new List<WordCourse>();
+
+        // 세이브의 단어장 id로 찾기. 없거나 모르는 id면 null (= 기본 단어장)
+        public WordCourse FindCourse(string courseId)
+        {
+            if (string.IsNullOrEmpty(courseId) || courses == null) return null;
+            foreach (var course in courses)
+                if (course != null && course.CourseId == courseId) return course;
+            return null;
+        }
+
+        // 지역에 붙은 기본 단어장들 (이야기 순서, 겹치지 않게) — 단어장 고르는 화면의 단어 수·예시 단어
+        public List<WordDatabase> BaseWordBooks()
+        {
+            var books = new List<WordDatabase>();
+            var ordered = new List<FieldArea>();
+            foreach (var area in areas) if (area != null) ordered.Add(area);
+            ordered.Sort((a, b) => a.StoryOrder.CompareTo(b.StoryOrder));
+            foreach (var area in ordered)
+            {
+                var book = area.Words;
+                if (book != null && !books.Contains(book)) books.Add(book);
+            }
+            return books;
+        }
 
         public CompanionData FindCompanion(string companionId)
         {
@@ -75,8 +103,10 @@ namespace WordRPG.Game
 
         // 에디터 수집기 전용
         public void ReplaceContents(IEnumerable<MonsterSpecies> newMonsters, IEnumerable<ItemData> newItems,
-            IEnumerable<FieldArea> newAreas = null, IEnumerable<RelicData> newRelics = null, IEnumerable<CompanionData> newCompanions = null)
+            IEnumerable<FieldArea> newAreas = null, IEnumerable<RelicData> newRelics = null, IEnumerable<CompanionData> newCompanions = null,
+            IEnumerable<WordCourse> newCourses = null)
         {
+            courses = newCourses != null ? new List<WordCourse>(newCourses) : new List<WordCourse>();
             monsters = new List<MonsterSpecies>(newMonsters);
             items = new List<ItemData>(newItems);
             areas = newAreas != null ? new List<FieldArea>(newAreas) : new List<FieldArea>();

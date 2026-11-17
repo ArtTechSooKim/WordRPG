@@ -1,0 +1,1220 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b72d5cf44eaeb8458f8605263c9da22, type: 3}
+  m_Name: business_tier1
+  m_EditorClassIdentifier: WordRPG::WordRPG.Words.WordDatabase
+  tier: 1
+  regionId: 
+  regionName: 
+  rewards: []
+  journal: {fileID: 0}
+  words:
+  - id: biz_invoice
+    english: invoice
+    meaning: "\uCCAD\uAD6C\uC11C, \uC1A1\uC7A5"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_receipt
+    english: receipt
+    meaning: "\uC601\uC218\uC99D"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_refund
+    english: refund
+    meaning: "\uD658\uBD88"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_discount
+    english: discount
+    meaning: "\uD560\uC778"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_deadline
+    english: deadline
+    meaning: "\uB9C8\uAC10 \uAE30\uD55C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_client
+    english: client
+    meaning: "\uC758\uB8B0\uC778, \uAC70\uB798\uCC98"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_customer
+    english: customer
+    meaning: "\uACE0\uAC1D, \uC190\uB2D8"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_colleague
+    english: colleague
+    meaning: "\uB3D9\uB8CC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_supervisor
+    english: supervisor
+    meaning: "\uC0C1\uC0AC, \uAC10\uB3C5\uAD00"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_employee
+    english: employee
+    meaning: "\uC9C1\uC6D0, \uC885\uC5C5\uC6D0"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_employer
+    english: employer
+    meaning: "\uACE0\uC6A9\uC8FC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_applicant
+    english: applicant
+    meaning: "\uC9C0\uC6D0\uC790"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_candidate
+    english: candidate
+    meaning: "\uD6C4\uBCF4\uC790"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_interview
+    english: interview
+    meaning: "\uBA74\uC811"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_salary
+    english: salary
+    meaning: "\uC6D4\uAE09, \uBD09\uAE09"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_wage
+    english: wage
+    meaning: "\uC784\uAE08, \uC2DC\uAE09"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_promotion
+    english: promotion
+    meaning: "\uC2B9\uC9C4, \uD310\uCD09"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_department
+    english: department
+    meaning: "\uBD80\uC11C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_branch
+    english: branch
+    meaning: "\uC9C0\uC810, \uC9C0\uC0AC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_headquarters
+    english: headquarters
+    meaning: "\uBCF8\uC0AC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_warehouse
+    english: warehouse
+    meaning: "\uCC3D\uACE0"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_inventory
+    english: inventory
+    meaning: "\uC7AC\uACE0, \uC7AC\uACE0 \uBAA9\uB85D"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_shipment
+    english: shipment
+    meaning: "\uBC30\uC1A1\uD488, \uC120\uC801"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_delivery
+    english: delivery
+    meaning: "\uBC30\uB2EC, \uBC30\uC1A1"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_purchase
+    english: purchase
+    meaning: "\uAD6C\uB9E4, \uAD6C\uC785\uD558\uB2E4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_budget
+    english: budget
+    meaning: "\uC608\uC0B0"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_expense
+    english: expense
+    meaning: "\uC9C0\uCD9C, \uACBD\uBE44"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_revenue
+    english: revenue
+    meaning: "\uB9E4\uCD9C, \uC218\uC785"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_profit
+    english: profit
+    meaning: "\uC774\uC775"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_loss
+    english: loss
+    meaning: "\uC190\uC2E4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_contract
+    english: contract
+    meaning: "\uACC4\uC57D, \uACC4\uC57D\uC11C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_agreement
+    english: agreement
+    meaning: "\uD569\uC758, \uD611\uC815"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_negotiate
+    english: negotiate
+    meaning: "\uD611\uC0C1\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_schedule
+    english: schedule
+    meaning: "\uC77C\uC815, \uC77C\uC815\uC744 \uC7A1\uB2E4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_appointment
+    english: appointment
+    meaning: "\uC57D\uC18D, \uC784\uBA85"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_reservation
+    english: reservation
+    meaning: "\uC608\uC57D"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_conference
+    english: conference
+    meaning: "\uD68C\uC758, \uD559\uD68C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_presentation
+    english: presentation
+    meaning: "\uBC1C\uD45C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_proposal
+    english: proposal
+    meaning: "\uC81C\uC548, \uC81C\uC548\uC11C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_document
+    english: document
+    meaning: "\uBB38\uC11C, \uC11C\uB958"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_form
+    english: form
+    meaning: "\uC591\uC2DD, \uC11C\uC2DD"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_signature
+    english: signature
+    meaning: "\uC11C\uBA85"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_approve
+    english: approve
+    meaning: "\uC2B9\uC778\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_submit
+    english: submit
+    meaning: "\uC81C\uCD9C\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_review
+    english: review
+    meaning: "\uAC80\uD1A0\uD558\uB2E4, \uAC80\uD1A0"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_confirm
+    english: confirm
+    meaning: "\uD655\uC778\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_cancel
+    english: cancel
+    meaning: "\uCDE8\uC18C\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_postpone
+    english: postpone
+    meaning: "\uC5F0\uAE30\uD558\uB2E4, \uBBF8\uB8E8\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_attend
+    english: attend
+    meaning: "\uCC38\uC11D\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_announce
+    english: announce
+    meaning: "\uBC1C\uD45C\uD558\uB2E4, \uC54C\uB9AC\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_hire
+    english: hire
+    meaning: "\uACE0\uC6A9\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_resign
+    english: resign
+    meaning: "\uC0AC\uC9C1\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_retire
+    english: retire
+    meaning: "\uC740\uD1F4\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_assign
+    english: assign
+    meaning: "\uBC30\uC815\uD558\uB2E4, \uB9E1\uAE30\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_supply
+    english: supply
+    meaning: "\uACF5\uAE09\uD558\uB2E4, \uACF5\uAE09"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_deliver
+    english: deliver
+    meaning: "\uBC30\uB2EC\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_install
+    english: install
+    meaning: "\uC124\uCE58\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_repair
+    english: repair
+    meaning: "\uC218\uB9AC\uD558\uB2E4, \uC218\uB9AC"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_replace
+    english: replace
+    meaning: "\uAD50\uCCB4\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_register
+    english: register
+    meaning: "\uB4F1\uB85D\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_renew
+    english: renew
+    meaning: "\uAC31\uC2E0\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_expire
+    english: expire
+    meaning: "\uB9CC\uB8CC\uB418\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_charge
+    english: charge
+    meaning: "(\uC694\uAE08\uC744) \uCCAD\uAD6C\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_fee
+    english: fee
+    meaning: "\uC218\uC218\uB8CC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_fare
+    english: fare
+    meaning: "(\uAD50\uD1B5) \uC694\uAE08"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_tax
+    english: tax
+    meaning: "\uC138\uAE08"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_loan
+    english: loan
+    meaning: "\uB300\uCD9C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_account
+    english: account
+    meaning: "\uACC4\uC88C, \uACC4\uC815"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_balance
+    english: balance
+    meaning: "\uC794\uC561, \uADE0\uD615"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_payment
+    english: payment
+    meaning: "\uC9C0\uBD88, \uB0A9\uBD80"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_deposit
+    english: deposit
+    meaning: "\uC608\uAE08, \uBCF4\uC99D\uAE08"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_withdraw
+    english: withdraw
+    meaning: "\uC778\uCD9C\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_transfer
+    english: transfer
+    meaning: "\uC774\uCCB4\uD558\uB2E4, \uC804\uADFC\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_vendor
+    english: vendor
+    meaning: "\uD310\uB9E4 \uC5C5\uCCB4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_supplier
+    english: supplier
+    meaning: "\uACF5\uAE09\uC5C5\uCCB4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_manufacturer
+    english: manufacturer
+    meaning: "\uC81C\uC870\uC5C5\uCCB4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_product
+    english: product
+    meaning: "\uC81C\uD488"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_sample
+    english: sample
+    meaning: "\uACAC\uBCF8"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_catalog
+    english: catalog
+    meaning: "\uC0C1\uD488 \uBAA9\uB85D"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_brochure
+    english: brochure
+    meaning: "\uC548\uB0B4 \uCC45\uC790"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_advertisement
+    english: advertisement
+    meaning: "\uAD11\uACE0"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_survey
+    english: survey
+    meaning: "\uC124\uBB38 \uC870\uC0AC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_feedback
+    english: feedback
+    meaning: "\uC758\uACAC, \uBC18\uC751"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_complaint
+    english: complaint
+    meaning: "\uBD88\uB9CC, \uD56D\uC758"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_policy
+    english: policy
+    meaning: "\uC815\uCC45, \uBC29\uCE68"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_requirement
+    english: requirement
+    meaning: "\uC694\uAD6C \uC0AC\uD56D"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_training
+    english: training
+    meaning: "\uAD50\uC721, \uC5F0\uC218"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_workshop
+    english: workshop
+    meaning: "\uC5F0\uC218\uD68C, \uC791\uC5C5\uC7A5"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_shift
+    english: shift
+    meaning: "\uAD50\uB300 \uADFC\uBB34"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_overtime
+    english: overtime
+    meaning: "\uCD08\uACFC \uADFC\uBB34"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_vacation
+    english: vacation
+    meaning: "\uD734\uAC00"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_benefit
+    english: benefit
+    meaning: "\uD61C\uD0DD, \uBCF5\uB9AC \uD6C4\uC0DD"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_pension
+    english: pension
+    meaning: "\uC5F0\uAE08"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_commute
+    english: commute
+    meaning: "\uD1B5\uADFC\uD558\uB2E4, \uD1B5\uADFC"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_luggage
+    english: luggage
+    meaning: "\uC9D0, \uC218\uD558\uBB3C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_departure
+    english: departure
+    meaning: "\uCD9C\uBC1C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_arrival
+    english: arrival
+    meaning: "\uB3C4\uCC29"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_destination
+    english: destination
+    meaning: "\uBAA9\uC801\uC9C0"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_boarding_pass
+    english: boarding pass
+    meaning: "\uD0D1\uC2B9\uAD8C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_delay
+    english: delay
+    meaning: "\uC9C0\uC5F0, \uBBF8\uB8E8\uB2E4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_reception
+    english: reception
+    meaning: "\uC811\uC218\uCC98, \uD658\uC601\uD68C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_facility
+    english: facility
+    meaning: "\uC2DC\uC124"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_equipment
+    english: equipment
+    meaning: "\uC7A5\uBE44, \uC124\uBE44"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_device
+    english: device
+    meaning: "\uC7A5\uCE58, \uAE30\uAE30"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_photocopier
+    english: photocopier
+    meaning: "\uBCF5\uC0AC\uAE30"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_supplies
+    english: supplies
+    meaning: "\uBE44\uD488, \uC6A9\uD488"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_stationery
+    english: stationery
+    meaning: "\uBB38\uAD6C\uB958"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_memo
+    english: memo
+    meaning: "\uD68C\uB78C, \uBA54\uBAA8"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_notice
+    english: notice
+    meaning: "\uACF5\uC9C0, \uD1B5\uC9C0"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_bulletin_board
+    english: bulletin board
+    meaning: "\uAC8C\uC2DC\uD310"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_extension
+    english: extension
+    meaning: "\uB0B4\uC120 \uBC88\uD638, \uC5F0\uC7A5"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_reminder
+    english: reminder
+    meaning: "\uC54C\uB9BC, \uB3C5\uCD09\uC7A5"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_estimate
+    english: estimate
+    meaning: "\uCD94\uC815, \uCD94\uC815\uD558\uB2E4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_quote
+    english: quote
+    meaning: "\uACAC\uC801, \uC778\uC6A9\uD558\uB2E4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_cost
+    english: cost
+    meaning: "\uBE44\uC6A9, \uAC12"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_reduce
+    english: reduce
+    meaning: "\uC904\uC774\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_increase
+    english: increase
+    meaning: "\uB298\uB9AC\uB2E4, \uC99D\uAC00"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_decline
+    english: decline
+    meaning: "\uAC10\uC18C, \uAC70\uC808\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_launch
+    english: launch
+    meaning: "\uCD9C\uC2DC\uD558\uB2E4, \uCD9C\uC2DC"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_expand
+    english: expand
+    meaning: "\uD655\uC7A5\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_compete
+    english: compete
+    meaning: "\uACBD\uC7C1\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_competitor
+    english: competitor
+    meaning: "\uACBD\uC7C1\uC0AC, \uACBD\uC7C1\uC790"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_market
+    english: market
+    meaning: "\uC2DC\uC7A5"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_demand
+    english: demand
+    meaning: "\uC218\uC694, \uC694\uAD6C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_industry
+    english: industry
+    meaning: "\uC0B0\uC5C5, \uC5C5\uACC4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_firm
+    english: firm
+    meaning: "\uD68C\uC0AC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_partner
+    english: partner
+    meaning: "\uB3D9\uC5C5\uC790, \uD611\uB825\uC0AC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_investor
+    english: investor
+    meaning: "\uD22C\uC790\uC790"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_intern
+    english: intern
+    meaning: "\uC778\uD134, \uC218\uC2B5 \uC9C1\uC6D0"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_task
+    english: task
+    meaning: "\uC5C5\uBB34, \uACFC\uC81C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_responsibility
+    english: responsibility
+    meaning: "\uCC45\uC784, \uC758\uBB34"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_position
+    english: position
+    meaning: "\uC9C1\uC704, \uC790\uB9AC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_vacancy
+    english: vacancy
+    meaning: "\uACF5\uC11D, \uBE48\uBC29"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_reference
+    english: reference
+    meaning: "\uCD94\uCC9C\uC11C, \uCC38\uACE0"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_recommend
+    english: recommend
+    meaning: "\uCD94\uCC9C\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_evaluate
+    english: evaluate
+    meaning: "\uD3C9\uAC00\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_performance
+    english: performance
+    meaning: "\uC131\uACFC, \uC2E4\uC801"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_efficient
+    english: efficient
+    meaning: "\uD6A8\uC728\uC801\uC778"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_available
+    english: available
+    meaning: "\uC774\uC6A9 \uAC00\uB2A5\uD55C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_reliable
+    english: reliable
+    meaning: "\uBBFF\uC744 \uB9CC\uD55C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_convenient
+    english: convenient
+    meaning: "\uD3B8\uB9AC\uD55C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_affordable
+    english: affordable
+    meaning: "\uAC00\uACA9\uC774 \uC54C\uB9DE\uC740"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_urgent
+    english: urgent
+    meaning: "\uAE34\uAE09\uD55C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_temporary
+    english: temporary
+    meaning: "\uC784\uC2DC\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_permanent
+    english: permanent
+    meaning: "\uC601\uAD6C\uC801\uC778, \uC815\uADDC\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_annual
+    english: annual
+    meaning: "\uC5F0\uAC04\uC758, \uB9E4\uB144\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_upcoming
+    english: upcoming
+    meaning: "\uB2E4\uAC00\uC624\uB294"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_previous
+    english: previous
+    meaning: "\uC774\uC804\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_additional
+    english: additional
+    meaning: "\uCD94\uAC00\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: biz_financial
+    english: financial
+    meaning: "\uC7AC\uC815\uC758, \uAE08\uC735\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 

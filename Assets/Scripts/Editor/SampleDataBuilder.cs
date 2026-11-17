@@ -515,6 +515,7 @@ namespace WordRPG.EditorTools
             SetExitsIfMismatch(forestPath, (junglePath, 1, forestPath), (meadowPath, 1, null));
             SetExitsIfMismatch(junglePath, (cavePath, 0, junglePath), (forestPath, 0, null)); // 동굴은 빈칸두꺼비 뒤 (#233 사용자: 열쇠보다 동굴을 먼저 가게 됨)
             SetExitsIfMismatch(cavePath, (junglePath, 0, null));
+            BuildCourses();
 
             AssetDatabase.SaveAssets();
             GameDatabaseBuilder.Refresh();
@@ -964,6 +965,45 @@ namespace WordRPG.EditorTools
 
         // 원본 맵에 새 칸(added 글자들)이 생겼을 때: 에셋의 맵이 그 칸만 빼고 원본과 같으면 원본으로 바꾼다 (#80 숲의 정글 출입구 D)
         // 말을 잃어 가는 사람들 (#209, GDD 9-10). 맵의 N·n을 위→아래, 왼→오른 순서로 채움
+        // 처음에 고르는 외울 단어장 (#273 사용자, GDD 9-12): 수능·내신 = 지역의 기본 단어장 그대로,
+        // 비즈니스·의학 용어 = Words/Courses의 CSV (Claude가 고르고 뜻을 씀 → 사용자 검수 — 시판 단어장·학원 자료는 쓰지 않음, GDD 11-2).
+        // courseId는 세이브에 적힘 — 출시 뒤 바꾸지 말 것. 이름·설명·예시 단어는 고르는 화면(Figma '단어장 고르기 (#273)')
+        [MenuItem("WordRPG/Data/Build Word Courses")]
+        public static void BuildCourses()
+        {
+            const string words = Root + "/Words/";
+            WordDatabase Book(string path)
+            {
+                var book = AssetDatabase.LoadAssetAtPath<WordDatabase>(path + ".asset");
+                if (book == null && File.Exists(path + ".csv")) book = WordRPG.EditorTools.WordCsvImporter.Import(path + ".csv");
+                return book;
+            }
+            var common = Book(words + "tier1_common");
+            var advanced = Book(words + "tier2_advanced");
+            Course("suneung", "수능·내신 영단어", "교과서·수능에 나오는 기본 영단어", 1, new[] { "access", "choice", "evidence" });
+            Course("business", "비즈니스 영단어", "회사·업무에서 자주 쓰는 영어", 2, new[] { "biz_invoice", "biz_deadline", "biz_negotiate" },
+                new CourseBook(common, Book(words + "Courses/business_tier1")), new CourseBook(advanced, Book(words + "Courses/business_tier2")));
+            Course("medical", "의학 용어", "병원·의학 공부에 나오는 영어 용어", 3, new[] { "med_fever", "med_artery", "med_diagnosis" },
+                new CourseBook(common, Book(words + "Courses/medical_tier1")), new CourseBook(advanced, Book(words + "Courses/medical_tier2")));
+            AssetDatabase.SaveAssets();
+            GameDatabaseBuilder.Refresh(); // 세이브의 단어장 id → 에셋
+        }
+
+        private static void Course(string id, string name, string summary, int order, string[] samples, params CourseBook[] books)
+        {
+            string folder = Root + "/Courses";
+            if (!AssetDatabase.IsValidFolder(folder)) AssetDatabase.CreateFolder(Root, "Courses");
+            string path = $"{folder}/{id}.asset";
+            var course = AssetDatabase.LoadAssetAtPath<WordCourse>(path);
+            if (course == null)
+            {
+                course = ScriptableObject.CreateInstance<WordCourse>();
+                AssetDatabase.CreateAsset(course, path);
+            }
+            course.Configure(id, name, summary, order, samples, books);
+            EditorUtility.SetDirty(course);
+        }
+
         private static void BuildNpcs(string meadowPath, string libraryPath, string forestPath, string junglePath, string cavePath)
         {
             FieldArea Load(string path) => AssetDatabase.LoadAssetAtPath<FieldArea>(path);

@@ -59,7 +59,7 @@
      `FieldScreen.HeroSetup`, 1.0 세이브도). `Hero.Rename`(규칙 `HeroNames`: 한글·영어·숫자 8글자)·`SetLook`, 그림은 `PlayerArt.SetLook`.
      이름 뒤 조사는 꼭 `UiKit.WithJosa` (플레이어가 지은 이름이라 받침이 정해져 있지 않음)
    - 업데이트 안내 (#115): `UpdateNotices`(세이브 칸 notices) — 예전 세이브로 켠 사람(= 업데이트한 사람)만 타이틀에서 한 번 (`TitleScreen.ShowUpdateNotice`,
-     `ConfirmDialog.ShowNotice` [확인] 하나). 새 게임은 모두 본 것으로 시작, 튜토리얼과 따로. 다음 업데이트 안내는 `UpdateNotices.All` 맨 뒤에 새 id로 (지금 1.2 동굴 · 1.3 인물 #213 — 이스터에그는 안내에 쓰지 않음)
+     `ConfirmDialog.ShowNotice` [확인] 하나). 새 게임은 모두 본 것으로 시작, 튜토리얼과 따로. 다음 업데이트 안내는 `UpdateNotices.All` 맨 뒤에 새 id로 (지금 1.2 동굴 · 1.3 인물 #213 · 1.4 단어장 고르기 #273 — 이스터에그는 안내에 쓰지 않음)
    - 말을 잃어 가는 사람들 = NPC (#209, GDD 9-10): 맵 글자 N(바닥)·n(잔디) = 서는 자리 (칸 종류는 바닥·잔디, `FieldMap.NpcSpots`), FieldArea `npcs`를 맵 순서로. 데이터 `NpcData`(npcId, 출시 뒤 바꾸지 말 것) + 단계 `NpcStage`(조건 = 보스 처치·찾은 단어 수 → 말·움직임·빠르기 `pace` #211 — 1 = 보통, 성격에 맞게), 규칙 `NpcLines`·`NpcMotion`(순수), 화면 `FieldNpcs`·`FieldScreen.Npcs`. 세이브 칸 없음.
      그림 Art/NinjaAdventure/Npcs/{npcId}.png (import_ninja_art.py NPC_SHEETS). 대사는 말풍선 한두 줄, 목표·보상·빨간 점 없음 (사용자). 데이터 기준 = `SampleDataBuilder.BuildNpcs`.
      인물 컷씬 (#234 숲 나무꾼): NpcData `entryLines`(그 지역에 처음 들어오면 달려와 알려 줌) · `bossThanksLines`·`exitCallLines`·`exitStoryLines`(보스 뒤 보스가 연 길 옆에서 배웅 — 주인공이 한 칸 뒤따라 같이 걸어감 `WalkTogether` #245) → `FieldScreen.Cutscenes`, 한 번만 = WorldState 이벤트. 대사를 기다리는 코루틴은 `WaitLine`(시간이 다 되거나 [확인]으로 다음 줄 #245 사용자 — 부르는 쪽은 그동안 `transitioning`을 켜서 [확인]이 옆 물건을 누르지 않게 #251)
@@ -76,6 +76,12 @@
      정식판 특전 (#233): GameDatabase `fullVersionGift`(호기심 물약 3 · 특제 상처약 5) → `FullVersionGift.Claim` 세이브마다 한 번(WorldState 이벤트), 정식판이면 가방 > 주인공 [모습 바꾸기] (`FieldScreen.ChangeLook`).
      앱 버전(PlayerSettings.bundleVersion)은 앱스토어 버전과 같아야 함 (지금 앱스토어 = **1.3** — 2026-11-11 출시 #263, 심사 코드 태그 v1.3-build7. **다음 = 1.4 고침 패치(#271 사용자: 호기심 물약 보스전·큰 보스 [확인]·달려드는 몸짓·두꺼비 소리 #265~#270) — 앱 버전 1.4, 가지 `release-1.4`, 빌드 번호 1부터**. 1.3 고침은 가지 `release-1.3` — #212 사용자: 1.4로 나누지 않고 NPC·상점까지 1.3에. 가지는 내기 전과 2.0 코드를 넣기 전에 main까지 올림, 앱 버전 1.3 (#221 — AI 곡 포함, 사용자 결정). **1.2 고침은 가지 `release-1.2`**(태그 v1.2-build3에서 뜸 #164)에서. **1.1 출시·고침은 가지 `release-1.1`**에서 빌드하고
      고친 것은 main에도 합침 — main에서 1.1을 빌드하지 말 것. 1.0 심사 코드는 태그 v1.0-build3, 1.0을 고쳐 다시 내야 하면 그 태그에서 가지를 땀). 지원·개인정보 웹 페이지 = `gh-pages` 브랜치 (작업메모)
+   - **외울 단어장 고르기** (#273, 1.4 — GDD 9-12): 새 게임에서 한 번(입장 영상 뒤·모습 앞 `FieldScreen.ChooseCourse` → `CourseSelectView`, Figma '단어장 고르기 (#273)'), 나중에 바꾸지 않음 (사용자).
+     데이터 `WordCourse`(courseId suneung·business·medical — 출시 뒤 바꾸지 말 것, GameDatabase `courses`) = 기본 단어장 → 대신 쓰는 단어장 `CourseBook`.
+     지역의 단어는 `WordDatabase.Words`가 `WordCourses.Active`를 보고 바꿔 줌 (전투·도감·보스 문·사전·석판·수련 모두 그대로 따라감) — 에셋 자체 단어는 `OwnWords`(누군가의 기록 문장).
+     Active는 GameSession이 정함 (만들거나 불러오면 기본부터, `ChooseCourse`) — 테스트에서 바꾸면 TearDown에서 null로. 세이브 칸 course (빈 값 = 안 고름, 예전 세이브는 불러올 때 수능·내신).
+     단어 = `Assets/Data/Words/Courses/{business|medical}_tier{1|2}.csv` (id 앞글자 biz_·med_, 기본 단어장과 같은 수 150·300 — WordCourseTests). Claude가 고르고 뜻을 씀 → 사용자 검수 (시판 단어장·학원 자료는 넣지 않음, GDD 11-2).
+     만들기 = `WordRPG > Data > Build Word Courses` (Create Sample Data에도 포함). 'TOEIC·토익'은 화면에 쓰지 않음 (상표)
    - 새 단어장은 regionId·regionName·도감 보상 `rewards`(`DexReward` 한 줄 = 보상 id·이름·징표(종류 Keepsake)·골드·wordsNeeded(0 = 다 채웠을 때)·storyOrder(징표 진열장 순서) — #147. 보상 id는 세이브에 적히니 출시 뒤 바꾸지 말 것)를 지정해야 함 (RegionDataTests가 검사)
    - 수련용 허수아비는 MonsterSpecies `trainingDummy`(맞아도 HP 그대로, 기술 없음) — 게임에 하나, 출현표에 넣지 말 것 (TrainingTests)
    - 필드 맵은 FieldArea의 글자 맵 (GDD 7·9장). 상자 수 = 내용물 수, 출입구 수 = 연결 수(서로 왕복), B ↔ 보스 지정,

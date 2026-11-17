@@ -222,8 +222,10 @@ namespace WordRPG.Tests
             var database = AssetDatabase.LoadAssetAtPath<GameDatabase>("Assets/Data/GameDatabase.asset");
             var seen = new HashSet<string>();
             var rewardIds = new HashSet<string>();
+            var courseBooks = WordCourseTests.CourseBooks(); // 고른 단어장의 단어만 담은 에셋(#273)은 지역 도감이 아님
             var books = AssetDatabase.FindAssets("t:WordDatabase", new[] { "Assets/Data" })
-                .Select(g => AssetDatabase.LoadAssetAtPath<WordDatabase>(AssetDatabase.GUIDToAssetPath(g))).ToList();
+                .Select(g => AssetDatabase.LoadAssetAtPath<WordDatabase>(AssetDatabase.GUIDToAssetPath(g)))
+                .Where(b => !courseBooks.Contains(b)).ToList();
             Assert.Greater(books.Count, 0);
 
             foreach (var book in books)
@@ -259,8 +261,10 @@ namespace WordRPG.Tests
         public void KeepsakeShelfFollowsTheStory()
         {
             var database = AssetDatabase.LoadAssetAtPath<GameDatabase>("Assets/Data/GameDatabase.asset");
+            var courseBooks = WordCourseTests.CourseBooks(); // 고른 단어장의 단어만 담은 에셋(#273)은 지역 도감이 아님
             var books = AssetDatabase.FindAssets("t:WordDatabase", new[] { "Assets/Data" })
-                .Select(g => AssetDatabase.LoadAssetAtPath<WordDatabase>(AssetDatabase.GUIDToAssetPath(g))).ToList();
+                .Select(g => AssetDatabase.LoadAssetAtPath<WordDatabase>(AssetDatabase.GUIDToAssetPath(g)))
+                .Where(b => !courseBooks.Contains(b)).ToList();
             var rewards = books.SelectMany(b => b.Rewards).ToList();
             Assert.AreEqual(rewards.Count, rewards.Select(r => r.StoryOrder).Distinct().Count(), "storyOrder가 겹침");
 

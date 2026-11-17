@@ -24,8 +24,14 @@ namespace WordRPG.Tests
         private const string Map = "#########\n#,,,,,,B#\n#.......#\n#P......#\n#########";
 
         private int saves;
+        private FieldArea createdArea;
 
-        private FieldScreen CreateField(GameSession session, bool intro = false, float encounterRate = 1f, int minSteps = 0, bool tutorials = true)
+        [TearDown]
+        public void ResetCourse() => WordCourses.Active = null;
+
+        // courses: 단어장 고르기를 시험할 때 — 이 지역의 단어장을 대신할 단어장들 (#273). 없으면 GameDatabase 없이 (= 기본 단어장으로 바로)
+        private FieldScreen CreateField(GameSession session, bool intro = false, float encounterRate = 1f, int minSteps = 0, bool tutorials = true,
+            System.Func<WordDatabase, WordCourse[]> courses = null)
         {
             var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
             var enemy = TestData.Species("slime", new MonsterStats(8, 1, 1), new MonsterStats(0, 0, 0), bite).Set("displayName", "잉크 슬라임");
@@ -39,8 +45,16 @@ namespace WordRPG.Tests
                 .Set("areaId", "library").Set("displayName", "잊혀진 서고").Set("map", Map)
                 .Set("encounters", table).Set("words", words).Set("boss", new BossEncounter(king, 3))
                 .Set("encounterRate", encounterRate).Set("minStepsBetweenEncounters", minSteps);
+            GameDatabase database = null;
+            if (courses != null)
+            {
+                database = ScriptableObject.CreateInstance<GameDatabase>();
+                database.ReplaceContents(new MonsterSpecies[0], new Items.ItemData[0], new[] { area }, null, null, courses(words));
+            }
             var field = new GameObject("HeroSetupFieldUnderTest").AddComponent<FieldScreen>();
-            field.Configure(area, session, () => saves++, step: 0.05f, animScale: 0.01f, tutorials: tutorials, setup: true, intro: intro);
+            field.Configure(area, session, () => saves++, step: 0.05f, animScale: 0.01f, gameDatabase: database, tutorials: tutorials,
+                setup: true, intro: intro);
+            createdArea = area;
             return field;
         }
 
@@ -86,7 +100,7 @@ namespace WordRPG.Tests
             Assert.IsFalse(again.CharacterSelect.IsOpen);
             int before = saves;
             ActiveButton(again.transform, "IntroSkipButton").onClick.Invoke();
-            yield return WaitFor(() => again.CharacterSelect.IsOpen, 2f);
+            yield return WaitFor(() => again.CharacterSelect != null && again.CharacterSelect.IsOpen, 2f);
             Assert.IsTrue(again.CharacterSelect.IsOpen, "영상 뒤 모습 고르기");
             Assert.IsTrue(old.Tutorials.Has(TutorialProgress.Intro));
             Assert.Greater(saves, before, "본 기록을 바로 저장 (모습을 고르기 전에 꺼도 다시 안 나오게)");
@@ -119,6 +133,62 @@ namespace WordRPG.Tests
             Assert.IsFalse(fourth.Intro.IsOpen, "본 영상은 다시 안 나옴");
             Assert.IsFalse(fourth.IsHeroSetupRunning);
             Object.Destroy(fourth.gameObject);
+            yield return null;
+        }
+
+        // #273 사용자: 처음 시작 화면에서 외울 단어장을 고름 (입장 영상 뒤 · 모습 고르기 앞, 한 번만). 확인 창에서 [다시 고르기]·뒤로가기 = 다시 고름
+        [UnityTest]
+        public IEnumerator NewGameChoosesTheWordCourseBeforeTheLook()
+        {
+            WordCourse Course(string id, string name, int order, params CourseBook[] books)
+            {
+                var course = ScriptableObject.CreateInstance<WordCourse>();
+                course.Configure(id, name, name + " 설명", order, new[] { id == "suneung" ? TestData.SampleWords()[0].Id : "biz_2" }, books);
+                return course;
+            }
+            WordDatabase business = null;
+            var session = NewSession();
+            var field = CreateField(session, courses: words =>
+            {
+                business = ScriptableObject.CreateInstance<WordDatabase>();
+                business.ReplaceWords(Enumerable.Range(1, 12).Select(i => new WordEntry("biz_" + i, "deal" + i, "거래 " + i, "n")));
+                return new[] { Course("suneung", "수능·내신 영단어", 1), Course("business", "비즈니스 영단어", 2, new CourseBook(words, business)) };
+            });
+            yield return WaitFor(() => field.CourseSelect != null && field.CourseSelect.IsOpen, 2f);
+            Assert.IsTrue(field.CourseSelect.IsOpen, "새 게임은 단어장부터");
+            Assert.IsFalse(field.CharacterSelect.IsOpen, "단어장을 고른 뒤 모습");
+            Assert.IsTrue(field.IsPanelOpen);
+            Assert.AreEqual("suneung", field.CourseSelect.Selected.CourseId, "처음엔 맨 위 단어장");
+            StringAssert.Contains("단어 12개", ActiveButton(field.transform, "CourseCard_business").GetComponentsInChildren<UnityEngine.UI.Text>()
+                .Select(t => t.text).Aggregate((a, b) => a + "|" + b), "카드에 그 단어장의 단어 수");
+
+            ActiveButton(field.transform, "CourseCard_business").onClick.Invoke();
+            Assert.AreEqual("business", field.CourseSelect.Selected.CourseId);
+            ActiveButton(field.transform, "CourseStartButton").onClick.Invoke();
+            Assert.IsTrue(field.CourseSelect.Dialog.IsOpen, "나중에 바꿀 수 없어서 한 번 더 묻는다");
+            StringAssert.Contains("비즈니스 영단어로 시작할까요?", field.CourseSelect.Dialog.TitleText);
+            field.HandleBack();
+            Assert.IsFalse(field.CourseSelect.Dialog.IsOpen, "뒤로가기 = 다시 고르기");
+            Assert.IsTrue(field.CourseSelect.IsOpen, "고르는 화면은 그대로");
+            Assert.IsTrue(session.NeedsCourseChoice);
+
+            int before = saves;
+            ActiveButton(field.transform, "CourseStartButton").onClick.Invoke();
+            ActiveButton(field.CourseSelect.Dialog.Root.transform, "DialogConfirmButton").onClick.Invoke(); // 필드의 다른 확인 창들과 이름이 같음
+            yield return WaitFor(() => field.CharacterSelect.IsOpen, 2f);
+            Assert.IsFalse(field.CourseSelect.IsOpen);
+            Assert.IsTrue(field.CharacterSelect.IsOpen, "그다음 모습 고르기");
+            Assert.AreEqual("business", session.CourseId);
+            Assert.Greater(saves, before, "고르자마자 저장");
+            Assert.AreEqual("biz_1", createdArea.Words.Words[0].Id, "지역의 단어 = 고른 단어장");
+            Object.Destroy(field.gameObject);
+            yield return null;
+
+            // 다시 켜도 묻지 않음
+            var again = CreateField(session, courses: words => new[] { Course("suneung", "수능·내신 영단어", 1) });
+            yield return WaitFor(() => again.CharacterSelect != null && again.CharacterSelect.IsOpen, 2f);
+            Assert.IsFalse(again.CourseSelect.IsOpen, "고른 사람은 다시 묻지 않음");
+            Object.Destroy(again.gameObject);
             yield return null;
         }
 

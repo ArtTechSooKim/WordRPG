@@ -266,7 +266,10 @@ namespace WordRPG.Tests
             StringAssert.Contains("말을 잃어 가는 사람들이 나타났습니다!", AllText(dialog));
             StringAssert.DoesNotContain("동굴", AllText(dialog));
             FindButton(dialog, "DialogConfirmButton").onClick.Invoke();
-            Assert.IsFalse(title.IsDialogOpen, "새 안내 하나로 끝");
+            Assert.IsTrue(title.IsDialogOpen, "이어서 1.4 단어장 고르기 안내 (#273)");
+            StringAssert.Contains("외울 단어장을 고를 수 있어요", AllText(dialog));
+            FindButton(dialog, "DialogConfirmButton").onClick.Invoke();
+            Assert.IsFalse(title.IsDialogOpen, "새 안내 둘로 끝");
             Object.Destroy(title.gameObject);
             yield return null;
         }
@@ -302,6 +305,9 @@ namespace WordRPG.Tests
             CollectionAssert.Contains(system.Load().Data.Notices, UpdateNotices.People.Id);
             FindButton(root, "TapToStart").onClick.Invoke();
             Assert.IsNull(started, "두 번째 안내가 떠 있는 동안에도 시작하지 않음");
+            FindButton(dialog, "DialogConfirmButton").onClick.Invoke();
+            Assert.IsTrue(title.IsDialogOpen, "그다음 1.4 단어장 고르기 안내 (#273)");
+            CollectionAssert.Contains(system.Load().Data.Notices, UpdateNotices.Courses.Id);
             FindButton(dialog, "DialogConfirmButton").onClick.Invoke();
             Assert.IsFalse(title.IsDialogOpen);
             FindButton(root, "TapToStart").onClick.Invoke();

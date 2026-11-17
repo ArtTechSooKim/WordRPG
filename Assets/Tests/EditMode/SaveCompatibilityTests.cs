@@ -161,6 +161,8 @@ namespace WordRPG.Tests
             updater.Notices.Mark(UpdateNotices.Cave.Id);
             Assert.AreSame(UpdateNotices.People, updater.Notices.NextUnseen(), "동굴 안내 다음에 1.3 안내");
             updater.Notices.Mark(UpdateNotices.People.Id);
+            Assert.AreSame(UpdateNotices.Courses, updater.Notices.NextUnseen(), "그다음 1.4 단어장 고르기 안내 (#273)");
+            updater.Notices.Mark(UpdateNotices.Courses.Id);
             updater.Tutorials.Clear();
             Assert.IsNull(updater.Notices.NextUnseen(), "튜토리얼 다시 보기로 안내가 다시 뜨지 않음");
             Assert.IsNull(Load(JsonUtility.ToJson(updater.ToSaveData(Now))).Notices.NextUnseen(), "본 기록은 세이브에");
@@ -174,6 +176,8 @@ namespace WordRPG.Tests
             var loaded = GameSession.FromSaveData(data, Database(), HeroData());
             Assert.AreSame(UpdateNotices.People, loaded.Notices.NextUnseen());
             loaded.Notices.Mark(UpdateNotices.People.Id);
+            Assert.AreSame(UpdateNotices.Courses, loaded.Notices.NextUnseen(), "1.4 단어장 고르기 안내 (#273)");
+            loaded.Notices.Mark(UpdateNotices.Courses.Id);
             Assert.IsNull(loaded.Notices.NextUnseen());
 
             Assert.AreEqual("update_1_2_cave", UpdateNotices.Cave.Id, "출시된 id는 바꾸지 않음");

@@ -556,7 +556,12 @@ namespace WordRPG.UI
                 battle.HandleBack();
                 return;
             }
-            if (transitioning || preemptView.IsOpen || heroSetupRunning) return; // 모습·이름 고르기는 끝까지 (#124)
+            if (courseSelect != null && courseSelect.Dialog.IsOpen)
+            {
+                courseSelect.Dialog.Hide(); // 단어장 확인 창 = [다시 고르기] (#273)
+                return;
+            }
+            if (transitioning || preemptView.IsOpen || heroSetupRunning) return; // 단어장·모습·이름 고르기는 끝까지 (#124)
             if (characterSelect.IsOpen && characterSelect.CanCancel)
             {
                 characterSelect.Cancel(); // 가방에서 연 모습 바꾸기 (#233)

@@ -28,13 +28,15 @@ namespace WordRPG.Game
         public static bool Has(WordDatabase book, Inventory inventory) =>
             book != null && book.Journal != null && inventory != null && inventory.GetCount(book.Journal) > 0;
 
-        // 기록에 들어가는 줄을 기록 순서로. 예문만 있는 단어는 빠진다. '찾음' = 도감과 같은 기준
+        // 기록에 들어가는 줄을 기록 순서로. 예문만 있는 단어는 빠진다. '찾음' = 도감과 같은 기준.
+        // 문장은 늘 이 단어장 자신의 단어(수능·내신 예문)로 쓴 이야기 — 다른 단어장을 골랐으면(#273) 그 단어장에서 찾은 단어 수만큼 앞에서부터 읽힘
         public static List<JournalLine> Lines(WordDatabase book, VocabularyProgress vocabulary)
         {
-            return book.Words.Where(word => word.Story > 0)
-                .OrderBy(word => word.Story)
-                .Select(word => new JournalLine(word, vocabulary.GetLevel(word.Id) > MasteryLevel.New))
-                .ToList();
+            var story = book.OwnWords.Where(word => word.Story > 0).OrderBy(word => word.Story).ToList();
+            if (ReferenceEquals(book.Words, book.OwnWords))
+                return story.Select(word => new JournalLine(word, vocabulary.GetLevel(word.Id) > MasteryLevel.New)).ToList();
+            int found = book.Words.Count(word => vocabulary.GetLevel(word.Id) > MasteryLevel.New);
+            return story.Select((word, i) => new JournalLine(word, i < found)).ToList();
         }
 
         // 문장에서 그 단어가 처음 나오는 자리 (낱말 전체로, 대소문자 무시). 없으면 start = -1

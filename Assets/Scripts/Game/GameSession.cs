@@ -55,6 +55,19 @@ namespace WordRPG.Game
         public PotionEffects Effects { get; private set; } = new PotionEffects();       // 효과 물약이 남긴 효과 (#146)
         public IReadOnlyList<string> LoadWarnings => loadWarnings;
 
+        // 처음에 고른 외울 단어장 (#273, GDD 9-12). 빈 id = 아직 안 고름(새 게임) → 필드에서 한 번 고르는 화면. 고른 뒤엔 바꾸지 않음
+        public string CourseId { get; private set; } = "";
+        public WordCourse Course { get; private set; } // null = 기본 단어장(수능·내신) 그대로
+        public bool NeedsCourseChoice => string.IsNullOrEmpty(CourseId);
+
+        // 단어장을 정한다: 지역의 단어가 바로 이 단어장의 것으로 (WordCourses.Active). null = 수능·내신
+        public void ChooseCourse(WordCourse course)
+        {
+            Course = course;
+            CourseId = course != null ? course.CourseId : WordCourses.DefaultId;
+            WordCourses.Active = course;
+        }
+
         // 연속 정답 수 (전투 콤보). 전투가 끝나도 이어지지만 세이브에는 넣지 않는다 — 게임을 다시 켜면 0부터
         public int ComboStreak { get; set; }
 
@@ -87,6 +100,7 @@ namespace WordRPG.Game
             Vocabulary = vocabulary;
             Record = record;
             World = world;
+            WordCourses.Active = null; // 게임은 한 번에 하나 — 새로 만든(불러온) 세션은 기본 단어장부터, 고른 단어장은 ChooseCourse가 정함
         }
 
         // level을 안 주면 HeroData의 시작 레벨. 시작 성유물을 가지고(앞에서부터 끼운 채로) 시작한다.
@@ -242,7 +256,7 @@ namespace WordRPG.Game
             return new SaveData(nowUtc, new HeroSaveData(Hero.Level, Hero.Exp, Hero.CurrentHp), relics,
                     Inventory, Vocabulary, Record, World).WithSkillSlots(skills, Hero.BasicSeatSlot?.Key).WithTutorials(Tutorials.Seen)
                 .WithNotices(Notices.Seen).WithCompanions(savedCompanions, PartyCompanion?.Data.CompanionId).WithHeroLook(Hero.CustomName, Hero.LookId)
-                .WithPotionEffects(Effects.NewWordsLeft, Effects.QuietStepsLeft);
+                .WithPotionEffects(Effects.NewWordsLeft, Effects.QuietStepsLeft).WithCourse(CourseId);
         }
 
         // 세이브에 있는 성유물을 찾을 수 없으면(삭제·id 변경) 빼고 경고를 남긴다. 성유물이 하나도 없으면 시작 성유물로 채운다.
@@ -302,12 +316,31 @@ namespace WordRPG.Game
             session.Tutorials = new TutorialProgress(data.Tutorials);
             session.Notices = new UpdateNotices(data.Notices);
             session.Effects = new PotionEffects(data.NewWordsLeft, data.QuietStepsLeft);
+            RestoreCourse(session, data, database, warnings);
             RestoreCompanions(session, data, database, warnings);
             session.loadWarnings.AddRange(warnings);
             if (database != null)
                 foreach (var area in database.Areas)
                     if (area != null) BossGate.DiscardUsedKey(area, session); // 예전 세이브에 남은 다 쓴 열쇠 (#147)
             return session;
+        }
+
+        // 단어장 (#273): 1.3까지의 세이브엔 칸이 없음 → 이미 하던 세이브(단어를 만났거나·싸웠거나·모습을 정함)는 수능·내신,
+        // 막 만든 세이브(고르는 화면에서 앱을 끔)는 빈 채로 → 다시 고름. 모르는 id(더 새 버전의 단어장)는 id를 지키고 기본 단어로
+        private static void RestoreCourse(GameSession session, SaveData data, GameDatabase database, List<string> warnings)
+        {
+            string id = data.Course;
+            bool started = data.Vocabulary.Entries.Count > 0 || data.Record.BattlesFought > 0 || !string.IsNullOrEmpty(data.HeroLook);
+            if (string.IsNullOrEmpty(id))
+            {
+                if (!started) return;
+                id = WordCourses.DefaultId;
+            }
+            var course = database != null ? database.FindCourse(id) : null;
+            if (course == null && id != WordCourses.DefaultId) warnings.Add($"세이브의 단어장 '{id}'를 찾을 수 없어 기본 단어로 합니다");
+            session.Course = course;
+            session.CourseId = id;
+            WordCourses.Active = course;
         }
 
         // 동료 (#77): 찾을 수 없는 동료는 빼고 경고. 쓰러진 채 저장됐으면 회복한 것으로 (주인공과 같은 규칙)

@@ -135,6 +135,9 @@ namespace WordRPG.Save
         // 효과 물약이 남긴 효과 (#146, 1.2 — 예전 세이브엔 없음 → 0 = 효과 없음)
         [SerializeField] private int newWordsLeft;
         [SerializeField] private int quietStepsLeft;
+        // 처음에 고른 외울 단어장 id (#273, 1.4 — WordCourse.courseId). 예전 세이브엔 없음 → 빈 문자열:
+        // 이미 하던 세이브는 불러올 때 수능·내신(WordCourses.DefaultId), 막 만든 세이브는 아직 안 고름
+        [SerializeField] private string course = "";
 
         public int Version => version;
         public DateTime SavedAtUtc => new DateTime(savedAtTicks, DateTimeKind.Utc);
@@ -156,8 +159,15 @@ namespace WordRPG.Save
         public string HeroLook => heroLook ?? "";
         public int NewWordsLeft => newWordsLeft;
         public int QuietStepsLeft => quietStepsLeft;
+        public string Course => course ?? "";
 
         public SaveData() { }
+
+        public SaveData WithCourse(string courseId)
+        {
+            course = courseId ?? "";
+            return this;
+        }
 
         public SaveData WithTutorials(IEnumerable<string> ids)
         {
