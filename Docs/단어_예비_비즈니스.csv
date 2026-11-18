@@ -1,0 +1,2152 @@
+id,english,meaning,pos,example,example_meaning,group
+biz_attorney,attorney,"변호사, 대리인",n,,,법·계약
+biz_chair,chair,의장을 맡다,v,,,업무 동사
+biz_cross_sell,cross-sell,관련 상품을 함께 팔다,v,,,마케팅·판매
+biz_operating_system,operating system,운영 체제,n,,,정보 기술
+biz_reference_number,reference number,참조 번호,n,,,사무·회의
+biz_target_market,target market,목표 시장,n,,,마케팅·판매
+biz_word_of_mouth,word of mouth,입소문,n,,,마케팅·판매
+biz_roll_call,roll call,출석 점검,n,,,사무·회의
+biz_wake_up_call,wake-up call,모닝콜,n,,,출장·여행·호텔
+biz_chief_executive,chief executive,최고 경영자,n,,,직업·업종
+biz_exchange_rate,exchange rate,환율,n,,,금융·은행
+biz_income_statement,income statement,손익 계산서,n,,,회계·세금
+biz_letter_of_credit,letter of credit,신용장,n,,,마케팅·판매
+biz_platform,platform,"승강장, 연단",n,,,출장·여행·호텔
+biz_travel_insurance,travel insurance,여행자 보험,n,,,출장·여행·호텔
+biz_value_added_tax,value-added tax,부가 가치세,n,,,회계·세금
+biz_background_check,background check,신원 조회,n,,,인사·채용
+biz_balance_due,balance due,"잔금, 미지불액",n,,,회계·세금
+biz_duty_free,duty-free,면세의,adj,,,물류·제조
+biz_job_description,job description,직무 기술서,n,,,인사·채용
+biz_pay_raise,pay raise,임금 인상,n,,,인사·채용
+biz_foreign_exchange,foreign exchange,외환,n,,,경제
+biz_two_factor,two-factor,이중 인증의,adj,,,정보 기술
+biz_approximately,approximately,"대략, 거의",adv,,,업무 부사
+biz_distribution,distribution,"유통, 분배",n,,,물류·제조
+biz_labor_force,labor force,"노동력, 노동 인구",n,,,경제
+biz_phase,phase,"단계, 국면",n,,,업무 명사
+biz_purchase_order,purchase order,구매 주문서,n,,,물류·제조
+biz_vice_president,vice president,"부사장, 부통령",n,,,인사·채용
+biz_down_payment,down payment,"계약금, 착수금",n,,,금융·은행
+biz_minimum_order,minimum order,최소 주문량,n,,,물류·제조
+biz_ministry,ministry,"(정부의) 부처, 성직",n,,,직업·업종
+biz_novel,novel,"새로운, 참신한",adj,,,업무 형용사
+biz_operating_cost,operating cost,운영비,n,,,회계·세금
+biz_pop_up_store,pop-up store,임시 매장,n,,,마케팅·판매
+biz_tech_support,tech support,기술 지원,n,,,정보 기술
+biz_travel_agency,travel agency,여행사,n,,,출장·여행·호텔
+biz_operations_manager,operations manager,운영 관리자,n,,,직업·업종
+biz_public_relations,public relations,"홍보, 대외 관계",n,,,마케팅·판매
+biz_bear_market,bear market,약세장,n,,,금융·은행
+biz_credit_score,credit score,신용 점수,n,,,금융·은행
+biz_machine_learning,machine learning,기계 학습,n,,,정보 기술
+biz_net_worth,net worth,"순자산, 자산 가치",n,,,금융·은행
+biz_public_sector,public sector,공공 부문,n,,,직업·업종
+biz_sales_target,sales target,판매 목표,n,,,마케팅·판매
+biz_chief_financial_officer,chief financial officer,최고 재무 책임자,n,,,직업·업종
+biz_developing_country,developing country,개발 도상국,n,,,경제
+biz_labor_union,labor union,노동조합,n,,,인사·채용
+biz_security_guard,security guard,경비원,n,,,직업·업종
+biz_data_entry,data entry,데이터 입력,n,,,정보 기술
+biz_dress_code,dress code,복장 규정,n,,,인사·채용
+biz_fixed_cost,fixed cost,고정비,n,,,회계·세금
+biz_fixed_term,fixed-term,기간이 정해진,adj,,,인사·채용
+biz_gift_card,gift card,기프트 카드,n,,,고객 서비스
+biz_one_way_ticket,one-way ticket,편도 승차권,n,,,출장·여행·호텔
+biz_resolution,resolution,"결의안, 해결",n,,,업무 명사
+biz_stock_exchange,stock exchange,증권 거래소,n,,,금융·은행
+biz_travel_agent,travel agent,여행사 직원,n,,,출장·여행·호텔
+biz_brand_image,brand image,브랜드 이미지,n,,,마케팅·판매
+biz_display_case,display case,진열장,n,,,마케팅·판매
+biz_on_time_delivery,on-time delivery,정시 배송,n,,,물류·제조
+biz_user_account,user account,사용자 계정,n,,,정보 기술
+biz_accurate,accurate,정확한,adj,,,업무 형용사
+biz_insurance_agent,insurance agent,보험 설계사,n,,,직업·업종
+biz_last_mile,last mile,최종 배송 구간,n,,,물류·제조
+biz_opposition,opposition,"반대, 상대측",n,,,업무 명사
+biz_production_capacity,production capacity,생산 능력,n,,,물류·제조
+biz_sales_volume,sales volume,판매량,n,,,마케팅·판매
+biz_scheme,scheme,"계획, 책략",n,,,업무 명사
+biz_time_frame,time frame,기간,n,,,사무·회의
+biz_ad_campaign,ad campaign,광고 캠페인,n,,,마케팅·판매
+biz_assembly_line,assembly line,조립 라인,n,,,물류·제조
+biz_customer_service,customer service,고객 서비스,n,,,고객 서비스
+biz_customer_support,customer support,고객 지원,n,,,고객 서비스
+biz_exclusive,exclusive,"독점적인, 배타적인",adj,,,마케팅·판매
+biz_foot_traffic,foot traffic,"유동 인구, 방문객 수",n,,,마케팅·판매
+biz_mining,mining,"광업, 채광",n,,,물류·제조
+biz_premier,premier,"최고의, 최초의",adj,,,업무 형용사
+biz_career_path,career path,"진로, 경력 경로",n,,,인사·채용
+biz_legislation,legislation,"법률 제정, 법률",n,,,법·계약
+biz_net_income,net income,순소득,n,,,회계·세금
+biz_operating_income,operating income,영업 이익,n,,,회계·세금
+biz_private_sector,private sector,민간 부문,n,,,직업·업종
+biz_sales_figures,sales figures,판매 실적,n,,,마케팅·판매
+biz_shared_drive,shared drive,공유 드라이브,n,,,정보 기술
+biz_tour_guide,tour guide,관광 안내원,n,,,출장·여행·호텔
+biz_expansion,expansion,"확장, 팽창",n,,,업무 명사
+biz_rent_free,rent-free,집세가 없는,adj,,,업무 명사
+biz_trade_route,trade route,교역로,n,,,경제
+biz_parent_company,parent company,모회사,n,,,경영·전략
+biz_reference_letter,reference letter,추천서,n,,,인사·채용
+biz_reform,reform,개혁,n,,,업무 명사
+biz_regional_manager,regional manager,지역 관리자,n,,,직업·업종
+biz_cost_cutting,cost-cutting,비용 절감,n,,,금융·은행
+biz_credit_limit,credit limit,신용 한도,n,,,금융·은행
+biz_debut,debut,"데뷔, 첫 등장",n,,,업무 명사
+biz_loan_officer,loan officer,대출 담당 직원,n,,,직업·업종
+biz_principal,principal,"원금, 교장",n,,,금융·은행
+biz_service_representative,service representative,서비스 담당 직원,n,,,고객 서비스
+biz_vote_of_confidence,vote of confidence,신임 투표,n,,,사무·회의
+biz_double_entry,double-entry,복식 부기의,adj,,,회계·세금
+biz_kitchen_staff,kitchen staff,주방 직원,n,,,출장·여행·호텔
+biz_tie_in,tie-in,연계 상품,n,,,마케팅·판매
+biz_window_seat,window seat,창가 좌석,n,,,출장·여행·호텔
+biz_chain_store,chain store,체인점,n,,,경영·전략
+biz_cold_chain,cold chain,저온 유통 체계,n,,,물류·제조
+biz_convention,convention,"대회, 관습",n,,,사무·회의
+biz_crisis_management,crisis management,위기관리,n,,,업무 명사
+biz_editor_in_chief,editor-in-chief,편집장,n,,,직업·업종
+biz_equivalent,equivalent,"동등한, 맞먹는",adj,,,업무 형용사
+biz_action_item,action item,실행 항목,n,,,사무·회의
+biz_contemporary,contemporary,"현대의, 동시대의",adj,,,업무 형용사
+biz_extensive,extensive,"광범위한, 대규모의",adj,,,업무 형용사
+biz_hard_hat,hard hat,안전모,n,,,물류·제조
+biz_settlement,settlement,"합의, 정착",n,,,법·계약
+biz_cash_flow,cash flow,현금 흐름,n,,,회계·세금
+biz_customer_base,customer base,고객층,n,,,마케팅·판매
+biz_data_driven,data-driven,데이터에 기반한,adj,,,마케팅·판매
+biz_partnership,partnership,"동업, 협력 관계",n,,,업무 명사
+biz_primarily,primarily,"주로, 첫째로",adv,,,업무 부사
+biz_storage_space,storage space,저장 공간,n,,,정보 기술
+biz_format,format,"형식, 판형",n,,,업무 명사
+biz_grace_period,grace period,유예 기간,n,,,업무 명사
+biz_market_driven,market-driven,시장 주도형의,adj,,,마케팅·판매
+biz_recognition,recognition,"인정, 인식",n,,,업무 명사
+biz_retail_price,retail price,소매가,n,,,마케팅·판매
+biz_duty_free_shop,duty-free shop,면세점,n,,,출장·여행·호텔
+biz_fine_print,fine print,작은 글씨의 세부 조항,n,,,법·계약
+biz_interior_design,interior design,실내 장식,n,,,부동산·시설
+biz_server,server,"서버, 서빙하는 사람",n,,,정보 기술
+biz_transition,transition,"전환, 과도기",n,,,업무 명사
+biz_administrative,administrative,"행정의, 관리의",adj,,,인사·채용
+biz_deputy_director,deputy director,부국장,n,,,업무 명사
+biz_enforcement,enforcement,"집행, 시행",n,,,법·계약
+biz_facility_manager,facility manager,시설 관리자,n,,,부동산·시설
+biz_gross,gross,"총, 총액의",adj,,,회계·세금
+biz_respectively,respectively,각각,adv,,,업무 부사
+biz_exposure,exposure,"노출, 폭로",n,,,업무 명사
+biz_marketing_mix,marketing mix,마케팅 믹스,n,,,마케팅·판매
+biz_mobile_payment,mobile payment,모바일 결제,n,,,정보 기술
+biz_parking_lot,parking lot,주차장,n,,,부동산·시설
+biz_screen_sharing,screen sharing,화면 공유,n,,,정보 기술
+biz_unique_selling_point,unique selling point,독특한 판매 강점,n,,,마케팅·판매
+biz_assembly_plant,assembly plant,조립 공장,n,,,물류·제조
+biz_branch_manager,branch manager,지점장,n,,,직업·업종
+biz_clock_in,clock in,출근 시간을 기록하다,v,,,인사·채용
+biz_commitment,commitment,"헌신, 약속",n,,,업무 명사
+biz_confident,confident,자신감 있는,adj,,,업무 형용사
+biz_net_profit,net profit,순이익,n,,,회계·세금
+biz_software_update,software update,소프트웨어 업데이트,n,,,정보 기술
+biz_window_shopping,window-shopping,아이쇼핑,n,,,마케팅·판매
+biz_cash_register,cash register,금전 등록기,n,,,금융·은행
+biz_convention_center,convention center,컨벤션 센터,n,,,사무·회의
+biz_storage_unit,storage unit,창고 칸,n,,,부동산·시설
+biz_supply_chain,supply chain,공급망,n,,,경제
+biz_wealth_management,wealth management,재산 관리,n,,,금융·은행
+biz_bureau,bureau,"사무국, 국",n,,,직업·업종
+biz_code_of_conduct,code of conduct,행동 강령,n,,,인사·채용
+biz_name_tag,name tag,이름표,n,,,사무·회의
+biz_alliance,alliance,"동맹, 제휴",n,,,업무 명사
+biz_file_sharing,file sharing,파일 공유,n,,,정보 기술
+biz_frequently_asked_questions,frequently asked questions,자주 묻는 질문,n,,,고객 서비스
+biz_ownership,ownership,"소유, 소유권",n,,,업무 명사
+biz_proof_of_purchase,proof of purchase,구매 증빙,n,,,고객 서비스
+biz_recall,recall,(제품을) 회수하다,v,,,물류·제조
+biz_drop_shipping,drop shipping,직배송,n,,,물류·제조
+biz_manufacturing_plant,manufacturing plant,제조 공장,n,,,물류·제조
+biz_raw_material,raw material,원자재,n,,,경제
+biz_red_tape,red tape,불필요한 형식 절차,n,,,경영·전략
+biz_subsequent,subsequent,"그다음의, 차후의",adj,,,업무 형용사
+biz_time_sheet,time sheet,근무 시간 기록표,n,,,인사·채용
+biz_amendment,amendment,"개정, 수정안",n,,,법·계약
+biz_board_of_directors,board of directors,이사회,n,,,인사·채용
+biz_hence,hence,"그러므로, 지금부터",adv,,,업무 부사
+biz_living_wage,living wage,생활 임금,n,,,경제
+biz_cutting_edge,cutting-edge,최첨단의,adj,,,업무 형용사
+biz_fraud,fraud,"사기, 사기꾼",n,,,법·계약
+biz_legacy,legacy,"유산, 업적",n,,,업무 명사
+biz_price_tag,price tag,가격표,n,,,마케팅·판매
+biz_publishing,publishing,"출판, 출판업",n,,,물류·제조
+biz_ratio,ratio,비율,n,,,업무 명사
+biz_resort,resort,"휴양지, 리조트",n,,,출장·여행·호텔
+biz_savings_account,savings account,저축 예금 계좌,n,,,금융·은행
+biz_spin_off,spin-off,"분사, 파생 상품",n,,,경영·전략
+biz_checking_account,checking account,당좌 예금 계좌,n,,,금융·은행
+biz_consent,consent,"동의, 허락",n,,,업무 명사
+biz_delivery_driver,delivery driver,배달 기사,n,,,직업·업종
+biz_self_employed,self-employed,자영업의,adj,,,직업·업종
+biz_user_friendly,user-friendly,사용하기 쉬운,adj,,,정보 기술
+biz_banking,banking,은행업,n,,,금융·은행
+biz_competitive_edge,competitive edge,경쟁 우위,n,,,마케팅·판매
+biz_studio_apartment,studio apartment,원룸 아파트,n,,,부동산·시설
+biz_credit_rating,credit rating,신용 등급,n,,,금융·은행
+biz_personnel_file,personnel file,인사 기록 카드,n,,,인사·채용
+biz_rally,rally,"결집하다, 회복하다",v,,,업무 동사
+biz_fleet,fleet,"함대, 차량 무리",n,,,물류·제조
+biz_foster,foster,"육성하다, 위탁 양육하다",v,,,업무 동사
+biz_residential,residential,"주거의, 주택지의",adj,,,부동산·시설
+biz_revenue_stream,revenue stream,수익원,n,,,회계·세금
+biz_sales_pitch,sales pitch,판매 권유,n,,,마케팅·판매
+biz_substantial,substantial,"상당한, 실질적인",adj,,,업무 형용사
+biz_data_privacy,data privacy,개인 정보 보호,n,,,정보 기술
+biz_e_commerce,e-commerce,전자 상거래,n,,,정보 기술
+biz_legislative,legislative,입법의,adj,,,법·계약
+biz_listing,listing,"(주식) 상장, 목록",n,,,금융·은행
+biz_mortgage_rate,mortgage rate,주택 담보 대출 금리,n,,,부동산·시설
+biz_ongoing,ongoing,진행 중인,adj,,,업무 형용사
+biz_punch_in,punch in,출근 카드를 찍다,v,,,인사·채용
+biz_remote_access,remote access,원격 접속,n,,,정보 기술
+biz_contract_worker,contract worker,계약직 근로자,n,,,인사·채용
+biz_domain,domain,"분야, 영역",n,,,업무 명사
+biz_dynamic,dynamic,역동적인,adj,,,업무 형용사
+biz_footage,footage,"장면, 화면",n,,,업무 명사
+biz_implementation,implementation,"시행, 이행",n,,,업무 명사
+biz_maintenance_schedule,maintenance schedule,정비 일정,n,,,물류·제조
+biz_outstanding_balance,outstanding balance,미결제 잔액,n,,,회계·세금
+biz_registered_mail,registered mail,등기 우편,n,,,사무·회의
+biz_terminal,terminal,"터미널, 말기의",n,,,출장·여행·호텔
+biz_consumer_confidence,consumer confidence,소비자 신뢰,n,,,경제
+biz_fire_exit,fire exit,화재 비상구,n,,,부동산·시설
+biz_hardware,hardware,"하드웨어, 철물",n,,,정보 기술
+biz_leave_of_absence,leave of absence,휴직,n,,,인사·채용
+biz_sales_associate,sales associate,판매 사원,n,,,직업·업종
+biz_summit,summit,"정상 회담, 정상",n,,,사무·회의
+biz_brand_awareness,brand awareness,브랜드 인지도,n,,,마케팅·판매
+biz_bull_market,bull market,강세장,n,,,금융·은행
+biz_carrier,carrier,"운송 회사, 보균자",n,,,물류·제조
+biz_customer_representative,customer representative,고객 담당 직원,n,,,직업·업종
+biz_discount_rate,discount rate,할인율,n,,,업무 명사
+biz_execution,execution,"실행, 처형",n,,,업무 명사
+biz_framework,framework,"틀, 체계",n,,,업무 명사
+biz_interaction,interaction,"상호 작용, 교류",n,,,업무 명사
+biz_online_banking,online banking,인터넷 뱅킹,n,,,정보 기술
+biz_collaboration,collaboration,"협력, 공동 작업",n,,,업무 명사
+biz_consumer_goods,consumer goods,소비재,n,,,마케팅·판매
+biz_reward_points,reward points,적립 포인트,n,,,마케팅·판매
+biz_safety_regulation,safety regulation,안전 규정,n,,,물류·제조
+biz_specialist,specialist,전문가,n,,,업무 명사
+biz_self_sufficient,self-sufficient,자급자족하는,adj,,,업무 형용사
+biz_spare_part,spare part,예비 부품,n,,,물류·제조
+biz_vessel,vessel,"선박, 혈관",n,,,물류·제조
+biz_classified,classified,"기밀의, 분류된",adj,,,법·계약
+biz_gross_profit,gross profit,매출 총이익,n,,,회계·세금
+biz_intervention,intervention,"개입, 중재",n,,,업무 명사
+biz_mainstream,mainstream,"주류, 대세",n,,,업무 명사
+biz_scope,scope,"범위, 영역",n,,,업무 명사
+biz_segment,segment,"부분, 계층",n,,,마케팅·판매
+biz_virtually,virtually,"사실상, 가상으로",adv,,,업무 부사
+biz_blue_chip,blue chip,우량주,n,,,금융·은행
+biz_currency_exchange,currency exchange,환전,n,,,출장·여행·호텔
+biz_delivery_fee,delivery fee,배달료,n,,,출장·여행·호텔
+biz_fiscal_year,fiscal year,회계 연도,n,,,회계·세금
+biz_minimum_wage,minimum wage,최저 임금,n,,,경제
+biz_repeat_customer,repeat customer,단골 고객,n,,,마케팅·판매
+biz_web_designer,web designer,웹 디자이너,n,,,직업·업종
+biz_wire_transfer,wire transfer,전신 송금,n,,,금융·은행
+biz_balance_sheet,balance sheet,대차 대조표,n,,,회계·세금
+biz_conversion,conversion,"전환, 개조",n,,,업무 명사
+biz_cost_accounting,cost accounting,원가 회계,n,,,회계·세금
+biz_diverse,diverse,다양한,adj,,,업무 형용사
+biz_exclusively,exclusively,"오로지, 독점적으로",adv,,,마케팅·판매
+biz_intellectual_property,intellectual property,지적 재산,n,,,법·계약
+biz_municipal,municipal,"시의, 지방 자치의",adj,,,직업·업종
+biz_treasury,treasury,"국고, 재무부",n,,,금융·은행
+biz_coalition,coalition,"연합, 연립",n,,,업무 명사
+biz_gross_revenue,gross revenue,총수입,n,,,회계·세금
+biz_regulatory,regulatory,"규제의, 단속의",adj,,,경제
+biz_subsequently,subsequently,"그 후에, 나중에",adv,,,업무 부사
+biz_tracking_number,tracking number,운송장 번호,n,,,물류·제조
+biz_usage,usage,"사용, 사용량",n,,,업무 명사
+biz_integration,integration,"통합, 융합",n,,,업무 명사
+biz_integrity,integrity,"진실성, 온전함",n,,,업무 명사
+biz_legitimate,legitimate,"합법적인, 정당한",adj,,,법·계약
+biz_market_segment,market segment,시장 세분화 집단,n,,,마케팅·판매
+biz_permit,permit,허가증,n,,,법·계약
+biz_productive,productive,생산적인,adj,,,업무 형용사
+biz_utility_bill,utility bill,공과금 고지서,n,,,부동산·시설
+biz_assembly_worker,assembly worker,조립공,n,,,직업·업종
+biz_backup,backup,"예비, 백업",n,,,정보 기술
+biz_cloud_storage,cloud storage,클라우드 저장소,n,,,정보 기술
+biz_fiscal_policy,fiscal policy,재정 정책,n,,,경제
+biz_highlight,highlight,가장 중요한 부분,n,,,업무 명사
+biz_serial_number,serial number,일련번호,n,,,물류·제조
+biz_trade_dispute,trade dispute,무역 분쟁,n,,,경제
+biz_vulnerable,vulnerable,취약한,adj,,,업무 형용사
+biz_work_permit,work permit,취업 허가증,n,,,인사·채용
+biz_distinguished,distinguished,"저명한, 기품 있는",adj,,,업무 형용사
+biz_emergency_exit,emergency exit,"비상구, 비상 출구",n,,,부동산·시설
+biz_expense_report,expense report,경비 보고서,n,,,회계·세금
+biz_in_transit,in transit,운송 중인,adj,,,물류·제조
+biz_letter_of_intent,letter of intent,의향서,n,,,사무·회의
+biz_listing_agent,listing agent,매도 중개인,n,,,부동산·시설
+biz_patch,patch,"수정 프로그램, 헝겊 조각",n,,,정보 기술
+biz_security_deposit,security deposit,보증금,n,,,부동산·시설
+biz_square_footage,square footage,면적,n,,,부동산·시설
+biz_customs,customs,"세관, 관습",n,,,물류·제조
+biz_emphasis,emphasis,"강조, 중점",n,,,업무 명사
+biz_expense_account,expense account,접대비 계정,n,,,출장·여행·호텔
+biz_respective,respective,각각의,adj,,,업무 형용사
+biz_venture_capital,venture capital,벤처 자본,n,,,금융·은행
+biz_asset_management,asset management,자산 관리,n,,,금융·은행
+biz_capital_gains,capital gains,자본 이득,n,,,회계·세금
+biz_consecutive,consecutive,연속적인,adj,,,업무 형용사
+biz_factory_worker,factory worker,공장 노동자,n,,,직업·업종
+biz_maintenance_worker,maintenance worker,"정비공, 관리 직원",n,,,직업·업종
+biz_public_transit,public transit,대중교통,n,,,출장·여행·호텔
+biz_runner_up,runner-up,"2위, 차점자",n,,,업무 명사
+biz_suite,suite,"스위트룸, 한 벌",n,,,출장·여행·호텔
+biz_accounting_firm,accounting firm,회계 법인,n,,,직업·업종
+biz_approval_rating,approval rating,지지율,n,,,업무 명사
+biz_bulk_order,bulk order,대량 주문,n,,,물류·제조
+biz_gift_certificate,gift certificate,상품권,n,,,마케팅·판매
+biz_gross_domestic_product,gross domestic product,국내 총생산,n,,,경제
+biz_resolve,resolve,"해결하다, 결심하다",v,,,업무 동사
+biz_self_evaluation,self-evaluation,자기 평가,n,,,인사·채용
+biz_substitute,substitute,"대체하다, 대신하다",v,,,업무 동사
+biz_surveillance,surveillance,감시,n,,,정보 기술
+biz_testimony,testimony,"증언, 증거",n,,,법·계약
+biz_unemployment_rate,unemployment rate,실업률,n,,,경제
+biz_virtual_assistant,virtual assistant,가상 비서,n,,,정보 기술
+biz_counsel,counsel,"법률 고문, 조언",n,,,인사·채용
+biz_emerging_market,emerging market,신흥 시장,n,,,경제
+biz_installation,installation,"설치, 설비",n,,,업무 명사
+biz_mid_sized,mid-sized,중간 규모의,adj,,,마케팅·판매
+biz_mutual_fund,mutual fund,뮤추얼 펀드,n,,,금융·은행
+biz_user_manual,user manual,사용 설명서,n,,,고객 서비스
+biz_accomplished,accomplished,"뛰어난, 노련한",adj,,,업무 형용사
+biz_cargo_hold,cargo hold,화물칸,n,,,물류·제조
+biz_protocol,protocol,"규약, 의례",n,,,사무·회의
+biz_binding,binding,구속력 있는,adj,,,법·계약
+biz_compound_interest,compound interest,복리,n,,,금융·은행
+biz_conviction,conviction,"확신, 유죄 판결",n,,,업무 명사
+biz_duration,duration,지속 기간,n,,,업무 명사
+biz_justify,justify,정당화하다,v,,,업무 동사
+biz_loyalty_program,loyalty program,단골 고객 우대 제도,n,,,마케팅·판매
+biz_mason,mason,"석공, 벽돌공",n,,,부동산·시설
+biz_provision,provision,"조항, 공급",n,,,법·계약
+biz_courtesy,courtesy,"예의, 호의",n,,,사무·회의
+biz_damages,damages,손해 배상금,n,,,법·계약
+biz_joint_venture,joint venture,"합작 투자, 합작 회사",n,,,경영·전략
+biz_keen,keen,"열망하는, 예리한",adj,,,업무 형용사
+biz_profit_margin,profit margin,이익률,n,,,회계·세금
+biz_publisher,publisher,"출판사, 발행인",n,,,직업·업종
+biz_reportedly,reportedly,소문에 의하면,adv,,,업무 부사
+biz_adjacent,adjacent,"인접한, 가까운",adj,,,부동산·시설
+biz_banner,banner,"현수막, 배너",n,,,마케팅·판매
+biz_entity,entity,"독립체, 법인",n,,,업무 명사
+biz_excessive,excessive,"지나친, 과도한",adj,,,업무 형용사
+biz_interface,interface,"접속 장치, 인터페이스",n,,,정보 기술
+biz_paper_jam,paper jam,종이 걸림,n,,,사무·회의
+biz_pension_fund,pension fund,연금 기금,n,,,금융·은행
+biz_provisions,provisions,"식량, 대비",n,,,업무 명사
+biz_yield_rate,yield rate,수율,n,,,물류·제조
+biz_agenda_item,agenda item,안건,n,,,사무·회의
+biz_alternate,alternate,번갈아 하다,v,,,업무 동사
+biz_artificial_intelligence,artificial intelligence,인공 지능,n,,,정보 기술
+biz_compliance_officer,compliance officer,준법 감시인,n,,,법·계약
+biz_convert,convert,"전환하다, 개조하다",v,,,업무 동사
+biz_generic,generic,"일반적인, 상표 없는",adj,,,업무 형용사
+biz_legal_counsel,legal counsel,법률 고문,n,,,법·계약
+biz_minimal,minimal,"아주 적은, 최소의",adj,,,업무 형용사
+biz_overview,overview,개요,n,,,업무 명사
+biz_proportion,proportion,"비율, 균형",n,,,업무 명사
+biz_restoration,restoration,"복원, 회복",n,,,업무 명사
+biz_trade_barrier,trade barrier,무역 장벽,n,,,경제
+biz_array,array,"배열, 다수",n,,,업무 명사
+biz_booth,booth,"부스, 칸막이 공간",n,,,사무·회의
+biz_breakdown,breakdown,"내역, 고장",n,,,회계·세금
+biz_data_breach,data breach,정보 유출,n,,,정보 기술
+biz_fixed_asset,fixed asset,고정 자산,n,,,회계·세금
+biz_glass_ceiling,glass ceiling,유리 천장,n,,,인사·채용
+biz_inflation_rate,inflation rate,물가 상승률,n,,,경제
+biz_innovative,innovative,혁신적인,adj,,,업무 형용사
+biz_monetary,monetary,"통화의, 금전의",adj,,,경제
+biz_peer_review,peer review,동료 평가,n,,,인사·채용
+biz_seemingly,seemingly,겉보기에는,adv,,,업무 부사
+biz_bug_fix,bug fix,버그 수정,n,,,정보 기술
+biz_dairy,dairy,"유제품의, 낙농장",adj,,,물류·제조
+biz_influential,influential,영향력 있는,adj,,,업무 형용사
+biz_lease_agreement,lease agreement,임대차 계약,n,,,부동산·시설
+biz_slot,slot,"자리, 틈",n,,,업무 명사
+biz_surveillance_camera,surveillance camera,감시 카메라,n,,,정보 기술
+biz_tax_haven,tax haven,조세 피난처,n,,,회계·세금
+biz_thoroughly,thoroughly,철저히,adv,,,업무 부사
+biz_time_slot,time slot,시간대,n,,,사무·회의
+biz_variable_cost,variable cost,변동비,n,,,회계·세금
+biz_beneficial,beneficial,"유익한, 이로운",adj,,,업무 형용사
+biz_brand_loyalty,brand loyalty,브랜드 충성도,n,,,마케팅·판매
+biz_bubble_economy,bubble economy,거품 경제,n,,,경제
+biz_car_rental,car rental,자동차 대여,n,,,출장·여행·호텔
+biz_connecting_flight,connecting flight,연결 항공편,n,,,출장·여행·호텔
+biz_dynamics,dynamics,"역학, 원동력",n,,,업무 명사
+biz_fitting_room,fitting room,탈의실,n,,,마케팅·판매
+biz_inevitable,inevitable,불가피한,adj,,,업무 형용사
+biz_lodge,lodge,"(불만을) 제기하다, 묵다",v,,,업무 동사
+biz_merit,merit,"장점, 공로",n,,,인사·채용
+biz_overwhelming,overwhelming,압도적인,adj,,,업무 형용사
+biz_rental_car,rental car,렌터카,n,,,출장·여행·호텔
+biz_road_closure,road closure,도로 폐쇄,n,,,부동산·시설
+biz_rotation,rotation,"순환, 교대",n,,,업무 명사
+biz_safety_inspection,safety inspection,안전 점검,n,,,물류·제조
+biz_toll,toll,통행료,n,,,출장·여행·호텔
+biz_viral,viral,"입소문이 나는, 바이러스성의",adj,,,마케팅·판매
+biz_administrator,administrator,"관리자, 행정관",n,,,직업·업종
+biz_assumption,assumption,"가정, 추정",n,,,업무 명사
+biz_capability,capability,"능력, 역량",n,,,업무 명사
+biz_cash_cow,cash cow,"효자 상품, 돈줄",n,,,마케팅·판매
+biz_digital_wallet,digital wallet,전자 지갑,n,,,정보 기술
+biz_excellence,excellence,탁월함,n,,,업무 명사
+biz_inn,inn,여관,n,,,출장·여행·호텔
+biz_momentum,momentum,"탄력, 추진력",n,,,업무 명사
+biz_nomination,nomination,"지명, 추천",n,,,업무 명사
+biz_notable,notable,"주목할 만한, 유명한",adj,,,업무 형용사
+biz_ballot,ballot,"투표 용지, 무기명 투표",n,,,사무·회의
+biz_elaborate,elaborate,"자세히 말하다, 정교한",v,,,업무 동사
+biz_fire_drill,fire drill,소방 훈련,n,,,부동산·시설
+biz_merit_pay,merit pay,성과급,n,,,인사·채용
+biz_monetary_policy,monetary policy,통화 정책,n,,,경제
+biz_presumably,presumably,"아마, 짐작하건대",adv,,,업무 부사
+biz_price_fixing,price-fixing,가격 담합,n,,,경제
+biz_adequate,adequate,"충분한, 적절한",adj,,,업무 형용사
+biz_exceptional,exceptional,"이례적인, 뛰어난",adj,,,업무 형용사
+biz_overnight_delivery,overnight delivery,익일 배송,n,,,물류·제조
+biz_parking_garage,parking garage,주차 건물,n,,,부동산·시설
+biz_proceeds,proceeds,"수익금, 매상고",n,,,금융·은행
+biz_purchasing_power,purchasing power,구매력,n,,,경제
+biz_sophisticated,sophisticated,"정교한, 세련된",adj,,,업무 형용사
+biz_withdrawal,withdrawal,"인출, 철수",n,,,금융·은행
+biz_lineup,lineup,"구성, 진용",n,,,업무 명사
+biz_nonetheless,nonetheless,그럼에도 불구하고,adv,,,업무 부사
+biz_placement,placement,"배치, 취업 알선",n,,,인사·채용
+biz_workplace,workplace,"직장, 일터",n,,,업무 명사
+biz_cabin_crew,cabin crew,객실 승무원,n,,,출장·여행·호텔
+biz_customer_satisfaction,customer satisfaction,고객 만족,n,,,마케팅·판매
+biz_letter_of_recommendation,letter of recommendation,추천장,n,,,인사·채용
+biz_parking_permit,parking permit,주차 허가증,n,,,부동산·시설
+biz_remainder,remainder,나머지,n,,,업무 명사
+biz_sentiment,sentiment,"정서, 감정",n,,,업무 명사
+biz_supplement,supplement,"보충하다, 보충물",v,,,업무 동사
+biz_thereby,thereby,그렇게 함으로써,adv,,,업무 부사
+biz_threshold,threshold,"문턱, 기준점",n,,,업무 명사
+biz_trade_deficit,trade deficit,무역 적자,n,,,경제
+biz_transaction_fee,transaction fee,거래 수수료,n,,,업무 명사
+biz_verdict,verdict,"평결, 판결",n,,,법·계약
+biz_white_collar,white-collar,사무직의,adj,,,직업·업종
+biz_accommodate,accommodate,"수용하다, 편의를 도모하다",v,,,업무 동사
+biz_accordingly,accordingly,"그에 따라, 적절히",adv,,,업무 부사
+biz_algorithm,algorithm,"알고리즘, 연산 방식",n,,,정보 기술
+biz_audit_report,audit report,감사 보고서,n,,,회계·세금
+biz_badge,badge,"신분증, 배지",n,,,사무·회의
+biz_broadcasting,broadcasting,"방송, 방송업",n,,,물류·제조
+biz_convenience,convenience,"편리, 편의",n,,,업무 명사
+biz_enthusiasm,enthusiasm,"열정, 열의",n,,,업무 명사
+biz_extract,extract,"추출하다, 뽑다",v,,,업무 동사
+biz_flexibility,flexibility,"유연성, 융통성",n,,,업무 명사
+biz_gauge,gauge,"측정하다, 판단하다",v,,,업무 동사
+biz_machinery,machinery,"기계류, 기구",n,,,물류·제조
+biz_probability,probability,"가능성, 확률",n,,,업무 명사
+biz_data_analyst,data analyst,데이터 분석가,n,,,직업·업종
+biz_flip_chart,flip chart,넘김 차트,n,,,사무·회의
+biz_graphic_designer,graphic designer,그래픽 디자이너,n,,,직업·업종
+biz_guided_tour,guided tour,가이드 동반 관광,n,,,출장·여행·호텔
+biz_harassment,harassment,"괴롭힘, 희롱",n,,,인사·채용
+biz_loading_zone,loading zone,하역 구역,n,,,부동산·시설
+biz_notably,notably,"특히, 현저히",adv,,,업무 부사
+biz_petty_cash,petty cash,소액 현금,n,,,회계·세금
+biz_shelf_life,shelf life,"유통 기한, 저장 수명",n,,,물류·제조
+biz_transparent,transparent,"투명한, 명료한",adj,,,업무 형용사
+biz_upside,upside,"긍정적인 면, 장점",n,,,업무 명사
+biz_void,void,"무효의, 빈",adj,,,법·계약
+biz_voluntary,voluntary,자발적인,adj,,,업무 형용사
+biz_best_seller,best-seller,베스트셀러,n,,,마케팅·판매
+biz_blue_collar,blue-collar,육체노동의,adj,,,직업·업종
+biz_considerably,considerably,"상당히, 많이",adv,,,업무 부사
+biz_customer_oriented,customer-oriented,고객 지향적인,adj,,,마케팅·판매
+biz_disclosure,disclosure,"공개, 폭로",n,,,법·계약
+biz_holdings,holdings,"보유 자산, 보유 주식",n,,,금융·은행
+biz_interim,interim,"중간의, 임시의",adj,,,업무 형용사
+biz_loan_shark,loan shark,고리대금업자,n,,,금융·은행
+biz_pledge,pledge,"약속하다, 서약",v,,,업무 동사
+biz_recruitment,recruitment,"채용, 신규 모집",n,,,인사·채용
+biz_career_ladder,career ladder,승진 단계,n,,,인사·채용
+biz_cluster,cluster,"무리, 집단",n,,,업무 명사
+biz_consulting_firm,consulting firm,컨설팅 회사,n,,,직업·업종
+biz_denial,denial,"부인, 거부",n,,,업무 명사
+biz_dock,dock,"부두, 선창",n,,,물류·제조
+biz_facilitate,facilitate,"촉진하다, 용이하게 하다",v,,,업무 동사
+biz_financial_analyst,financial analyst,재무 분석가,n,,,직업·업종
+biz_instrumental,instrumental,중요한 역할을 하는,adj,,,업무 형용사
+biz_offset,offset,상쇄하다,v,,,업무 동사
+biz_speculation,speculation,"투기, 추측",n,,,금융·은행
+biz_upload,upload,"업로드하다, 올리다",v,,,정보 기술
+biz_archive,archive,"기록 보관소, 기록",n,,,업무 명사
+biz_compelling,compelling,"설득력 있는, 강력한",adj,,,업무 형용사
+biz_container_ship,container ship,컨테이너선,n,,,물류·제조
+biz_defendant,defendant,피고,n,,,법·계약
+biz_irrelevant,irrelevant,무관한,adj,,,업무 형용사
+biz_labor_intensive,labor-intensive,노동 집약적인,adj,,,업무 명사
+biz_porter,porter,"짐꾼, 수위",n,,,출장·여행·호텔
+biz_referendum,referendum,국민 투표,n,,,업무 명사
+biz_seasonal,seasonal,"계절적인, 제철의",adj,,,마케팅·판매
+biz_sequel,sequel,"속편, 후속",n,,,업무 명사
+biz_all_inclusive,all-inclusive,모든 것이 포함된,adj,,,마케팅·판매
+biz_certification,certification,"인증, 증명",n,,,법·계약
+biz_financial_advisor,financial advisor,재무 상담사,n,,,직업·업종
+biz_frontier,frontier,"미개척 분야, 국경",n,,,업무 명사
+biz_inclusive,inclusive,"포괄적인, 모두를 포함한",adj,,,인사·채용
+biz_mandate,mandate,"권한, 명령",n,,,법·계약
+biz_succession,succession,"계승, 연속",n,,,인사·채용
+biz_thereafter,thereafter,그 후에,adv,,,업무 부사
+biz_thorough,thorough,"철저한, 빈틈없는",adj,,,업무 형용사
+biz_architectural,architectural,"건축의, 건축학의",adj,,,부동산·시설
+biz_circular,circular,"회람, 전단",n,,,사무·회의
+biz_deadline_extension,deadline extension,마감 연장,n,,,사무·회의
+biz_dedication,dedication,"헌신, 전념",n,,,업무 명사
+biz_enforce,enforce,"시행하다, 강요하다",v,,,업무 동사
+biz_explicit,explicit,"명백한, 노골적인",adj,,,업무 형용사
+biz_explicitly,explicitly,명백하게,adv,,,업무 부사
+biz_fraction,fraction,"일부, 분수",n,,,업무 명사
+biz_integral,integral,"필수적인, 내장된",adj,,,업무 형용사
+biz_nominee,nominee,"지명된 사람, 후보",n,,,인사·채용
+biz_packaging,packaging,"포장, 포장재",n,,,물류·제조
+biz_protective_gear,protective gear,보호 장비,n,,,물류·제조
+biz_renowned,renowned,"유명한, 명성 있는",adj,,,업무 형용사
+biz_rule_of_thumb,rule of thumb,경험에서 얻은 법칙,n,,,경영·전략
+biz_spa,spa,"온천, 스파",n,,,출장·여행·호텔
+biz_spike,spike,"급증, 뾰족한 것",n,,,경제
+biz_substantially,substantially,"상당히, 대체로",adv,,,업무 부사
+biz_superb,superb,"최고의, 훌륭한",adj,,,업무 형용사
+biz_viable,viable,"실행 가능한, 성공할 수 있는",adj,,,경제
+biz_bargain,bargain,"흥정하다, 거래",v,,,업무 동사
+biz_depot,depot,"창고, 차고",n,,,물류·제조
+biz_distress,distress,"고통, 곤경",n,,,업무 명사
+biz_execute,execute,"실행하다, 처형하다",v,,,업무 동사
+biz_wholesale_price,wholesale price,도매가,n,,,마케팅·판매
+biz_aggregate,aggregate,"합계, 총액",n,,,업무 명사
+biz_consequently,consequently,"그 결과, 따라서",adv,,,업무 부사
+biz_motive,motive,"동기, 이유",n,,,업무 명사
+biz_optimal,optimal,최적의,adj,,,업무 형용사
+biz_prosecutor,prosecutor,"검사, 기소자",n,,,법·계약
+biz_recipient,recipient,"수령인, 수신자",n,,,사무·회의
+biz_simulation,simulation,모의실험,n,,,업무 명사
+biz_supervision,supervision,"감독, 관리",n,,,인사·채용
+biz_automotive,automotive,자동차의,adj,,,물류·제조
+biz_bundle,bundle,"묶음, 꾸러미",n,,,마케팅·판매
+biz_dial_in,dial in,전화로 접속하다,v,,,사무·회의
+biz_elimination,elimination,"제거, 탈락",n,,,업무 명사
+biz_file_clerk,file clerk,문서 정리원,n,,,직업·업종
+biz_litigation,litigation,"소송, 고소",n,,,법·계약
+biz_norm,norm,"표준, 규범",n,,,업무 명사
+biz_overtime_pay,overtime pay,초과 근무 수당,n,,,업무 명사
+biz_price_hike,price hike,가격 인상,n,,,마케팅·판매
+biz_readily,readily,"손쉽게, 기꺼이",adv,,,업무 부사
+biz_sustain,sustain,"지속하다, 유지하다",v,,,업무 동사
+biz_clearance_sale,clearance sale,재고 정리 할인,n,,,마케팅·판매
+biz_cloud_computing,cloud computing,클라우드 컴퓨팅,n,,,정보 기술
+biz_continental_breakfast,continental breakfast,간단한 아침 식사,n,,,출장·여행·호텔
+biz_delegation,delegation,"대표단, 위임",n,,,인사·채용
+biz_demographic,demographic,인구 통계학적인,adj,,,마케팅·판매
+biz_donor,donor,"기부자, 기증자",n,,,업무 명사
+biz_enrollment,enrollment,"등록, 입학",n,,,업무 명사
+biz_equity_stake,equity stake,지분,n,,,금융·은행
+biz_filing_cabinet,filing cabinet,서류 보관함,n,,,사무·회의
+biz_impose,impose,"부과하다, 강요하다",v,,,업무 동사
+biz_instruction_manual,instruction manual,"사용 설명서, 지침서",n,,,고객 서비스
+biz_junk_bond,junk bond,"정크 본드, 고위험 채권",n,,,금융·은행
+biz_lounge,lounge,"휴게실, 라운지",n,,,사무·회의
+biz_manuscript,manuscript,"원고, 필사본",n,,,업무 명사
+biz_nest_egg,nest egg,"비상금, 저축금",n,,,금융·은행
+biz_networking_event,networking event,인맥 쌓기 행사,n,,,인사·채용
+biz_notification,notification,"알림, 통지",n,,,사무·회의
+biz_outline,outline,개요를 서술하다,v,,,업무 동사
+biz_runway,runway,활주로,n,,,출장·여행·호텔
+biz_showcase,showcase,"선보이다, 진열장",v,,,마케팅·판매
+biz_warehouse_worker,warehouse worker,창고 직원,n,,,직업·업종
+biz_accountability,accountability,"책임, 의무",n,,,업무 명사
+biz_batch,batch,"한 묶음, 1회분",n,,,물류·제조
+biz_compliment,compliment,"칭찬, 찬사",n,,,업무 명사
+biz_coordinator,coordinator,"진행자, 조정자",n,,,인사·채용
+biz_deployment,deployment,"배치, 전개",n,,,업무 명사
+biz_offshore,offshore,"해외의, 연안의",adj,,,물류·제조
+biz_optional,optional,선택적인,adj,,,업무 형용사
+biz_overhead_cost,overhead cost,간접비,n,,,회계·세금
+biz_pioneer,pioneer,"개척자, 선구자",n,,,업무 명사
+biz_renewable,renewable,"재생 가능한, 갱신 가능한",adj,,,물류·제조
+biz_shortage,shortage,"부족, 모자람",n,,,업무 명사
+biz_subsidiary_company,subsidiary company,자회사,n,,,업무 명사
+biz_suburban,suburban,교외의,adj,,,부동산·시설
+biz_verbal,verbal,"구두의, 말의",adj,,,업무 형용사
+biz_advocacy,advocacy,"옹호, 지지",n,,,업무 명사
+biz_aftermath,aftermath,"여파, 후유증",n,,,업무 명사
+biz_batch_number,batch number,제조 번호,n,,,물류·제조
+biz_coordination,coordination,"조정, 협조",n,,,업무 명사
+biz_discretion,discretion,"재량, 신중함",n,,,업무 명사
+biz_elevation,elevation,"승격, 고도",n,,,업무 명사
+biz_inevitably,inevitably,불가피하게,adv,,,업무 부사
+biz_opt_out,opt-out,"탈퇴, 거부",n,,,업무 명사
+biz_reservoir,reservoir,"저장소, 저수지",n,,,업무 명사
+biz_scrap,scrap,폐기하다,v,,,업무 동사
+biz_shuttle,shuttle,"셔틀, 왕복 운행",n,,,출장·여행·호텔
+biz_transparency,transparency,투명성,n,,,업무 명사
+biz_vet,vet,면밀히 검토하다,v,,,경영·전략
+biz_adverse,adverse,"불리한, 해로운",adj,,,업무 형용사
+biz_alumni,alumni,"졸업생들, 동문",n,,,업무 명사
+biz_heir,heir,상속인,n,,,금융·은행
+biz_liable,liable,법적 책임이 있는,adj,,,법·계약
+biz_retail_outlet,retail outlet,소매점,n,,,마케팅·판매
+biz_solidarity,solidarity,"연대, 결속",n,,,업무 명사
+biz_time_consuming,time-consuming,시간이 많이 걸리는,adj,,,업무 명사
+biz_workforce_planning,workforce planning,인력 계획,n,,,인사·채용
+biz_adjustment,adjustment,"조정, 적응",n,,,업무 명사
+biz_bubble_wrap,bubble wrap,"뽁뽁이, 기포 포장재",n,,,물류·제조
+biz_credibility,credibility,신뢰성,n,,,업무 명사
+biz_haul,haul,"운반하다, 끌다",v,,,물류·제조
+biz_hospitality_industry,hospitality industry,"서비스업, 접객업",n,,,업무 명사
+biz_metric,metric,"측정 기준, 지표",n,,,회계·세금
+biz_proximity,proximity,"근접, 가까움",n,,,업무 명사
+biz_utilities_company,utilities company,공익 기업,n,,,물류·제조
+biz_billboard,billboard,옥외 광고판,n,,,마케팅·판매
+biz_database_administrator,database administrator,데이터베이스 관리자,n,,,정보 기술
+biz_economist,economist,경제학자,n,,,직업·업종
+biz_hiring_freeze,hiring freeze,채용 동결,n,,,인사·채용
+biz_hypothesis,hypothesis,가설,n,,,업무 명사
+biz_legally_binding,legally binding,법적 구속력이 있는,adj,,,법·계약
+biz_maturity,maturity,"(어음의) 만기, 성숙",n,,,금융·은행
+biz_promotional,promotional,"홍보의, 판촉의",adj,,,마케팅·판매
+biz_repeal,repeal,폐지하다,v,,,법·계약
+biz_abundance,abundance,"풍부, 다수",n,,,업무 명사
+biz_autonomy,autonomy,"자율성, 자치",n,,,업무 명사
+biz_booking,booking,예약,n,,,출장·여행·호텔
+biz_cooperative,cooperative,협동조합,n,,,업무 명사
+biz_correspondent,correspondent,"특파원, 통신원",n,,,사무·회의
+biz_mindset,mindset,사고방식,n,,,업무 명사
+biz_nonprofit,nonprofit,"비영리 단체, 비영리의",n,,,업무 명사
+biz_penalty_clause,penalty clause,위약 조항,n,,,마케팅·판매
+biz_prestigious,prestigious,"명망 있는, 일류의",adj,,,업무 형용사
+biz_prompt,prompt,"즉각적인, 신속한",adj,,,고객 서비스
+biz_relay,relay,전달하다,v,,,업무 동사
+biz_taxpayer,taxpayer,납세자,n,,,회계·세금
+biz_arbitrary,arbitrary,"임의적인, 제멋대로인",adj,,,업무 형용사
+biz_clarify,clarify,분명히 하다,v,,,업무 동사
+biz_compilation,compilation,"편집, 모음집",n,,,업무 명사
+biz_constitute,constitute,"구성하다, 설립하다",v,,,업무 동사
+biz_fiscal_deficit,fiscal deficit,재정 적자,n,,,회계·세금
+biz_lengthy,lengthy,"너무 긴, 장황한",adj,,,업무 형용사
+biz_niche,niche,"틈새, 틈새시장",n,,,마케팅·판매
+biz_packing_slip,packing slip,포장 명세서,n,,,물류·제조
+biz_proposition,proposition,"제의, 명제",n,,,업무 명사
+biz_spam_filter,spam filter,스팸 차단기,n,,,정보 기술
+biz_timely,timely,시기적절한,adj,,,업무 형용사
+biz_trade_surplus,trade surplus,무역 흑자,n,,,경제
+biz_word_processor,word processor,워드 프로세서,n,,,사무·회의
+biz_angel_investor,angel investor,엔젤 투자자,n,,,직업·업종
+biz_boarding_gate,boarding gate,탑승구,n,,,출장·여행·호텔
+biz_bracket,bracket,"계층, 괄호",n,,,업무 명사
+biz_customs_declaration,customs declaration,세관 신고서,n,,,출장·여행·호텔
+biz_economies_of_scale,economies of scale,규모의 경제,n,,,경제
+biz_futures,futures,"선물, 선물 거래",n,,,금융·은행
+biz_letter_opener,letter opener,편지 칼,n,,,사무·회의
+biz_promptly,promptly,"즉시, 정각에",adv,,,고객 서비스
+biz_renewal,renewal,"갱신, 재개",n,,,법·계약
+biz_steadily,steadily,꾸준히,adv,,,업무 부사
+biz_convey,convey,"전달하다, 운반하다",v,,,업무 동사
+biz_differential,differential,"차이, 격차",n,,,업무 명사
+biz_livestock,livestock,가축,n,,,물류·제조
+biz_oversight,oversight,"감독, 실수",n,,,업무 명사
+biz_ramp_up,ramp up,"늘리다, 증가시키다",v,,,업무 동사
+biz_startup,startup,"신생 기업, 시작",n,,,업무 명사
+biz_statute,statute,"법령, 규칙",n,,,법·계약
+biz_straightforward,straightforward,"간단한, 솔직한",adj,,,업무 형용사
+biz_telecommunications,telecommunications,원거리 통신,n,,,물류·제조
+biz_value_proposition,value proposition,가치 제안,n,,,마케팅·판매
+biz_collectively,collectively,"집합적으로, 공동으로",adv,,,업무 부사
+biz_consolidated,consolidated,"연결의, 통합된",adj,,,회계·세금
+biz_coordinate,coordinate,"조정하다, 편성하다",v,,,업무 동사
+biz_decree,decree,"법령, 명령",n,,,업무 명사
+biz_deliberate,deliberate,"숙고하다, 고의적인",v,,,사무·회의
+biz_inadequate,inadequate,불충분한,adj,,,업무 형용사
+biz_premise,premise,"전제, 구내",n,,,업무 명사
+biz_redemption,redemption,"상환, 구원",n,,,업무 명사
+biz_remedy,remedy,"해결책, 치료",n,,,업무 명사
+biz_revision,revision,"수정, 개정",n,,,업무 명사
+biz_stimulus,stimulus,"경기 부양책, 자극",n,,,경제
+biz_tax_bracket,tax bracket,과세 등급,n,,,회계·세금
+biz_alternatively,alternatively,"그 대신에, 또는",adv,,,업무 부사
+biz_boycott,boycott,"불매 운동, 거부",n,,,업무 명사
+biz_carpenter,carpenter,목수,n,,,부동산·시설
+biz_cuisine,cuisine,"요리, 요리법",n,,,출장·여행·호텔
+biz_fringe_benefit,fringe benefit,부가 혜택,n,,,인사·채용
+biz_fundraising,fundraising,모금,n,,,업무 명사
+biz_inferior,inferior,"열등한, 하위의",adj,,,업무 형용사
+biz_per_capita,per capita,1인당,adj,,,경제
+biz_reliance,reliance,"의존, 의지",n,,,업무 명사
+biz_reluctant,reluctant,"꺼리는, 마지못한",adj,,,업무 형용사
+biz_retention,retention,"보유, 유지",n,,,고객 서비스
+biz_undergo,undergo,"겪다, 받다",v,,,업무 동사
+biz_automation,automation,자동화,n,,,물류·제조
+biz_decisive,decisive,"결정적인, 단호한",adj,,,업무 형용사
+biz_inheritance,inheritance,"상속, 유산",n,,,금융·은행
+biz_minimize,minimize,최소화하다,v,,,업무 동사
+biz_predominantly,predominantly,"대부분, 주로",adv,,,업무 부사
+biz_rivalry,rivalry,"경쟁, 경쟁 관계",n,,,업무 명사
+biz_royalty,royalty,"저작권 사용료, 왕족",n,,,법·계약
+biz_sufficiently,sufficiently,충분히,adv,,,업무 부사
+biz_tutorial,tutorial,"사용 지침서, 개별 지도",n,,,정보 기술
+biz_vacant,vacant,"비어 있는, 공석의",adj,,,부동산·시설
+biz_vicinity,vicinity,"인근, 부근",n,,,업무 명사
+biz_bulletin,bulletin,"공고, 뉴스 단신",n,,,사무·회의
+biz_inconsistent,inconsistent,일관성 없는,adj,,,업무 형용사
+biz_mechanic,mechanic,정비공,n,,,직업·업종
+biz_modify,modify,"수정하다, 변경하다",v,,,업무 동사
+biz_promo_code,promo code,할인 코드,n,,,마케팅·판매
+biz_quality_assurance,quality assurance,품질 보증,n,,,물류·제조
+biz_recession_proof,recession-proof,불황에 강한,adj,,,업무 명사
+biz_collaborative,collaborative,"협력하는, 공동의",adj,,,업무 형용사
+biz_compensate,compensate,"보상하다, 보충하다",v,,,법·계약
+biz_constructive,constructive,건설적인,adj,,,업무 형용사
+biz_foremost,foremost,"가장 중요한, 맨 앞의",adj,,,업무 형용사
+biz_hierarchy,hierarchy,"계층, 위계",n,,,업무 명사
+biz_participant,participant,참가자,n,,,업무 명사
+biz_precedent,precedent,"선례, 판례",n,,,법·계약
+biz_prevalent,prevalent,"널리 퍼진, 일반적인",adj,,,업무 형용사
+biz_render,render,"만들다, 제공하다",v,,,업무 동사
+biz_specify,specify,명시하다,v,,,업무 동사
+biz_visibility,visibility,"가시성, 눈에 잘 띔",n,,,업무 명사
+biz_abundant,abundant,풍부한,adj,,,업무 형용사
+biz_analytics,analytics,"분석, 분석 정보",n,,,마케팅·판매
+biz_attribute,attribute,"속성, 특성",n,,,업무 명사
+biz_complement,complement,보완하다,v,,,업무 동사
+biz_incumbent,incumbent,"현직자, 재임 중인",n,,,인사·채용
+biz_interval,interval,"간격, 휴식 시간",n,,,업무 명사
+biz_prohibition,prohibition,"금지, 금지령",n,,,법·계약
+biz_sustainability,sustainability,지속 가능성,n,,,물류·제조
+biz_top_notch,top-notch,"일류의, 최상급의",adj,,,마케팅·판매
+biz_biased,biased,편향된,adj,,,업무 형용사
+biz_bypass,bypass,"우회하다, 건너뛰다",v,,,경영·전략
+biz_catalyst,catalyst,"촉매, 계기",n,,,업무 명사
+biz_designation,designation,"지정, 명칭",n,,,업무 명사
+biz_diploma,diploma,"졸업장, 수료증",n,,,업무 명사
+biz_newsletter,newsletter,"소식지, 회보",n,,,업무 명사
+biz_predictable,predictable,예측할 수 있는,adj,,,업무 형용사
+biz_stellar,stellar,"뛰어난, 별의",adj,,,업무 형용사
+biz_tax_exempt,tax-exempt,비과세의,adj,,,회계·세금
+biz_username,username,사용자 이름,n,,,정보 기술
+biz_customer_retention,customer retention,고객 유지,n,,,마케팅·판매
+biz_deed,deed,"증서, 행위",n,,,법·계약
+biz_disciplinary,disciplinary,"징계의, 훈련의",adj,,,인사·채용
+biz_double_digit,double-digit,두 자릿수의,adj,,,업무 명사
+biz_eligibility,eligibility,"자격, 적격성",n,,,인사·채용
+biz_endorsement,endorsement,"지지, 보증 광고",n,,,마케팅·판매
+biz_forthcoming,forthcoming,"다가오는, 기꺼이 돕는",adj,,,업무 형용사
+biz_prestige,prestige,"명성, 위신",n,,,업무 명사
+biz_relevance,relevance,"관련성, 타당성",n,,,업무 명사
+biz_retailer,retailer,"소매업자, 소매점",n,,,마케팅·판매
+biz_ribbon_cutting,ribbon-cutting,"개관식, 준공식",n,,,사무·회의
+biz_temp,temp,임시 직원,n,,,인사·채용
+biz_textile,textile,"직물, 섬유",n,,,물류·제조
+biz_trademark_registration,trademark registration,상표 등록,n,,,법·계약
+biz_allocation,allocation,"할당, 배분",n,,,업무 명사
+biz_anticipation,anticipation,"예상, 기대",n,,,업무 명사
+biz_authorization,authorization,"허가, 권한 부여",n,,,법·계약
+biz_auxiliary,auxiliary,보조의,adj,,,업무 형용사
+biz_baggage,baggage,수하물,n,,,출장·여행·호텔
+biz_cancellation_policy,cancellation policy,취소 규정,n,,,출장·여행·호텔
+biz_curb_appeal,curb appeal,외관의 매력,n,,,부동산·시설
+biz_departure_lounge,departure lounge,출발 라운지,n,,,출장·여행·호텔
+biz_emergence,emergence,"출현, 발생",n,,,업무 명사
+biz_enclosed,enclosed,동봉된,adj,,,사무·회의
+biz_endurance,endurance,"인내, 지구력",n,,,업무 명사
+biz_evacuation,evacuation,"대피, 피난",n,,,부동산·시설
+biz_hedge,hedge,(위험을) 분산하다,v,,,금융·은행
+biz_initiate,initiate,"착수하다, 개시하다",v,,,업무 동사
+biz_loading_dock,loading dock,하역장,n,,,물류·제조
+biz_renovation,renovation,"수리, 개조",n,,,부동산·시설
+biz_rewarding,rewarding,보람 있는,adj,,,업무 형용사
+biz_scrutiny,scrutiny,정밀 조사,n,,,업무 명사
+biz_startup_founder,startup founder,창업자,n,,,직업·업종
+biz_tax_accountant,tax accountant,세무사,n,,,직업·업종
+biz_worthwhile,worthwhile,"가치 있는, 할 보람이 있는",adj,,,업무 형용사
+biz_aerospace,aerospace,항공 우주 산업,n,,,물류·제조
+biz_analytical,analytical,분석적인,adj,,,업무 형용사
+biz_bankrupt,bankrupt,파산한,adj,,,금융·은행
+biz_devotion,devotion,"헌신, 몰두",n,,,업무 명사
+biz_dilemma,dilemma,"딜레마, 진퇴양난",n,,,업무 명사
+biz_flagship_store,flagship store,대표 매장,n,,,마케팅·판매
+biz_null,null,무효의,adj,,,법·계약
+biz_paramount,paramount,"가장 중요한, 최고의",adj,,,업무 형용사
+biz_positioning,positioning,"포지셔닝, 위치 선정",n,,,마케팅·판매
+biz_proxy,proxy,"대리인, 대리 투표",n,,,업무 명사
+biz_regain,regain,되찾다,v,,,업무 동사
+biz_stimulus_package,stimulus package,경기 부양책 묶음,n,,,업무 명사
+biz_thrive,thrive,번창하다,v,,,업무 동사
+biz_unpaid,unpaid,"미지불의, 무급의",adj,,,회계·세금
+biz_aisle,aisle,통로,n,,,출장·여행·호텔
+biz_bilateral,bilateral,"쌍방의, 양측의",adj,,,업무 형용사
+biz_confrontation,confrontation,"대립, 대결",n,,,업무 명사
+biz_dismissal,dismissal,"해고, 묵살",n,,,인사·채용
+biz_integrate,integrate,통합하다,v,,,업무 동사
+biz_obstacle,obstacle,장애물,n,,,업무 명사
+biz_onset,onset,"시작, 개시",n,,,업무 명사
+biz_reconciliation,reconciliation,"(계정) 대조, 화해",n,,,회계·세금
+biz_slogan,slogan,"구호, 표어",n,,,업무 명사
+biz_strive,strive,"분투하다, 노력하다",v,,,업무 동사
+biz_undertaking,undertaking,"사업, 일",n,,,업무 명사
+biz_unpaid_leave,unpaid leave,무급 휴가,n,,,인사·채용
+biz_warranty_period,warranty period,보증 기간,n,,,고객 서비스
+biz_accredited,accredited,"공인된, 인가된",adj,,,법·계약
+biz_ample,ample,"충분한, 넓은",adj,,,업무 형용사
+biz_baggage_claim,baggage claim,수하물 찾는 곳,n,,,출장·여행·호텔
+biz_consolidation,consolidation,"통합, 합병",n,,,경제
+biz_diplomacy,diplomacy,"외교, 외교적 수완",n,,,업무 명사
+biz_directive,directive,"지시, 지령",n,,,사무·회의
+biz_disruption,disruption,"붕괴, 지장",n,,,업무 명사
+biz_hedge_fund,hedge fund,헤지 펀드,n,,,금융·은행
+biz_impulse_buy,impulse buy,충동구매,n,,,마케팅·판매
+biz_induction,induction,"취임, 입문 교육",n,,,인사·채용
+biz_marginal,marginal,"미미한, 가장자리의",adj,,,업무 형용사
+biz_municipality,municipality,지방 자치 단체,n,,,직업·업종
+biz_penetration,penetration,"침투, 관통",n,,,마케팅·판매
+biz_preferably,preferably,"가급적, 되도록이면",adv,,,업무 부사
+biz_slack,slack,"느슨한, 침체된",adj,,,업무 형용사
+biz_tactic,tactic,"전술, 작전",n,,,업무 명사
+biz_template,template,"서식, 견본",n,,,사무·회의
+biz_unexpectedly,unexpectedly,뜻밖에,adv,,,업무 부사
+biz_acclaimed,acclaimed,호평을 받은,adj,,,업무 형용사
+biz_apprentice,apprentice,"견습생, 도제",n,,,인사·채용
+biz_comprehend,comprehend,이해하다,v,,,업무 동사
+biz_counterpart,counterpart,"상대방, 대응하는 것",n,,,업무 명사
+biz_dietary,dietary,"식사의, 식이 요법의",adj,,,출장·여행·호텔
+biz_emission,emission,"배출, 배기가스",n,,,물류·제조
+biz_functionality,functionality,기능성,n,,,업무 명사
+biz_idle,idle,"가동되지 않는, 게으른",adj,,,업무 형용사
+biz_indictment,indictment,"기소, 고발",n,,,법·계약
+biz_overlap,overlap,"중복, 겹침",n,,,업무 명사
+biz_responsive,responsive,빨리 반응하는,adj,,,고객 서비스
+biz_technician,technician,기술자,n,,,사무·회의
+biz_transcript,transcript,"녹취록, 성적 증명서",n,,,사무·회의
+biz_verification,verification,"확인, 검증",n,,,업무 명사
+biz_aisle_seat,aisle seat,통로 쪽 좌석,n,,,출장·여행·호텔
+biz_broadband,broadband,초고속 인터넷,n,,,정보 기술
+biz_cancellation_fee,cancellation fee,취소 수수료,n,,,출장·여행·호텔
+biz_contingent,contingent,"~에 달린, 조건부의",adj,,,업무 형용사
+biz_exodus,exodus,"대탈출, 대이동",n,,,업무 명사
+biz_fallout,fallout,"좋지 않은 결과, 낙진",n,,,업무 명사
+biz_forestry,forestry,"임업, 산림 관리",n,,,물류·제조
+biz_inconvenience,inconvenience,"불편, 폐",n,,,고객 서비스
+biz_plaque,plaque,"명판, 상패",n,,,업무 명사
+biz_seating_chart,seating chart,좌석 배치도,n,,,사무·회의
+biz_takeover,takeover,경영권 인수,n,,,업무 명사
+biz_trait,trait,"특성, 특징",n,,,업무 명사
+biz_underestimate,underestimate,과소평가하다,v,,,업무 동사
+biz_consortium,consortium,"협회, 컨소시엄",n,,,업무 명사
+biz_defect,defect,"결함, 결점",n,,,물류·제조
+biz_efficacy,efficacy,"효능, 효험",n,,,업무 명사
+biz_extended_warranty,extended warranty,연장 보증,n,,,고객 서비스
+biz_manifest,manifest,"적하 목록, 명백한",n,,,물류·제조
+biz_outreach,outreach,"봉사 활동, 대외 활동",n,,,업무 명사
+biz_part_timer,part-timer,시간제 근무자,n,,,인사·채용
+biz_rigorous,rigorous,"엄격한, 철저한",adj,,,업무 형용사
+biz_skeptical,skeptical,회의적인,adj,,,업무 형용사
+biz_staple,staple,스테이플러로 고정하다,v,,,사무·회의
+biz_advent,advent,"출현, 도래",n,,,업무 명사
+biz_cosmetics,cosmetics,화장품,n,,,물류·제조
+biz_courier_service,courier service,택배 회사,n,,,직업·업종
+biz_fixture,fixture,"붙박이 설비, 고정 출연자",n,,,부동산·시설
+biz_gala,gala,"경축 행사, 축제",n,,,사무·회의
+biz_goodwill,goodwill,"호의, 영업권",n,,,업무 명사
+biz_imminent,imminent,임박한,adj,,,업무 형용사
+biz_insulation,insulation,"단열, 절연",n,,,부동산·시설
+biz_lag,lag,뒤처지다,v,,,업무 동사
+biz_replica,replica,복제품,n,,,업무 명사
+biz_stimulate,stimulate,"자극하다, 활성화하다",v,,,업무 동사
+biz_susceptible,susceptible,영향을 받기 쉬운,adj,,,업무 형용사
+biz_translator,translator,번역가,n,,,직업·업종
+biz_accelerate,accelerate,"가속하다, 촉진하다",v,,,업무 동사
+biz_backlash,backlash,반발,n,,,업무 명사
+biz_blockchain,blockchain,블록체인,n,,,정보 기술
+biz_chef_de_cuisine,chef de cuisine,주방장,n,,,출장·여행·호텔
+biz_crunch,crunch,"위기, 부족",n,,,업무 명사
+biz_demise,demise,"종말, 사망",n,,,업무 명사
+biz_disregard,disregard,무시하다,v,,,업무 동사
+biz_eco_friendly,eco-friendly,친환경적인,adj,,,물류·제조
+biz_imperative,imperative,반드시 해야 하는,adj,,,업무 형용사
+biz_misconduct,misconduct,"위법 행위, 부정행위",n,,,법·계약
+biz_mute,mute,음소거하다,v,,,사무·회의
+biz_optimization,optimization,최적화,n,,,업무 명사
+biz_outdated,outdated,구식의,adj,,,업무 형용사
+biz_peripheral,peripheral,"주변 장치, 주변적인",n,,,정보 기술
+biz_provisional,provisional,"임시의, 잠정적인",adj,,,업무 형용사
+biz_repay,repay,"갚다, 상환하다",v,,,금융·은행
+biz_saturated,saturated,"포화된, 흠뻑 젖은",adj,,,마케팅·판매
+biz_smoke_detector,smoke detector,연기 감지기,n,,,부동산·시설
+biz_tangible,tangible,"실체가 있는, 명백한",adj,,,업무 형용사
+biz_venture_capitalist,venture capitalist,벤처 투자가,n,,,직업·업종
+biz_versatile,versatile,"다재다능한, 다용도의",adj,,,업무 형용사
+biz_caliber,caliber,"역량, 구경",n,,,업무 명사
+biz_derivative,derivative,"파생 상품, 파생어",n,,,금융·은행
+biz_drastically,drastically,"대폭, 과감하게",adv,,,업무 부사
+biz_exemption,exemption,"면제, 공제",n,,,회계·세금
+biz_furnished,furnished,가구가 비치된,adj,,,부동산·시설
+biz_inaccurate,inaccurate,부정확한,adj,,,업무 형용사
+biz_inception,inception,"시작, 발단",n,,,업무 명사
+biz_intervene,intervene,"개입하다, 중재하다",v,,,업무 동사
+biz_manifesto,manifesto,"선언문, 성명서",n,,,업무 명사
+biz_maternity_leave,maternity leave,출산 휴가,n,,,인사·채용
+biz_no_vacancy,no vacancy,빈방 없음,n,,,출장·여행·호텔
+biz_salvage,salvage,"구하다, 인양하다",v,,,업무 동사
+biz_slash,slash,"대폭 삭감하다, 베다",v,,,경영·전략
+biz_standpoint,standpoint,"관점, 입장",n,,,업무 명사
+biz_terminate,terminate,"해고하다, 끝내다",v,,,인사·채용
+biz_undermine,undermine,약화시키다,v,,,업무 동사
+biz_vocational,vocational,"직업의, 직업 훈련의",adj,,,인사·채용
+biz_withstand,withstand,견뎌 내다,v,,,업무 동사
+biz_approximate,approximate,대략의,adj,,,업무 형용사
+biz_catering,catering,출장 요리,n,,,사무·회의
+biz_checkout,checkout,"체크아웃, 계산대",n,,,출장·여행·호텔
+biz_expo,expo,박람회,n,,,사무·회의
+biz_incidence,incidence,"발생, 발생률",n,,,업무 명사
+biz_mileage,mileage,"마일리지, 주행 거리",n,,,출장·여행·호텔
+biz_outdoor_seating,outdoor seating,야외 좌석,n,,,출장·여행·호텔
+biz_plausible,plausible,그럴듯한,adj,,,업무 형용사
+biz_query,query,"질문, 문의",n,,,사무·회의
+biz_restraint,restraint,"억제, 제지",n,,,업무 명사
+biz_affiliation,affiliation,"소속, 제휴",n,,,업무 명사
+biz_assertion,assertion,"주장, 단언",n,,,업무 명사
+biz_certified_public_accountant,certified public accountant,공인 회계사,n,,,직업·업종
+biz_cultivation,cultivation,"경작, 양성",n,,,업무 명사
+biz_drastic,drastic,"과감한, 급격한",adj,,,업무 형용사
+biz_legitimacy,legitimacy,"정당성, 합법성",n,,,법·계약
+biz_maximize,maximize,극대화하다,v,,,업무 동사
+biz_periodic,periodic,주기적인,adj,,,업무 형용사
+biz_podium,podium,"연단, 시상대",n,,,사무·회의
+biz_reconsider,reconsider,재고하다,v,,,업무 동사
+biz_refrain,refrain,삼가다,v,,,업무 동사
+biz_temporal,temporal,"시간의, 세속적인",adj,,,업무 형용사
+biz_bandwidth,bandwidth,대역폭,n,,,정보 기술
+biz_beforehand,beforehand,"미리, 사전에",adv,,,업무 부사
+biz_comprise,comprise,"구성하다, 이루어지다",v,,,업무 동사
+biz_debit,debit,"차변, 인출하다",n,,,회계·세금
+biz_demolition,demolition,"철거, 파괴",n,,,부동산·시설
+biz_differentiate,differentiate,"차별화하다, 구별하다",v,,,마케팅·판매
+biz_inventory_turnover,inventory turnover,재고 회전율,n,,,물류·제조
+biz_lab_technician,lab technician,실험실 기술자,n,,,직업·업종
+biz_presume,presume,추정하다,v,,,업무 동사
+biz_regulator,regulator,"규제 기관, 단속자",n,,,법·계약
+biz_restructuring,restructuring,구조 조정,n,,,금융·은행
+biz_tally,tally,"집계하다, 일치하다",v,,,회계·세금
+biz_thriving,thriving,번성하는,adj,,,업무 형용사
+biz_unanimously,unanimously,만장일치로,adv,,,업무 부사
+biz_alloy,alloy,합금,n,,,물류·제조
+biz_enclosure,enclosure,"동봉물, 울타리",n,,,사무·회의
+biz_fraudulent,fraudulent,"사기를 치는, 부정한",adj,,,법·계약
+biz_informative,informative,"유익한, 정보를 주는",adj,,,업무 형용사
+biz_infringement,infringement,"침해, 위반",n,,,법·계약
+biz_internship,internship,인턴 과정,n,,,인사·채용
+biz_moonlight,moonlight,부업을 하다,v,,,인사·채용
+biz_paradigm,paradigm,"패러다임, 모범",n,,,업무 명사
+biz_scarce,scarce,"부족한, 드문",adj,,,업무 형용사
+biz_stint,stint,(일하는) 기간,n,,,인사·채용
+biz_surge_pricing,surge pricing,탄력 요금제,n,,,업무 명사
+biz_symposium,symposium,"심포지엄, 학술 토론회",n,,,사무·회의
+biz_tailor,tailor,"맞추다, 재단하다",v,,,업무 동사
+biz_trajectory,trajectory,"궤도, 궤적",n,,,업무 명사
+biz_unrest,unrest,"불안, 소요",n,,,업무 명사
+biz_utmost,utmost,최대한의,adj,,,업무 형용사
+biz_equilibrium,equilibrium,"균형, 평형",n,,,경제
+biz_flaw,flaw,"결함, 흠",n,,,업무 명사
+biz_hereby,hereby,"이로써, 이에 의하여",adv,,,법·계약
+biz_nominal,nominal,"명목상의, 아주 적은",adj,,,업무 형용사
+biz_ordinance,ordinance,"조례, 법령",n,,,법·계약
+biz_prolific,prolific,"다작의, 많이 생산하는",adj,,,업무 형용사
+biz_prosperous,prosperous,"번영하는, 부유한",adj,,,업무 형용사
+biz_ventilation,ventilation,"환기, 통풍",n,,,부동산·시설
+biz_abide,abide,"준수하다, 견디다",v,,,업무 동사
+biz_commence,commence,시작하다,v,,,업무 동사
+biz_compatibility,compatibility,호환성,n,,,정보 기술
+biz_deal_breaker,deal breaker,협상 결렬 요인,n,,,경영·전략
+biz_disrupt,disrupt,"방해하다, 지장을 주다",v,,,업무 동사
+biz_fundraiser,fundraiser,"모금 행사, 모금자",n,,,업무 명사
+biz_garment,garment,"의복, 옷",n,,,물류·제조
+biz_mailing_list,mailing list,우편물 수신자 명단,n,,,마케팅·판매
+biz_periodically,periodically,주기적으로,adv,,,업무 부사
+biz_plumbing,plumbing,"배관, 배관 작업",n,,,부동산·시설
+biz_readiness,readiness,준비가 되어 있음,n,,,업무 명사
+biz_redundant,redundant,"불필요한, 정리 해고된",adj,,,업무 형용사
+biz_cartel,cartel,"카르텔, 기업 연합",n,,,경제
+biz_caucus,caucus,(정당) 간부 회의,n,,,사무·회의
+biz_columnist,columnist,"칼럼니스트, 기고가",n,,,직업·업종
+biz_dictate,dictate,"받아쓰게 하다, 지시하다",v,,,사무·회의
+biz_discounted,discounted,할인된,adj,,,마케팅·판매
+biz_flight_attendant,flight attendant,승무원,n,,,출장·여행·호텔
+biz_flyer,flyer,"전단, 비행사",n,,,마케팅·판매
+biz_foreman,foreman,"현장 감독, 반장",n,,,직업·업종
+biz_influx,influx,"유입, 쇄도",n,,,업무 명사
+biz_jet_lag,jet lag,시차증,n,,,출장·여행·호텔
+biz_resilience,resilience,"회복력, 탄력성",n,,,업무 명사
+biz_swipe,swipe,"(카드를) 긁다, 훔치다",v,,,사무·회의
+biz_adhere,adhere,"고수하다, 들러붙다",v,,,업무 동사
+biz_ambiguous,ambiguous,애매모호한,adj,,,업무 형용사
+biz_banquet_hall,banquet hall,연회장,n,,,출장·여행·호텔
+biz_cartridge,cartridge,카트리지,n,,,사무·회의
+biz_inexpensive,inexpensive,비싸지 않은,adj,,,마케팅·판매
+biz_latitude,latitude,"재량, 위도",n,,,업무 명사
+biz_parameter,parameter,"한도, 매개 변수",n,,,업무 명사
+biz_relocation,relocation,"이전, 재배치",n,,,업무 명사
+biz_satisfactory,satisfactory,만족스러운,adj,,,업무 형용사
+biz_wary,wary,"경계하는, 조심하는",adj,,,업무 형용사
+biz_abruptly,abruptly,"갑자기, 퉁명스럽게",adv,,,업무 부사
+biz_commute_time,commute time,통근 시간,n,,,출장·여행·호텔
+biz_contend,contend,"주장하다, 다투다",v,,,업무 동사
+biz_culinary,culinary,요리의,adj,,,출장·여행·호텔
+biz_demographics,demographics,"인구 통계, 인구 구성",n,,,마케팅·판매
+biz_dissent,dissent,"반대, 이의",n,,,업무 명사
+biz_eminent,eminent,"저명한, 탁월한",adj,,,업무 형용사
+biz_encryption,encryption,암호화,n,,,정보 기술
+biz_endeavor,endeavor,"노력하다, 노력",v,,,업무 동사
+biz_implication,implication,"영향, 함축",n,,,업무 명사
+biz_induce,induce,"유도하다, 설득하다",v,,,업무 동사
+biz_liaison_officer,liaison officer,연락 담당관,n,,,업무 명사
+biz_managerial,managerial,"관리의, 경영의",adj,,,인사·채용
+biz_multinational,multinational,다국적의,adj,,,업무 형용사
+biz_payroll_clerk,payroll clerk,급여 담당자,n,,,직업·업종
+biz_programmer,programmer,프로그래머,n,,,직업·업종
+biz_repetitive,repetitive,반복적인,adj,,,업무 형용사
+biz_reversal,reversal,"반전, 역전",n,,,업무 명사
+biz_acquaintance,acquaintance,"지인, 아는 사람",n,,,업무 명사
+biz_bureaucracy,bureaucracy,"관료주의, 관료",n,,,업무 명사
+biz_cater,cater,"음식을 공급하다, 맞추다",v,,,업무 동사
+biz_collective_bargaining,collective bargaining,단체 교섭,n,,,인사·채용
+biz_cumulative,cumulative,누적되는,adj,,,업무 형용사
+biz_curator,curator,"큐레이터, 관리자",n,,,업무 명사
+biz_detrimental,detrimental,해로운,adj,,,업무 형용사
+biz_disposable_income,disposable income,가처분 소득,n,,,경제
+biz_entitlement,entitlement,"자격, 권리",n,,,업무 명사
+biz_garner,garner,"모으다, 얻다",v,,,업무 동사
+biz_intricate,intricate,복잡한,adj,,,업무 형용사
+biz_longevity,longevity,"오래 지속됨, 장수",n,,,업무 명사
+biz_plaintiff,plaintiff,"원고, 고소인",n,,,법·계약
+biz_replicate,replicate,"복제하다, 반복하다",v,,,업무 동사
+biz_summon,summon,"소환하다, 호출하다",v,,,업무 동사
+biz_accreditation,accreditation,"인가, 승인",n,,,법·계약
+biz_articulate,articulate,분명히 표현하는,adj,,,업무 형용사
+biz_buffet,buffet,뷔페,n,,,출장·여행·호텔
+biz_downfall,downfall,몰락,n,,,업무 명사
+biz_downside,downside,"부정적인 면, 단점",n,,,업무 명사
+biz_empowerment,empowerment,권한 부여,n,,,경영·전략
+biz_headset,headset,헤드셋,n,,,사무·회의
+biz_hostile_takeover,hostile takeover,적대적 인수,n,,,경영·전략
+biz_interpreter,interpreter,통역사,n,,,직업·업종
+biz_mitigate,mitigate,완화시키다,v,,,업무 동사
+biz_poultry,poultry,가금류,n,,,물류·제조
+biz_prosecute,prosecute,기소하다,v,,,법·계약
+biz_reboot,reboot,재부팅하다,v,,,정보 기술
+biz_restrictive,restrictive,제한하는,adj,,,업무 형용사
+biz_specs,specs,"사양, 명세",n,,,정보 기술
+biz_swiftly,swiftly,신속히,adv,,,업무 부사
+biz_whereabouts,whereabouts,"행방, 소재",n,,,업무 명사
+biz_work_ethic,work ethic,직업 윤리,n,,,인사·채용
+biz_amenities,amenities,편의 시설,n,,,업무 명사
+biz_conform,conform,"따르다, 순응하다",v,,,업무 동사
+biz_customary,customary,"관례적인, 습관적인",adj,,,업무 형용사
+biz_evacuate,evacuate,"대피시키다, 비우다",v,,,부동산·시설
+biz_maneuver,maneuver,"책략, 기동",n,,,업무 명사
+biz_overlook,overlook,"간과하다, 내려다보다",v,,,업무 동사
+biz_pawn,pawn,"저당 잡히다, 졸",v,,,금융·은행
+biz_persist,persist,"지속되다, 고집하다",v,,,업무 동사
+biz_rationale,rationale,"근거, 이유",n,,,업무 명사
+biz_rebound,rebound,"반등하다, 회복하다",v,,,경제
+biz_semiconductor,semiconductor,반도체,n,,,물류·제조
+biz_simultaneous,simultaneous,동시의,adj,,,업무 형용사
+biz_staffing,staffing,"인력 배치, 직원 채용",n,,,인사·채용
+biz_vanguard,vanguard,"선봉, 선두",n,,,업무 명사
+biz_waiver,waiver,권리 포기 각서,n,,,법·계약
+biz_alleviate,alleviate,"완화하다, 덜다",v,,,업무 동사
+biz_ballroom,ballroom,무도회장,n,,,출장·여행·호텔
+biz_copyright_infringement,copyright infringement,저작권 침해,n,,,법·계약
+biz_dependency,dependency,"의존, 종속",n,,,업무 명사
+biz_endowment,endowment,"기부금, 재능",n,,,금융·은행
+biz_event_planner,event planner,행사 기획자,n,,,직업·업종
+biz_fidelity,fidelity,"충실함, 정확도",n,,,업무 명사
+biz_mediocre,mediocre,"평범한, 그저 그런",adj,,,업무 형용사
+biz_piracy,piracy,"저작권 침해, 해적 행위",n,,,법·계약
+biz_residual,residual,"남은, 잔여의",adj,,,업무 명사
+biz_subscriber,subscriber,"구독자, 가입자",n,,,마케팅·판매
+biz_uphold,uphold,"유지하다, 지지하다",v,,,법·계약
+biz_zoning,zoning,용도 지역 지정,n,,,법·계약
+biz_appendix,appendix,"부록, 맹장",n,,,업무 명사
+biz_auditorium,auditorium,강당,n,,,사무·회의
+biz_dedicate,dedicate,"바치다, 헌신하다",v,,,업무 동사
+biz_diligence,diligence,"근면, 성실",n,,,업무 명사
+biz_diversion,diversion,"전환, 우회로",n,,,업무 명사
+biz_empower,empower,권한을 주다,v,,,경영·전략
+biz_inbox,inbox,받은 편지함,n,,,사무·회의
+biz_interviewer,interviewer,면접관,n,,,인사·채용
+biz_introductory,introductory,"입문의, 소개용의",adj,,,마케팅·판매
+biz_mediation,mediation,"조정, 중재",n,,,법·계약
+biz_postage,postage,우편 요금,n,,,사무·회의
+biz_prohibit,prohibit,금지하다,v,,,업무 동사
+biz_pros_and_cons,pros and cons,장단점,n,,,업무 명사
+biz_quotation,quotation,"견적, 인용",n,,,마케팅·판매
+biz_seasoned,seasoned,"경험 많은, 양념한",adj,,,업무 형용사
+biz_tighten,tighten,"조이다, 강화하다",v,,,업무 동사
+biz_usher,usher,"안내하다, 안내원",v,,,업무 동사
+biz_wedding_planner,wedding planner,웨딩 플래너,n,,,직업·업종
+biz_allegation,allegation,"혐의, 주장",n,,,업무 명사
+biz_correspond,correspond,"서신을 주고받다, 일치하다",v,,,사무·회의
+biz_due_diligence,due diligence,"실사, 기업 실사",n,,,법·계약
+biz_paycheck,paycheck,"급여 수표, 봉급",n,,,회계·세금
+biz_pivotal,pivotal,중추적인,adj,,,업무 형용사
+biz_profitability,profitability,수익성,n,,,경제
+biz_provoke,provoke,"유발하다, 화나게 하다",v,,,업무 동사
+biz_reconcile,reconcile,"(계정을) 맞추다, 화해시키다",v,,,회계·세금
+biz_resilient,resilient,회복력 있는,adj,,,업무 형용사
+biz_router,router,"공유기, 라우터",n,,,정보 기술
+biz_tedious,tedious,지루한,adj,,,업무 형용사
+biz_utilization,utilization,"활용, 이용",n,,,물류·제조
+biz_coincide,coincide,"동시에 일어나다, 일치하다",v,,,업무 동사
+biz_dine,dine,식사하다,v,,,출장·여행·호텔
+biz_dissolve,dissolve,"해산하다, 녹이다",v,,,업무 동사
+biz_dubious,dubious,의심스러운,adj,,,업무 형용사
+biz_expectancy,expectancy,"기대, 예상",n,,,업무 명사
+biz_hiatus,hiatus,"공백, 중단",n,,,업무 명사
+biz_lapse,lapse,"실수, 경과",n,,,업무 명사
+biz_ledger,ledger,"장부, 원장",n,,,회계·세금
+biz_login,login,로그인,n,,,정보 기술
+biz_malware,malware,악성 소프트웨어,n,,,정보 기술
+biz_noteworthy,noteworthy,주목할 만한,adj,,,업무 형용사
+biz_plunge,plunge,"급락하다, 뛰어들다",v,,,경제
+biz_pragmatic,pragmatic,실용적인,adj,,,업무 형용사
+biz_teller,teller,은행 창구 직원,n,,,금융·은행
+biz_volatility,volatility,변동성,n,,,경제
+biz_auditor,auditor,회계 감사관,n,,,회계·세금
+biz_bidder,bidder,입찰자,n,,,마케팅·판매
+biz_blueprint,blueprint,"청사진, 설계도",n,,,물류·제조
+biz_carbon_footprint,carbon footprint,탄소 발자국,n,,,물류·제조
+biz_commencement,commencement,"시작, 졸업식",n,,,업무 명사
+biz_concede,concede,"인정하다, 양보하다",v,,,업무 동사
+biz_crossroads,crossroads,"기로, 교차로",n,,,업무 명사
+biz_diner,diner,"식사하는 사람, 간이식당",n,,,출장·여행·호텔
+biz_disposition,disposition,"기질, 성향",n,,,업무 명사
+biz_expiration,expiration,"만료, 만기",n,,,법·계약
+biz_incompatible,incompatible,양립할 수 없는,adj,,,업무 형용사
+biz_injunction,injunction,"금지 명령, 명령",n,,,법·계약
+biz_innate,innate,타고난,adj,,,업무 형용사
+biz_keynote,keynote,"기조, 기조연설",n,,,사무·회의
+biz_speculate,speculate,"투기하다, 추측하다",v,,,금융·은행
+biz_apprenticeship,apprenticeship,"견습 기간, 수습 기간",n,,,인사·채용
+biz_breakout_session,breakout session,분과 회의,n,,,사무·회의
+biz_crate,crate,나무 상자,n,,,물류·제조
+biz_goodwill_gesture,goodwill gesture,호의의 표시,n,,,고객 서비스
+biz_makeover,makeover,"단장, 변신",n,,,업무 명사
+biz_turbulent,turbulent,"격동의, 난기류의",adj,,,업무 형용사
+biz_concise,concise,"간결한, 축약된",adj,,,업무 형용사
+biz_contraction,contraction,"수축, 축소",n,,,업무 명사
+biz_convergence,convergence,"수렴, 한곳에 모임",n,,,업무 명사
+biz_criterion,criterion,기준,n,,,업무 명사
+biz_deduction,deduction,"공제, 추론",n,,,업무 명사
+biz_diminish,diminish,"줄어들다, 약해지다",v,,,업무 동사
+biz_disclaimer,disclaimer,면책 조항,n,,,법·계약
+biz_disruptive,disruptive,"지장을 주는, 혁신적인",adj,,,업무 형용사
+biz_globalization,globalization,세계화,n,,,경제
+biz_groundbreaking,groundbreaking,"기공식, 획기적인",adj,,,부동산·시설
+biz_keynote_speech,keynote speech,기조연설,n,,,사무·회의
+biz_manpower,manpower,인력,n,,,인사·채용
+biz_overhead_compartment,overhead compartment,머리 위 짐칸,n,,,출장·여행·호텔
+biz_plight,plight,"곤경, 역경",n,,,업무 명사
+biz_preventive_maintenance,preventive maintenance,예방 정비,n,,,물류·제조
+biz_simplify,simplify,단순화하다,v,,,업무 동사
+biz_stabilize,stabilize,안정시키다,v,,,업무 동사
+biz_vigorous,vigorous,"활발한, 격렬한",adj,,,업무 형용사
+biz_candid,candid,솔직한,adj,,,업무 형용사
+biz_caretaker,caretaker,"관리인, 돌보는 사람",n,,,부동산·시설
+biz_confidentiality,confidentiality,비밀 유지,n,,,법·계약
+biz_durability,durability,내구성,n,,,물류·제조
+biz_patronage,patronage,"애용, 후원",n,,,마케팅·판매
+biz_pinnacle,pinnacle,"정점, 절정",n,,,업무 명사
+biz_prosper,prosper,번영하다,v,,,업무 동사
+biz_statistic,statistic,"통계, 통계 자료",n,,,업무 명사
+biz_subordinate,subordinate,부하 직원,n,,,인사·채용
+biz_tax_deduction,tax deduction,세금 공제,n,,,회계·세금
+biz_variance,variance,"차이, 변동",n,,,회계·세금
+biz_commuter,commuter,통근자,n,,,부동산·시설
+biz_duly,duly,"정식으로, 적절히",adv,,,법·계약
+biz_feasibility,feasibility,실현 가능성,n,,,업무 명사
+biz_inadvertently,inadvertently,"무심코, 부주의로",adv,,,업무 부사
+biz_invariably,invariably,"변함없이, 언제나",adv,,,업무 부사
+biz_lodging,lodging,"숙박, 숙소",n,,,출장·여행·호텔
+biz_order_fulfillment,order fulfillment,주문 처리,n,,,물류·제조
+biz_outset,outset,"시작, 착수",n,,,업무 명사
+biz_patio,patio,테라스,n,,,출장·여행·호텔
+biz_repayment,repayment,"상환, 변제",n,,,금융·은행
+biz_soaring,soaring,치솟는,adj,,,업무 형용사
+biz_solvent,solvent,지불 능력이 있는,adj,,,금융·은행
+biz_sturdy,sturdy,"튼튼한, 견고한",adj,,,물류·제조
+biz_timetable,timetable,시간표,n,,,출장·여행·호텔
+biz_viability,viability,실행 가능성,n,,,경제
+biz_cash_strapped,cash-strapped,자금난에 처한,adj,,,금융·은행
+biz_collusion,collusion,"공모, 담합",n,,,경제
+biz_contingency_plan,contingency plan,비상 대책,n,,,업무 명사
+biz_contractual,contractual,계약상의,adj,,,인사·채용
+biz_deterioration,deterioration,"악화, 저하",n,,,업무 명사
+biz_discreet,discreet,"신중한, 조심스러운",adj,,,업무 형용사
+biz_enact,enact,(법을) 제정하다,v,,,법·계약
+biz_fulfillment_center,fulfillment center,주문 처리 센터,n,,,물류·제조
+biz_hostel,hostel,호스텔,n,,,출장·여행·호텔
+biz_illicit,illicit,"불법의, 부정한",adj,,,법·계약
+biz_mundane,mundane,"평범한, 일상적인",adj,,,업무 형용사
+biz_proficiency,proficiency,"능숙함, 숙달",n,,,인사·채용
+biz_reinforcement,reinforcement,"강화, 증원",n,,,업무 명사
+biz_repository,repository,"저장소, 보관소",n,,,업무 명사
+biz_sanction,sanction,"제재, 허가",n,,,법·계약
+biz_stringent,stringent,"엄중한, 엄격한",adj,,,업무 형용사
+biz_trainee,trainee,"수습 직원, 훈련생",n,,,인사·채용
+biz_biotechnology,biotechnology,생명 공학,n,,,물류·제조
+biz_cultivate,cultivate,"기르다, 경작하다",v,,,업무 동사
+biz_disparity,disparity,"격차, 차이",n,,,업무 명사
+biz_divert,divert,"우회시키다, 전환하다",v,,,업무 동사
+biz_footwear,footwear,신발류,n,,,물류·제조
+biz_lavish,lavish,"호화로운, 아낌없는",adj,,,업무 형용사
+biz_performance_appraisal,performance appraisal,업무 평가,n,,,인사·채용
+biz_reluctance,reluctance,"꺼림, 마지못해 함",n,,,업무 명사
+biz_unconventional,unconventional,관례를 벗어난,adj,,,업무 형용사
+biz_austerity,austerity,"긴축, 내핍",n,,,경제
+biz_candidacy,candidacy,"입후보, 출마",n,,,업무 명사
+biz_dormant,dormant,"휴면의, 잠자는",adj,,,업무 형용사
+biz_eviction,eviction,퇴거,n,,,법·계약
+biz_foreclosure,foreclosure,담보물 압류,n,,,금융·은행
+biz_hesitant,hesitant,주저하는,adj,,,업무 형용사
+biz_hurdle,hurdle,"장애물, 허들",n,,,업무 명사
+biz_indefinite,indefinite,"무기한의, 불명확한",adj,,,업무 형용사
+biz_insightful,insightful,통찰력 있는,adj,,,업무 형용사
+biz_job_seeker,job seeker,구직자,n,,,인사·채용
+biz_moderator,moderator,"사회자, 중재자",n,,,사무·회의
+biz_persuasive,persuasive,설득력 있는,adj,,,업무 형용사
+biz_proactive,proactive,"주도적인, 앞서 대처하는",adj,,,업무 형용사
+biz_projector,projector,"영사기, 프로젝터",n,,,사무·회의
+biz_prudent,prudent,"신중한, 현명한",adj,,,업무 형용사
+biz_spacious,spacious,"넓은, 널찍한",adj,,,부동산·시설
+biz_authoritative,authoritative,권위 있는,adj,,,업무 형용사
+biz_bribery,bribery,뇌물 수수,n,,,법·계약
+biz_bureaucratic,bureaucratic,관료적인,adj,,,업무 형용사
+biz_deviation,deviation,"일탈, 편차",n,,,업무 명사
+biz_embark,embark,"탑승하다, 착수하다",v,,,출장·여행·호텔
+biz_entrepreneurial,entrepreneurial,기업가적인,adj,,,업무 형용사
+biz_etiquette,etiquette,"예절, 에티켓",n,,,사무·회의
+biz_kickoff,kickoff,"(행사의) 시작, 킥오프",n,,,사무·회의
+biz_modem,modem,모뎀,n,,,정보 기술
+biz_ripple_effect,ripple effect,파급 효과,n,,,경제
+biz_thrift,thrift,"절약, 검약",n,,,금융·은행
+biz_turnaround,turnaround,"호전, 처리 시간",n,,,업무 명사
+biz_turnaround_time,turnaround time,처리 시간,n,,,사무·회의
+biz_validate,validate,"입증하다, 승인하다",v,,,업무 동사
+biz_checkpoint,checkpoint,"검문소, 점검 지점",n,,,업무 명사
+biz_cornerstone,cornerstone,"초석, 토대",n,,,업무 명사
+biz_hinder,hinder,"방해하다, 저해하다",v,,,업무 동사
+biz_hotline,hotline,"직통 전화, 상담 전화",n,,,사무·회의
+biz_intermittent,intermittent,간헐적인,adj,,,업무 형용사
+biz_negligible,negligible,무시해도 될 정도의,adj,,,업무 형용사
+biz_obligatory,obligatory,의무적인,adj,,,업무 형용사
+biz_preface,preface,"서문, 머리말",n,,,업무 명사
+biz_punitive,punitive,"처벌의, 가혹한",adj,,,업무 형용사
+biz_stamina,stamina,"체력, 지구력",n,,,업무 명사
+biz_acronym,acronym,"두문자어, 약어",n,,,사무·회의
+biz_adversity,adversity,역경,n,,,업무 명사
+biz_advertiser,advertiser,광고주,n,,,마케팅·판매
+biz_affidavit,affidavit,진술서,n,,,법·계약
+biz_compile,compile,"엮다, 편집하다",v,,,업무 동사
+biz_impartial,impartial,공정한,adj,,,업무 형용사
+biz_incremental,incremental,"점진적인, 증가하는",adj,,,업무 형용사
+biz_affluent,affluent,부유한,adj,,,업무 형용사
+biz_ambiguity,ambiguity,애매모호함,n,,,업무 명사
+biz_antitrust,antitrust,독점 금지의,adj,,,경제
+biz_beneficiary,beneficiary,"수혜자, 보험금 수령인",n,,,금융·은행
+biz_brokerage,brokerage,"중개업, 중개 수수료",n,,,금융·은행
+biz_enlist,enlist,"협력을 얻다, 입대하다",v,,,업무 동사
+biz_hallmark,hallmark,"특징, 품질 보증 마크",n,,,업무 명사
+biz_immaculate,immaculate,티 하나 없는,adj,,,업무 형용사
+biz_lessen,lessen,"줄이다, 적게 하다",v,,,업무 동사
+biz_lifespan,lifespan,수명,n,,,업무 명사
+biz_saturation,saturation,"포화, 포화 상태",n,,,마케팅·판매
+biz_scarcity,scarcity,"부족, 결핍",n,,,물류·제조
+biz_setback,setback,"차질, 좌절",n,,,업무 명사
+biz_sizable,sizable,상당한 크기의,adj,,,업무 형용사
+biz_surpass,surpass,능가하다,v,,,업무 동사
+biz_counterfeit_goods,counterfeit goods,위조품,n,,,법·계약
+biz_deductible,deductible,"공제 가능한, 자기 부담금",adj,,,금융·은행
+biz_exert,exert,"발휘하다, 노력하다",v,,,업무 동사
+biz_hefty,hefty,"두둑한, 무거운",adj,,,업무 형용사
+biz_outsourcing,outsourcing,외부 위탁,n,,,물류·제조
+biz_overrun,overrun,"초과, 초과분",n,,,업무 명사
+biz_payload,payload,"탑재량, 유효 하중",n,,,물류·제조
+biz_payout,payout,"지불금, 지출",n,,,인사·채용
+biz_pertinent,pertinent,"관련 있는, 적절한",adj,,,업무 형용사
+biz_plumber,plumber,배관공,n,,,부동산·시설
+biz_slump,slump,"폭락, 부진",n,,,경제
+biz_supplementary,supplementary,"보충의, 추가의",adj,,,업무 형용사
+biz_vending_machine,vending machine,자판기,n,,,마케팅·판매
+biz_annuity,annuity,"연금, 연간 지급액",n,,,금융·은행
+biz_authentication,authentication,"인증, 진짜임을 증명함",n,,,정보 기술
+biz_clerical,clerical,"사무직의, 성직자의",adj,,,인사·채용
+biz_complimentary,complimentary,"무료의, 칭찬하는",adj,,,마케팅·판매
+biz_cost_overrun,cost overrun,비용 초과,n,,,회계·세금
+biz_cybersecurity,cybersecurity,사이버 보안,n,,,정보 기술
+biz_escalate,escalate,"확대되다, 단계적으로 높이다",v,,,고객 서비스
+biz_exceedingly,exceedingly,"극도로, 대단히",adv,,,업무 부사
+biz_frontline,frontline,"최전선의, 현장의",adj,,,경영·전략
+biz_goggles,goggles,보호 안경,n,,,물류·제조
+biz_pinpoint,pinpoint,정확히 찾아내다,v,,,업무 동사
+biz_ponder,ponder,숙고하다,v,,,업무 동사
+biz_reimbursement,reimbursement,"비용 환급, 변제",n,,,회계·세금
+biz_revert,revert,되돌아가다,v,,,업무 동사
+biz_taxable,taxable,과세 대상의,adj,,,회계·세금
+biz_unilateral,unilateral,일방적인,adj,,,업무 형용사
+biz_withholding_tax,withholding tax,원천 징수세,n,,,회계·세금
+biz_adherence,adherence,"고수, 준수",n,,,업무 명사
+biz_appellate,appellate,항소의,adj,,,법·계약
+biz_capitalize,capitalize,"이용하다, 대문자로 쓰다",v,,,업무 동사
+biz_deem,deem,"여기다, 간주하다",v,,,업무 동사
+biz_erratic,erratic,"변덕스러운, 불규칙한",adj,,,업무 형용사
+biz_indispensable,indispensable,없어서는 안 될,adj,,,업무 형용사
+biz_inhibit,inhibit,억제하다,v,,,업무 동사
+biz_issuance,issuance,"발행, 발급",n,,,업무 명사
+biz_loom,loom,"어렴풋이 나타나다, 다가오다",v,,,업무 동사
+biz_perseverance,perseverance,"인내, 끈기",n,,,업무 명사
+biz_subpoena,subpoena,소환장,n,,,법·계약
+biz_adept,adept,능숙한,adj,,,업무 형용사
+biz_agility,agility,민첩성,n,,,업무 명사
+biz_dashboard,dashboard,"현황판, 계기판",n,,,정보 기술
+biz_excursion,excursion,"짧은 여행, 유람",n,,,출장·여행·호텔
+biz_hectic,hectic,몹시 바쁜,adj,,,업무 형용사
+biz_invoke,invoke,"들먹이다, 발동하다",v,,,업무 동사
+biz_negligent,negligent,"태만한, 부주의한",adj,,,법·계약
+biz_persuasion,persuasion,설득,n,,,경영·전략
+biz_reorganization,reorganization,"개편, 재편성",n,,,업무 명사
+biz_underdog,underdog,"약자, 이길 가능성이 적은 쪽",n,,,업무 명사
+biz_escalation,escalation,"확대, 악화",n,,,업무 명사
+biz_forfeit,forfeit,"몰수당하다, 박탈당하다",v,,,업무 동사
+biz_furnishings,furnishings,"가구, 비품",n,,,부동산·시설
+biz_pamphlet,pamphlet,"팸플릿, 소책자",n,,,마케팅·판매
+biz_philanthropy,philanthropy,자선 활동,n,,,업무 명사
+biz_receptive,receptive,수용적인,adj,,,업무 형용사
+biz_redundancy,redundancy,"정리 해고, 불필요한 중복",n,,,인사·채용
+biz_sideline,sideline,"제외하다, 소외시키다",v,,,업무 동사
+biz_supervise,supervise,"감독하다, 관리하다",v,,,인사·채용
+biz_supervisory,supervisory,"감독의, 관리의",adj,,,인사·채용
+biz_takeaway,takeaway,"핵심 요점, 포장 음식",n,,,업무 명사
+biz_voicemail,voicemail,음성 메시지,n,,,사무·회의
+biz_bolster,bolster,"강화하다, 북돋우다",v,,,업무 동사
+biz_cohesive,cohesive,"화합하는, 결속력 있는",adj,,,업무 형용사
+biz_denomination,denomination,"(화폐의) 액면가, 교파",n,,,금융·은행
+biz_dissatisfied,dissatisfied,불만스러운,adj,,,고객 서비스
+biz_incidental,incidental,"부수적인, 우연한",adj,,,업무 형용사
+biz_luncheon,luncheon,오찬,n,,,사무·회의
+biz_nurture,nurture,"양육하다, 육성하다",v,,,업무 동사
+biz_overt,overt,"명백한, 공공연한",adj,,,업무 형용사
+biz_prioritize,prioritize,우선순위를 매기다,v,,,업무 동사
+biz_proprietor,proprietor,"소유주, 경영자",n,,,직업·업종
+biz_resurgence,resurgence,"재기, 부활",n,,,업무 명사
+biz_spreadsheet,spreadsheet,스프레드시트,n,,,회계·세금
+biz_stagnant,stagnant,"침체된, 고여 있는",adj,,,경제
+biz_aspiration,aspiration,"열망, 포부",n,,,업무 명사
+biz_attentive,attentive,"주의 깊은, 세심한",adj,,,고객 서비스
+biz_broaden,broaden,"넓히다, 넓어지다",v,,,업무 동사
+biz_cryptocurrency,cryptocurrency,암호 화폐,n,,,정보 기술
+biz_enrich,enrich,풍부하게 하다,v,,,업무 동사
+biz_fruitful,fruitful,"생산적인, 유익한",adj,,,업무 형용사
+biz_omission,omission,"생략, 누락",n,,,업무 명사
+biz_prepaid,prepaid,선불의,adj,,,회계·세금
+biz_reassure,reassure,안심시키다,v,,,업무 동사
+biz_typo,typo,"오타, 오식",n,,,사무·회의
+biz_acclaim,acclaim,"칭찬, 호평",n,,,업무 명사
+biz_ascertain,ascertain,"확인하다, 알아내다",v,,,업무 동사
+biz_ballpark_figure,ballpark figure,대략적인 수치,n,,,경영·전략
+biz_denote,denote,"나타내다, 의미하다",v,,,업무 동사
+biz_eradicate,eradicate,근절하다,v,,,업무 동사
+biz_exporter,exporter,"수출업자, 수출국",n,,,경제
+biz_flourishing,flourishing,번창하는,adj,,,업무 형용사
+biz_ineligible,ineligible,자격이 없는,adj,,,업무 형용사
+biz_infusion,infusion,"투입, 주입",n,,,업무 명사
+biz_malfunction,malfunction,"오작동, 고장",n,,,고객 서비스
+biz_markedly,markedly,현저하게,adv,,,업무 부사
+biz_mediator,mediator,"조정자, 중재자",n,,,법·계약
+biz_payback,payback,"보상, 투자 회수",n,,,업무 명사
+biz_recourse,recourse,"의지, 상환 청구권",n,,,업무 명사
+biz_retrospect,retrospect,"회고, 회상",n,,,업무 명사
+biz_sporadic,sporadic,산발적인,adj,,,업무 형용사
+biz_upscale,upscale,"고급의, 상류층의",adj,,,업무 형용사
+biz_cohesion,cohesion,"결속, 화합",n,,,업무 명사
+biz_constraint,constraint,"제약, 제한",n,,,업무 명사
+biz_cramped,cramped,비좁은,adj,,,부동산·시설
+biz_defunct,defunct,"없어진, 기능하지 않는",adj,,,업무 형용사
+biz_esteemed,esteemed,존경받는,adj,,,업무 형용사
+biz_predicament,predicament,"곤경, 궁지",n,,,업무 명사
+biz_predominant,predominant,"두드러진, 우세한",adj,,,업무 형용사
+biz_uptake,uptake,"흡수, 이용률",n,,,업무 명사
+biz_withhold,withhold,"보류하다, 주지 않다",v,,,업무 동사
+biz_adversely,adversely,불리하게,adv,,,업무 부사
+biz_belt_tightening,belt-tightening,"긴축, 허리띠 졸라매기",n,,,금융·은행
+biz_competency,competency,"역량, 능력",n,,,인사·채용
+biz_impetus,impetus,"자극, 원동력",n,,,업무 명사
+biz_lucid,lucid,명쾌한,adj,,,업무 형용사
+biz_outweigh,outweigh,~보다 더 크다,v,,,업무 동사
+biz_precarious,precarious,"불안정한, 위태로운",adj,,,업무 형용사
+biz_proclaim,proclaim,선언하다,v,,,업무 동사
+biz_reassurance,reassurance,"안심시키는 말, 안심",n,,,업무 명사
+biz_restrain,restrain,"억누르다, 제지하다",v,,,업무 동사
+biz_sole_proprietor,sole proprietor,개인 사업자,n,,,직업·업종
+biz_streamlined,streamlined,"간소화된, 유선형의",adj,,,업무 명사
+biz_assortment,assortment,"여러 가지, 구색",n,,,업무 명사
+biz_concurrently,concurrently,동시에,adv,,,업무 부사
+biz_core_competency,core competency,핵심 역량,n,,,경영·전략
+biz_culmination,culmination,"정점, 최고조",n,,,업무 명사
+biz_dissemination,dissemination,"보급, 유포",n,,,업무 명사
+biz_electrician,electrician,전기 기사,n,,,부동산·시설
+biz_hamper,hamper,"방해하다, 제한하다",v,,,업무 동사
+biz_liquidation,liquidation,"청산, 재고 정리",n,,,마케팅·판매
+biz_nuanced,nuanced,미묘한 차이가 있는,adj,,,업무 형용사
+biz_outage,outage,"정전, 서비스 중단",n,,,정보 기술
+biz_preoccupied,preoccupied,"몰두한, 정신이 팔린",adj,,,업무 형용사
+biz_receptionist,receptionist,접수 담당자,n,,,인사·채용
+biz_recruiter,recruiter,채용 담당자,n,,,인사·채용
+biz_remuneration,remuneration,"보수, 보상",n,,,회계·세금
+biz_revoke,revoke,"취소하다, 폐지하다",v,,,법·계약
+biz_strategist,strategist,전략가,n,,,업무 명사
+biz_undisputed,undisputed,이론의 여지가 없는,adj,,,업무 형용사
+biz_accommodating,accommodating,"친절한, 잘 협조하는",adj,,,업무 형용사
+biz_attest,attest,"증명하다, 증언하다",v,,,업무 동사
+biz_borrower,borrower,돈을 빌리는 사람,n,,,금융·은행
+biz_commend,commend,"칭찬하다, 추천하다",v,,,업무 동사
+biz_conveyor_belt,conveyor belt,컨베이어 벨트,n,,,물류·제조
+biz_customization,customization,맞춤 제작,n,,,업무 명사
+biz_impeccable,impeccable,흠잡을 데 없는,adj,,,업무 형용사
+biz_inbound,inbound,"들어오는, 수신의",adj,,,업무 명사
+biz_malpractice,malpractice,업무상 과실,n,,,업무 명사
+biz_payoff,payoff,"성과, 보상",n,,,업무 명사
+biz_pessimistic,pessimistic,비관적인,adj,,,업무 형용사
+biz_realtor,realtor,부동산 중개인,n,,,부동산·시설
+biz_sluggish,sluggish,"부진한, 느린",adj,,,경제
+biz_ultimatum,ultimatum,최후통첩,n,,,경영·전략
+biz_webinar,webinar,"웨비나, 온라인 세미나",n,,,사무·회의
+biz_conducive,conducive,도움이 되는,adj,,,업무 형용사
+biz_conscientious,conscientious,"양심적인, 성실한",adj,,,업무 형용사
+biz_firewall,firewall,방화벽,n,,,정보 기술
+biz_housekeeping,housekeeping,"객실 관리, 살림",n,,,출장·여행·호텔
+biz_jargon,jargon,"전문 용어, 특수 용어",n,,,업무 명사
+biz_logistical,logistical,"물류의, 실행 계획의",adj,,,업무 형용사
+biz_loophole,loophole,"빠져나갈 구멍, 허점",n,,,법·계약
+biz_meticulous,meticulous,꼼꼼한,adj,,,업무 형용사
+biz_paternity_leave,paternity leave,아빠 육아 휴가,n,,,인사·채용
+biz_prerequisite,prerequisite,"전제 조건, 필수 과목",n,,,인사·채용
+biz_quantify,quantify,수량화하다,v,,,업무 동사
+biz_requisite,requisite,"필요조건, 필수품",n,,,업무 명사
+biz_unload,unload,(짐을) 내리다,v,,,물류·제조
+biz_upkeep,upkeep,"유지, 유지비",n,,,부동산·시설
+biz_bestselling,bestselling,가장 많이 팔리는,adj,,,마케팅·판매
+biz_clout,clout,영향력,n,,,업무 명사
+biz_diligent,diligent,"부지런한, 근면한",adj,,,업무 형용사
+biz_discern,discern,"알아차리다, 분별하다",v,,,업무 동사
+biz_downgrade,downgrade,등급을 낮추다,v,,,경영·전략
+biz_formulate,formulate,"만들어 내다, 공식화하다",v,,,업무 동사
+biz_segmentation,segmentation,"분할, 세분화",n,,,업무 명사
+biz_auspices,auspices,"후원, 보호",n,,,업무 명사
+biz_clientele,clientele,"고객층, 의뢰인들",n,,,마케팅·판매
+biz_diversification,diversification,"다각화, 다양화",n,,,금융·은행
+biz_fishery,fishery,"어업, 어장",n,,,물류·제조
+biz_intangible,intangible,"무형의, 만질 수 없는",adj,,,회계·세금
+biz_landscaping,landscaping,조경,n,,,부동산·시설
+biz_misconception,misconception,오해,n,,,업무 명사
+biz_negotiable,negotiable,협상의 여지가 있는,adj,,,경영·전략
+biz_overturn,overturn,"뒤집다, 번복하다",v,,,법·계약
+biz_payer,payer,지불인,n,,,금융·은행
+biz_prospectus,prospectus,"사업 설명서, 안내서",n,,,업무 명사
+biz_reciprocal,reciprocal,"상호의, 호혜적인",adj,,,업무 형용사
+biz_stewardship,stewardship,"관리, 책임 관리",n,,,업무 명사
+biz_synergy,synergy,"시너지, 상승효과",n,,,업무 명사
+biz_cutoff,cutoff,"마감, 차단",n,,,업무 명사
+biz_drawback,drawback,"결점, 문제점",n,,,업무 명사
+biz_entail,entail,수반하다,v,,,업무 동사
+biz_prolong,prolong,"연장하다, 늘이다",v,,,업무 동사
+biz_sender,sender,발신자,n,,,사무·회의
+biz_unfavorable,unfavorable,"불리한, 호의적이지 않은",adj,,,업무 형용사
+biz_aptitude,aptitude,"적성, 소질",n,,,인사·채용
+biz_courteous,courteous,"공손한, 정중한",adj,,,고객 서비스
+biz_defer,defer,"미루다, 따르다",v,,,업무 동사
+biz_demeanor,demeanor,"태도, 품행",n,,,업무 명사
+biz_detour,detour,"우회로, 우회하다",n,,,부동산·시설
+biz_downtime,downtime,가동 중지 시간,n,,,물류·제조
+biz_fanfare,fanfare,"팡파르, 요란한 선전",n,,,업무 명사
+biz_homeowner,homeowner,주택 소유자,n,,,부동산·시설
+biz_janitor,janitor,"건물 관리인, 청소원",n,,,사무·회의
+biz_lien,lien,"유치권, 선취 특권",n,,,금융·은행
+biz_recurrence,recurrence,"재발, 반복",n,,,업무 명사
+biz_refinement,refinement,"개선, 세련",n,,,업무 명사
+biz_revamp,revamp,"개편하다, 개조하다",v,,,업무 동사
+biz_unparalleled,unparalleled,비할 데 없는,adj,,,업무 형용사
+biz_unsolicited,unsolicited,요청하지 않은,adj,,,업무 형용사
+biz_unveil,unveil,"공개하다, 발표하다",v,,,마케팅·판매
+biz_assertive,assertive,"적극적인, 자기주장이 강한",adj,,,업무 형용사
+biz_augment,augment,"늘리다, 증대시키다",v,,,업무 동사
+biz_complacent,complacent,자기만족에 빠진,adj,,,업무 형용사
+biz_confer,confer,"상의하다, 수여하다",v,,,업무 동사
+biz_counteract,counteract,"대응하다, 중화하다",v,,,업무 동사
+biz_devise,devise,고안하다,v,,,업무 동사
+biz_downturn,downturn,"경기 침체, 하락",n,,,경제
+biz_gimmick,gimmick,"술책, 눈속임",n,,,마케팅·판매
+biz_groundwork,groundwork,"기초 작업, 토대",n,,,경영·전략
+biz_perpetuate,perpetuate,영속시키다,v,,,업무 동사
+biz_renounce,renounce,"포기하다, 버리다",v,,,업무 동사
+biz_resonate,resonate,"공명하다, 울려 퍼지다",v,,,업무 동사
+biz_signage,signage,"간판, 표지판",n,,,업무 명사
+biz_stagnation,stagnation,"침체, 정체",n,,,경제
+biz_unravel,unravel,"풀다, 해결하다",v,,,업무 동사
+biz_watchdog,watchdog,감시 단체,n,,,법·계약
+biz_allege,allege,(증거 없이) 주장하다,v,,,경영·전략
+biz_demolish,demolish,"철거하다, 파괴하다",v,,,부동산·시설
+biz_insolvency,insolvency,지급 불능 상태,n,,,금융·은행
+biz_mobilize,mobilize,동원하다,v,,,업무 동사
+biz_throughput,throughput,처리량,n,,,물류·제조
+biz_tout,tout,"홍보하다, 강매하다",v,,,경영·전략
+biz_whistleblower,whistleblower,내부 고발자,n,,,법·계약
+biz_absentee,absentee,"결근자, 불참자",n,,,인사·채용
+biz_circulate,circulate,"돌리다, 순환하다",v,,,업무 동사
+biz_condone,condone,용납하다,v,,,경영·전략
+biz_deregulation,deregulation,규제 완화,n,,,경제
+biz_envision,envision,"구상하다, 상상하다",v,,,업무 동사
+biz_flammable,flammable,"불이 잘 붙는, 가연성의",adj,,,물류·제조
+biz_hone,hone,연마하다,v,,,업무 동사
+biz_rectify,rectify,바로잡다,v,,,업무 동사
+biz_rudimentary,rudimentary,"기초적인, 초보의",adj,,,업무 형용사
+biz_unforeseen,unforeseen,예측하지 못한,adj,,,업무 형용사
+biz_valet,valet,주차 대행원,n,,,출장·여행·호텔
+biz_affordability,affordability,감당할 수 있는 정도,n,,,업무 명사
+biz_attrition,attrition,"자연 감원, 소모",n,,,인사·채용
+biz_bailout,bailout,긴급 구제 금융,n,,,금융·은행
+biz_budgetary,budgetary,예산의,adj,,,회계·세금
+biz_foresight,foresight,선견지명,n,,,업무 명사
+biz_procure,procure,"조달하다, 구하다",v,,,물류·제조
+biz_propel,propel,"추진하다, 나아가게 하다",v,,,업무 동사
+biz_roadmap,roadmap,"로드맵, 계획",n,,,업무 명사
+biz_severance_pay,severance pay,퇴직 수당,n,,,인사·채용
+biz_tycoon,tycoon,"거물, 재벌",n,,,직업·업종
+biz_workflow,workflow,작업 흐름,n,,,업무 명사
+biz_burnout,burnout,"극도의 피로, 탈진",n,,,인사·채용
+biz_buyout,buyout,기업 매수,n,,,경영·전략
+biz_caveat,caveat,"주의 사항, 경고",n,,,업무 명사
+biz_chairperson,chairperson,의장,n,,,인사·채용
+biz_deteriorate,deteriorate,악화되다,v,,,업무 동사
+biz_formality,formality,"형식적 절차, 격식",n,,,업무 명사
+biz_grievance,grievance,"고충, 불만",n,,,인사·채용
+biz_merchandising,merchandising,"판매 촉진, 상품화 계획",n,,,마케팅·판매
+biz_proponent,proponent,지지자,n,,,업무 명사
+biz_redress,redress,"시정, 배상",n,,,업무 명사
+biz_unsecured,unsecured,"무담보의, 안전하지 않은",adj,,,금융·은행
+biz_abbreviation,abbreviation,"약어, 축약",n,,,사무·회의
+biz_avert,avert,"피하다, 막다",v,,,업무 동사
+biz_bullish,bullish,"강세의, 낙관적인",adj,,,금융·은행
+biz_claimant,claimant,"청구인, 신청자",n,,,금융·은행
+biz_decipher,decipher,"판독하다, 해독하다",v,,,업무 동사
+biz_dispersal,dispersal,"분산, 해산",n,,,업무 명사
+biz_impede,impede,"지연시키다, 방해하다",v,,,업무 동사
+biz_jobless,jobless,실직한,adj,,,인사·채용
+biz_jurisprudence,jurisprudence,"법학, 법체계",n,,,법·계약
+biz_ombudsman,ombudsman,"옴부즈맨, 민원 조사관",n,,,법·계약
+biz_ratification,ratification,"비준, 승인",n,,,업무 명사
+biz_refute,refute,반박하다,v,,,업무 동사
+biz_showroom,showroom,전시실,n,,,마케팅·판매
+biz_sightseeing,sightseeing,관광,n,,,출장·여행·호텔
+biz_steadfast,steadfast,"확고한, 변함없는",adj,,,업무 형용사
+biz_tentatively,tentatively,잠정적으로,adv,,,업무 부사
+biz_blunder,blunder,큰 실수,n,,,업무 명사
+biz_concierge,concierge,"안내원, 관리인",n,,,출장·여행·호텔
+biz_duplex,duplex,두 가구 연립 주택,n,,,부동산·시설
+biz_inaction,inaction,"무대책, 활동하지 않음",n,,,업무 명사
+biz_lenient,lenient,관대한,adj,,,업무 형용사
+biz_reiterate,reiterate,되풀이하다,v,,,업무 동사
+biz_upheaval,upheaval,"격변, 대변동",n,,,업무 명사
+biz_viewership,viewership,"시청자 수, 시청자층",n,,,마케팅·판매
+biz_vouch,vouch,보증하다,v,,,업무 동사
+biz_capitalization,capitalization,"자본화, 시가 총액",n,,,회계·세금
+biz_custodian,custodian,"관리인, 보관자",n,,,사무·회의
+biz_delinquent,delinquent,"연체된, 비행의",adj,,,금융·은행
+biz_disapprove,disapprove,못마땅해하다,v,,,업무 동사
+biz_leaflet,leaflet,"전단, 광고 쪽지",n,,,마케팅·판매
+biz_overpriced,overpriced,너무 비싼,adj,,,마케팅·판매
+biz_pallet,pallet,"화물 운반대, 팔레트",n,,,물류·제조
+biz_philanthropist,philanthropist,자선가,n,,,업무 명사
+biz_readership,readership,"독자 수, 독자층",n,,,마케팅·판매
+biz_relinquish,relinquish,"포기하다, 내주다",v,,,업무 동사
+biz_salient,salient,"가장 중요한, 두드러진",adj,,,업무 형용사
+biz_schematic,schematic,"도식, 개략적인",n,,,물류·제조
+biz_stockpile,stockpile,"비축하다, 비축량",v,,,물류·제조
+biz_strenuous,strenuous,"몹시 힘든, 격렬한",adj,,,업무 형용사
+biz_acknowledgment,acknowledgment,"접수 확인, 인정",n,,,사무·회의
+biz_dispense,dispense,"나누어 주다, 조제하다",v,,,업무 동사
+biz_disqualification,disqualification,"실격, 자격 박탈",n,,,업무 명사
+biz_frugal,frugal,"절약하는, 검소한",adj,,,업무 형용사
+biz_leveraged,leveraged,차입금을 이용한,adj,,,금융·은행
+biz_momentous,momentous,중대한,adj,,,업무 형용사
+biz_notary,notary,공증인,n,,,법·계약
+biz_occupant,occupant,"거주자, 점유자",n,,,부동산·시설
+biz_roundtable,roundtable,"원탁회의, 좌담회",n,,,사무·회의
+biz_tenacity,tenacity,"끈기, 고집",n,,,업무 명사
+biz_attainable,attainable,달성할 수 있는,adj,,,업무 형용사
+biz_catered,catered,음식이 제공되는,adj,,,출장·여행·호텔
+biz_centerpiece,centerpiece,"중앙 장식물, 핵심",n,,,사무·회의
+biz_condominium,condominium,분양 아파트,n,,,부동산·시설
+biz_cordial,cordial,"다정한, 진심 어린",adj,,,업무 형용사
+biz_custodial_staff,custodial staff,관리 직원,n,,,직업·업종
+biz_elicit,elicit,이끌어 내다,v,,,업무 동사
+biz_fledgling,fledgling,"신생의, 갓 시작한",adj,,,업무 형용사
+biz_multilateral,multilateral,다자간의,adj,,,경제
+biz_plenary,plenary,전원 출석의,adj,,,사무·회의
+biz_rebuttal,rebuttal,반박,n,,,업무 명사
+biz_refrigerated,refrigerated,냉장된,adj,,,물류·제조
+biz_scaffolding,scaffolding,"비계, 발판",n,,,부동산·시설
+biz_slowdown,slowdown,"둔화, 감속",n,,,경제
+biz_undercut,undercut,더 싸게 팔다,v,,,업무 동사
+biz_apprehension,apprehension,"우려, 체포",n,,,업무 명사
+biz_benefactor,benefactor,"후원자, 은인",n,,,업무 명사
+biz_heyday,heyday,전성기,n,,,업무 명사
+biz_lukewarm,lukewarm,"미지근한, 시큰둥한",adj,,,업무 형용사
+biz_markup,markup,"가격 인상분, 이윤 폭",n,,,회계·세금
+biz_obstruct,obstruct,"막다, 방해하다",v,,,업무 동사
+biz_percentile,percentile,백분위,n,,,업무 명사
+biz_reinstate,reinstate,"복직시키다, 회복시키다",v,,,업무 동사
+biz_remit,remit,송금하다,v,,,금융·은행
+biz_respondent,respondent,응답자,n,,,마케팅·판매
+biz_amalgamation,amalgamation,"합병, 융합",n,,,업무 명사
+biz_automate,automate,자동화하다,v,,,물류·제조
+biz_certify,certify,"증명하다, 자격증을 주다",v,,,법·계약
+biz_henceforth,henceforth,이후로,adv,,,업무 부사
+biz_importer,importer,"수입업자, 수입국",n,,,경제
+biz_meticulously,meticulously,꼼꼼하게,adv,,,업무 부사
+biz_moratorium,moratorium,"활동 중단, 지불 유예",n,,,업무 명사
+biz_prerogative,prerogative,"특권, 특혜",n,,,업무 명사
+biz_sous_chef,sous-chef,부주방장,n,,,출장·여행·호텔
+biz_abstain,abstain,"기권하다, 삼가다",v,,,사무·회의
+biz_cubicle,cubicle,칸막이 사무 공간,n,,,사무·회의
+biz_exclusivity,exclusivity,"독점권, 배타성",n,,,마케팅·판매
+biz_mogul,mogul,(업계의) 큰손,n,,,직업·업종
+biz_omit,omit,"빠뜨리다, 생략하다",v,,,업무 동사
+biz_quorum,quorum,정족수,n,,,사무·회의
+biz_rigor,rigor,"엄격함, 철저함",n,,,업무 명사
+biz_shortlist,shortlist,최종 후보 명단,n,,,인사·채용
+biz_tenancy,tenancy,"임차 기간, 임차",n,,,법·계약
+biz_toner,toner,토너,n,,,사무·회의
+biz_unify,unify,"통합하다, 통일하다",v,,,업무 동사
+biz_deliberation,deliberation,"숙의, 숙고",n,,,사무·회의
+biz_deviate,deviate,벗어나다,v,,,업무 동사
+biz_mainstay,mainstay,"대들보, 중심",n,,,업무 명사
+biz_marketable,marketable,시장성이 있는,adj,,,마케팅·판매
+biz_rollout,rollout,"출시, 공개",n,,,마케팅·판매
+biz_tagline,tagline,"광고 문구, 표어",n,,,마케팅·판매
+biz_townhouse,townhouse,연립 주택,n,,,부동산·시설
+biz_arrears,arrears,연체금,n,,,금융·은행
+biz_assimilate,assimilate,"동화되다, 흡수하다",v,,,업무 동사
+biz_bistro,bistro,작은 식당,n,,,출장·여행·호텔
+biz_bonanza,bonanza,"노다지, 대성공",n,,,업무 명사
+biz_compendium,compendium,"개요, 요약집",n,,,업무 명사
+biz_complacency,complacency,"자기만족, 안주",n,,,업무 명사
+biz_errand,errand,"심부름, 볼일",n,,,사무·회의
+biz_fiduciary,fiduciary,"신탁의, 수탁자의",adj,,,금융·은행
+biz_freighter,freighter,화물선,n,,,물류·제조
+biz_intermittently,intermittently,간헐적으로,adv,,,업무 부사
+biz_lubricant,lubricant,윤활유,n,,,물류·제조
+biz_macroeconomic,macroeconomic,거시 경제의,adj,,,경제
+biz_sprinkler,sprinkler,스프링클러,n,,,부동산·시설
+biz_standstill,standstill,"정지, 멈춤",n,,,업무 명사
+biz_ticketing,ticketing,발권,n,,,사무·회의
+biz_acquittal,acquittal,무죄 판결,n,,,법·계약
+biz_escrow,escrow,제3자 예치,n,,,금융·은행
+biz_garnish,garnish,"(급여를) 압류하다, 장식하다",v,,,경영·전략
+biz_headway,headway,"진전, 전진",n,,,업무 명사
+biz_magnate,magnate,"거물, 큰 사업가",n,,,직업·업종
+biz_per_diem,per diem,"일당, 일일 수당",n,,,회계·세금
+biz_reciprocity,reciprocity,"상호 이익, 호혜",n,,,업무 명사
+biz_workstation,workstation,"작업 공간, 워크스테이션",n,,,사무·회의
+biz_apprehensive,apprehensive,"걱정되는, 불안한",adj,,,업무 형용사
+biz_byproduct,byproduct,부산물,n,,,업무 명사
+biz_disseminate,disseminate,"퍼뜨리다, 보급하다",v,,,업무 동사
+biz_fixer_upper,fixer-upper,수리가 필요한 집,n,,,부동산·시설
+biz_juncture,juncture,"시점, 중대 국면",n,,,업무 명사
+biz_licensee,licensee,사용 허가를 받은 사람,n,,,마케팅·판매
+biz_preclude,preclude,"못하게 하다, 막다",v,,,업무 동사
+biz_preorder,preorder,예약 주문하다,v,,,마케팅·판매
+biz_retract,retract,"철회하다, 취소하다",v,,,업무 동사
+biz_embezzlement,embezzlement,횡령,n,,,법·계약
+biz_enforceable,enforceable,시행할 수 있는,adj,,,법·계약
+biz_escalator,escalator,에스컬레이터,n,,,부동산·시설
+biz_shortfall,shortfall,"부족분, 부족액",n,,,물류·제조
+biz_detract,detract,"손상시키다, 떨어뜨리다",v,,,업무 동사
+biz_exorbitant,exorbitant,(값이) 터무니없는,adj,,,업무 형용사
+biz_financier,financier,"금융업자, 자본가",n,,,금융·은행
+biz_florist,florist,"꽃집 주인, 화초 재배자",n,,,직업·업종
+biz_hindrance,hindrance,"방해, 장애물",n,,,업무 명사
+biz_inflate,inflate,부풀리다,v,,,업무 동사
+biz_outflow,outflow,유출,n,,,금융·은행
+biz_outperform,outperform,더 나은 성과를 내다,v,,,업무 동사
+biz_refreshments,refreshments,다과,n,,,사무·회의
+biz_restructure,restructure,구조를 조정하다,v,,,업무 동사
+biz_shipper,shipper,"화주, 운송업자",n,,,물류·제조
+biz_stipend,stipend,"수당, 장학금",n,,,회계·세금
+biz_backer,backer,"후원자, 지지자",n,,,업무 명사
+biz_consignment,consignment,"위탁 판매, 탁송물",n,,,마케팅·판매
+biz_expiry,expiry,"만료일, 기한 만료",n,,,업무 명사
+biz_expiry_date,expiry date,유효 기한,n,,,물류·제조
+biz_freelancer,freelancer,프리랜서,n,,,인사·채용
+biz_handout,handout,"유인물, 지원금",n,,,사무·회의
+biz_instill,instill,"주입하다, 서서히 심어 주다",v,,,업무 동사
+biz_invalidate,invalidate,무효화하다,v,,,법·계약
+biz_mishap,mishap,"작은 사고, 불운",n,,,업무 명사
+biz_outbound,outbound,"외국행의, 발신의",adj,,,업무 명사
+biz_stifle,stifle,"억압하다, 숨 막히게 하다",v,,,업무 동사
+biz_apologetic,apologetic,"미안해하는, 사과하는",adj,,,고객 서비스
+biz_bookkeeping,bookkeeping,"부기, 장부 정리",n,,,회계·세금
+biz_forerunner,forerunner,"선구자, 전신",n,,,업무 명사
+biz_forgo,forgo,"포기하다, ~없이 지내다",v,,,업무 동사
+biz_infringe,infringe,"침해하다, 위반하다",v,,,법·계약
+biz_reinstatement,reinstatement,"복직, 복위",n,,,인사·채용
+biz_swamped,swamped,"일이 쌓인, 정신없이 바쁜",adj,,,사무·회의
+biz_arbitrator,arbitrator,중재인,n,,,법·계약
+biz_buoyant,buoyant,"호황의, 활기찬",adj,,,경제
+biz_curtail,curtail,"줄이다, 삭감하다",v,,,업무 동사
+biz_leeway,leeway,재량의 여지,n,,,업무 명사
+biz_negate,negate,"무효화하다, 부정하다",v,,,업무 동사
+biz_outnumber,outnumber,수적으로 우세하다,v,,,업무 동사
+biz_recoup,recoup,"되찾다, 만회하다",v,,,금융·은행
+biz_shoplifting,shoplifting,가게 물건 훔치기,n,,,마케팅·판매
+biz_amortization,amortization,분할 상환,n,,,금융·은행
+biz_bottleneck,bottleneck,"병목 현상, 장애",n,,,업무 명사
+biz_carpentry,carpentry,"목공, 목수 일",n,,,부동산·시설
+biz_deadlock,deadlock,교착 상태,n,,,업무 명사
+biz_displace,displace,"대신하다, 쫓아내다",v,,,업무 동사
+biz_evict,evict,"쫓아내다, 퇴거시키다",v,,,법·계약
+biz_expedited_shipping,expedited shipping,빠른 배송,n,,,물류·제조
+biz_facsimile,facsimile,"복사, 팩스",n,,,사무·회의
+biz_petrochemical,petrochemical,석유 화학 제품,n,,,물류·제조
+biz_shredder,shredder,문서 파쇄기,n,,,사무·회의
+biz_underscore,underscore,"강조하다, 밑줄을 긋다",v,,,업무 동사
+biz_warehousing,warehousing,창고 보관,n,,,물류·제조
+biz_bereavement_leave,bereavement leave,경조 휴가,n,,,인사·채용
+biz_boardroom,boardroom,중역 회의실,n,,,인사·채용
+biz_confectionery,confectionery,"과자류, 제과점",n,,,물류·제조
+biz_handover,handover,"인수인계, 양도",n,,,사무·회의
+biz_impasse,impasse,막다른 상태,n,,,업무 명사
+biz_increment,increment,"증가, 인상분",n,,,업무 명사
+biz_persevere,persevere,인내하며 계속하다,v,,,업무 동사
+biz_marketer,marketer,마케팅 담당자,n,,,마케팅·판매
+biz_phishing,phishing,"피싱, 정보 사기",n,,,정보 기술
+biz_sabbatical,sabbatical,안식 휴가,n,,,인사·채용
+biz_salaried,salaried,봉급을 받는,adj,,,인사·채용
+biz_uninstall,uninstall,제거하다,v,,,정보 기술
+biz_disqualify,disqualify,실격시키다,v,,,경영·전략
+biz_entrant,entrant,신규 참가자,n,,,업무 명사
+biz_ratify,ratify,"비준하다, 승인하다",v,,,법·계약
+biz_slideshow,slideshow,슬라이드 쇼,n,,,사무·회의
+biz_splurge,splurge,돈을 펑펑 쓰다,v,,,금융·은행
+biz_takeout,takeout,"포장 음식, 포장해 가는",n,,,출장·여행·호텔
+biz_windfall,windfall,뜻밖의 횡재,n,,,업무 명사
+biz_workday,workday,근무일,n,,,인사·채용
+biz_confiscate,confiscate,압수하다,v,,,업무 동사
+biz_deflation,deflation,"물가 하락, 디플레이션",n,,,경제
+biz_expatriate,expatriate,국외 거주자,n,,,업무 명사
+biz_nepotism,nepotism,"족벌주의, 연고주의",n,,,인사·채용
+biz_resell,resell,되팔다,v,,,경영·전략
+biz_revocation,revocation,"취소, 철회",n,,,법·계약
+biz_subsidize,subsidize,보조금을 주다,v,,,경제
+biz_corroborate,corroborate,"확증하다, 뒷받침하다",v,,,경영·전략
+biz_delinquency,delinquency,"연체, 비행",n,,,업무 명사
+biz_exacerbate,exacerbate,악화시키다,v,,,업무 동사
+biz_refinance,refinance,재융자하다,v,,,금융·은행
+biz_remodel,remodel,"개조하다, 리모델링하다",v,,,부동산·시설
+biz_retroactive,retroactive,소급하는,adj,,,업무 형용사
+biz_signatory,signatory,"서명인, 조약 가맹국",n,,,법·계약
+biz_stipulation,stipulation,"(계약) 조건, 명기",n,,,법·계약
+biz_devaluation,devaluation,평가 절하,n,,,금융·은행
+biz_downplay,downplay,경시하다,v,,,업무 동사
+biz_helpline,helpline,상담 전화,n,,,고객 서비스
+biz_undervalued,undervalued,저평가된,adj,,,금융·은행
+biz_facilitator,facilitator,"진행자, 조력자",n,,,업무 명사
+biz_fortify,fortify,"강화하다, 요새화하다",v,,,업무 동사
+biz_reprimand,reprimand,질책하다,v,,,업무 동사
+biz_succinct,succinct,간결한,adj,,,업무 형용사
+biz_welder,welder,용접공,n,,,부동산·시설
+biz_addendum,addendum,"부록, 추가 조항",n,,,법·계약
+biz_barcode,barcode,바코드,n,,,물류·제조
+biz_clipboard,clipboard,클립보드,n,,,사무·회의
+biz_compensatory,compensatory,보상의,adj,,,인사·채용
+biz_fluctuation,fluctuation,"변동, 오르내림",n,,,경제
+biz_inefficiency,inefficiency,비효율,n,,,업무 명사
+biz_inflow,inflow,유입,n,,,업무 명사
+biz_rebrand,rebrand,브랜드 이미지를 바꾸다,v,,,마케팅·판매
+biz_bookkeeper,bookkeeper,경리 담당자,n,,,회계·세금
+biz_divest,divest,(자산을) 매각하다,v,,,금융·은행
+biz_pertain,pertain,"관련되다, 적용되다",v,,,업무 동사
+biz_regrettably,regrettably,유감스럽게도,adv,,,업무 부사
+biz_shopkeeper,shopkeeper,가게 주인,n,,,직업·업종
+biz_subside,subside,"가라앉다, 진정되다",v,,,업무 동사
+biz_unattainable,unattainable,도달할 수 없는,adj,,,업무 형용사
+biz_entrust,entrust,맡기다,v,,,업무 동사
+biz_forklift,forklift,지게차,n,,,물류·제조
+biz_laminate,laminate,코팅하다,v,,,사무·회의
+biz_pensioner,pensioner,연금 수령자,n,,,인사·채용
+biz_rescind,rescind,"철회하다, 폐지하다",v,,,법·계약
+biz_revitalize,revitalize,활성화하다,v,,,업무 동사
+biz_storefront,storefront,"가게 앞, 매장",n,,,마케팅·판매
+biz_appetizer,appetizer,"전채 요리, 애피타이저",n,,,출장·여행·호텔
+biz_bankroll,bankroll,자금을 대다,v,,,금융·은행
+biz_belittle,belittle,하찮게 여기다,v,,,업무 동사
+biz_coerce,coerce,강요하다,v,,,업무 동사
+biz_fintech,fintech,"핀테크, 금융 기술",n,,,금융·은행
+biz_insolvent,insolvent,지급 불능의,adj,,,금융·은행
+biz_notepad,notepad,메모장,n,,,사무·회의
+biz_outlier,outlier,"이상치, 동떨어진 것",n,,,업무 명사
+biz_precede,precede,앞서다,v,,,업무 동사
+biz_presumptuous,presumptuous,주제넘은,adj,,,업무 형용사
+biz_thrifty,thrifty,절약하는,adj,,,금융·은행
+biz_whiteboard,whiteboard,화이트보드,n,,,사무·회의
+biz_wholesaler,wholesaler,도매업자,n,,,마케팅·판매
+biz_brevity,brevity,간결함,n,,,업무 명사
+biz_handyman,handyman,"잡역부, 수리공",n,,,부동산·시설
+biz_rollover,rollover,"이월, 전복",n,,,업무 명사
+biz_underpaid,underpaid,"박봉의, 저임금의",adj,,,인사·채용
+biz_heighten,heighten,"높이다, 강화하다",v,,,업무 동사
+biz_mentorship,mentorship,"멘토링, 지도",n,,,인사·채용
+biz_necessitate,necessitate,필요로 하다,v,,,업무 동사
+biz_overdraft,overdraft,"당좌 대월, 초과 인출",n,,,금융·은행
+biz_protectionist,protectionist,보호 무역주의의,adj,,,경제
+biz_salesperson,salesperson,판매원,n,,,마케팅·판매
+biz_bearish,bearish,"약세의, 비관적인",adj,,,금융·은행
+biz_commensurate,commensurate,"상응하는, 어울리는",adj,,,업무 형용사
+biz_expedient,expedient,"편리한, 편의주의적인",adj,,,업무 형용사
+biz_outlay,outlay,"비용, 지출",n,,,업무 명사
+biz_spearhead,spearhead,선봉에 서다,v,,,업무 동사
+biz_substantiate,substantiate,입증하다,v,,,업무 동사
+biz_accolade,accolade,"찬사, 표창",n,,,업무 명사
+biz_falter,falter,"흔들리다, 비틀거리다",v,,,업무 동사
+biz_icebreaker,icebreaker,분위기를 푸는 말,n,,,인사·채용
+biz_infuse,infuse,"불어넣다, 우려내다",v,,,업무 동사
+biz_stagger,stagger,"비틀거리다, 시차를 두다",v,,,업무 동사
+biz_arbitrage,arbitrage,차익 거래,n,,,금융·은행
+biz_cashback,cashback,"캐시백, 현금 환급",n,,,마케팅·판매
+biz_locksmith,locksmith,열쇠공,n,,,직업·업종
+biz_monetize,monetize,수익을 창출하다,v,,,경영·전략
+biz_outlast,outlast,~보다 오래가다,v,,,업무 동사
+biz_protectionism,protectionism,보호 무역주의,n,,,경제
+biz_retiree,retiree,은퇴자,n,,,인사·채용
+biz_appraiser,appraiser,"감정사, 평가인",n,,,회계·세금
+biz_inclement,inclement,(날씨가) 궂은,adj,,,업무 형용사
+biz_legible,legible,읽을 수 있는,adj,,,업무 형용사
+biz_photojournalist,photojournalist,보도 사진 기자,n,,,직업·업종
+biz_reorganize,reorganize,재편성하다,v,,,업무 동사
+biz_allot,allot,"할당하다, 배당하다",v,,,업무 동사
+biz_calibrate,calibrate,"눈금을 맞추다, 조정하다",v,,,물류·제조
+biz_guarantor,guarantor,보증인,n,,,금융·은행
+biz_inadvertent,inadvertent,"무심코 한, 고의가 아닌",adj,,,업무 형용사
+biz_preeminent,preeminent,"탁월한, 뛰어난",adj,,,업무 형용사
+biz_provisionally,provisionally,임시로,adv,,,업무 부사
+biz_skyrocket,skyrocket,"급등하다, 치솟다",v,,,업무 동사
+biz_uptick,uptick,소폭 상승,n,,,경제
+biz_appraised_value,appraised value,감정가,n,,,부동산·시설
+biz_appreciable,appreciable,"상당한, 눈에 띄는",adj,,,업무 형용사
+biz_reciprocate,reciprocate,보답하다,v,,,업무 동사
+biz_restock,restock,"재입고하다, 다시 채우다",v,,,물류·제조
+biz_agribusiness,agribusiness,농업 관련 산업,n,,,물류·제조
+biz_amass,amass,"모으다, 축적하다",v,,,업무 동사
+biz_enclose,enclose,"동봉하다, 둘러싸다",v,,,사무·회의
+biz_entree,entree,주요리,n,,,출장·여행·호텔
+biz_magnify,magnify,확대하다,v,,,업무 동사
+biz_redistribute,redistribute,재분배하다,v,,,업무 동사
+biz_tenured,tenured,종신 재직권이 있는,adj,,,인사·채용
+biz_brainchild,brainchild,독창적인 아이디어,n,,,업무 명사
+biz_encrypt,encrypt,암호화하다,v,,,정보 기술
+biz_instigate,instigate,"부추기다, 착수시키다",v,,,업무 동사
+biz_irrevocable,irrevocable,취소할 수 없는,adj,,,업무 형용사
+biz_stockbroker,stockbroker,주식 중개인,n,,,금융·은행
+biz_walkout,walkout,"파업, 퇴장",n,,,인사·채용
+biz_furlough,furlough,"일시 해고, 휴가",n,,,인사·채용
+biz_paralegal,paralegal,법률 보조원,n,,,법·계약
+biz_refundable,refundable,환불 가능한,adj,,,출장·여행·호텔
+biz_waver,waver,흔들리다,v,,,업무 동사
+biz_benchmarking,benchmarking,"벤치마킹, 기준 비교",n,,,경영·전략
+biz_opportune,opportune,시기가 좋은,adj,,,업무 형용사
+biz_penalize,penalize,"처벌하다, 불리하게 하다",v,,,법·계약
+biz_receivership,receivership,법정 관리,n,,,금융·은행
+biz_shareholding,shareholding,주식 보유,n,,,금융·은행
+biz_commonality,commonality,공통점,n,,,업무 명사
+biz_emcee,emcee,행사 진행자,n,,,사무·회의
+biz_ergonomic,ergonomic,인체 공학적인,adj,,,업무 명사
+biz_overrule,overrule,"기각하다, 뒤엎다",v,,,경영·전략
+biz_punctuality,punctuality,시간 엄수,n,,,사무·회의
+biz_authenticate,authenticate,인증하다,v,,,정보 기술
+biz_balk,balk,"망설이다, 주춤하다",v,,,경영·전략
+biz_buyback,buyback,"자사주 매입, 되사기",n,,,금융·은행
+biz_probationary,probationary,"수습 중인, 시험 삼아 하는",adj,,,인사·채용
+biz_renegotiate,renegotiate,재협상하다,v,,,업무 동사
+biz_subcontractor,subcontractor,하청업자,n,,,인사·채용
+biz_condense,condense,"요약하다, 응축하다",v,,,업무 동사
+biz_disbursement,disbursement,"지급금, 지출",n,,,금융·은행
+biz_entitle,entitle,"자격을 주다, 제목을 붙이다",v,,,업무 동사
+biz_procrastinate,procrastinate,"미루다, 꾸물거리다",v,,,업무 동사
+biz_solvency,solvency,지불 능력,n,,,금융·은행
+biz_synchronize,synchronize,동시에 일어나게 하다,v,,,업무 동사
+biz_workaround,workaround,임시 해결책,n,,,업무 명사
+biz_demotion,demotion,"강등, 좌천",n,,,인사·채용
+biz_interviewee,interviewee,면접 대상자,n,,,인사·채용
+biz_motion_to_adjourn,motion to adjourn,휴회 동의,n,,,사무·회의
+biz_stopover,stopover,"잠시 머묾, 도중하차",n,,,출장·여행·호텔
+biz_dietitian,dietitian,영양사,n,,,직업·업종
+biz_frontrunner,frontrunner,선두 주자,n,,,업무 명사
+biz_insufficiency,insufficiency,불충분,n,,,업무 명사
+biz_proliferate,proliferate,"급증하다, 확산되다",v,,,업무 동사
+biz_requisition,requisition,"요청서, 청구",n,,,물류·제조
+biz_scalability,scalability,확장성,n,,,경영·전략
+biz_tardy,tardy,"늦은, 지각한",adj,,,사무·회의
+biz_transcribe,transcribe,"기록하다, 옮겨 적다",v,,,업무 동사
+biz_yardstick,yardstick,"기준, 척도",n,,,업무 명사
+biz_claims_adjuster,claims adjuster,보험 손해 사정인,n,,,직업·업종
+biz_decrypt,decrypt,해독하다,v,,,정보 기술
+biz_disembark,disembark,"내리다, 하선하다",v,,,출장·여행·호텔
+biz_franchisee,franchisee,가맹점주,n,,,마케팅·판매
+biz_kickback,kickback,"뒷돈, 리베이트",n,,,법·계약
+biz_supersede,supersede,"대신하다, 대체하다",v,,,업무 동사
+biz_truckload,truckload,트럭 한 대분,n,,,물류·제조
+biz_exhibitor,exhibitor,전시 참가 업체,n,,,사무·회의
+biz_layover,layover,"경유, 단기 체류",n,,,출장·여행·호텔
+biz_outgrow,outgrow,너무 커져서 맞지 않게 되다,v,,,경영·전략
+biz_overstate,overstate,과장하다,v,,,업무 동사
+biz_rejuvenate,rejuvenate,활기를 되찾게 하다,v,,,업무 동사
+biz_transact,transact,거래하다,v,,,업무 동사
+biz_underpin,underpin,뒷받침하다,v,,,업무 동사
+biz_adjournment,adjournment,"휴회, 연기",n,,,업무 명사
+biz_fallback,fallback,"대비책, 후퇴",n,,,업무 명사
+biz_orchestrate,orchestrate,"조직하다, 편곡하다",v,,,업무 동사
+biz_panelist,panelist,"토론자, 패널",n,,,사무·회의
+biz_deplete,deplete,"고갈시키다, 대폭 감소시키다",v,,,업무 동사
+biz_haggle,haggle,"값을 깎다, 흥정하다",v,,,마케팅·판매
+biz_lanyard,lanyard,목걸이 끈,n,,,사무·회의
+biz_proportionately,proportionately,비례하여,adv,,,업무 부사
+biz_quantifiable,quantifiable,수량화할 수 있는,adj,,,업무 형용사
+biz_gratuity,gratuity,"팁, 봉사료",n,,,회계·세금
+biz_outbid,outbid,더 높은 값을 부르다,v,,,경영·전략
+biz_underwriter,underwriter,"보험업자, 증권 인수인",n,,,금융·은행
+biz_affix,affix,"붙이다, 첨부하다",v,,,업무 동사
+biz_checkbook,checkbook,수표책,n,,,금융·은행
+biz_cordially,cordially,"진심으로, 정중하게",adv,,,업무 부사
+biz_discontinuation,discontinuation,"중단, 단종",n,,,업무 명사
+biz_overvalued,overvalued,고평가된,adj,,,금융·은행
+biz_stockholder,stockholder,주주,n,,,업무 명사
+biz_dwindle,dwindle,줄어들다,v,,,업무 동사
+biz_indemnify,indemnify,"배상하다, 보장하다",v,,,법·계약
+biz_registrant,registrant,등록자,n,,,사무·회의
+biz_bylaw,bylaw,"내규, 조례",n,,,업무 명사
+biz_cofounder,cofounder,공동 창업자,n,,,직업·업종
+biz_deferral,deferral,"연기, 유예",n,,,업무 명사
+biz_letterhead,letterhead,편지지 윗부분의 인쇄 문구,n,,,사무·회의
+biz_printout,printout,출력물,n,,,사무·회의
+biz_proofread,proofread,교정을 보다,v,,,사무·회의
+biz_tactful,tactful,"요령 있는, 눈치 있는",adj,,,업무 형용사
+biz_understaffed,understaffed,인원이 부족한,adj,,,인사·채용
+biz_lessee,lessee,임차인,n,,,법·계약
+biz_workweek,workweek,주간 근무 시간,n,,,인사·채용
+biz_absenteeism,absenteeism,잦은 결근,n,,,인사·채용
+biz_inaugurate,inaugurate,"취임시키다, 개시하다",v,,,업무 동사
+biz_irregularity,irregularity,"불규칙, 부정",n,,,업무 명사
+biz_refurbish,refurbish,"새로 꾸미다, 개장하다",v,,,부동산·시설
+biz_shortcoming,shortcoming,"단점, 부족한 점",n,,,업무 명사
+biz_concurrence,concurrence,"동의, 동시 발생",n,,,업무 명사
+biz_delineate,delineate,"묘사하다, 윤곽을 그리다",v,,,업무 동사
+biz_mockup,mockup,실물 모형,n,,,마케팅·판매
+biz_sweatshop,sweatshop,노동 착취 공장,n,,,업무 명사
+biz_illegible,illegible,읽기 어려운,adj,,,업무 형용사
+biz_troubleshoot,troubleshoot,문제를 해결하다,v,,,고객 서비스
+biz_underwrite,underwrite,(보험을) 인수하다,v,,,금융·은행
+biz_appraise,appraise,"평가하다, 감정하다",v,,,경영·전략
+biz_intranet,intranet,사내 통신망,n,,,사무·회의
+biz_isolationism,isolationism,고립주의,n,,,경제
+biz_turnkey,turnkey,바로 쓸 수 있는,adj,,,경영·전략
+biz_usury,usury,고리대금,n,,,금융·은행
+biz_inducement,inducement,"유인책, 장려금",n,,,업무 명사
+biz_pitfall,pitfall,"함정, 위험",n,,,업무 명사
+biz_stapler,stapler,스테이플러,n,,,사무·회의
+biz_frugality,frugality,"검약, 절약",n,,,금융·은행
+biz_liquidator,liquidator,청산인,n,,,금융·은행
+biz_abstention,abstention,기권,n,,,사무·회의
+biz_acquaint,acquaint,"익히다, 알게 하다",v,,,업무 동사
+biz_copywriter,copywriter,광고 문안 작성자,n,,,마케팅·판매
+biz_foreclose,foreclose,(담보물을) 압류하다,v,,,금융·은행
+biz_liaise,liaise,연락을 취하다,v,,,업무 동사
+biz_accrual,accrual,"발생, 누적",n,,,회계·세금
+biz_actuary,actuary,보험 계리사,n,,,금융·은행
+biz_logbook,logbook,"업무 일지, 운항 일지",n,,,사무·회의
+biz_annul,annul,무효로 하다,v,,,법·계약
+biz_overcharge,overcharge,바가지를 씌우다,v,,,마케팅·판매
+biz_rescheduling,rescheduling,일정 재조정,n,,,사무·회의
+biz_telemarketing,telemarketing,전화 판매,n,,,마케팅·판매
+biz_headhunter,headhunter,인재 스카우트 담당자,n,,,인사·채용
+biz_sommelier,sommelier,소믈리에,n,,,출장·여행·호텔
+biz_upturn,upturn,"호전, 상승",n,,,경제
+biz_bequeath,bequeath,"유증하다, 물려주다",v,,,금융·은행
+biz_monopolize,monopolize,독점하다,v,,,경제
+biz_sublet,sublet,"전대하다, 다시 빌려주다",v,,,법·계약
+biz_biannual,biannual,연 2회의,adj,,,회계·세금
+biz_consign,consign,"맡기다, 위탁하다",v,,,업무 동사
+biz_incentivize,incentivize,장려책을 주다,v,,,경영·전략
+biz_policyholder,policyholder,보험 계약자,n,,,금융·은행
+biz_undersigned,undersigned,아래 서명한 사람,n,,,법·계약
+biz_unionize,unionize,노조를 결성하다,v,,,경영·전략
+biz_debrief,debrief,보고를 듣다,v,,,업무 동사
+biz_headcount,headcount,인원수,n,,,인사·채용
+biz_holdup,holdup,"지연, 강도",n,,,업무 명사
+biz_litigate,litigate,소송을 제기하다,v,,,법·계약
+biz_lubricate,lubricate,기름을 치다,v,,,물류·제조
+biz_oversupply,oversupply,공급 과잉,n,,,업무 명사
+biz_paperless,paperless,종이를 쓰지 않는,adj,,,업무 명사
+biz_tardiness,tardiness,지각,n,,,사무·회의
+biz_centralize,centralize,중앙 집중화하다,v,,,업무 동사
+biz_collate,collate,"대조하다, 수집하다",v,,,업무 동사
+biz_counterparty,counterparty,거래 상대방,n,,,법·계약
+biz_maitre_d,maitre d',수석 웨이터,n,,,출장·여행·호텔
+biz_speculator,speculator,투기꾼,n,,,업무 명사
+biz_cutback,cutback,"삭감, 축소",n,,,업무 명사
+biz_helpdesk,helpdesk,안내 창구,n,,,정보 기술
+biz_reroute,reroute,경로를 바꾸다,v,,,경영·전략
+biz_enumerate,enumerate,열거하다,v,,,경영·전략
+biz_markdown,markdown,가격 인하,n,,,마케팅·판매
+biz_minibar,minibar,객실 냉장고,n,,,출장·여행·호텔
+biz_stopgap,stopgap,임시방편,n,,,업무 명사
+biz_defray,defray,(비용을) 부담하다,v,,,회계·세금
+biz_force_majeure,force majeure,불가항력,n,,,마케팅·판매
+biz_postpaid,postpaid,후불의,adj,,,회계·세금
+biz_arbitrate,arbitrate,중재하다,v,,,업무 동사
+biz_lessor,lessor,임대인,n,,,법·계약
+biz_reorder,reorder,재주문하다,v,,,물류·제조
+biz_transpire,transpire,"일어나다, 알려지다",v,,,업무 동사
+biz_underperform,underperform,기대에 못 미치다,v,,,금융·은행
+biz_carryover,carryover,"이월, 이월금",n,,,회계·세금
+biz_redeploy,redeploy,(인력·장비를) 다시 배치하다,v,,,업무 동사
+biz_endorser,endorser,"광고 모델, 보증인",n,,,마케팅·판매
+biz_footfall,footfall,매장 방문객 수,n,,,마케팅·판매
+biz_teleconference,teleconference,원격 회의,n,,,사무·회의
+biz_postmark,postmark,소인,n,,,사무·회의
+biz_construe,construe,해석하다,v,,,업무 동사
+biz_subcontract,subcontract,하청을 주다,v,,,업무 동사
+biz_waitlist,waitlist,대기자 명단,n,,,출장·여행·호텔
+biz_chatbot,chatbot,챗봇,n,,,정보 기술
+biz_landscaper,landscaper,조경사,n,,,부동산·시설
+biz_oligopoly,oligopoly,과점,n,,,경제
+biz_reassign,reassign,재배치하다,v,,,인사·채용
+biz_bill_of_lading,bill of lading,선하 증권,n,,,물류·제조
+biz_demote,demote,강등시키다,v,,,인사·채용
+biz_nationalize,nationalize,국유화하다,v,,,경제
+biz_payee,payee,수취인,n,,,금융·은행
+biz_consignor,consignor,"화주, 위탁자",n,,,물류·제조
+biz_digitize,digitize,디지털화하다,v,,,정보 기술
+biz_franchisor,franchisor,가맹 본부,n,,,마케팅·판매
+biz_micromanage,micromanage,세세한 것까지 관리하다,v,,,경영·전략
+biz_onboarding,onboarding,신입 적응 교육,n,,,인사·채용
+biz_overpayment,overpayment,초과 지불,n,,,회계·세금
+biz_divestiture,divestiture,사업 매각,n,,,금융·은행
+biz_microeconomics,microeconomics,미시 경제학,n,,,경제
+biz_nondisclosure,nondisclosure,비공개,n,,,법·계약
+biz_layaway,layaway,할부 예약 구매,n,,,마케팅·판매
+biz_offshoring,offshoring,해외 위탁,n,,,물류·제조
+biz_overqualified,overqualified,필요 이상의 자격을 갖춘,adj,,,인사·채용
+biz_repercussion,repercussion,"(좋지 않은) 영향, 반향",n,,,업무 명사
+biz_earmark,earmark,(용도를) 배정하다,v,,,업무 동사
+biz_misprint,misprint,인쇄 오류,n,,,업무 명사
+biz_amalgamate,amalgamate,"합병하다, 합치다",v,,,경영·전략
+biz_groundskeeper,groundskeeper,구내 관리인,n,,,부동산·시설
+biz_overspend,overspend,과소비하다,v,,,금융·은행
+biz_freight_forwarder,freight forwarder,운송 주선업자,n,,,물류·제조
+biz_retool,retool,"재정비하다, 기계를 바꾸다",v,,,경영·전략
+biz_chargeback,chargeback,"지불 거절, 대금 환불",n,,,회계·세금
+biz_deregulate,deregulate,규제를 풀다,v,,,법·계약
+biz_repossess,repossess,"회수하다, 압류하다",v,,,업무 동사
+biz_surmount,surmount,극복하다,v,,,업무 동사
+biz_transshipment,transshipment,환적,n,,,물류·제조
+biz_apportion,apportion,배분하다,v,,,업무 동사
+biz_pawnshop,pawnshop,전당포,n,,,금융·은행
+biz_reallocate,reallocate,재할당하다,v,,,경영·전략
+biz_decentralize,decentralize,분산시키다,v,,,업무 동사
+biz_debenture,debenture,무담보 사채,n,,,금융·은행
+biz_disburse,disburse,"지출하다, 지급하다",v,,,금융·은행
+biz_liberalize,liberalize,자유화하다,v,,,경제
+biz_proofreader,proofreader,교정자,n,,,사무·회의
+biz_unfurnished,unfurnished,가구가 없는,adj,,,부동산·시설
+biz_nonpayment,nonpayment,"미납, 지불 불이행",n,,,업무 명사
+biz_closeout,closeout,폐점 정리 판매,n,,,마케팅·판매
+biz_bankable,bankable,돈벌이가 되는,adj,,,금융·은행
+biz_nonrefundable,nonrefundable,환불되지 않는,adj,,,출장·여행·호텔
+biz_stockroom,stockroom,재고 창고,n,,,마케팅·판매
+biz_upsell,upsell,더 비싼 상품을 권하다,v,,,마케팅·판매
+biz_digitalization,digitalization,디지털화,n,,,정보 기술
+biz_mentee,mentee,"멘티, 조언을 받는 사람",n,,,인사·채용
+biz_stagflation,stagflation,스태그플레이션,n,,,경제
+biz_inundate,inundate,"쇄도하다, 범람시키다",v,,,업무 동사
+biz_honorarium,honorarium,사례금,n,,,업무 명사
+biz_mortgagee,mortgagee,저당권자,n,,,금융·은행
+biz_oversell,oversell,과장해서 선전하다,v,,,경영·전략
+biz_preowned,preowned,중고의,adj,,,마케팅·판매
+biz_obsolescent,obsolescent,구식이 되어 가는,adj,,,업무 형용사
+biz_embezzle,embezzle,횡령하다,v,,,법·계약
+biz_cosign,cosign,연대 보증하다,v,,,금융·은행
+biz_underpayment,underpayment,과소 지급,n,,,회계·세금
+biz_telecommute,telecommute,재택근무하다,v,,,인사·채용
+biz_bellhop,bellhop,호텔 짐꾼,n,,,출장·여행·호텔
+biz_outmaneuver,outmaneuver,책략으로 이기다,v,,,경영·전략
+biz_reimbursable,reimbursable,상환할 수 있는,adj,,,회계·세금
+biz_keycard,keycard,카드 키,n,,,정보 기술
+biz_nonbinding,nonbinding,구속력이 없는,adj,,,업무 명사
+biz_ramification,ramification,(파생되는) 영향,n,,,업무 명사
+biz_tabulate,tabulate,표로 만들다,v,,,업무 동사
+biz_nonnegotiable,nonnegotiable,협상할 수 없는,adj,,,경영·전략
+biz_videoconference,videoconference,화상 회의,n,,,사무·회의
+biz_counteroffer,counteroffer,"수정 제안, 역제안",n,,,경영·전략
+biz_bondholder,bondholder,채권 소유자,n,,,금융·은행
+biz_amortize,amortize,분할 상환하다,v,,,회계·세금
+biz_waybill,waybill,화물 운송장,n,,,물류·제조
+biz_outbox,outbox,보낼 편지함,n,,,사무·회의
+biz_consignee,consignee,수하인,n,,,물류·제조
+biz_creditworthy,creditworthy,신용할 수 있는,adj,,,금융·은행
+biz_mortgagor,mortgagor,저당 설정자,n,,,금융·은행
+biz_underpay,underpay,적게 지불하다,v,,,경영·전략
+biz_backorder,backorder,이월 주문,n,,,물류·제조
+biz_countersign,countersign,"부서하다, 연서하다",v,,,법·계약
+biz_reimpose,reimpose,다시 부과하다,v,,,업무 동사
+biz_recapitalize,recapitalize,자본을 재구성하다,v,,,금융·은행
+biz_underbid,underbid,더 싸게 입찰하다,v,,,경영·전략
+biz_payslip,payslip,급여 명세서,n,,,회계·세금
+biz_underqualified,underqualified,자격이 부족한,adj,,,인사·채용
+biz_overstaffed,overstaffed,인원이 과잉인,adj,,,인사·채용
+biz_stocktaking,stocktaking,재고 조사,n,,,물류·제조
+biz_backdate,backdate,소급 적용하다,v,,,회계·세금
+biz_mechanize,mechanize,기계화하다,v,,,물류·제조
+biz_noncompete,noncompete,경업 금지의,adj,,,마케팅·판매
+biz_prorate,prorate,비례 배분하다,v,,,회계·세금
+biz_upskill,upskill,새 기술을 익히게 하다,v,,,인사·채용
+biz_remunerate,remunerate,보수를 주다,v,,,업무 동사
+biz_notarize,notarize,공증하다,v,,,법·계약
+biz_writedown,writedown,"평가 절하, 감액",n,,,금융·은행
+biz_overbook,overbook,정원 이상으로 예약을 받다,v,,,출장·여행·호텔
+biz_storewide,storewide,매장 전체의,adj,,,마케팅·판매
+biz_reengineer,reengineer,재설계하다,v,,,경영·전략
+biz_reshoring,reshoring,생산 시설 국내 복귀,n,,,물류·제조
+biz_flextime,flextime,자율 근무 시간제,n,,,인사·채용
+biz_microloan,microloan,소액 대출,n,,,금융·은행
+biz_headhunt,headhunt,인재를 스카우트하다,v,,,경영·전략
+biz_doorbuster,doorbuster,파격 할인 미끼 상품,n,,,마케팅·판매
+biz_reskill,reskill,재교육하다,v,,,인사·채용
+biz_telecommuter,telecommuter,재택근무자,n,,,정보 기술

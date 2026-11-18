@@ -184,7 +184,7 @@ namespace WordRPG.Tests
                     {
                         StringAssert.StartsWith(prefix, word.Id, $"{book.name}: 단어 id는 단어장 앞글자로 (세이브 기록이 섞이지 않게)");
                         Assert.IsFalse(string.IsNullOrWhiteSpace(word.Meaning), $"{word.Id} 뜻이 비어 있음");
-                        Assert.IsTrue(word.PartOfSpeech == "n" || word.PartOfSpeech == "v" || word.PartOfSpeech == "adj", $"{word.Id} 품사");
+                        Assert.IsTrue(PartsOfSpeech.Contains(word.PartOfSpeech), $"{word.Id} 품사");
                     }
                 }
                 var all = baseBooks.SelectMany(b => course.BookFor(b).OwnWords).ToList();
@@ -206,6 +206,57 @@ namespace WordRPG.Tests
                     int words = area.Words.Words.Count;
                     Assert.LessOrEqual(area.BossGateWords, words, $"{course.CourseId}·{area.AreaId}: 보스 문 단어 수");
                     Assert.LessOrEqual(area.ShrineWords, words, $"{course.CourseId}·{area.AreaId}: 유적 제단 단어 수");
+                }
+            }
+        }
+
+        private static readonly string[] PartsOfSpeech = { "n", "v", "adj", "adv" };
+
+        // Docs/의 단어 CSV (예비 단어장 — 게임 에셋이 아님)에서 영어 열
+        private static List<List<string>> DocsCsv(string file)
+        {
+            string path = System.IO.Path.Combine(Application.dataPath, "..", "Docs", file);
+            Assert.IsTrue(System.IO.File.Exists(path), file + " 없음");
+            var rows = WordRPG.Core.CsvParser.Parse(System.IO.File.ReadAllText(path));
+            rows.RemoveAt(0); // 머리글
+            return rows.Where(r => r.Count > 3 && r[0].Length > 0).ToList();
+        }
+
+        // #276 사용자: 수능 중·하(중·고 공통 1,200)와 겹치는 말은 초원·서고 단어장에만 — 숲부터 쓰는 단어장과 예비에는 없음.
+        // 비즈니스·의학 예비(Docs/단어_예비_비즈니스·의학.csv)는 다음 버전부터 위에서 300개씩: 그 단어장과 겹치지 않고 같은 뜻도 없음
+        [Test]
+        public void HarderCourseWordsSkipEasySuneungWords()
+        {
+            var database = RealDatabase();
+            var baseBooks = database.BaseWordBooks();
+            var easyBook = baseBooks.OrderBy(b => b.Tier).First();
+            var easy = new HashSet<string>(easyBook.OwnWords.Select(w => w.English.ToLowerInvariant()));
+            easy.UnionWith(DocsCsv("단어_예비_중고공통.csv").Select(r => r[1].Trim().ToLowerInvariant()));
+            Assert.Greater(easy.Count, 1000, "중·고 공통 단어 (지금 150 + 예비)");
+
+            foreach (var (courseId, reserveFile) in new[] { ("business", "단어_예비_비즈니스.csv"), ("medical", "단어_예비_의학.csv") })
+            {
+                var course = database.FindCourse(courseId);
+                string prefix = courseId == "business" ? "biz_" : "med_";
+                foreach (var baseBook in baseBooks.Where(b => b != easyBook))
+                    foreach (var word in course.BookFor(baseBook).OwnWords)
+                        Assert.IsFalse(easy.Contains(word.English.ToLowerInvariant()), $"{word.Id}: 쉬운 수능 단어는 초원·서고 단어장에만");
+
+                var used = new HashSet<string>(baseBooks.SelectMany(b => course.BookFor(b).OwnWords).Select(w => w.Id));
+                var reserve = DocsCsv(reserveFile);
+                Assert.GreaterOrEqual(reserve.Count, 2000, $"{courseId}: 예비 단어 (버전마다 300개쯤 · 6~7버전)");
+                var ids = new HashSet<string>();
+                var meanings = new HashSet<string>();
+                foreach (var r in reserve)
+                {
+                    string id = r[0], english = r[1].Trim(), meaning = r[2].Trim(), pos = r[3].Trim();
+                    StringAssert.StartsWith(prefix, id, $"{reserveFile}: 단어 id 앞글자");
+                    Assert.IsTrue(ids.Add(id), $"{reserveFile}: {id}가 두 번");
+                    Assert.IsFalse(used.Contains(id), $"{reserveFile}: {id}는 이미 단어장에 있음");
+                    Assert.IsFalse(easy.Contains(english.ToLowerInvariant()), $"{reserveFile}: {english}는 쉬운 수능 단어 (초원·서고에만)");
+                    Assert.IsFalse(string.IsNullOrEmpty(meaning), $"{reserveFile}: {id} 뜻");
+                    Assert.IsTrue(meanings.Add(meaning), $"{reserveFile}: 같은 뜻 '{meaning}'이 두 번 (한 단어장에 들어가면 보기 두 개가 같아짐)");
+                    Assert.Contains(pos, PartsOfSpeech, $"{reserveFile}: {id} 품사");
                 }
             }
         }

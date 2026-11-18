@@ -554,9 +554,9 @@ MonoBehaviour:
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_cast
-    english: cast
-    meaning: "\uAE41\uC2A4"
+  - id: med_brace
+    english: brace
+    meaning: "\uBCF4\uC870\uAE30, \uBC84\uD300\uB300"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -1562,9 +1562,9 @@ MonoBehaviour:
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_dentist
-    english: dentist
-    meaning: "\uCE58\uACFC \uC758\uC0AC"
+  - id: med_otolaryngologist
+    english: otolaryngologist
+    meaning: "\uC774\uBE44\uC778\uD6C4\uACFC \uC758\uC0AC"
     partOfSpeech: n
     example: 
     exampleMeaning: 
@@ -2010,9 +2010,9 @@ MonoBehaviour:
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_labor
-    english: labor
-    meaning: "\uC9C4\uD1B5, \uBD84\uB9CC"
+  - id: med_epidural
+    english: epidural
+    meaning: "\uACBD\uB9C9\uC678 \uB9C8\uCDE8"
     partOfSpeech: n
     example: 
     exampleMeaning: 

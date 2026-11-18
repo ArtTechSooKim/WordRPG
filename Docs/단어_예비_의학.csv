@@ -1,0 +1,2129 @@
+id,english,meaning,pos,example,example_meaning,group
+med_on_call,on call,"당직인, 대기 중인",adj,,,병원·의료진
+med_home_care,home care,"재가 간호, 방문 돌봄",n,,,병원·의료진
+med_life_support,life support,생명 유지 장치,n,,,병원·의료진
+med_house_call,house call,왕진,n,,,병원·의료진
+med_half_life,half-life,반감기,n,,,약
+med_living_will,living will,"생전 유언, 사전 의료 지시서",n,,,병원·의료진
+med_support_group,support group,"자조 모임, 지지 모임",n,,,정신 건강
+med_end_of_life_care,end-of-life care,임종 돌봄,n,,,병원·의료진
+med_family_history,family history,가족력,n,,,병원·의료진
+med_health_care,health care,"보건 의료, 의료 서비스",n,,,병원·의료진
+med_public_health,public health,공중 보건,n,,,병원·의료진
+med_control_group,control group,대조군,n,,,약
+med_case_history,case history,"병력, 사례 기록",n,,,병원·의료진
+med_white_matter,white matter,백질,n,,,뇌·신경
+med_care_plan,care plan,"간호 계획, 돌봄 계획",n,,,치료·관리
+med_self_care,self-care,자기 관리,n,,,치료·관리
+med_blood_work,blood work,혈액 검사,n,,,진단·검사
+med_health_record,health record,건강 기록,n,,,의료 일반
+med_evidence_based,evidence-based,근거 중심의,adj,,,의료 일반
+med_long_term_care,long-term care,장기 요양,n,,,병원·의료진
+med_due_date,due date,출산 예정일,n,,,산부인과
+med_death_rate,death rate,사망률,n,,,병원·의료진
+med_standard_of_care,standard of care,표준 치료,n,,,치료·관리
+med_pressure_point,pressure point,"지압점, 압박점",n,,,응급
+med_heart_attack,heart attack,심장 마비,n,,,심장·혈관 질환
+med_blood_type,blood type,혈액형,n,,,혈액
+med_hospital_stay,hospital stay,입원 기간,n,,,병원·의료진
+med_medical_record,medical record,"의무 기록, 진료 기록",n,,,병원·의료진
+med_case_manager,case manager,사례 관리자,n,,,병원·의료진
+med_first_line_treatment,first-line treatment,1차 치료,n,,,치료·관리
+med_second_opinion,second opinion,다른 의사의 소견,n,,,병원·의료진
+med_bed_rest,bed rest,침상 안정,n,,,병원·의료진
+med_sleep_study,sleep study,수면 다원 검사,n,,,호흡기
+med_blood_bank,blood bank,혈액 은행,n,,,혈액
+med_c_section,C-section,제왕 절개,n,,,수술·처치
+med_critical,critical,"위독한, 중대한",adj,,,형용사
+med_family_doctor,family doctor,가정의,n,,,병원·의료진
+med_treatment_plan,treatment plan,치료 계획,n,,,치료·관리
+med_health_insurance,health insurance,건강 보험,n,,,병원·의료진
+med_brain_death,brain death,뇌사,n,,,병원·의료진
+med_code_blue,code blue,심정지 응급 호출,n,,,응급
+med_on_call_doctor,on-call doctor,당직 의사,n,,,병원·의료진
+med_primary_care,primary care,1차 진료,n,,,병원·의료진
+med_blood_loss,blood loss,"출혈량, 실혈",n,,,응급
+med_follow_up_visit,follow-up visit,추적 진료,n,,,치료·관리
+med_pain_management,pain management,통증 관리,n,,,치료·관리
+med_blood_culture,blood culture,혈액 배양,n,,,진단·검사
+med_brand_name,brand name,상표명,n,,,약
+med_critical_care,critical care,중환자 치료,n,,,응급
+med_heart_block,heart block,심장 차단,n,,,심장·혈관
+med_mental_health,mental health,정신 건강,n,,,정신 건강
+med_patient_care,patient care,"환자 치료, 간호",n,,,병원·의료진
+med_family_medicine,family medicine,가정 의학,n,,,병원·의료진
+med_blood_cell,blood cell,혈구,n,,,혈액
+med_length_of_stay,length of stay,재원 기간,n,,,병원·의료진
+med_operating_room,operating room,수술실,n,,,수술·처치
+med_medical_waste,medical waste,의료 폐기물,n,,,의료 기구
+med_sick_note,sick note,병가 진단서,n,,,병원·의료진
+med_annual_physical,annual physical,연례 건강 검진,n,,,의료 일반
+med_blood_count,blood count,혈구 수,n,,,진단·검사
+med_long_term_memory,long-term memory,장기 기억,n,,,정신 건강
+med_birth_rate,birth rate,출생률,n,,,병원·의료진
+med_day_surgery,day surgery,당일 수술,n,,,수술·처치
+med_natural_birth,natural birth,자연 분만,n,,,산부인과
+med_stress_test,stress test,운동 부하 검사,n,,,심장·혈관 질환
+med_reference_range,reference range,"참고 범위, 정상 범위",n,,,진단·검사
+med_treatment_option,treatment option,치료 선택지,n,,,치료·관리
+med_heavy_metal,heavy metal,중금속,n,,,기타 질환
+med_labor_pain,labor pain,분만 진통,n,,,기타 질환
+med_short_term_memory,short-term memory,단기 기억,n,,,정신 건강
+med_operating_table,operating table,수술대,n,,,수술·처치
+med_recovery_time,recovery time,회복 기간,n,,,치료·관리
+med_dry_eye,dry eye,안구 건조증,n,,,눈·귀·코·목
+med_patient_safety,patient safety,환자 안전,n,,,의료 일반
+med_medical_device,medical device,의료 기기,n,,,의료 기구
+med_over_the_counter,over-the-counter,처방 없이 살 수 있는,adj,,,약
+med_blood_flow,blood flow,"혈류량, 혈액 흐름",n,,,심장·혈관
+med_blood_sugar,blood sugar,혈당,n,,,내분비·대사 질환
+med_critical_condition,critical condition,위독한 상태,n,,,병원·의료진
+med_delivery_room,delivery room,분만실,n,,,산부인과
+med_flat_feet,flat feet,평발,n,,,근골격 질환
+med_external,external,"외부의, 외용의",adj,,,위치·방향
+med_recovery_room,recovery room,회복실,n,,,수술·처치
+med_risk_factor,risk factor,위험 요인,n,,,치료·관리
+med_sports_medicine,sports medicine,스포츠 의학,n,,,근골격 질환
+med_clinical,clinical,"임상의, 임상적인",adj,,,진단·검사
+med_complete_blood_count,complete blood count,전혈구 검사,n,,,진단·검사
+med_extended_release,extended-release,서방형의,adj,,,약
+med_open_heart_surgery,open-heart surgery,심장 절개 수술,n,,,수술·처치
+med_white_cell_count,white cell count,백혈구 수,n,,,진단·검사
+med_recovery_position,recovery position,회복 자세,n,,,응급
+med_double_vision,double vision,"복시, 겹보임",n,,,눈·귀·코·목
+med_dry_mouth,dry mouth,"입 마름, 구강 건조증",n,,,기타 질환
+med_hearing_aid,hearing aid,보청기,n,,,눈·귀·코·목
+med_range_of_motion,range of motion,관절 가동 범위,n,,,뼈·관절
+med_false_positive,false positive,위양성,n,,,진단·검사
+med_out_of_pocket,out-of-pocket,본인 부담의,adj,,,병원·의료진
+med_conservative_treatment,conservative treatment,보존적 치료,n,,,치료·관리
+med_light_therapy,light therapy,광선 요법,n,,,치료·관리
+med_growth_plate,growth plate,성장판,n,,,뼈·관절
+med_medical_license,medical license,의사 면허,n,,,병원·의료진
+med_pain_relief,pain relief,통증 완화,n,,,치료·관리
+med_visual_field,visual field,시야,n,,,눈·귀·코·목
+med_alternative_medicine,alternative medicine,대체 의학,n,,,치료·관리
+med_electronic_health_record,electronic health record,전자 건강 기록,n,,,의료 일반
+med_emergency_medicine,emergency medicine,응급 의학,n,,,병원·의료진
+med_off_label,off-label,허가 외의,adj,,,형용사
+med_walker,walker,보행기,n,,,의료 기구
+med_clinical_sign,clinical sign,임상 징후,n,,,진단·검사
+med_social_anxiety,social anxiety,사회 불안,n,,,정신 건강
+med_acquired,acquired,후천적인,adj,,,증상
+med_chest_pain,chest pain,"가슴 통증, 흉통",n,,,증상
+med_double_blind,double-blind,이중 맹검의,adj,,,약
+med_false_negative,false negative,위음성,n,,,진단·검사
+med_gray_matter,gray matter,회색질,n,,,뇌·신경
+med_self_harm,self-harm,자해,n,,,정신 건강
+med_internal_medicine,internal medicine,"내과, 내과학",n,,,병원·의료진
+med_medical_chart,medical chart,진료 차트,n,,,병원·의료진
+med_nervous_system,nervous system,신경계,n,,,뇌·신경
+med_social_worker,social worker,사회 복지사,n,,,병원·의료진
+med_drug_resistance,drug resistance,약물 내성,n,,,약
+med_first_degree_burn,first-degree burn,1도 화상,n,,,응급
+med_blind_spot,blind spot,맹점,n,,,눈·귀·코·목
+med_emergency_surgery,emergency surgery,응급 수술,n,,,응급
+med_head_nurse,head nurse,수간호사,n,,,병원·의료진
+med_hot_flash,hot flash,"안면 홍조, 열감",n,,,기타 질환
+med_eye_chart,eye chart,시력 검사표,n,,,눈·귀·코·목
+med_growth_chart,growth chart,성장 도표,n,,,발달·노화
+med_health_care_worker,health care worker,의료 종사자,n,,,병원·의료진
+med_middle_ear,middle ear,"가운데귀, 중이",n,,,피부·눈·귀·코
+med_second_degree_burn,second-degree burn,2도 화상,n,,,응급
+med_body_mass_index,body mass index,체질량 지수,n,,,진단·검사
+med_clinical_trial,clinical trial,임상 시험,n,,,약
+med_speech_therapy,speech therapy,언어 치료,n,,,수술·처치
+med_progressive,progressive,진행성의,adj,,,증상
+med_third_degree_burn,third-degree burn,3도 화상,n,,,응급
+med_stable_condition,stable condition,안정된 상태,n,,,병원·의료진
+med_transmission,transmission,"전파, 전염",n,,,면역·감염
+med_central_nervous_system,central nervous system,중추 신경계,n,,,뇌·신경
+med_nursing,nursing,"간호, 간호학",n,,,병원·의료진
+med_rapid_test,rapid test,신속 검사,n,,,진단·검사
+med_within_normal_limits,within normal limits,정상 범위 내의,adj,,,진단·검사
+med_charge_nurse,charge nurse,책임 간호사,n,,,병원·의료진
+med_consent_form,consent form,동의서,n,,,병원·의료진
+med_medical_resident,medical resident,"전공의, 레지던트",n,,,병원·의료진
+med_nursing_home,nursing home,요양원,n,,,병원·의료진
+med_skin_tag,skin tag,쥐젖,n,,,피부
+med_nursing_care,nursing care,"간호, 돌봄",n,,,병원·의료진
+med_peak_flow,peak flow,최대 날숨 유량,n,,,호흡기
+med_survival_rate,survival rate,생존율,n,,,종양
+med_ward_round,ward round,병동 회진,n,,,병원·의료진
+med_age_spots,age spots,검버섯,n,,,피부
+med_infection_control,infection control,감염 관리,n,,,면역·감염
+med_trans_fat,trans fat,트랜스 지방,n,,,영양·건강
+med_electric_shock,electric shock,감전,n,,,응급
+med_face_shield,face shield,안면 보호대,n,,,의료 기구
+med_hip_joint,hip joint,"엉덩 관절, 고관절",n,,,뼈·관절
+med_mental_illness,mental illness,정신 질환,n,,,정신 건강
+med_chief_complaint,chief complaint,주 호소 증상,n,,,병원·의료진
+med_oral,oral,"입의, 경구의",adj,,,위치·방향
+med_plastic_surgery,plastic surgery,성형 수술,n,,,수술·처치
+med_aids,AIDS,후천 면역 결핍증,n,,,면역·감염
+med_breast_cancer,breast cancer,유방암,n,,,산부인과
+med_chest_x_ray,chest X-ray,흉부 엑스선 사진,n,,,호흡기
+med_eye_drops,eye drops,안약,n,,,눈·귀·코·목
+med_first_aid_kit,first aid kit,"구급상자, 응급 처치 상자",n,,,응급
+med_guidelines,guidelines,"지침, 가이드라인",n,,,의료 일반
+med_joint_replacement,joint replacement,관절 치환술,n,,,수술·처치
+med_medical_certificate,medical certificate,진단서,n,,,병원·의료진
+med_sleep_disorder,sleep disorder,수면 장애,n,,,정신 건강
+med_suspension,suspension,"현탁액, 정지",n,,,약
+med_toxic,toxic,"독성의, 유독한",adj,,,형용사
+med_contrast_medium,contrast medium,조영제,n,,,진단·검사
+med_dominant,dominant,우성의,adj,,,세포·유전
+med_examination_room,examination room,진찰실,n,,,병원·의료진
+med_medical_tourism,medical tourism,의료 관광,n,,,병원·의료진
+med_throat_culture,throat culture,인후 배양 검사,n,,,진단·검사
+med_blood_pressure_monitor,blood pressure monitor,혈압 측정기,n,,,의료 기구
+med_down_syndrome,Down syndrome,다운 증후군,n,,,발달·노화
+med_fall_prevention,fall prevention,낙상 예방,n,,,발달·노화
+med_wound_care,wound care,상처 관리,n,,,치료·관리
+med_acid_base_balance,acid-base balance,산 염기 균형,n,,,생리·대사
+med_blood_vessel,blood vessel,혈관,n,,,심장·혈관
+med_open_wound,open wound,열린 상처,n,,,응급
+med_eating_disorder,eating disorder,섭식 장애,n,,,정신 건강
+med_lifestyle_disease,lifestyle disease,생활 습관병,n,,,치료·관리
+med_panic_attack,panic attack,공황 발작,n,,,정신 건강
+med_speech_disorder,speech disorder,언어 장애,n,,,정신 건강
+med_stem_cell,stem cell,줄기세포,n,,,세포·유전
+med_animal_bite,animal bite,동물에 물림,n,,,응급
+med_drug_interaction,drug interaction,약물 상호 작용,n,,,약
+med_filling,filling,"충전재, (치아) 때우기",n,,,소화기 질환
+med_healing_process,healing process,치유 과정,n,,,치료·관리
+med_balance_disorder,balance disorder,평형 장애,n,,,뇌·신경
+med_collapse,collapse,쓰러지다,v,,,동사·일반
+med_life_threatening,life-threatening,생명을 위협하는,adj,,,응급
+med_physical_exam,physical exam,신체검사,n,,,진단·검사
+med_dressing,dressing,"드레싱, 상처 덮개",n,,,피부
+med_genetic_testing,genetic testing,유전자 검사,n,,,진단·검사
+med_hiv,HIV,인간 면역 결핍 바이러스,n,,,면역·감염
+med_lens,lens,"수정체, 렌즈",n,,,피부·눈·귀·코
+med_nursing_assistant,nursing assistant,간호 조무사,n,,,병원·의료진
+med_inner_ear,inner ear,"속귀, 내이",n,,,피부·눈·귀·코
+med_muscle_tone,muscle tone,근긴장도,n,,,근육·힘줄
+med_registered_nurse,registered nurse,정규 간호사,n,,,병원·의료진
+med_whole_grain,whole grain,통곡물,n,,,영양·건강
+med_hip_replacement,hip replacement,고관절 치환술,n,,,수술·처치
+med_medical_ethics,medical ethics,의료 윤리,n,,,병원·의료진
+med_specific_gravity,specific gravity,비중,n,,,진단·검사
+med_strain,strain,"균주, 변종",n,,,면역·감염
+med_chronic_pain,chronic pain,만성 통증,n,,,증상
+med_trauma,trauma,"외상, 정신적 충격",n,,,정신 건강
+med_chest_tube,chest tube,"가슴관, 흉관",n,,,의료 기구
+med_elderly_care,elderly care,노인 돌봄,n,,,발달·노화
+med_gene_therapy,gene therapy,유전자 치료,n,,,세포·유전
+med_health_screening,health screening,건강 선별 검사,n,,,의료 일반
+med_infected,infected,감염된,adj,,,동사·일반
+med_type_1_diabetes,type 1 diabetes,제1형 당뇨병,n,,,내분비·대사 질환
+med_type_2_diabetes,type 2 diabetes,제2형 당뇨병,n,,,내분비·대사 질환
+med_admission_form,admission form,입원 신청서,n,,,병원·의료진
+med_colony,colony,"집락, 군체",n,,,진단·검사
+med_secondary_infection,secondary infection,이차 감염,n,,,면역·감염
+med_smooth_muscle,smooth muscle,"민무늬근, 평활근",n,,,근육·힘줄
+med_cognitive,cognitive,인지의,adj,,,뇌·신경
+med_contact_lens,contact lens,콘택트렌즈,n,,,눈·귀·코·목
+med_liver_cancer,liver cancer,간암,n,,,소화기 질환
+med_nerve_block,nerve block,신경 차단술,n,,,뇌·신경
+med_nerve_damage,nerve damage,신경 손상,n,,,뇌·신경
+med_personality_disorder,personality disorder,성격 장애,n,,,정신 건강
+med_stretch_marks,stretch marks,튼살,n,,,피부
+med_tissue_sample,tissue sample,조직 표본,n,,,진단·검사
+med_frozen_shoulder,frozen shoulder,"오십견, 유착성 관절낭염",n,,,근골격 질환
+med_generic_name,generic name,"일반명, 성분명",n,,,약
+med_patient_advocate,patient advocate,환자 권익 옹호인,n,,,병원·의료진
+med_trauma_center,trauma center,외상 센터,n,,,응급
+med_bone_density,bone density,골밀도,n,,,뼈·관절
+med_bone_tissue,bone tissue,뼈 조직,n,,,장기·몸 부위
+med_cold_sweat,cold sweat,식은땀,n,,,증상
+med_eye_strain,eye strain,눈의 피로,n,,,눈·귀·코·목
+med_immune_response,immune response,면역 반응,n,,,면역·감염
+med_low_grade_fever,low-grade fever,미열,n,,,증상
+med_substance_abuse,substance abuse,약물 남용,n,,,정신 건강
+med_yellow_fever,yellow fever,황열,n,,,면역·감염
+med_black_lung,black lung,탄광부 진폐증,n,,,기타 질환
+med_cancer_screening,cancer screening,암 검진,n,,,종양
+med_ear_drops,ear drops,"귀약, 점이제",n,,,눈·귀·코·목
+med_ear_infection,ear infection,귀 감염,n,,,눈·귀·코·목
+med_grief,grief,"비탄, 슬픔",n,,,정신 건강
+med_knee_replacement,knee replacement,무릎 관절 치환술,n,,,수술·처치
+med_loss_of_consciousness,loss of consciousness,의식 상실,n,,,증상
+med_oxygen_tank,oxygen tank,산소통,n,,,의료 기구
+med_drain,drain,배액관,n,,,수술·처치
+med_liver_failure,liver failure,간부전,n,,,소화기 질환
+med_mood_disorder,mood disorder,기분 장애,n,,,정신 건강
+med_physician_assistant,physician assistant,의사 보조 인력,n,,,병원·의료진
+med_rescue_breathing,rescue breathing,인공호흡,n,,,응급
+med_bone_density_test,bone density test,골밀도 검사,n,,,진단·검사
+med_laser_surgery,laser surgery,레이저 수술,n,,,수술·처치
+med_oxygen_therapy,oxygen therapy,산소 요법,n,,,치료·관리
+med_baby_tooth,baby tooth,젖니,n,,,소화기
+med_blood_brain_barrier,blood-brain barrier,혈액 뇌 장벽,n,,,뇌·신경
+med_fluid_therapy,fluid therapy,수액 요법,n,,,치료·관리
+med_liver_function_test,liver function test,간 기능 검사,n,,,진단·검사
+med_surgical,surgical,"수술의, 외과의",adj,,,수술·처치
+med_targeted_therapy,targeted therapy,표적 치료,n,,,종양
+med_withdrawal,withdrawal,"금단, 철수",n,,,정신 건강
+med_aging,aging,노화,n,,,발달·노화
+med_early_detection,early detection,조기 발견,n,,,진단·검사
+med_heart_valve_disease,heart valve disease,심장 판막 질환,n,,,심장·혈관 질환
+med_lung_cancer,lung cancer,폐암,n,,,호흡기 질환
+med_supportive_care,supportive care,"보조적 치료, 지지 요법",n,,,치료·관리
+med_surgical_team,surgical team,수술 팀,n,,,병원·의료진
+med_balanced_diet,balanced diet,균형 잡힌 식단,n,,,영양·건강
+med_elevated,elevated,"높아진, 상승한",adj,,,진단·검사
+med_hospital_administrator,hospital administrator,병원 행정가,n,,,병원·의료진
+med_toxic_shock,toxic shock,독성 쇼크,n,,,기타 질환
+med_attention_deficit,attention deficit,주의력 결핍,n,,,정신 건강
+med_feeding_tube,feeding tube,"급식관, 영양관",n,,,의료 기구
+med_gut,gut,"장, 소화관",n,,,소화기
+med_isolation,isolation,"격리, 고립",n,,,면역·감염
+med_shoulder_blade,shoulder blade,어깨뼈,n,,,뼈·관절
+med_tube_feeding,tube feeding,관 급식,n,,,소화기
+med_ear_canal,ear canal,"외이도, 귀길",n,,,피부·눈·귀·코
+med_gene_editing,gene editing,유전자 편집,n,,,의료 일반
+med_bed_bugs,bed bugs,빈대,n,,,면역·감염
+med_infection_prevention,infection prevention,감염 예방,n,,,치료·관리
+med_iv_pole,IV pole,수액 걸이,n,,,의료 기구
+med_lung_capacity,lung capacity,폐활량,n,,,호흡기
+med_muscle_weakness,muscle weakness,근력 약화,n,,,증상
+med_root_canal,root canal,"신경 치료, 근관",n,,,소화기 질환
+med_mad_cow_disease,mad cow disease,광우병,n,,,면역·감염
+med_resistant,resistant,"내성이 있는, 저항하는",adj,,,형용사
+med_taste_bud,taste bud,"맛봉오리, 미뢰",n,,,피부·눈·귀·코
+med_vector,vector,"매개체, 매개 생물",n,,,면역·감염
+med_internal_bleeding,internal bleeding,내출혈,n,,,응급
+med_oxygen_mask,oxygen mask,산소마스크,n,,,호흡기 질환
+med_panic_disorder,panic disorder,공황 장애,n,,,정신 건강
+med_plastic_surgeon,plastic surgeon,성형외과 의사,n,,,병원·의료진
+med_blood_donation,blood donation,헌혈,n,,,의료 일반
+med_cognitive_therapy,cognitive therapy,인지 치료,n,,,정신 건강
+med_induced_labor,induced labor,유도 분만,n,,,산부인과
+med_therapist,therapist,치료사,n,,,정신 건강
+med_permanent_tooth,permanent tooth,영구치,n,,,소화기
+med_viral_load,viral load,바이러스양,n,,,면역·감염
+med_cold_sore,cold sore,"입술 포진, 입술 물집",n,,,면역·감염
+med_cord_blood,cord blood,제대혈,n,,,의료 일반
+med_cough_up,cough up,"토해 내다, 기침해서 뱉다",v,,,동사·일반
+med_exercise_induced,exercise-induced,운동으로 생기는,adj,,,기타 질환
+med_iron_supplement,iron supplement,철분제,n,,,약
+med_kidney_failure,kidney failure,"콩팥 기능 상실, 신부전",n,,,비뇨기·신장 질환
+med_sensitivity,sensitivity,"민감도, 예민함",n,,,진단·검사
+med_attending_physician,attending physician,주치의,n,,,병원·의료진
+med_birth_control_pill,birth control pill,경구 피임약,n,,,약
+med_dose_dependent,dose-dependent,용량 의존적인,adj,,,약
+med_prescription_drug,prescription drug,처방약,n,,,약
+med_brain_tumor,brain tumor,뇌종양,n,,,뇌·신경 질환
+med_cognitive_decline,cognitive decline,인지 저하,n,,,정신 건강
+med_imaging,imaging,"영상 검사, 촬영",n,,,진단·검사
+med_physical_therapist,physical therapist,물리 치료사,n,,,수술·처치
+med_precision_medicine,precision medicine,정밀 의학,n,,,의료 일반
+med_prone,prone,"엎드린, ~하기 쉬운",adj,,,위치·방향
+med_revival,revival,"소생, 회복",n,,,응급
+med_wound_healing,wound healing,상처 치유,n,,,치료·관리
+med_bone_scan,bone scan,뼈 스캔,n,,,진단·검사
+med_habit_forming,habit-forming,습관성의,adj,,,정신 건강
+med_pet_scan,PET scan,양전자 방출 단층 촬영,n,,,진단·검사
+med_primary_tumor,primary tumor,원발 종양,n,,,종양
+med_sleeping_pill,sleeping pill,수면제,n,,,정신 건강
+med_torn_muscle,torn muscle,근육 파열,n,,,근골격 질환
+med_cough_drop,cough drop,기침 사탕,n,,,약
+med_discharge_plan,discharge plan,퇴원 계획,n,,,치료·관리
+med_inherited,inherited,"유전된, 물려받은",adj,,,형용사
+med_medical_imaging,medical imaging,의료 영상,n,,,진단·검사
+med_muscle_fiber,muscle fiber,근섬유,n,,,근육·힘줄
+med_mortality,mortality,"사망률, 죽음",n,,,면역·감염
+med_obsession,obsession,"강박 관념, 집착",n,,,정신 건강
+med_rejection,rejection,"거부 반응, 거절",n,,,수술·처치
+med_surgical_procedure,surgical procedure,수술 절차,n,,,수술·처치
+med_blood_donor,blood donor,헌혈자,n,,,혈액
+med_health_literacy,health literacy,건강 정보 이해 능력,n,,,의료 일반
+med_nursery,nursery,신생아실,n,,,병원·의료진
+med_pharmaceutical_company,pharmaceutical company,제약 회사,n,,,약
+med_plague,plague,"페스트, 전염병",n,,,면역·감염
+med_viral_infection,viral infection,바이러스 감염,n,,,면역·감염
+med_bleeding_disorder,bleeding disorder,출혈 장애,n,,,혈액 질환
+med_crash_cart,crash cart,응급 처치 카트,n,,,의료 기구
+med_peer_reviewed,peer-reviewed,동료 심사를 거친,adj,,,의료 일반
+med_wisdom_tooth,wisdom tooth,사랑니,n,,,소화기
+med_emotional_distress,emotional distress,정서적 고통,n,,,정신 건강
+med_marker,marker,"표지자, 지표",n,,,진단·검사
+med_psychiatric,psychiatric,"정신과의, 정신 의학의",adj,,,정신 건강
+med_sodium,sodium,나트륨,n,,,영양·건강
+med_isolation_ward,isolation ward,격리 병동,n,,,병원·의료진
+med_lethal,lethal,치명적인,adj,,,형용사
+med_radius,radius,"노뼈, 요골",n,,,뼈·관절
+med_secondary_tumor,secondary tumor,전이 종양,n,,,종양
+med_surgical_mask,surgical mask,수술용 마스크,n,,,수술·처치
+med_kidney_infection,kidney infection,신장 감염,n,,,기타 질환
+med_low_sodium,low-sodium,저염의,adj,,,영양·건강
+med_resting_heart_rate,resting heart rate,안정 시 심박수,n,,,심장·혈관
+med_therapeutic,therapeutic,"치료의, 치료 효과가 있는",adj,,,약
+med_genetics,genetics,유전학,n,,,세포·유전
+med_loss_of_appetite,loss of appetite,식욕 부진,n,,,증상
+med_poisoning,poisoning,중독,n,,,응급
+med_sperm,sperm,정자,n,,,비뇨·생식
+med_sudden_infant_death,sudden infant death,영아 돌연사,n,,,발달·노화
+med_diagnostic,diagnostic,"진단의, 진단용의",adj,,,진단·검사
+med_food_poisoning,food poisoning,식중독,n,,,소화기 질환
+med_graves_disease,Graves' disease,그레이브스병,n,,,내분비·대사 질환
+med_tissue_donation,tissue donation,조직 기증,n,,,의료 일반
+med_toddler,toddler,걸음마 하는 아기,n,,,발달·노화
+med_calcium,calcium,칼슘,n,,,영양·건강
+med_enzyme,enzyme,효소,n,,,소화기
+med_lead_poisoning,lead poisoning,납중독,n,,,기타 질환
+med_mental_fatigue,mental fatigue,정신적 피로,n,,,정신 건강
+med_morning_sickness,morning sickness,입덧,n,,,산부인과
+med_sore_throat,sore throat,"인후통, 목 아픔",n,,,눈·귀·코·목
+med_urine_culture,urine culture,소변 배양,n,,,진단·검사
+med_burning_sensation,burning sensation,화끈거림,n,,,증상
+med_discharge_summary,discharge summary,퇴원 요약지,n,,,병원·의료진
+med_psychologist,psychologist,심리학자,n,,,정신 건강
+med_acquired_immunity,acquired immunity,후천 면역,n,,,면역·감염
+med_autism_spectrum,autism spectrum,자폐 스펙트럼,n,,,정신 건강
+med_counselor,counselor,상담사,n,,,정신 건강
+med_ct_scan,CT scan,컴퓨터 단층 촬영,n,,,진단·검사
+med_growth_hormone,growth hormone,성장 호르몬,n,,,내분비
+med_heating_pad,heating pad,온열 패드,n,,,의료 기구
+med_hygiene,hygiene,위생,n,,,영양·건강
+med_receptor,receptor,수용체,n,,,세포·유전
+med_rehab,rehab,"재활, 재활 치료",n,,,정신 건강
+med_reproductive_system,reproductive system,생식계,n,,,비뇨·생식
+med_respiratory_rate,respiratory rate,호흡수,n,,,진단·검사
+med_allergic,allergic,알레르기가 있는,adj,,,동사·일반
+med_cell_membrane,cell membrane,세포막,n,,,세포·유전
+med_fertility,fertility,"생식 능력, 가임",n,,,산부인과
+med_hand_hygiene,hand hygiene,손 위생,n,,,면역·감염
+med_infectious_disease,infectious disease,감염병,n,,,면역·감염
+med_tension_headache,tension headache,긴장성 두통,n,,,뇌·신경 질환
+med_traction,traction,"견인, 견인 요법",n,,,수술·처치
+med_variant,variant,"변이, 변이종",n,,,면역·감염
+med_alcohol_poisoning,alcohol poisoning,급성 알코올 중독,n,,,기타 질환
+med_behavioral_therapy,behavioral therapy,행동 치료,n,,,정신 건강
+med_chronic_kidney_disease,chronic kidney disease,만성 콩팥병,n,,,비뇨기·신장 질환
+med_drainage,drainage,"배액, 배수",n,,,수술·처치
+med_relieve,relieve,"덜어 주다, 완화하다",v,,,동사·일반
+med_sleep_hygiene,sleep hygiene,수면 위생,n,,,영양·건강
+med_anal_canal,anal canal,항문관,n,,,장기·몸 부위
+med_cane,cane,지팡이,n,,,의료 기구
+med_fertility_treatment,fertility treatment,불임 치료,n,,,산부인과
+med_iris,iris,홍채,n,,,피부·눈·귀·코
+med_motion_sickness,motion sickness,멀미,n,,,기타 질환
+med_near_drowning,near-drowning,익사할 뻔한 상태,n,,,응급
+med_neural,neural,신경의,adj,,,뇌·신경
+med_organ_donation,organ donation,장기 기증,n,,,병원·의료진
+med_respiratory_failure,respiratory failure,호흡 부전,n,,,호흡기 질환
+med_syrup,syrup,시럽,n,,,약
+med_upper_respiratory,upper respiratory,상기도의,adj,,,호흡기
+med_urine_sample,urine sample,소변 검사물,n,,,진단·검사
+med_wheelchair_bound,wheelchair-bound,휠체어에 의지하는,adj,,,형용사
+med_conception,conception,"임신, 수태",n,,,비뇨·생식
+med_gown,gown,"가운, 수술복",n,,,면역·감염
+med_heart_bypass,heart bypass,심장 우회술,n,,,수술·처치
+med_heart_transplant,heart transplant,심장 이식,n,,,심장·혈관 질환
+med_lateral,lateral,"가쪽의, 외측의",adj,,,위치·방향
+med_psychiatric_ward,psychiatric ward,정신과 병동,n,,,정신 건강
+med_cardiac_muscle,cardiac muscle,심장근,n,,,근육·힘줄
+med_cardiac_output,cardiac output,심박출량,n,,,심장·혈관
+med_chest_compression,chest compression,가슴 압박,n,,,응급
+med_hair_transplant,hair transplant,모발 이식,n,,,피부
+med_insulin_resistance,insulin resistance,인슐린 저항성,n,,,내분비·대사 질환
+med_overweight,overweight,과체중의,adj,,,영양·건강
+med_serum,serum,혈청,n,,,혈액
+med_surgical_gloves,surgical gloves,수술용 장갑,n,,,수술·처치
+med_allergic_reaction,allergic reaction,알레르기 반응,n,,,약
+med_bacterial,bacterial,세균성의,adj,,,형용사
+med_blood_glucose,blood glucose,"혈당, 혈중 포도당",n,,,진단·검사
+med_chemical_peel,chemical peel,화학 박피,n,,,피부
+med_hospital_gown,hospital gown,환자복,n,,,의료 기구
+med_post_traumatic_stress,post-traumatic stress,외상 후 스트레스,n,,,정신 건강
+med_weakened,weakened,약해진,adj,,,형용사
+med_bilateral,bilateral,양쪽의,adj,,,위치·방향
+med_choke,choke,숨이 막히다,v,,,동사·일반
+med_inflammatory,inflammatory,염증성의,adj,,,면역·감염
+med_organ_donor,organ donor,장기 기증자,n,,,수술·처치
+med_tennis_elbow,tennis elbow,"테니스 엘보, 외측 상과염",n,,,근골격 질환
+med_traumatic_brain_injury,traumatic brain injury,외상성 뇌 손상,n,,,뇌·신경
+med_vitamin_supplement,vitamin supplement,비타민 보충제,n,,,약
+med_active_ingredient,active ingredient,유효 성분,n,,,약
+med_asthma_attack,asthma attack,천식 발작,n,,,기타 질환
+med_bypass_surgery,bypass surgery,우회로 수술,n,,,심장·혈관 질환
+med_calf,calf,종아리,n,,,근육·힘줄
+med_fatty_acid,fatty acid,지방산,n,,,영양·건강
+med_lump,lump,"혹, 덩어리",n,,,증상
+med_milestone,milestone,"발달 단계, 이정표",n,,,발달·노화
+med_spinal_tap,spinal tap,척수액 검사,n,,,진단·검사
+med_tooth_sensitivity,tooth sensitivity,이 시림,n,,,기타 질환
+med_transplant_surgery,transplant surgery,이식 수술,n,,,수술·처치
+med_anti_inflammatory,anti-inflammatory,"소염제, 항염증의",n,,,약
+med_baseline,baseline,"기준치, 기준선",n,,,진단·검사
+med_collapsed_lung,collapsed lung,"허탈된 폐, 기흉",n,,,기타 질환
+med_contaminated,contaminated,오염된,adj,,,동사·일반
+med_genome,genome,"유전체, 게놈",n,,,세포·유전
+med_lethal_dose,lethal dose,치사량,n,,,약
+med_limb,limb,"팔다리, 사지",n,,,장기·몸 부위
+med_radiation_sickness,radiation sickness,방사선병,n,,,기타 질환
+med_respiratory_infection,respiratory infection,호흡기 감염,n,,,호흡기
+med_spinal_canal,spinal canal,척추관,n,,,뼈·관절
+med_developmental_delay,developmental delay,발달 지연,n,,,발달·노화
+med_failure_to_thrive,failure to thrive,성장 장애,n,,,기타 질환
+med_invasive,invasive,"침습적인, 침입하는",adj,,,수술·처치
+med_massage_therapist,massage therapist,마사지 치료사,n,,,치료·관리
+med_plaque,plaque,"플라크, 치석",n,,,심장·혈관 질환
+med_scrub,scrub,(수술 전) 손을 씻다,v,,,수술·처치
+med_spinal_nerve,spinal nerve,척수 신경,n,,,뇌·신경
+med_cardiovascular,cardiovascular,심혈관의,adj,,,심장·혈관 질환
+med_cluster_headache,cluster headache,군발 두통,n,,,뇌·신경 질환
+med_differential_diagnosis,differential diagnosis,감별 진단,n,,,진단·검사
+med_efficacy,efficacy,"효능, 효과",n,,,약
+med_insulin_pump,insulin pump,인슐린 펌프,n,,,의료 기구
+med_obese,obese,비만인,adj,,,영양·건강
+med_premature_beat,premature beat,조기 박동,n,,,심장·혈관
+med_sensory,sensory,감각의,adj,,,뇌·신경
+med_acute_kidney_injury,acute kidney injury,급성 신장 손상,n,,,비뇨기·신장 질환
+med_airborne,airborne,공기 매개의,adj,,,면역·감염
+med_caffeine,caffeine,카페인,n,,,영양·건강
+med_heartbeat,heartbeat,심장 박동,n,,,심장·혈관
+med_muscular,muscular,근육의,adj,,,위치·방향
+med_neck_brace,neck brace,목 보호대,n,,,의료 기구
+med_plasma_donation,plasma donation,혈장 기증,n,,,의료 일반
+med_transmit,transmit,"전염시키다, 옮기다",v,,,동사·일반
+med_absorption,absorption,흡수,n,,,약
+med_brain_swelling,brain swelling,뇌부종,n,,,뇌·신경
+med_cardiac_surgeon,cardiac surgeon,심장 외과 의사,n,,,심장·혈관 질환
+med_cosmetic_surgery,cosmetic surgery,미용 성형,n,,,수술·처치
+med_joint_capsule,joint capsule,관절주머니,n,,,장기·몸 부위
+med_medical_intern,medical intern,"수련의, 인턴",n,,,병원·의료진
+med_occupational_therapy,occupational therapy,작업 치료,n,,,수술·처치
+med_premature_birth,premature birth,조산,n,,,산부인과
+med_prevalence,prevalence,"유병률, 널리 퍼짐",n,,,면역·감염
+med_scar_tissue,scar tissue,흉터 조직,n,,,피부
+med_stress_fracture,stress fracture,피로 골절,n,,,근골격 질환
+med_sympathetic_nerve,sympathetic nerve,교감 신경,n,,,뇌·신경
+med_tidal_volume,tidal volume,일회 호흡량,n,,,호흡기
+med_amino_acid,amino acid,아미노산,n,,,영양·건강
+med_birth_defect,birth defect,선천적 결손증,n,,,발달·노화
+med_cardiovascular_disease,cardiovascular disease,심혈관 질환,n,,,심장·혈관 질환
+med_discomfort,discomfort,불편감,n,,,증상
+med_fatty_liver,fatty liver,지방간,n,,,소화기 질환
+med_optic,optic,"눈의, 시력의",adj,,,피부·눈·귀·코
+med_posture,posture,자세,n,,,영양·건강
+med_prostate_cancer,prostate cancer,전립샘암,n,,,산부인과
+med_staging,staging,병기 결정,n,,,종양
+med_zinc,zinc,아연,n,,,영양·건강
+med_absence_seizure,absence seizure,"소발작, 결신 발작",n,,,뇌·신경
+med_flare_up,flare-up,"(증상의) 재발, 악화",n,,,증상
+med_heat_rash,heat rash,땀띠,n,,,기타 질환
+med_seizure_disorder,seizure disorder,발작 장애,n,,,뇌·신경
+med_stitch_up,stitch up,"꿰매다, 봉합하다",v,,,수술·처치
+med_symptom_free,symptom-free,증상이 없는,adj,,,증상
+med_tooth_decay,tooth decay,"충치, 치아 우식",n,,,소화기 질환
+med_bacterial_infection,bacterial infection,세균 감염,n,,,면역·감염
+med_practitioner,practitioner,"개업 의사, 종사자",n,,,의료 일반
+med_saturated_fat,saturated fat,포화 지방,n,,,영양·건강
+med_scaling,scaling,"스케일링, 치석 제거",n,,,수술·처치
+med_spinal_fusion,spinal fusion,척추 유합술,n,,,수술·처치
+med_bee_sting,bee sting,벌에 쏘임,n,,,응급
+med_breast_lump,breast lump,유방 멍울,n,,,기타 질환
+med_general_practitioner,general practitioner,일반의,n,,,병원·의료진
+med_gluten,gluten,글루텐,n,,,영양·건강
+med_liver_transplant,liver transplant,간 이식,n,,,소화기 질환
+med_metabolic,metabolic,"대사의, 물질대사의",adj,,,영양·건강
+med_peripheral_vision,peripheral vision,주변 시야,n,,,눈·귀·코·목
+med_stem_cell_transplant,stem cell transplant,줄기세포 이식,n,,,의료 일반
+med_tooth_extraction,tooth extraction,발치,n,,,수술·처치
+med_tumor_marker,tumor marker,종양 표지자,n,,,종양
+med_addictive,addictive,중독성 있는,adj,,,정신 건강
+med_casualty,casualty,"사상자, 피해자",n,,,응급
+med_iron_deficiency,iron deficiency,철 결핍,n,,,혈액 질환
+med_organ_transplant,organ transplant,장기 이식,n,,,의료 일반
+med_physiology,physiology,생리학,n,,,세포·유전
+med_regeneration,regeneration,재생,n,,,세포·유전
+med_scrub_nurse,scrub nurse,수술실 간호사,n,,,병원·의료진
+med_suicidal,suicidal,자살 충동을 느끼는,adj,,,정신 건강
+med_bladder_cancer,bladder cancer,방광암,n,,,비뇨기·신장 질환
+med_bladder_wall,bladder wall,방광벽,n,,,장기·몸 부위
+med_testosterone,testosterone,테스토스테론,n,,,내분비
+med_bladder_stone,bladder stone,방광 결석,n,,,비뇨기·신장 질환
+med_calorie,calorie,"칼로리, 열량",n,,,영양·건강
+med_cortex,cortex,"피질, 겉질",n,,,뇌·신경
+med_food_allergy,food allergy,음식 알레르기,n,,,영양·건강
+med_mass_casualty,mass casualty,대량 사상자,n,,,응급
+med_nucleus,nucleus,(세포)핵,n,,,세포·유전
+med_vaccination,vaccination,예방 접종,n,,,면역·감염
+med_binge_eating,binge eating,폭식,n,,,정신 건강
+med_choking,choking,"질식, 목이 막힘",n,,,응급
+med_colon_cancer,colon cancer,대장암,n,,,소화기 질환
+med_compound_fracture,compound fracture,개방 골절,n,,,근골격 질환
+med_drip,drip,점적 주사,n,,,약
+med_drug_allergy,drug allergy,약물 알레르기,n,,,약
+med_jet_lag,jet lag,시차증,n,,,영양·건강
+med_maternity_ward,maternity ward,산부인과 병동,n,,,병원·의료진
+med_potassium,potassium,칼륨,n,,,영양·건강
+med_respiratory_therapist,respiratory therapist,호흡 치료사,n,,,호흡기 질환
+med_spinal_cord_injury,spinal cord injury,척수 손상,n,,,근골격 질환
+med_stitches,stitches,"봉합, 꿰맨 자국",n,,,피부
+med_toxicity,toxicity,독성,n,,,약
+med_viral_pneumonia,viral pneumonia,바이러스 폐렴,n,,,기타 질환
+med_yeast_infection,yeast infection,"칸디다 감염, 효모균 감염",n,,,기타 질환
+med_altitude_sickness,altitude sickness,고산병,n,,,기타 질환
+med_glucose_tolerance_test,glucose tolerance test,포도당 내성 검사,n,,,진단·검사
+med_kidney_transplant,kidney transplant,신장 이식,n,,,비뇨기·신장 질환
+med_pathology,pathology,병리학,n,,,세포·유전
+med_portal_vein,portal vein,"문맥, 간문맥",n,,,심장·혈관
+med_sanitation,sanitation,"위생 시설, 공중위생",n,,,영양·건강
+med_temporal_bone,temporal bone,"관자뼈, 측두골",n,,,뼈·관절
+med_wellness,wellness,"건강, 웰빙",n,,,영양·건강
+med_abdominal_pain,abdominal pain,복통,n,,,증상
+med_abdominal_wall,abdominal wall,"배벽, 복벽",n,,,장기·몸 부위
+med_autopsy_report,autopsy report,부검 보고서,n,,,진단·검사
+med_craving,craving,"갈망, 강한 욕구",n,,,정신 건강
+med_lithium,lithium,리튬,n,,,약
+med_nurse_practitioner,nurse practitioner,전문 간호사,n,,,병원·의료진
+med_pathology_report,pathology report,병리 보고서,n,,,진단·검사
+med_psychiatry,psychiatry,정신 의학,n,,,정신 건강
+med_superficial,superficial,"얕은, 표면의",adj,,,위치·방향
+med_vaccination_schedule,vaccination schedule,예방 접종 일정,n,,,기타 질환
+med_booster_shot,booster shot,추가 접종,n,,,면역·감염
+med_longevity,longevity,장수,n,,,발달·노화
+med_obstruction,obstruction,"폐쇄, 막힘",n,,,기타 질환
+med_peripheral_nerve,peripheral nerve,말초 신경,n,,,뇌·신경
+med_replicate,replicate,복제하다,v,,,동사·일반
+med_bladder_infection,bladder infection,방광 감염,n,,,기타 질환
+med_chemotherapy_drug,chemotherapy drug,항암제,n,,,약
+med_contact_tracing,contact tracing,접촉자 추적,n,,,면역·감염
+med_dietary_fiber,dietary fiber,식이 섬유,n,,,영양·건강
+med_optic_nerve,optic nerve,시신경,n,,,뇌·신경
+med_physiological,physiological,생리적인,adj,,,세포·유전
+med_scarlet_fever,scarlet fever,성홍열,n,,,면역·감염
+med_bowel_movement,bowel movement,배변 활동,n,,,소화기
+med_fasting_blood_sugar,fasting blood sugar,공복 혈당,n,,,진단·검사
+med_herd_immunity,herd immunity,집단 면역,n,,,면역·감염
+med_mechanical_ventilation,mechanical ventilation,기계 환기,n,,,호흡기
+med_memory_impairment,memory impairment,기억 장애,n,,,정신 건강
+med_metabolic_syndrome,metabolic syndrome,대사 증후군,n,,,내분비·대사 질환
+med_pediatric,pediatric,소아과의,adj,,,병원·의료진
+med_adrenaline,adrenaline,아드레날린,n,,,뇌·신경
+med_aura,aura,"전조, 아우라",n,,,뇌·신경
+med_hepatitis_a,hepatitis A,A형 간염,n,,,기타 질환
+med_nicotine,nicotine,니코틴,n,,,영양·건강
+med_oral_cavity,oral cavity,"입안, 구강",n,,,소화기
+med_socket,socket,"관절 오목, 구멍",n,,,뼈·관절
+med_anterior,anterior,"앞쪽의, 전방의",adj,,,위치·방향
+med_appendix,appendix,"충수, 막창자꼬리",n,,,소화기
+med_dosage_form,dosage form,제형,n,,,약
+med_eye_socket,eye socket,"눈구멍, 안와",n,,,뼈·관절
+med_hepatitis_b,hepatitis B,B형 간염,n,,,소화기 질환
+med_hepatitis_c,hepatitis C,C형 간염,n,,,소화기 질환
+med_influenza,influenza,"인플루엔자, 독감",n,,,면역·감염
+med_liver_enzymes,liver enzymes,간 효소,n,,,소화기
+med_robotic_surgery,robotic surgery,로봇 수술,n,,,수술·처치
+med_stool_test,stool test,대변 검사,n,,,진단·검사
+med_tear_duct,tear duct,눈물관,n,,,피부·눈·귀·코
+med_thyroid_cancer,thyroid cancer,갑상샘암,n,,,내분비·대사 질환
+med_breastfeeding,breastfeeding,모유 수유,n,,,산부인과
+med_hangover,hangover,숙취,n,,,영양·건강
+med_personalized_medicine,personalized medicine,맞춤 의학,n,,,의료 일반
+med_preventive,preventive,"예방의, 예방적인",adj,,,영양·건강
+med_thyroid_function_test,thyroid function test,갑상샘 기능 검사,n,,,진단·검사
+med_braces,braces,치아 교정기,n,,,소화기 질환
+med_c_reactive_protein,C-reactive protein,C 반응 단백,n,,,진단·검사
+med_differentiation,differentiation,분화,n,,,세포·유전
+med_fractured,fractured,골절된,adj,,,형용사
+med_life_expectancy,life expectancy,기대 수명,n,,,병원·의료진
+med_magnesium,magnesium,마그네슘,n,,,영양·건강
+med_nasal,nasal,코의,adj,,,위치·방향
+med_vitamin_deficiency,vitamin deficiency,비타민 결핍,n,,,영양·건강
+med_ball_and_socket_joint,ball-and-socket joint,절구 관절,n,,,뼈·관절
+med_body_odor,body odor,"체취, 몸 냄새",n,,,피부
+med_bone_marrow,bone marrow,골수,n,,,뼈·관절
+med_implant,implant,"이식물, 임플란트",n,,,수술·처치
+med_pharmacy_technician,pharmacy technician,약국 기술원,n,,,병원·의료진
+med_preventive_medicine,preventive medicine,예방 의학,n,,,병원·의료진
+med_restless_legs_syndrome,restless legs syndrome,하지 불안 증후군,n,,,뇌·신경 질환
+med_abdominal_muscles,abdominal muscles,"배 근육, 복근",n,,,근육·힘줄
+med_anomaly,anomaly,"이상, 변칙",n,,,진단·검사
+med_graft,graft,"이식편, 이식",n,,,수술·처치
+med_heat_exhaustion,heat exhaustion,열 탈진,n,,,응급
+med_hereditary_disease,hereditary disease,유전병,n,,,형용사
+med_pediatric_ward,pediatric ward,소아 병동,n,,,병원·의료진
+med_placebo_effect,placebo effect,위약 효과,n,,,의료 일반
+med_puberty,puberty,사춘기,n,,,발달·노화
+med_pulmonary_function_test,pulmonary function test,폐 기능 검사,n,,,진단·검사
+med_antibiotic_resistance,antibiotic resistance,항생제 내성,n,,,면역·감염
+med_digestive_system,digestive system,소화계,n,,,소화기
+med_ovarian,ovarian,난소의,adj,,,장기·몸 부위
+med_respiratory_tract,respiratory tract,호흡기관,n,,,호흡기
+med_stabilize,stabilize,(상태를) 안정시키다,v,,,동사·일반
+med_allergic_asthma,allergic asthma,알레르기 천식,n,,,기타 질환
+med_antibody_test,antibody test,항체 검사,n,,,진단·검사
+med_blood_smear,blood smear,혈액 도말,n,,,진단·검사
+med_bloody_stool,bloody stool,혈변,n,,,증상
+med_cervical,cervical,"목의, 자궁 경부의",adj,,,뼈·관절
+med_clamp,clamp,"죔쇠, 클램프",n,,,수술·처치
+med_cold_intolerance,cold intolerance,추위 못 견딤,n,,,기타 질환
+med_diabetic,diabetic,"당뇨병의, 당뇨병 환자",adj,,,내분비·대사 질환
+med_dorsal,dorsal,등쪽의,adj,,,위치·방향
+med_nail_fungus,nail fungus,손발톱 무좀,n,,,피부
+med_nasal_bone,nasal bone,코뼈,n,,,뼈·관절
+med_ovarian_cancer,ovarian cancer,난소암,n,,,산부인과
+med_skin_graft,skin graft,피부 이식,n,,,피부
+med_surgical_staples,surgical staples,수술용 스테이플,n,,,수술·처치
+med_blurred_vision,blurred vision,"흐린 시력, 흐려 보임",n,,,눈·귀·코·목
+med_cervical_cancer,cervical cancer,자궁 경부암,n,,,산부인과
+med_frontal_bone,frontal bone,"이마뼈, 전두골",n,,,뼈·관절
+med_heat_intolerance,heat intolerance,더위 못 견딤,n,,,기타 질환
+med_mania,mania,조증,n,,,정신 건강
+med_microscope_slide,microscope slide,현미경 슬라이드,n,,,의료 기구
+med_mri_scan,MRI scan,자기 공명 영상 검사,n,,,진단·검사
+med_night_blindness,night blindness,야맹증,n,,,눈·귀·코·목
+med_orderly,orderly,병원 잡역부,n,,,병원·의료진
+med_reflex,reflex,"반사, 반사 작용",n,,,뇌·신경
+med_bacterial_pneumonia,bacterial pneumonia,세균성 폐렴,n,,,기타 질환
+med_bone_graft,bone graft,뼈 이식,n,,,수술·처치
+med_chaplain,chaplain,"원목, 병원 목사",n,,,병원·의료진
+med_coroner,coroner,검시관,n,,,병원·의료진
+med_generalized,generalized,"전신적인, 일반화된",adj,,,증상
+med_gram_stain,Gram stain,그람 염색,n,,,진단·검사
+med_posterior,posterior,"뒤쪽의, 후방의",adj,,,위치·방향
+med_psychotic,psychotic,정신증의,adj,,,정신 건강
+med_tick_borne,tick-borne,진드기 매개의,adj,,,면역·감염
+med_color_blindness,color blindness,색맹,n,,,눈·귀·코·목
+med_cpr,CPR,심폐 소생술,n,,,응급
+med_flea,flea,벼룩,n,,,면역·감염
+med_medic,medic,"의무병, 의사",n,,,병원·의료진
+med_paranoia,paranoia,편집증,n,,,정신 건강
+med_sterile_field,sterile field,멸균 영역,n,,,기타 질환
+med_nasal_spray,nasal spray,코 분무제,n,,,눈·귀·코·목
+med_viral_hepatitis,viral hepatitis,바이러스 간염,n,,,기타 질환
+med_cohort,cohort,"코호트, 집단",n,,,의료 일반
+med_conceive,conceive,"임신하다, 생각해 내다",v,,,동사·일반
+med_diffusion,diffusion,확산,n,,,생리·대사
+med_fetal,fetal,태아의,adj,,,기타 질환
+med_flushing,flushing,"홍조, 얼굴이 붉어짐",n,,,증상
+med_localized,localized,국소적인,adj,,,증상
+med_scrape,scrape,"찰과상, 긁힌 상처",n,,,응급
+med_dental_implant,dental implant,치아 임플란트,n,,,수술·처치
+med_general_anesthesia,general anesthesia,전신 마취,n,,,수술·처치
+med_local_anesthesia,local anesthesia,국소 마취,n,,,수술·처치
+med_skeletal,skeletal,"뼈대의, 골격의",adj,,,위치·방향
+med_tonic,tonic,강장제,n,,,약
+med_benign_tumor,benign tumor,양성 종양,n,,,종양
+med_infancy,infancy,유아기,n,,,발달·노화
+med_irregular_heartbeat,irregular heartbeat,불규칙한 심장 박동,n,,,증상
+med_delusion,delusion,망상,n,,,정신 건강
+med_dopamine,dopamine,도파민,n,,,뇌·신경
+med_endemic,endemic,"풍토성의, 고유한",adj,,,면역·감염
+med_morphine,morphine,모르핀,n,,,약
+med_pelvic,pelvic,골반의,adj,,,위치·방향
+med_percussion,percussion,"타진, 두드려 진찰함",n,,,진단·검사
+med_sanitary,sanitary,"위생의, 청결한",adj,,,형용사
+med_surrogate_mother,surrogate mother,대리모,n,,,산부인과
+med_adolescence,adolescence,청소년기,n,,,발달·노화
+med_biochemistry,biochemistry,생화학,n,,,세포·유전
+med_dysfunctional,dysfunctional,기능 장애의,adj,,,형용사
+med_estrogen,estrogen,에스트로겐,n,,,내분비
+med_infect,infect,감염시키다,v,,,동사·일반
+med_pathological,pathological,"병적인, 병리학의",adj,,,형용사
+med_pelvic_floor,pelvic floor,골반저,n,,,근육·힘줄
+med_reflex_hammer,reflex hammer,반사 망치,n,,,진단·검사
+med_suction,suction,"흡인, 석션",n,,,호흡기
+med_enamel,enamel,"법랑질, 사기질",n,,,소화기
+med_herpes,herpes,"헤르페스, 포진",n,,,산부인과
+med_palate,palate,"입천장, 구개",n,,,소화기
+med_saliva,saliva,"침, 타액",n,,,소화기
+med_skeletal_muscle,skeletal muscle,"뼈대근, 골격근",n,,,근육·힘줄
+med_thyroid_hormone,thyroid hormone,갑상샘 호르몬,n,,,장기·몸 부위
+med_unilateral,unilateral,한쪽의,adj,,,위치·방향
+med_amnesia,amnesia,기억 상실증,n,,,뇌·신경 질환
+med_aspirin,aspirin,아스피린,n,,,약
+med_borderline,borderline,"경계의, 경계선상의",adj,,,진단·검사
+med_cognition,cognition,인지,n,,,뇌·신경
+med_embryo,embryo,배아,n,,,비뇨·생식
+med_herbal_medicine,herbal medicine,"한약, 약초 요법",n,,,치료·관리
+med_infirmary,infirmary,"의무실, 양호실",n,,,병원·의료진
+med_innate_immunity,innate immunity,선천 면역,n,,,면역·감염
+med_itchy,itchy,가려운,adj,,,증상
+med_pancreatic,pancreatic,"이자의, 췌장의",adj,,,소화기
+med_randomized,randomized,무작위의,adj,,,의료 일반
+med_sling,sling,"팔걸이 붕대, 삼각건",n,,,수술·처치
+med_swine_flu,swine flu,"돼지 독감, 신종 인플루엔자",n,,,면역·감염
+med_holistic,holistic,전체론적인,adj,,,치료·관리
+med_opioid,opioid,"오피오이드, 마약성 진통제",n,,,약
+med_pancreatic_cancer,pancreatic cancer,췌장암,n,,,소화기 질환
+med_saline,saline,식염수,n,,,약
+med_steroid,steroid,스테로이드,n,,,약
+med_bedside_manner,bedside manner,환자를 대하는 태도,n,,,병원·의료진
+med_intestinal,intestinal,"장의, 창자의",adj,,,소화기
+med_manic,manic,조증의,adj,,,정신 건강
+med_oxygen_saturation,oxygen saturation,산소 포화도,n,,,호흡기 질환
+med_reversible,reversible,되돌릴 수 있는,adj,,,형용사
+med_vaccinated,vaccinated,예방 접종을 받은,adj,,,형용사
+med_ace_inhibitor,ACE inhibitor,ACE 억제제,n,,,약
+med_compression_stockings,compression stockings,압박 스타킹,n,,,의료 기구
+med_filtration,filtration,여과,n,,,생리·대사
+med_fungal,fungal,"진균성의, 곰팡이의",adj,,,형용사
+med_portal_hypertension,portal hypertension,문맥 고혈압,n,,,소화기
+med_pulmonary_vein,pulmonary vein,폐정맥,n,,,심장·혈관
+med_radiation_oncology,radiation oncology,방사선 종양학,n,,,종양
+med_sweat_gland,sweat gland,땀샘,n,,,피부·눈·귀·코
+med_urinary_system,urinary system,비뇨계,n,,,비뇨·생식
+med_aspiration,aspiration,"흡인, 열망",n,,,호흡기 질환
+med_bone_marrow_transplant,bone marrow transplant,골수 이식,n,,,혈액
+med_elective_surgery,elective surgery,선택 수술,n,,,수술·처치
+med_epidemiology,epidemiology,역학,n,,,세포·유전
+med_hinge_joint,hinge joint,경첩 관절,n,,,뼈·관절
+med_sclerosis,sclerosis,경화증,n,,,기타 질환
+med_skin_biopsy,skin biopsy,피부 생검,n,,,수술·처치
+med_taper,taper,(약을) 점점 줄이다,v,,,약
+med_toxin,toxin,독소,n,,,면역·감염
+med_abdominal_cavity,abdominal cavity,"배안, 복강",n,,,소화기
+med_afflicted,afflicted,고통받는,adj,,,동사·일반
+med_cholera,cholera,콜레라,n,,,소화기 질환
+med_detox,detox,해독 치료,n,,,정신 건강
+med_lipid,lipid,지질,n,,,영양·건강
+med_multiple_sclerosis,multiple sclerosis,다발 경화증,n,,,뇌·신경 질환
+med_ocd,OCD,강박 장애,n,,,정신 건강
+med_pediatrics,pediatrics,소아과학,n,,,병원·의료진
+med_sunscreen,sunscreen,자외선 차단제,n,,,피부
+med_vocal_cords,vocal cords,성대,n,,,호흡기
+med_forearm,forearm,"아래팔, 전완",n,,,장기·몸 부위
+med_irreversible,irreversible,되돌릴 수 없는,adj,,,형용사
+med_lipid_profile,lipid profile,지질 검사,n,,,진단·검사
+med_occult_blood,occult blood,잠혈,n,,,소화기 질환
+med_pore,pore,"모공, 땀구멍",n,,,피부·눈·귀·코
+med_rupture,rupture,파열,n,,,기타 질환
+med_sinus,sinus,"부비강, 굴",n,,,호흡기
+med_splinter,splinter,"가시, 파편",n,,,응급
+med_diaper_rash,diaper rash,기저귀 발진,n,,,기타 질환
+med_digestive_tract,digestive tract,소화관,n,,,소화기
+med_distal,distal,"먼 쪽의, 원위의",adj,,,위치·방향
+med_fungal_infection,fungal infection,진균 감염,n,,,면역·감염
+med_gastrointestinal,gastrointestinal,위장관의,adj,,,소화기
+med_latent,latent,잠복성의,adj,,,증상
+med_midwife,midwife,조산사,n,,,산부인과
+med_parasitic,parasitic,기생충의,adj,,,형용사
+med_polio,polio,소아마비,n,,,면역·감염
+med_potency,potency,"효력, 역가",n,,,약
+med_pulmonary_artery,pulmonary artery,폐동맥,n,,,심장·혈관
+med_torn_ligament,torn ligament,인대 파열,n,,,근골격 질환
+med_transverse,transverse,"가로의, 횡단의",adj,,,위치·방향
+med_canine_tooth,canine tooth,송곳니,n,,,소화기
+med_dehydrated,dehydrated,탈수된,adj,,,증상
+med_excise,excise,"절제하다, 잘라 내다",v,,,수술·처치
+med_gastric_juice,gastric juice,위액,n,,,소화기
+med_groin,groin,사타구니,n,,,장기·몸 부위
+med_morbid,morbid,병적인,adj,,,형용사
+med_nasal_congestion,nasal congestion,코막힘,n,,,호흡기 질환
+med_serotonin,serotonin,세로토닌,n,,,뇌·신경
+med_smallpox,smallpox,천연두,n,,,면역·감염
+med_snoring,snoring,코골이,n,,,호흡기
+med_spinal_anesthesia,spinal anesthesia,척추 마취,n,,,뇌·신경
+med_visceral,visceral,내장의,adj,,,위치·방향
+med_antidote,antidote,해독제,n,,,약
+med_anus,anus,항문,n,,,소화기
+med_auditory,auditory,청각의,adj,,,피부·눈·귀·코
+med_balm,balm,"연고, 진통 연고",n,,,약
+med_congenital_disorder,congenital disorder,선천성 질환,n,,,발달·노화
+med_infusion_pump,infusion pump,수액 펌프,n,,,의료 기구
+med_inhale,inhale,들이마시다,v,,,동사·일반
+med_intolerant,intolerant,"못 견디는, 불내성의",adj,,,형용사
+med_liver_lobe,liver lobe,간엽,n,,,장기·몸 부위
+med_medical_malpractice,medical malpractice,의료 과실,n,,,병원·의료진
+med_microbiology,microbiology,미생물학,n,,,세포·유전
+med_nasal_cavity,nasal cavity,"코안, 비강",n,,,호흡기
+med_psychotherapy,psychotherapy,"정신 요법, 심리 치료",n,,,정신 건강
+med_euphoria,euphoria,"다행감, 행복감",n,,,정신 건강
+med_malignant_tumor,malignant tumor,악성 종양,n,,,종양
+med_psychosis,psychosis,정신증,n,,,정신 건강
+med_radial_artery,radial artery,노동맥,n,,,심장·혈관
+med_recurrent,recurrent,"재발성의, 반복되는",adj,,,증상
+med_tenderness,tenderness,"누를 때 아픔, 압통",n,,,증상
+med_cloning,cloning,복제,n,,,세포·유전
+med_large_intestine,large intestine,"대장, 큰창자",n,,,소화기
+med_latent_infection,latent infection,잠복 감염,n,,,면역·감염
+med_needle_biopsy,needle biopsy,바늘 생검,n,,,수술·처치
+med_renal_artery,renal artery,콩팥 동맥,n,,,장기·몸 부위
+med_small_intestine,small intestine,"소장, 작은창자",n,,,소화기
+med_smoking_cessation,smoking cessation,금연,n,,,영양·건강
+med_coronavirus,coronavirus,코로나바이러스,n,,,면역·감염
+med_familial,familial,가족성의,adj,,,형용사
+med_feces,feces,"대변, 분변",n,,,소화기
+med_knuckle,knuckle,손가락 마디,n,,,장기·몸 부위
+med_prosthetic,prosthetic,"인공 보철의, 의지의",adj,,,수술·처치
+med_scrubs,scrubs,수술복,n,,,수술·처치
+med_specificity,specificity,특이도,n,,,진단·검사
+med_anatomical,anatomical,해부학적인,adj,,,세포·유전
+med_antigen_test,antigen test,항원 검사,n,,,진단·검사
+med_bile,bile,"담즙, 쓸개즙",n,,,소화기
+med_circumcision,circumcision,"포경 수술, 할례",n,,,수술·처치
+med_coronary_artery,coronary artery,관상 동맥,n,,,심장·혈관
+med_fetal_heartbeat,fetal heartbeat,태아 심장 박동,n,,,기타 질환
+med_fine_needle_aspiration,fine-needle aspiration,세침 흡인,n,,,수술·처치
+med_genitals,genitals,생식기,n,,,비뇨·생식
+med_head_lice,head lice,머릿니,n,,,면역·감염
+med_lice,lice,이 (머릿니 등),n,,,면역·감염
+med_medial,medial,"안쪽의, 내측의",adj,,,위치·방향
+med_renal_cortex,renal cortex,"콩팥 겉질, 신피질",n,,,장기·몸 부위
+med_septic,septic,"패혈성의, 세균에 감염된",adj,,,형용사
+med_sinus_rhythm,sinus rhythm,"동율동, 정상 심장 리듬",n,,,심장·혈관
+med_vertebrae,vertebrae,척추뼈들,n,,,뼈·관절
+med_coronary_artery_disease,coronary artery disease,관상 동맥 질환,n,,,심장·혈관 질환
+med_lupus,lupus,루푸스,n,,,면역·감염
+med_lymph,lymph,"림프, 림프액",n,,,장기·몸 부위
+med_stiffness,stiffness,"뻣뻣함, 경직",n,,,증상
+med_tia,TIA,일과성 허혈 발작,n,,,뇌·신경 질환
+med_adam_s_apple,Adam's apple,"후골, 울대뼈",n,,,장기·몸 부위
+med_aerobic,aerobic,유산소의,adj,,,영양·건강
+med_airway,airway,"기도, 숨길",n,,,호흡기
+med_contractions,contractions,"(분만) 진통, 자궁 수축",n,,,산부인과
+med_debilitating,debilitating,쇠약하게 하는,adj,,,형용사
+med_fibrosis,fibrosis,섬유증,n,,,기타 질환
+med_iodine,iodine,요오드,n,,,영양·건강
+med_lyme_disease,Lyme disease,라임병,n,,,면역·감염
+med_puncture_wound,puncture wound,찔린 상처,n,,,응급
+med_septic_shock,septic shock,패혈성 쇼크,n,,,면역·감염
+med_sobriety,sobriety,술 취하지 않은 상태,n,,,정신 건강
+med_urinary_retention,urinary retention,"요폐, 소변 정체",n,,,비뇨기·신장 질환
+med_veterinarian,veterinarian,수의사,n,,,병원·의료진
+med_abstinence,abstinence,"금욕, 절제",n,,,정신 건강
+med_disabling,disabling,장애를 일으키는,adj,,,형용사
+med_hydration,hydration,수분 공급,n,,,영양·건강
+med_melanoma,melanoma,흑색종,n,,,종양
+med_remission_rate,remission rate,관해율,n,,,종양
+med_soothe,soothe,진정시키다,v,,,동사·일반
+med_tic_disorder,tic disorder,틱 장애,n,,,정신 건강
+med_carbohydrate,carbohydrate,탄수화물,n,,,영양·건강
+med_euthanasia,euthanasia,안락사,n,,,병원·의료진
+med_gastric_bypass,gastric bypass,위 우회술,n,,,형용사
+med_pelvic_cavity,pelvic cavity,"골반안, 골반강",n,,,장기·몸 부위
+med_proximal,proximal,"몸쪽의, 근위의",adj,,,위치·방향
+med_swollen_glands,swollen glands,림프샘 부기,n,,,증상
+med_aspiration_pneumonia,aspiration pneumonia,흡인성 폐렴,n,,,기타 질환
+med_autoimmune_disease,autoimmune disease,자가 면역 질환,n,,,면역·감염
+med_beta_blocker,beta blocker,베타 차단제,n,,,약
+med_biotech,biotech,생명 공학,n,,,의료 일반
+med_bloodstream,bloodstream,혈류,n,,,심장·혈관
+med_corrective_lenses,corrective lenses,교정 렌즈,n,,,눈·귀·코·목
+med_fatality,fatality,"사망자, 사망 사고",n,,,응급
+med_hamstring,hamstring,"넙다리 뒤 근육, 오금줄",n,,,근육·힘줄
+med_lymph_vessel,lymph vessel,림프관,n,,,장기·몸 부위
+med_prenatal_care,prenatal care,산전 관리,n,,,기타 질환
+med_urinary_tract,urinary tract,요로,n,,,비뇨·생식
+med_anthrax,anthrax,탄저병,n,,,면역·감염
+med_cancerous,cancerous,"암의, 암성의",adj,,,종양
+med_deteriorate,deteriorate,악화되다,v,,,동사·일반
+med_incubation,incubation,"잠복, 배양",n,,,면역·감염
+med_mucus,mucus,점액,n,,,장기·몸 부위
+med_pcr_test,PCR test,유전자 증폭 검사,n,,,진단·검사
+med_pharmacology,pharmacology,약리학,n,,,세포·유전
+med_pulmonary_hypertension,pulmonary hypertension,폐동맥 고혈압,n,,,심장·혈관 질환
+med_regenerate,regenerate,재생하다,v,,,수술·처치
+med_thyroid_gland,thyroid gland,갑상샘,n,,,내분비·대사 질환
+med_adhesion,adhesion,유착,n,,,기타 질환
+med_congenital_heart_defect,congenital heart defect,선천성 심장 결함,n,,,심장·혈관 질환
+med_hpv,HPV,인유두종 바이러스,n,,,면역·감염
+med_motor_neuron,motor neuron,운동 뉴런,n,,,뇌·신경
+med_sedentary,sedentary,주로 앉아서 지내는,adj,,,영양·건강
+med_shivering,shivering,"오한, 떨림",n,,,증상
+med_urinary_tract_infection,urinary tract infection,요로 감염,n,,,비뇨기·신장 질환
+med_whitehead,whitehead,"화이트헤드, 흰 여드름",n,,,피부
+med_dental_floss,dental floss,치실,n,,,소화기 질환
+med_inconclusive,inconclusive,결론이 나지 않은,adj,,,진단·검사
+med_incubator,incubator,"인큐베이터, 보육기",n,,,산부인과
+med_motor_neuron_disease,motor neuron disease,운동 신경 세포 질환,n,,,뇌·신경 질환
+med_sickle_cell_disease,sickle cell disease,겸상 적혈구병,n,,,혈액 질환
+med_temporal_lobe,temporal lobe,"측두엽, 관자엽",n,,,뇌·신경
+med_toxicology,toxicology,독성학,n,,,세포·유전
+med_hives,hives,두드러기,n,,,면역·감염
+med_inhalation,inhalation,"흡입, 들숨",n,,,호흡기
+med_intestinal_obstruction,intestinal obstruction,장폐색,n,,,소화기 질환
+med_neonatal,neonatal,신생아의,adj,,,산부인과
+med_throbbing,throbbing,욱신거리는,adj,,,증상
+med_botox,botox,보톡스,n,,,피부
+med_burnout_syndrome,burnout syndrome,번아웃 증후군,n,,,정신 건강
+med_caregiver,caregiver,"간병인, 돌보는 사람",n,,,병원·의료진
+med_contraceptive,contraceptive,"피임약, 피임의",n,,,약
+med_discontinue,discontinue,"(약을) 끊다, 중단하다",v,,,동사·일반
+med_exhale,exhale,내쉬다,v,,,동사·일반
+med_gurney,gurney,환자 이송 침대,n,,,의료 기구
+med_immunology,immunology,면역학,n,,,세포·유전
+med_secretion,secretion,"분비, 분비물",n,,,생리·대사
+med_urinary_urgency,urinary urgency,요의 절박,n,,,비뇨기·신장 질환
+med_calcium_channel_blocker,calcium channel blocker,칼슘 통로 차단제,n,,,약
+med_compulsion,compulsion,"강박, 충동",n,,,정신 건강
+med_night_sweats,night sweats,"식은땀, 도한",n,,,증상
+med_palliative,palliative,"완화하는, 완화의",adj,,,종양
+med_phobia,phobia,공포증,n,,,정신 건강
+med_sterilization,sterilization,"멸균, 불임 수술",n,,,면역·감염
+med_stuttering,stuttering,말더듬기,n,,,정신 건강
+med_susceptibility,susceptibility,"감수성, 걸리기 쉬움",n,,,치료·관리
+med_syphilis,syphilis,매독,n,,,산부인과
+med_tingling,tingling,"따끔거림, 저림",n,,,증상
+med_bacterial_meningitis,bacterial meningitis,세균성 뇌수막염,n,,,기타 질환
+med_brain_hemorrhage,brain hemorrhage,뇌출혈,n,,,뇌·신경 질환
+med_compounding,compounding,조제,n,,,약
+med_dispensary,dispensary,"조제실, 진료소",n,,,약
+med_gait,gait,"걸음걸이, 보행",n,,,뇌·신경
+med_incapacitated,incapacitated,"무능력해진, 활동 불능의",adj,,,증상
+med_lumbar,lumbar,"허리의, 요추의",adj,,,뼈·관절
+med_mitochondria,mitochondria,미토콘드리아,n,,,세포·유전
+med_salmonella,salmonella,살모넬라균,n,,,소화기 질환
+med_symptomatic,symptomatic,증상이 있는,adj,,,진단·검사
+med_symptomatic_treatment,symptomatic treatment,대증 요법,n,,,치료·관리
+med_whooping_cough,whooping cough,백일해,n,,,호흡기 질환
+med_achilles_tendon,Achilles tendon,아킬레스건,n,,,근육·힘줄
+med_elastic_bandage,elastic bandage,탄력 붕대,n,,,의료 기구
+med_frontal_lobe,frontal lobe,"전두엽, 이마엽",n,,,뇌·신경
+med_morgue,morgue,시체 안치소,n,,,병원·의료진
+med_psychoanalysis,psychoanalysis,정신 분석,n,,,정신 건강
+med_radiotherapy,radiotherapy,방사선 치료,n,,,종양
+med_shingles,shingles,대상 포진,n,,,면역·감염
+med_sti,STI,성 매개 감염,n,,,산부인과
+med_cardiology,cardiology,"심장학, 심장내과",n,,,심장·혈관 질환
+med_nauseous,nauseous,"메스꺼운, 구역질 나는",adj,,,증상
+med_proton_pump_inhibitor,proton pump inhibitor,양성자 펌프 억제제,n,,,약
+med_pubic,pubic,"두덩의, 치골의",adj,,,장기·몸 부위
+med_skin_lesion,skin lesion,피부 병변,n,,,피부
+med_trimester,trimester,(임신의) 3개월 기간,n,,,비뇨·생식
+med_anesthetic,anesthetic,마취제,n,,,약
+med_biceps,biceps,"위팔 두갈래근, 이두근",n,,,근육·힘줄
+med_bile_duct,bile duct,"담관, 쓸개관",n,,,소화기
+med_endocrine,endocrine,내분비의,adj,,,내분비
+med_endocrine_system,endocrine system,내분비계,n,,,내분비
+med_epithelial,epithelial,상피의,adj,,,장기·몸 부위
+med_excruciating,excruciating,"극심한, 참을 수 없는",adj,,,증상
+med_hepatic,hepatic,간의,adj,,,소화기
+med_local_anesthetic,local anesthetic,국소 마취제,n,,,약
+med_pap_smear,Pap smear,자궁 경부 세포 검사,n,,,산부인과
+med_stimulant,stimulant,"각성제, 흥분제",n,,,정신 건강
+med_succumb,succumb,"굴복하다, (병으로) 죽다",v,,,동사·일반
+med_ventral,ventral,배쪽의,adj,,,위치·방향
+med_whiplash,whiplash,"채찍 손상, 편타 손상",n,,,근골격 질환
+med_cerebral_palsy,cerebral palsy,뇌성 마비,n,,,뇌·신경 질환
+med_fertilization,fertilization,수정,n,,,비뇨·생식
+med_foley_catheter,Foley catheter,폴리 도뇨관,n,,,비뇨기·신장 질환
+med_opportunistic_infection,opportunistic infection,기회 감염,n,,,면역·감염
+med_phenotype,phenotype,표현형,n,,,세포·유전
+med_respiration,respiration,호흡,n,,,호흡기
+med_thoracic,thoracic,"가슴의, 흉부의",adj,,,뼈·관절
+med_acupuncture,acupuncture,"침술, 침 치료",n,,,수술·처치
+med_neurologist,neurologist,신경과 의사,n,,,뇌·신경 질환
+med_obstetrics,obstetrics,산과학,n,,,산부인과
+med_penicillin,penicillin,페니실린,n,,,약
+med_renal_pelvis,renal pelvis,"신우, 콩팥 깔때기",n,,,비뇨·생식
+med_secondhand_smoke,secondhand smoke,간접흡연,n,,,영양·건강
+med_aortic_arch,aortic arch,대동맥궁,n,,,심장·혈관
+med_aortic_valve,aortic valve,대동맥판,n,,,심장·혈관
+med_cortisol,cortisol,코르티솔,n,,,내분비
+med_incurable,incurable,치료할 수 없는,adj,,,형용사
+med_iron_deficiency_anemia,iron-deficiency anemia,철 결핍성 빈혈,n,,,기타 질환
+med_kawasaki_disease,Kawasaki disease,가와사키병,n,,,발달·노화
+med_olfactory,olfactory,후각의,adj,,,피부·눈·귀·코
+med_sickly,sickly,병약한,adj,,,형용사
+med_agar,agar,한천,n,,,진단·검사
+med_dyslexia,dyslexia,난독증,n,,,정신 건강
+med_ejection_fraction,ejection fraction,박출률,n,,,심장·혈관
+med_mouth_ulcer,mouth ulcer,"입안 궤양, 구내염",n,,,기타 질환
+med_pulmonary_fibrosis,pulmonary fibrosis,폐섬유증,n,,,호흡기
+med_pus,pus,고름,n,,,기타 질환
+med_sneezing,sneezing,재채기,n,,,증상
+med_terminally_ill,terminally ill,말기 환자의,adj,,,형용사
+med_umbilical,umbilical,"탯줄의, 배꼽의",adj,,,산부인과
+med_uterine,uterine,자궁의,adj,,,장기·몸 부위
+med_antimicrobial,antimicrobial,"항균의, 항균제",adj,,,면역·감염
+med_cervix,cervix,자궁 경부,n,,,비뇨·생식
+med_degenerative,degenerative,퇴행성의,adj,,,증상
+med_eyelid,eyelid,눈꺼풀,n,,,피부·눈·귀·코
+med_immunization_record,immunization record,예방 접종 기록,n,,,의료 일반
+med_progesterone,progesterone,프로게스테론,n,,,내분비
+med_adhesive_bandage,adhesive bandage,반창고,n,,,피부
+med_blister,blister,"물집, 수포",n,,,피부
+med_colorectal,colorectal,"결장 직장의, 대장의",adj,,,소화기 질환
+med_extremity,extremity,"사지, 손발",n,,,장기·몸 부위
+med_gestation,gestation,임신 기간,n,,,비뇨·생식
+med_intravenous_drip,intravenous drip,정맥 점적 주사,n,,,형용사
+med_leprosy,leprosy,"한센병, 나병",n,,,면역·감염
+med_narcotic,narcotic,"마약, 마약성의",n,,,약
+med_rehabilitate,rehabilitate,재활시키다,v,,,동사·일반
+med_sleep_apnea,sleep apnea,수면 무호흡증,n,,,호흡기 질환
+med_spore,spore,"포자, 홀씨",n,,,면역·감염
+med_adrenal,adrenal,부신의,adj,,,장기·몸 부위
+med_apoptosis,apoptosis,세포 자멸사,n,,,세포·유전
+med_avian_influenza,avian influenza,조류 인플루엔자,n,,,면역·감염
+med_connective_tissue,connective tissue,결합 조직,n,,,장기·몸 부위
+med_cranial,cranial,"머리뼈의, 두개의",adj,,,위치·방향
+med_fainting_spell,fainting spell,"기절, 실신",n,,,증상
+med_hippocampus,hippocampus,해마,n,,,뇌·신경
+med_moisturizer,moisturizer,보습제,n,,,피부
+med_molar,molar,어금니,n,,,소화기
+med_twitching,twitching,"경련, 씰룩거림",n,,,증상
+med_unresponsive,unresponsive,반응이 없는,adj,,,형용사
+med_clinician,clinician,임상의,n,,,의료 일반
+med_conduction,conduction,전도,n,,,생리·대사
+med_fascia,fascia,근막,n,,,근육·힘줄
+med_fatigued,fatigued,피로한,adj,,,형용사
+med_hairline_fracture,hairline fracture,"미세 골절, 실금",n,,,근골격 질환
+med_hernia_repair,hernia repair,탈장 수술,n,,,수술·처치
+med_methadone,methadone,메타돈,n,,,약
+med_minimally_invasive,minimally invasive,최소 침습의,adj,,,수술·처치
+med_ovulation,ovulation,배란,n,,,비뇨·생식
+med_postpartum,postpartum,"산후의, 분만 후의",adj,,,산부인과
+med_anaerobic,anaerobic,무산소의,adj,,,영양·건강
+med_menstrual_cramps,menstrual cramps,생리통,n,,,산부인과
+med_postpartum_depression,postpartum depression,산후 우울증,n,,,산부인과
+med_bereavement,bereavement,사별,n,,,정신 건강
+med_cataract_surgery,cataract surgery,백내장 수술,n,,,수술·처치
+med_cranial_nerve,cranial nerve,뇌신경,n,,,뇌·신경
+med_delirium,delirium,섬망,n,,,뇌·신경 질환
+med_dilated,dilated,확장된,adj,,,동사·일반
+med_lactose_intolerance,lactose intolerance,유당 불내증,n,,,영양·건강
+med_melatonin,melatonin,멜라토닌,n,,,내분비
+med_ovarian_cyst,ovarian cyst,난소 낭종,n,,,기타 질환
+med_pathogenic,pathogenic,병원성의,adj,,,면역·감염
+med_petri_dish,petri dish,페트리 접시,n,,,의료 기구
+med_restorative,restorative,회복시키는,adj,,,형용사
+med_retinal_detachment,retinal detachment,망막 박리,n,,,눈·귀·코·목
+med_delirious,delirious,"섬망 상태의, 헛소리하는",adj,,,형용사
+med_geriatric,geriatric,"노인의, 노인병의",adj,,,병원·의료진
+med_morbidity,morbidity,"이환율, 병적 상태",n,,,면역·감염
+med_nerve_conduction,nerve conduction,신경 전도,n,,,진단·검사
+med_redness,redness,"발적, 붉어짐",n,,,증상
+med_sedation,sedation,"진정, 진정 상태",n,,,정신 건강
+med_sunburn,sunburn,햇볕 화상,n,,,피부
+med_testicular,testicular,고환의,adj,,,장기·몸 부위
+med_antioxidant,antioxidant,"항산화제, 산화 방지제",n,,,영양·건강
+med_circadian_rhythm,circadian rhythm,"일주기 리듬, 생체 리듬",n,,,영양·건강
+med_integrative_medicine,integrative medicine,통합 의학,n,,,치료·관리
+med_irritable_bowel_syndrome,irritable bowel syndrome,과민 대장 증후군,n,,,소화기 질환
+med_ocular,ocular,"눈의, 안구의",adj,,,피부·눈·귀·코
+med_rheumatoid_arthritis,rheumatoid arthritis,류머티스 관절염,n,,,근골격 질환
+med_thoracic_cavity,thoracic cavity,"가슴안, 흉강",n,,,장기·몸 부위
+med_typhoid,typhoid,장티푸스,n,,,소화기 질환
+med_conscious_sedation,conscious sedation,의식 하 진정,n,,,수술·처치
+med_dermatology,dermatology,"피부과학, 피부과",n,,,피부
+med_emt,EMT,응급 구조사,n,,,병원·의료진
+med_ibuprofen,ibuprofen,이부프로펜,n,,,약
+med_immobile,immobile,움직이지 못하는,adj,,,형용사
+med_mood_stabilizer,mood stabilizer,기분 안정제,n,,,정신 건강
+med_ophthalmology,ophthalmology,"안과학, 안과",n,,,눈·귀·코·목
+med_runny_nose,runny nose,콧물,n,,,호흡기 질환
+med_tendon_sheath,tendon sheath,"힘줄 집, 건초",n,,,장기·몸 부위
+med_electrolyte_imbalance,electrolyte imbalance,전해질 불균형,n,,,생리·대사
+med_epileptic,epileptic,뇌전증의,adj,,,동사·일반
+med_exacerbate,exacerbate,악화시키다,v,,,동사·일반
+med_heart_murmur,heart murmur,심잡음,n,,,심장·혈관 질환
+med_hemoglobin_level,hemoglobin level,혈색소 수치,n,,,진단·검사
+med_hygienic,hygienic,위생적인,adj,,,형용사
+med_incontinence,incontinence,"요실금, 실금",n,,,비뇨기·신장 질환
+med_pharmacological,pharmacological,약리학적인,adj,,,약
+med_vegetative_state,vegetative state,식물인간 상태,n,,,병원·의료진
+med_allele,allele,대립 유전자,n,,,세포·유전
+med_celiac_disease,celiac disease,셀리악병,n,,,소화기 질환
+med_cleft_lip,cleft lip,"입술 갈림증, 구순열",n,,,발달·노화
+med_contact_dermatitis,contact dermatitis,접촉 피부염,n,,,피부
+med_dengue_fever,dengue fever,뎅기열,n,,,면역·감염
+med_hiccup,hiccup,딸꾹질,n,,,소화기 질환
+med_pectoral,pectoral,"가슴의, 가슴 근육",adj,,,근육·힘줄
+med_recessive,recessive,열성의,adj,,,세포·유전
+med_breech_birth,breech birth,"둔위 분만, 거꾸로 나옴",n,,,기타 질환
+med_chronic_bronchitis,chronic bronchitis,만성 기관지염,n,,,기타 질환
+med_cramping,cramping,"쥐가 남, 경련",n,,,증상
+med_deafness,deafness,"청각 장애, 귀먹음",n,,,눈·귀·코·목
+med_disoriented,disoriented,"지남력을 잃은, 혼란스러운",adj,,,형용사
+med_in_vitro_fertilization,in vitro fertilization,체외 수정,n,,,산부인과
+med_ketamine,ketamine,케타민,n,,,약
+med_nutritionist,nutritionist,"영양사, 영양학자",n,,,병원·의료진
+med_rectal,rectal,직장의,adj,,,소화기
+med_septum,septum,"중격, 사이막",n,,,심장·혈관
+med_abnormality,abnormality,"이상, 기형",n,,,진단·검사
+med_acute_bronchitis,acute bronchitis,급성 기관지염,n,,,기타 질환
+med_emulsion,emulsion,"유제, 에멀션",n,,,약
+med_femoral,femoral,"넙다리의, 대퇴의",adj,,,뼈·관절
+med_gauze,gauze,거즈,n,,,피부
+med_hallucination,hallucination,환각,n,,,정신 건강
+med_lifesaving,lifesaving,생명을 구하는,adj,,,응급
+med_platelet_count,platelet count,혈소판 수,n,,,진단·검사
+med_sterilized,sterilized,"소독된, 멸균된",adj,,,형용사
+med_tumor_suppressor_gene,tumor suppressor gene,종양 억제 유전자,n,,,종양
+med_codeine,codeine,코데인,n,,,약
+med_decompression_sickness,decompression sickness,"감압병, 잠수병",n,,,기타 질환
+med_health_checkup,health checkup,건강 검진,n,,,병원·의료진
+med_insect_repellent,insect repellent,방충제,n,,,면역·감염
+med_nitrous_oxide,nitrous oxide,"아산화 질소, 웃음 가스",n,,,약
+med_tartar,tartar,치석,n,,,기타 질환
+med_triage_nurse,triage nurse,분류 간호사,n,,,병원·의료진
+med_virulent,virulent,"독성이 강한, 악성의",adj,,,면역·감염
+med_asymptomatic_carrier,asymptomatic carrier,무증상 보균자,n,,,형용사
+med_blood_clotting,blood clotting,혈액 응고,n,,,혈액 질환
+med_circulatory_system,circulatory system,순환계,n,,,심장·혈관
+med_cornea_transplant,cornea transplant,각막 이식,n,,,수술·처치
+med_gash,gash,깊은 상처,n,,,응급
+med_genotype,genotype,유전자형,n,,,세포·유전
+med_heartburn,heartburn,속쓰림,n,,,소화기 질환
+med_ischemic,ischemic,허혈성의,adj,,,뇌·신경 질환
+med_pigmentation,pigmentation,색소 침착,n,,,피부
+med_rectal_bleeding,rectal bleeding,직장 출혈,n,,,소화기
+med_shortness_of_breath,shortness of breath,숨 가쁨,n,,,증상
+med_cutaneous,cutaneous,피부의,adj,,,위치·방향
+med_fentanyl,fentanyl,펜타닐,n,,,약
+med_hyperactivity,hyperactivity,과잉 행동,n,,,정신 건강
+med_infertile,infertile,불임의,adj,,,기타 질환
+med_tingle,tingle,"따끔거리다, 얼얼하다",v,,,동사·일반
+med_ambulatory,ambulatory,"외래의, 걸을 수 있는",adj,,,형용사
+med_chiropractor,chiropractor,척추 지압사,n,,,근골격 질환
+med_enema,enema,"관장, 관장제",n,,,약
+med_ischemia,ischemia,허혈,n,,,뇌·신경 질환
+med_lumbar_puncture,lumbar puncture,요추 천자,n,,,뇌·신경 질환
+med_phalanx,phalanx,"손가락뼈, 발가락뼈",n,,,뼈·관절
+med_scrotum,scrotum,음낭,n,,,비뇨·생식
+med_torsion,torsion,"염전, 꼬임",n,,,기타 질환
+med_urethra,urethra,요도,n,,,비뇨·생식
+med_amygdala,amygdala,편도체,n,,,뇌·신경
+med_gastric_ulcer,gastric ulcer,위궤양,n,,,기타 질환
+med_growth_spurt,growth spurt,급성장기,n,,,기타 질환
+med_gynecology,gynecology,부인과학,n,,,산부인과
+med_infarction,infarction,경색,n,,,뇌·신경 질환
+med_lactation,lactation,"젖 분비, 수유",n,,,산부인과
+med_malaise,malaise,"불쾌감, 권태감",n,,,증상
+med_neurosurgery,neurosurgery,"신경외과, 신경외과 수술",n,,,뇌·신경 질환
+med_pulmonary_edema,pulmonary edema,폐부종,n,,,호흡기 질환
+med_reconstructive_surgery,reconstructive surgery,재건 수술,n,,,수술·처치
+med_teething,teething,이가 남,n,,,기타 질환
+med_urea,urea,요소,n,,,비뇨기·신장 질환
+med_abdominal_aorta,abdominal aorta,"배대동맥, 복부 대동맥",n,,,심장·혈관
+med_carotid_artery,carotid artery,"목동맥, 경동맥",n,,,심장·혈관
+med_ingest,ingest,"섭취하다, 먹다",v,,,생리·대사
+med_melanin,melanin,멜라닌,n,,,피부·눈·귀·코
+med_neuropathy,neuropathy,신경병증,n,,,뇌·신경 질환
+med_neurotransmitter,neurotransmitter,신경 전달 물질,n,,,뇌·신경
+med_oxytocin,oxytocin,옥시토신,n,,,내분비
+med_spasm,spasm,"연축, 경련",n,,,뇌·신경 질환
+med_subcutaneous,subcutaneous,"피부밑의, 피하의",adj,,,피부·눈·귀·코
+med_swab,swab,"면봉, 검체 채취",n,,,진단·검사
+med_thrush,thrush,아구창,n,,,기타 질환
+med_underweight,underweight,저체중의,adj,,,영양·건강
+med_breastfeed,breastfeed,모유를 먹이다,v,,,동사·일반
+med_chlamydia,chlamydia,클라미디아,n,,,산부인과
+med_cotton_swab,cotton swab,면봉,n,,,의료 기구
+med_cystic_fibrosis,cystic fibrosis,낭포성 섬유증,n,,,호흡기 질환
+med_femoral_artery,femoral artery,"넙다리 동맥, 대퇴 동맥",n,,,심장·혈관
+med_feverish,feverish,열이 나는,adj,,,증상
+med_lymphatic,lymphatic,림프의,adj,,,위치·방향
+med_lymphatic_system,lymphatic system,림프계,n,,,장기·몸 부위
+med_predisposition,predisposition,"소인, 경향",n,,,치료·관리
+med_centrifuge,centrifuge,원심 분리기,n,,,진단·검사
+med_comatose,comatose,혼수상태의,adj,,,형용사
+med_deep_vein_thrombosis,deep vein thrombosis,심부 정맥 혈전증,n,,,심장·혈관 질환
+med_dentures,dentures,"틀니, 의치",n,,,소화기 질환
+med_discoloration,discoloration,변색,n,,,증상
+med_disinfectant,disinfectant,소독제,n,,,면역·감염
+med_first_responder,first responder,최초 대응자,n,,,병원·의료진
+med_gallbladder_wall,gallbladder wall,담낭벽,n,,,장기·몸 부위
+med_genetic_predisposition,genetic predisposition,유전적 소인,n,,,치료·관리
+med_hemorrhagic,hemorrhagic,출혈성의,adj,,,기타 질환
+med_sanatorium,sanatorium,요양소,n,,,병원·의료진
+med_urinate,urinate,소변을 보다,v,,,동사·일반
+med_urology,urology,"비뇨의학과, 비뇨기학",n,,,비뇨기·신장 질환
+med_zika_virus,Zika virus,지카 바이러스,n,,,면역·감염
+med_alveolar,alveolar,"폐포의, 허파 꽈리의",adj,,,장기·몸 부위
+med_cleft_palate,cleft palate,"입천장 갈림증, 구개열",n,,,발달·노화
+med_communicable,communicable,전염성의,adj,,,면역·감염
+med_copd,COPD,만성 폐쇄성 폐 질환,n,,,호흡기 질환
+med_crohn_s_disease,Crohn's disease,크론병,n,,,소화기 질환
+med_dysentery,dysentery,이질,n,,,소화기 질환
+med_hair_follicle,hair follicle,"털집, 모낭",n,,,피부·눈·귀·코
+med_hrt,HRT,호르몬 대체 요법,n,,,내분비·대사 질환
+med_malnourished,malnourished,영양실조의,adj,,,형용사
+med_neurosurgeon,neurosurgeon,신경외과 의사,n,,,뇌·신경 질환
+med_ooze,ooze,스며 나오다,v,,,동사·일반
+med_stenosis,stenosis,협착증,n,,,기타 질환
+med_vertebral_column,vertebral column,"척주, 척추뼈 기둥",n,,,뼈·관절
+med_visual_acuity,visual acuity,시력,n,,,눈·귀·코·목
+med_bell_s_palsy,Bell's palsy,"벨 마비, 안면 신경 마비",n,,,뇌·신경 질환
+med_carcinogenic,carcinogenic,발암성의,adj,,,종양
+med_gestational_diabetes,gestational diabetes,임신성 당뇨병,n,,,산부인과
+med_osmosis,osmosis,삼투,n,,,생리·대사
+med_resection,resection,(장기 일부) 절제술,n,,,수술·처치
+med_scab,scab,"딱지가 앉다, 딱지",v,,,동사·일반
+med_collarbone,collarbone,"빗장뼈, 쇄골",n,,,뼈·관절
+med_encephalitis,encephalitis,뇌염,n,,,뇌·신경 질환
+med_lethargic,lethargic,무기력한,adj,,,형용사
+med_oncologist,oncologist,종양 전문의,n,,,종양
+med_ablation,ablation,"절제술, 제거",n,,,수술·처치
+med_bloodborne,bloodborne,혈액 매개의,adj,,,형용사
+med_cerebral_infarction,cerebral infarction,뇌경색,n,,,뇌·신경 질환
+med_cytoplasm,cytoplasm,세포질,n,,,세포·유전
+med_esophageal,esophageal,식도의,adj,,,장기·몸 부위
+med_meniscus,meniscus,"반달 연골, 반월판",n,,,뼈·관절
+med_muscular_dystrophy,muscular dystrophy,근육 퇴행 위축,n,,,근골격 질환
+med_parietal_bone,parietal bone,"마루뼈, 두정골",n,,,뼈·관절
+med_peripheral_neuropathy,peripheral neuropathy,말초 신경병증,n,,,뇌·신경 질환
+med_tweezers,tweezers,"핀셋, 족집게",n,,,의료 기구
+med_wart,wart,사마귀,n,,,피부
+med_anemic,anemic,빈혈의,adj,,,동사·일반
+med_endocrinology,endocrinology,내분비학,n,,,내분비·대사 질환
+med_erectile_dysfunction,erectile dysfunction,발기 부전,n,,,산부인과
+med_fester,fester,곪다,v,,,동사·일반
+med_hysterectomy,hysterectomy,자궁 절제술,n,,,산부인과
+med_immunotherapy,immunotherapy,면역 요법,n,,,종양
+med_inoperable,inoperable,수술할 수 없는,adj,,,형용사
+med_interferon,interferon,인터페론,n,,,약
+med_osteoarthritis,osteoarthritis,골관절염,n,,,근골격 질환
+med_scalpel,scalpel,"메스, 수술용 칼",n,,,수술·처치
+med_sphincter,sphincter,"조임근, 괄약근",n,,,근육·힘줄
+med_spinal_stenosis,spinal stenosis,척추관 협착증,n,,,근골격 질환
+med_synapse,synapse,"시냅스, 연접",n,,,뇌·신경
+med_toothache,toothache,치통,n,,,증상
+med_typhus,typhus,발진티푸스,n,,,면역·감염
+med_athlete_s_foot,athlete's foot,무좀,n,,,면역·감염
+med_constipated,constipated,변비가 있는,adj,,,소화기
+med_mandible,mandible,"아래턱뼈, 하악골",n,,,뼈·관절
+med_monoclonal_antibody,monoclonal antibody,단일 클론 항체,n,,,약
+med_musculoskeletal,musculoskeletal,근골격의,adj,,,근골격 질환
+med_myeloma,myeloma,골수종,n,,,혈액 질환
+med_occlusion,occlusion,"폐색, 막힘",n,,,기타 질환
+med_preterm,preterm,"만삭 전의, 조산의",adj,,,산부인과
+med_sedative_hypnotic,sedative-hypnotic,진정 수면제,n,,,약
+med_aortic_dissection,aortic dissection,대동맥 박리,n,,,심장·혈관
+med_droplet,droplet,"비말, 작은 물방울",n,,,면역·감염
+med_epithelium,epithelium,상피,n,,,장기·몸 부위
+med_ergonomics,ergonomics,인체 공학,n,,,영양·건강
+med_homeostasis,homeostasis,항상성,n,,,세포·유전
+med_jugular_vein,jugular vein,"목정맥, 경정맥",n,,,심장·혈관
+med_mesothelioma,mesothelioma,중피종,n,,,기타 질환
+med_autonomic,autonomic,자율 신경의,adj,,,뇌·신경
+med_emaciated,emaciated,"수척한, 여윈",adj,,,형용사
+med_recuperate,recuperate,"회복하다, 기운을 되찾다",v,,,동사·일반
+med_scurvy,scurvy,괴혈병,n,,,근골격 질환
+med_vaccinate,vaccinate,예방 접종을 하다,v,,,면역·감염
+med_bloating,bloating,"더부룩함, 팽만감",n,,,소화기 질환
+med_bulimia,bulimia,폭식증,n,,,정신 건강
+med_capillary_refill,capillary refill,모세 혈관 재충전,n,,,심장·혈관
+med_carpal,carpal,손목뼈,n,,,뼈·관절
+med_endometriosis,endometriosis,자궁 내막증,n,,,산부인과
+med_excision,excision,절제,n,,,수술·처치
+med_humerus,humerus,"위팔뼈, 상완골",n,,,뼈·관절
+med_hypertrophy,hypertrophy,비대,n,,,기타 질환
+med_lactate,lactate,젖산,n,,,진단·검사
+med_mucous_membrane,mucous membrane,점막,n,,,장기·몸 부위
+med_postoperative,postoperative,수술 후의,adj,,,수술·처치
+med_sarcoma,sarcoma,육종,n,,,종양
+med_strep_throat,strep throat,연쇄상 구균 인두염,n,,,면역·감염
+med_systolic,systolic,수축기의,adj,,,심장·혈관
+med_urination,urination,배뇨,n,,,비뇨·생식
+med_wean,wean,젖을 떼다,v,,,동사·일반
+med_barium,barium,바륨,n,,,소화기 질환
+med_dermal_filler,dermal filler,"필러, 피부 충전제",n,,,피부
+med_dissociative,dissociative,해리성의,adj,,,정신 건강
+med_epidermis,epidermis,표피,n,,,피부·눈·귀·코
+med_epinephrine,epinephrine,에피네프린,n,,,면역·감염
+med_frailty,frailty,"노쇠, 허약",n,,,발달·노화
+med_frequent_urination,frequent urination,빈뇨,n,,,비뇨기·신장 질환
+med_gonorrhea,gonorrhea,임질,n,,,산부인과
+med_immunodeficiency,immunodeficiency,면역 결핍,n,,,면역·감염
+med_larynx,larynx,후두,n,,,호흡기
+med_mouthwash,mouthwash,구강 청결제,n,,,소화기 질환
+med_scrub_typhus,scrub typhus,쯔쯔가무시병,n,,,면역·감염
+med_umbilical_hernia,umbilical hernia,배꼽 탈장,n,,,기타 질환
+med_folic_acid,folic acid,엽산,n,,,영양·건강
+med_hand_sanitizer,hand sanitizer,손 소독제,n,,,면역·감염
+med_mastectomy,mastectomy,유방 절제술,n,,,산부인과
+med_pulmonary_embolism,pulmonary embolism,폐색전증,n,,,호흡기 질환
+med_vasectomy,vasectomy,정관 수술,n,,,산부인과
+med_acetaminophen,acetaminophen,아세트아미노펜,n,,,약
+med_carpal_tunnel_syndrome,carpal tunnel syndrome,손목 터널 증후군,n,,,근골격 질환
+med_coagulation,coagulation,"응고, 혈액 응고",n,,,혈액
+med_coagulation_test,coagulation test,응고 검사,n,,,진단·검사
+med_disorientation,disorientation,"지남력 장애, 방향 감각 상실",n,,,증상
+med_heart_palpitations,heart palpitations,심장 두근거림,n,,,증상
+med_intracranial_pressure,intracranial pressure,두개 내압,n,,,뇌·신경
+med_lethargy,lethargy,"무기력, 혼수 상태",n,,,증상
+med_pernicious_anemia,pernicious anemia,악성 빈혈,n,,,기타 질환
+med_proliferate,proliferate,증식하다,v,,,동사·일반
+med_unconsciousness,unconsciousness,의식 불명,n,,,응급
+med_analgesic,analgesic,진통제,n,,,약
+med_cochlear_implant,cochlear implant,인공 와우,n,,,눈·귀·코·목
+med_gangrene,gangrene,괴저,n,,,면역·감염
+med_neurodegenerative,neurodegenerative,신경 퇴행성의,adj,,,뇌·신경 질환
+med_throb,throb,욱신거리다,v,,,동사·일반
+med_acute_pancreatitis,acute pancreatitis,급성 췌장염,n,,,소화기
+med_axon,axon,"축삭, 신경 돌기",n,,,뇌·신경
+med_cerebellum,cerebellum,소뇌,n,,,뇌·신경
+med_drowsiness,drowsiness,"졸음, 나른함",n,,,증상
+med_dysplasia,dysplasia,형성 이상,n,,,기타 질환
+med_encephalopathy,encephalopathy,뇌병증,n,,,기타 질환
+med_excretion,excretion,"배설, 배설물",n,,,약
+med_hypothalamus,hypothalamus,시상하부,n,,,뇌·신경
+med_occipital_bone,occipital bone,"뒤통수뼈, 후두골",n,,,뼈·관절
+med_parietal_lobe,parietal lobe,"두정엽, 마루엽",n,,,뇌·신경
+med_perfusion,perfusion,관류,n,,,생리·대사
+med_respirator,respirator,"호흡 보호구, 인공호흡기",n,,,의료 기구
+med_tincture,tincture,팅크제,n,,,약
+med_alopecia,alopecia,탈모증,n,,,종양
+med_cardiomyopathy,cardiomyopathy,심근병증,n,,,심장·혈관 질환
+med_curative,curative,치료 효과가 있는,adj,,,형용사
+med_endoscopic,endoscopic,내시경의,adj,,,진단·검사
+med_hoarse,hoarse,목이 쉰,adj,,,눈·귀·코·목
+med_laxative,laxative,"완하제, 변비약",n,,,소화기 질환
+med_pathophysiology,pathophysiology,병태 생리학,n,,,세포·유전
+med_sleepwalking,sleepwalking,"몽유병, 잠결에 걷기",n,,,정신 건강
+med_aed,AED,자동 심장 충격기,n,,,응급
+med_colic,colic,"영아 산통, 복통",n,,,기타 질환
+med_dandruff,dandruff,비듬,n,,,피부
+med_diphtheria,diphtheria,디프테리아,n,,,면역·감염
+med_ectopic_pregnancy,ectopic pregnancy,자궁 외 임신,n,,,산부인과
+med_immunoglobulin,immunoglobulin,면역 글로불린,n,,,약
+med_malignancy,malignancy,"악성 종양, 악성",n,,,종양
+med_postnatal,postnatal,출산 후의,adj,,,기타 질환
+med_staphylococcus,staphylococcus,포도상 구균,n,,,면역·감염
+med_bariatric_surgery,bariatric surgery,비만 대사 수술,n,,,수술·처치
+med_bedridden,bedridden,누워만 지내는,adj,,,증상
+med_cranium,cranium,"머리뼈, 두개",n,,,뼈·관절
+med_histamine,histamine,히스타민,n,,,면역·감염
+med_ketone,ketone,케톤,n,,,진단·검사
+med_nape,nape,목덜미,n,,,장기·몸 부위
+med_prognostic,prognostic,예후의,adj,,,형용사
+med_warfarin,warfarin,와파린,n,,,약
+med_allergen,allergen,알레르기 유발 물질,n,,,면역·감염
+med_asthmatic,asthmatic,"천식의, 천식 환자",adj,,,동사·일반
+med_biomarker,biomarker,생체 지표,n,,,진단·검사
+med_constricted,constricted,"좁아진, 수축된",adj,,,동사·일반
+med_fibromyalgia,fibromyalgia,섬유 근육통,n,,,근골격 질환
+med_forceps,forceps,"겸자, 집게",n,,,수술·처치
+med_heparin,heparin,헤파린,n,,,약
+med_liposuction,liposuction,지방 흡입술,n,,,수술·처치
+med_microbe,microbe,미생물,n,,,면역·감염
+med_mutate,mutate,돌연변이가 되다,v,,,동사·일반
+med_myeloid,myeloid,골수성의,adj,,,기타 질환
+med_regress,regress,"퇴행하다, 줄어들다",v,,,동사·일반
+med_uric_acid,uric acid,요산,n,,,진단·검사
+med_hematology,hematology,혈액학,n,,,혈액 질환
+med_insomniac,insomniac,불면증 환자,n,,,정신 건강
+med_mitosis,mitosis,체세포 분열,n,,,세포·유전
+med_queasy,queasy,메스꺼운,adj,,,증상
+med_resuscitate,resuscitate,소생시키다,v,,,수술·처치
+med_slurred_speech,slurred speech,불분명한 발음,n,,,증상
+med_sterilize,sterilize,"멸균하다, 불임 수술을 하다",v,,,면역·감염
+med_telemedicine,telemedicine,원격 의료,n,,,병원·의료진
+med_antiretroviral,antiretroviral,항레트로바이러스제,n,,,약
+med_aortic_stenosis,aortic stenosis,대동맥판 협착증,n,,,심장·혈관
+med_diazepam,diazepam,디아제팜,n,,,약
+med_histology,histology,조직학,n,,,세포·유전
+med_idiopathic,idiopathic,"특발성의, 원인 불명의",adj,,,증상
+med_preclinical,preclinical,전임상의,adj,,,형용사
+med_triceps,triceps,"위팔 세갈래근, 삼두근",n,,,근육·힘줄
+med_acetylcholine,acetylcholine,아세틸콜린,n,,,뇌·신경
+med_aphasia,aphasia,실어증,n,,,뇌·신경 질환
+med_bursa,bursa,윤활 주머니,n,,,뼈·관절
+med_fistula,fistula,"샛길, 누공",n,,,소화기 질환
+med_probiotic,probiotic,"프로바이오틱스, 유익균",n,,,소화기 질환
+med_sharps_container,sharps container,날카로운 의료 폐기물 통,n,,,의료 기구
+med_virulence,virulence,"독성, 병원력",n,,,면역·감염
+med_amniotic_fluid,amniotic fluid,양수,n,,,비뇨·생식
+med_bronchial,bronchial,기관지의,adj,,,장기·몸 부위
+med_callus,callus,굳은살,n,,,피부
+med_fibula,fibula,"종아리뼈, 비골",n,,,뼈·관절
+med_ganglion,ganglion,신경절,n,,,뇌·신경
+med_huntington_s_disease,Huntington's disease,헌팅턴병,n,,,뇌·신경 질환
+med_laparoscopic,laparoscopic,복강경의,adj,,,수술·처치
+med_occipital_lobe,occipital lobe,"후두엽, 뒤통수엽",n,,,뇌·신경
+med_prophylactic,prophylactic,예방의,adj,,,약
+med_prophylaxis,prophylaxis,"예방, 예방법",n,,,약
+med_radiography,radiography,방사선 촬영,n,,,진단·검사
+med_rotator_cuff,rotator cuff,회전근개,n,,,근육·힘줄
+med_albumin,albumin,알부민,n,,,진단·검사
+med_atrial_fibrillation,atrial fibrillation,심방 세동,n,,,심장·혈관 질환
+med_carcinogen,carcinogen,발암 물질,n,,,종양
+med_flatulence,flatulence,"방귀, 장내 가스",n,,,소화기 질환
+med_inflame,inflame,염증을 일으키다,v,,,동사·일반
+med_irrigate,irrigate,"세척하다, 관개하다",v,,,수술·처치
+med_phlegm,phlegm,"가래, 담",n,,,호흡기 질환
+med_renal_colic,renal colic,신장 산통,n,,,비뇨기·신장 질환
+med_salivary_gland,salivary gland,침샘,n,,,소화기
+med_thymus,thymus,"가슴샘, 흉선",n,,,장기·몸 부위
+med_antipsychotic,antipsychotic,항정신병 약,n,,,정신 건강
+med_bioavailability,bioavailability,생체 이용률,n,,,약
+med_dropper,dropper,"점적기, 스포이트",n,,,의료 기구
+med_fallopian_tube,fallopian tube,"나팔관, 자궁관",n,,,비뇨·생식
+med_neonatal_jaundice,neonatal jaundice,신생아 황달,n,,,기타 질환
+med_neurosis,neurosis,신경증,n,,,정신 건강
+med_obstetric,obstetric,산과의,adj,,,산부인과
+med_shin_splints,shin splints,정강이 통증,n,,,근골격 질환
+med_ventricular_fibrillation,ventricular fibrillation,심실 세동,n,,,심장·혈관 질환
+med_claustrophobia,claustrophobia,폐소 공포증,n,,,정신 건강
+med_deviated_septum,deviated septum,비중격 만곡증,n,,,눈·귀·코·목
+med_mammary_gland,mammary gland,"젖샘, 유선",n,,,비뇨·생식
+med_meiosis,meiosis,감수 분열,n,,,세포·유전
+med_mitral_valve,mitral valve,승모판,n,,,심장·혈관
+med_perforation,perforation,"천공, 구멍이 뚫림",n,,,기타 질환
+med_prednisone,prednisone,프레드니손,n,,,약
+med_d_dimer,D-dimer,디다이머,n,,,진단·검사
+med_febrile,febrile,"열이 나는, 열성의",adj,,,면역·감염
+med_immunological,immunological,면역학적인,adj,,,형용사
+med_investigational,investigational,"시험 중인, 연구용의",adj,,,형용사
+med_macular_degeneration,macular degeneration,황반 변성,n,,,눈·귀·코·목
+med_metformin,metformin,메트포르민,n,,,약
+med_pleural,pleural,흉막의,adj,,,장기·몸 부위
+med_prolapse,prolapse,"탈출증, 빠짐",n,,,기타 질환
+med_rheumatic_fever,rheumatic fever,류머티즘열,n,,,면역·감염
+med_cortisone,cortisone,코르티손,n,,,약
+med_creatinine,creatinine,크레아티닌,n,,,비뇨기·신장 질환
+med_dental_hygienist,dental hygienist,치위생사,n,,,병원·의료진
+med_lidocaine,lidocaine,리도카인,n,,,약
+med_psychosomatic,psychosomatic,"정신 신체의, 심인성의",adj,,,정신 건강
+med_statin,statin,스타틴,n,,,약
+med_tourniquet,tourniquet,지혈대,n,,,수술·처치
+med_ataxia,ataxia,운동 실조,n,,,뇌·신경 질환
+med_optometrist,optometrist,검안사,n,,,눈·귀·코·목
+med_rubella,rubella,풍진,n,,,면역·감염
+med_streptococcus,streptococcus,연쇄상 구균,n,,,면역·감염
+med_brainstem,brainstem,"뇌줄기, 뇌간",n,,,뇌·신경
+med_febrile_seizure,febrile seizure,열성 경련,n,,,뇌·신경
+med_hepatic_encephalopathy,hepatic encephalopathy,간성 뇌증,n,,,소화기
+med_naloxone,naloxone,날록손,n,,,약
+med_obstetric_ultrasound,obstetric ultrasound,산과 초음파,n,,,기타 질환
+med_orthodontist,orthodontist,치아 교정 전문의,n,,,소화기 질환
+med_prion,prion,프리온,n,,,면역·감염
+med_tapeworm,tapeworm,촌충,n,,,면역·감염
+med_urologist,urologist,비뇨의학과 의사,n,,,비뇨기·신장 질환
+med_adrenal_insufficiency,adrenal insufficiency,부신 기능 저하증,n,,,생리·대사
+med_anesthesiology,anesthesiology,마취통증의학,n,,,수술·처치
+med_angiography,angiography,혈관 조영술,n,,,심장·혈관 질환
+med_antifungal,antifungal,항진균제,n,,,약
+med_atropine,atropine,아트로핀,n,,,약
+med_cerebrospinal_fluid,cerebrospinal fluid,뇌척수액,n,,,뇌·신경
+med_defecation,defecation,배변,n,,,소화기
+med_effervescent,effervescent,발포성의,adj,,,약
+med_myelin,myelin,"미엘린, 말이집",n,,,뇌·신경
+med_nosebleed,nosebleed,코피,n,,,눈·귀·코·목
+med_varicose_veins,varicose veins,하지 정맥류,n,,,심장·혈관 질환
+med_anaphylactic,anaphylactic,아나필락시스의,adj,,,기타 질환
+med_kneecap,kneecap,무릎뼈,n,,,뼈·관절
+med_narcolepsy,narcolepsy,기면증,n,,,뇌·신경 질환
+med_postmenopausal,postmenopausal,폐경 후의,adj,,,형용사
+med_cardiopulmonary,cardiopulmonary,심폐의,adj,,,심장·혈관 질환
+med_epidemiologist,epidemiologist,역학자,n,,,면역·감염
+med_hyperplasia,hyperplasia,"과다 형성, 증식증",n,,,기타 질환
+med_hypertensive,hypertensive,고혈압의,adj,,,동사·일반
+med_medulla,medulla,"숨뇌, 연수",n,,,뇌·신경
+med_metatarsal,metatarsal,"발허리뼈, 중족골",n,,,뼈·관절
+med_lymphocyte,lymphocyte,림프구,n,,,혈액
+med_noninvasive,noninvasive,비침습적인,adj,,,수술·처치
+med_oxygenation,oxygenation,산소화,n,,,생리·대사
+med_patella,patella,"무릎뼈, 슬개골",n,,,뼈·관절
+med_prostatic,prostatic,전립샘의,adj,,,장기·몸 부위
+med_adenocarcinoma,adenocarcinoma,선암,n,,,종양
+med_decompress,decompress,감압하다,v,,,수술·처치
+med_embryology,embryology,발생학,n,,,세포·유전
+med_geriatrics,geriatrics,노인 의학,n,,,병원·의료진
+med_orthopedics,orthopedics,정형외과학,n,,,근골격 질환
+med_overactive_bladder,overactive bladder,과민성 방광,n,,,비뇨기·신장 질환
+med_sciatica,sciatica,좌골 신경통,n,,,뇌·신경 질환
+med_stool_softener,stool softener,대변 연화제,n,,,약
+med_vitreous_body,vitreous body,유리체,n,,,피부·눈·귀·코
+med_biliary,biliary,담도의,adj,,,소화기
+med_coronary_angiography,coronary angiography,관상 동맥 조영술,n,,,심장·혈관
+med_cpap,CPAP,지속 양압기,n,,,호흡기
+med_glycemic_index,glycemic index,혈당 지수,n,,,영양·건강
+med_gynecological,gynecological,부인과의,adj,,,산부인과
+med_humidifier,humidifier,가습기,n,,,의료 기구
+med_hypersensitive,hypersensitive,과민한,adj,,,형용사
+med_incubate,incubate,"잠복하다, 배양하다",v,,,동사·일반
+med_metabolize,metabolize,대사하다,v,,,생리·대사
+med_pharmacokinetics,pharmacokinetics,약동학,n,,,약
+med_preoperative,preoperative,수술 전의,adj,,,수술·처치
+med_scapula,scapula,"어깨뼈, 견갑골",n,,,뼈·관절
+med_arthritic,arthritic,관절염의,adj,,,동사·일반
+med_astigmatism,astigmatism,난시,n,,,눈·귀·코·목
+med_birthmark,birthmark,"모반, 반점",n,,,피부
+med_botulism,botulism,보툴리누스 중독,n,,,면역·감염
+med_cannula,cannula,"캐뉼라, 삽입관",n,,,의료 기구
+med_diastolic,diastolic,이완기의,adj,,,심장·혈관
+med_endocrinologist,endocrinologist,내분비내과 의사,n,,,내분비·대사 질환
+med_maxilla,maxilla,"위턱뼈, 상악골",n,,,뼈·관절
+med_peritoneal_dialysis,peritoneal dialysis,복막 투석,n,,,비뇨기·신장 질환
+med_pineal_gland,pineal gland,"솔방울샘, 송과선",n,,,내분비
+med_retinopathy,retinopathy,망막병증,n,,,눈·귀·코·목
+med_acidosis,acidosis,산증,n,,,생리·대사
+med_anticancer,anticancer,항암의,adj,,,약
+med_macrophage,macrophage,대식 세포,n,,,혈액
+med_oxygen_cannula,oxygen cannula,산소 콧줄,n,,,의료 기구
+med_thalamus,thalamus,시상,n,,,뇌·신경
+med_ulcerative_colitis,ulcerative colitis,궤양성 대장염,n,,,소화기
+med_afflict,afflict,"괴롭히다, 시달리게 하다",v,,,동사·일반
+med_benzodiazepine,benzodiazepine,벤조디아제핀,n,,,약
+med_epidural_hematoma,epidural hematoma,경막외 혈종,n,,,뇌·신경
+med_hemodialysis,hemodialysis,혈액 투석,n,,,비뇨기·신장 질환
+med_propofol,propofol,프로포폴,n,,,약
+med_scabies,scabies,옴,n,,,면역·감염
+med_sciatic_nerve,sciatic nerve,"궁둥 신경, 좌골 신경",n,,,뇌·신경
+med_testis,testis,고환,n,,,비뇨·생식
+med_windpipe,windpipe,"숨통, 기관",n,,,호흡기
+med_corticosteroid,corticosteroid,코르티코스테로이드,n,,,약
+med_lymphoid,lymphoid,림프성의,adj,,,기타 질환
+med_nitroglycerin,nitroglycerin,니트로글리세린,n,,,약
+med_ribosome,ribosome,리보솜,n,,,세포·유전
+med_sanitize,sanitize,위생 처리하다,v,,,동사·일반
+med_supine,supine,바로 누운,adj,,,위치·방향
+med_amputate,amputate,절단하다,v,,,수술·처치
+med_asphyxia,asphyxia,질식,n,,,호흡기 질환
+med_axillary,axillary,겨드랑이의,adj,,,장기·몸 부위
+med_dermis,dermis,진피,n,,,피부·눈·귀·코
+med_diabetic_retinopathy,diabetic retinopathy,당뇨병성 망막병증,n,,,내분비·대사 질환
+med_effusion,effusion,"삼출, 유출",n,,,기타 질환
+med_hemophilia,hemophilia,혈우병,n,,,혈액 질환
+med_intramuscular,intramuscular,근육 내의,adj,,,약
+med_optician,optician,안경사,n,,,눈·귀·코·목
+med_readmission,readmission,재입원,n,,,병원·의료진
+med_rickets,rickets,구루병,n,,,근골격 질환
+med_stillbirth,stillbirth,사산,n,,,산부인과
+med_colostomy,colostomy,"결장 창냄술, 인공 항문",n,,,소화기 질환
+med_defecate,defecate,배변하다,v,,,동사·일반
+med_ketosis,ketosis,케톤증,n,,,생리·대사
+med_triglyceride,triglyceride,중성 지방,n,,,심장·혈관 질환
+med_wheeze,wheeze,쌕쌕거리다,v,,,증상
+med_angioplasty,angioplasty,혈관 성형술,n,,,심장·혈관 질환
+med_contraindicated,contraindicated,"금기의, 쓰면 안 되는",adj,,,약
+med_exhalation,exhalation,"날숨, 내쉬기",n,,,호흡기
+med_gastroenteritis,gastroenteritis,위장염,n,,,소화기 질환
+med_glioblastoma,glioblastoma,교모세포종,n,,,기타 질환
+med_nonspecific,nonspecific,비특이적인,adj,,,형용사
+med_ovum,ovum,난자,n,,,비뇨·생식
+med_regurgitation,regurgitation,역류,n,,,소화기 질환
+med_rheumatology,rheumatology,류머티즘학,n,,,근골격 질환
+med_rhinitis,rhinitis,비염,n,,,호흡기 질환
+med_belching,belching,트림,n,,,소화기 질환
+med_convalescence,convalescence,"회복기, 요양",n,,,치료·관리
+med_dwarfism,dwarfism,왜소증,n,,,내분비·대사 질환
+med_nephrology,nephrology,"신장학, 신장내과",n,,,비뇨기·신장 질환
+med_polycystic_kidney,polycystic kidney,다낭신,n,,,비뇨기·신장 질환
+med_vagus_nerve,vagus nerve,미주 신경,n,,,뇌·신경
+med_canker_sore,canker sore,"구내염, 입안 헐음",n,,,기타 질환
+med_glycolysis,glycolysis,해당 과정,n,,,생리·대사
+med_hydrotherapy,hydrotherapy,수치료,n,,,치료·관리
+med_laryngitis,laryngitis,후두염,n,,,호흡기 질환
+med_neuroblastoma,neuroblastoma,신경모세포종,n,,,기타 질환
+med_quadriceps,quadriceps,"넙다리 네갈래근, 사두근",n,,,근육·힘줄
+med_unvaccinated,unvaccinated,예방 접종을 받지 않은,adj,,,형용사
+med_freckle,freckle,주근깨,n,,,피부
+med_intraocular_pressure,intraocular pressure,안압,n,,,눈·귀·코·목
+med_nasal_polyp,nasal polyp,"코 용종, 비용종",n,,,호흡기
+med_rosacea,rosacea,"주사, 딸기코",n,,,피부
+med_tendinitis,tendinitis,"힘줄염, 건염",n,,,근골격 질환
+med_immobilize,immobilize,움직이지 못하게 고정하다,v,,,수술·처치
+med_sacrum,sacrum,"엉치뼈, 천골",n,,,뼈·관절
+med_sputum_test,sputum test,가래 검사,n,,,진단·검사
+med_ulna,ulna,"자뼈, 척골",n,,,뼈·관절
+med_agoraphobia,agoraphobia,광장 공포증,n,,,정신 건강
+med_floaters,floaters,"비문증, 날파리증",n,,,눈·귀·코·목
+med_heimlich_maneuver,Heimlich maneuver,하임리히법,n,,,응급
+med_hyperthermia,hyperthermia,고체온증,n,,,증상
+med_parenteral,parenteral,비경구의,adj,,,형용사
+med_peritonitis,peritonitis,복막염,n,,,소화기 질환
+med_synovial_fluid,synovial fluid,"윤활액, 활액",n,,,뼈·관절
+med_tonsil_stones,tonsil stones,편도 결석,n,,,눈·귀·코·목
+med_vitiligo,vitiligo,백반증,n,,,피부
+med_catheterization,catheterization,"도관 삽입, 도뇨",n,,,비뇨기·신장 질환
+med_parenteral_nutrition,parenteral nutrition,정맥 영양,n,,,소화기
+med_pharynx,pharynx,인두,n,,,호흡기
+med_preeclampsia,preeclampsia,"전자간증, 임신 중독증",n,,,산부인과
+med_syncope,syncope,"실신, 졸도",n,,,뇌·신경 질환
+med_barrett_s_esophagus,Barrett's esophagus,바렛 식도,n,,,소화기
+med_cardiac_catheterization,cardiac catheterization,심장 도관술,n,,,심장·혈관
+med_enteric_coated,enteric-coated,장용 코팅의,adj,,,약
+med_hydrocephalus,hydrocephalus,"뇌수종, 수두증",n,,,뇌·신경 질환
+med_immunocompromised,immunocompromised,면역력이 약한,adj,,,면역·감염
+med_internist,internist,내과 의사,n,,,병원·의료진
+med_appendectomy,appendectomy,충수 절제술,n,,,소화기 질환
+med_bilirubin,bilirubin,빌리루빈,n,,,혈액
+med_cartilaginous,cartilaginous,연골의,adj,,,장기·몸 부위
+med_lightheaded,lightheaded,"머리가 띵한, 어지러운",adj,,,증상
+med_lozenge,lozenge,"트로키, 목에 녹이는 약",n,,,약
+med_meningococcal,meningococcal,수막구균의,adj,,,기타 질환
+med_nodule,nodule,"결절, 작은 혹",n,,,증상
+med_oxygen_concentrator,oxygen concentrator,산소 발생기,n,,,의료 기구
+med_glucagon,glucagon,글루카곤,n,,,내분비
+med_neuralgia,neuralgia,신경통,n,,,뇌·신경 질환
+med_otolaryngology,otolaryngology,이비인후과학,n,,,눈·귀·코·목
+med_sebaceous_gland,sebaceous gland,피지샘,n,,,피부·눈·귀·코
+med_tracheal,tracheal,기관의,adj,,,장기·몸 부위
+med_vena_cava,vena cava,대정맥,n,,,심장·혈관
+med_brachial_artery,brachial artery,위팔 동맥,n,,,심장·혈관
+med_endocarditis,endocarditis,심내막염,n,,,심장·혈관 질환
+med_leukocyte,leukocyte,백혈구,n,,,혈액
+med_oncogene,oncogene,암 유전자,n,,,종양
+med_parathyroid_gland,parathyroid gland,부갑상샘,n,,,내분비
+med_ringworm,ringworm,"백선, 버짐",n,,,면역·감염
+med_undernourished,undernourished,영양 부족의,adj,,,증상
+med_vasculitis,vasculitis,혈관염,n,,,심장·혈관 질환
+med_endothelium,endothelium,내피,n,,,심장·혈관
+med_glioma,glioma,신경 교종,n,,,뇌·신경 질환
+med_parasympathetic,parasympathetic,부교감 신경의,adj,,,뇌·신경
+med_polycystic_ovary,polycystic ovary,다낭성 난소,n,,,기타 질환
+med_spina_bifida,spina bifida,"척추 갈림증, 이분 척추",n,,,발달·노화
+med_cochlea,cochlea,달팽이관,n,,,피부·눈·귀·코
+med_mastitis,mastitis,"젖샘염, 유선염",n,,,기타 질환
+med_neurodevelopmental,neurodevelopmental,신경 발달의,adj,,,정신 건강
+med_neutrophil,neutrophil,"호중구, 중성구",n,,,혈액
+med_podiatrist,podiatrist,발 전문의,n,,,근골격 질환
+med_pubis,pubis,"두덩뼈, 치골",n,,,뼈·관절
+med_adenovirus,adenovirus,아데노바이러스,n,,,면역·감염
+med_ail,ail,"아프게 하다, 괴롭히다",v,,,동사·일반
+med_amoxicillin,amoxicillin,아목시실린,n,,,약
+med_autoclave,autoclave,고압 멸균기,n,,,면역·감염
+med_doula,doula,"출산 도우미, 둘라",n,,,병원·의료진
+med_inoculate,inoculate,접종하다,v,,,동사·일반
+med_muscle_relaxant,muscle relaxant,근육 이완제,n,,,약
+med_rotavirus,rotavirus,로타바이러스,n,,,면역·감염
+med_tourette_syndrome,Tourette syndrome,투렛 증후군,n,,,정신 건강
+med_atopic_dermatitis,atopic dermatitis,아토피 피부염,n,,,피부
+med_endorphin,endorphin,엔도르핀,n,,,뇌·신경
+med_formulary,formulary,처방집,n,,,약
+med_gingivitis,gingivitis,"잇몸염, 치은염",n,,,소화기 질환
+med_hyoid_bone,hyoid bone,"목뿔뼈, 설골",n,,,뼈·관절
+med_lockjaw,lockjaw,"개구 장애, 파상풍",n,,,기타 질환
+med_misdiagnosis,misdiagnosis,오진,n,,,진단·검사
+med_mitral_valve_prolapse,mitral valve prolapse,승모판 탈출증,n,,,심장·혈관 질환
+med_neoplasm,neoplasm,신생물,n,,,종양
+med_nephropathy,nephropathy,신장병증,n,,,기타 질환
+med_sarcoidosis,sarcoidosis,사르코이드증,n,,,면역·감염
+med_urine_dipstick,urine dipstick,소변 막대 검사,n,,,진단·검사
+med_inguinal,inguinal,"샅고랑의, 서혜부의",adj,,,장기·몸 부위
+med_jaundiced,jaundiced,황달이 있는,adj,,,기타 질환
+med_neurotoxic,neurotoxic,신경 독성의,adj,,,형용사
+med_pneumococcal,pneumococcal,폐렴구균의,adj,,,기타 질환
+med_sagittal,sagittal,시상의,adj,,,위치·방향
+med_sublingual,sublingual,혀 밑의,adj,,,약
+med_thrombocytopenia,thrombocytopenia,혈소판 감소증,n,,,혈액 질환
+med_addison_s_disease,Addison's disease,애디슨병,n,,,내분비·대사 질환
+med_aseptic,aseptic,무균의,adj,,,형용사
+med_croup,croup,"크루프, 후두염",n,,,호흡기 질환
+med_hypoglycemic,hypoglycemic,저혈당의,adj,,,내분비·대사 질환
+med_hypoglycemic_agent,hypoglycemic agent,혈당 강하제,n,,,약
+med_ilium,ilium,"엉덩뼈, 장골",n,,,뼈·관절
+med_medevac,medevac,의료 후송,n,,,응급
+med_norovirus,norovirus,노로바이러스,n,,,면역·감염
+med_radiologic,radiologic,방사선학의,adj,,,진단·검사
+med_thalassemia,thalassemia,지중해 빈혈,n,,,혈액 질환
+med_transdermal,transdermal,"피부를 통한, 경피의",adj,,,약
+med_tubal_ligation,tubal ligation,난관 결찰술,n,,,수술·처치
+med_backache,backache,"요통, 등의 통증",n,,,증상
+med_colostrum,colostrum,초유,n,,,산부인과
+med_cytology,cytology,세포학,n,,,세포·유전
+med_gastroenterologist,gastroenterologist,소화기내과 의사,n,,,소화기 질환
+med_incisor,incisor,앞니,n,,,소화기
+med_ingrown_toenail,ingrown toenail,내성 발톱,n,,,피부
+med_senility,senility,"노쇠, 노망",n,,,발달·노화
+med_snakebite,snakebite,뱀에 물림,n,,,응급
+med_atherosclerotic,atherosclerotic,죽상 경화성의,adj,,,기타 질환
+med_comorbidity,comorbidity,동반 질환,n,,,치료·관리
+med_endoscope,endoscope,내시경,n,,,소화기 질환
+med_periodontitis,periodontitis,치주염,n,,,소화기 질환
+med_sonogram,sonogram,초음파 사진,n,,,진단·검사
+med_stoma,stoma,"창냄, 장루",n,,,소화기
+med_carbuncle,carbuncle,"큰 종기, 옹",n,,,피부
+med_fibrinogen,fibrinogen,피브리노겐,n,,,진단·검사
+med_perineum,perineum,"샅, 회음",n,,,장기·몸 부위
+med_rehydrate,rehydrate,수분을 보충하다,v,,,수술·처치
+med_toxoplasmosis,toxoplasmosis,톡소플라스마증,n,,,면역·감염
+med_cough_suppressant,cough suppressant,기침 억제제,n,,,약
+med_hydrocortisone,hydrocortisone,하이드로코티손,n,,,약
+med_membranous,membranous,막의,adj,,,장기·몸 부위
+med_myopathy,myopathy,근육병증,n,,,기타 질환
+med_cerebrum,cerebrum,대뇌,n,,,뇌·신경
+med_cushing_s_syndrome,Cushing's syndrome,쿠싱 증후군,n,,,내분비·대사 질환
+med_earwax,earwax,귀지,n,,,눈·귀·코·목
+med_laparoscopy,laparoscopy,복강경 검사,n,,,수술·처치
+med_miscarry,miscarry,유산하다,v,,,산부인과
+med_myocardium,myocardium,"심장 근육층, 심근",n,,,심장·혈관
+med_retractor,retractor,견인기,n,,,수술·처치
+med_ulceration,ulceration,궤양 형성,n,,,피부
+med_anticoagulation,anticoagulation,항응고 요법,n,,,심장·혈관
+med_dislocate,dislocate,"탈구시키다, 빠지게 하다",v,,,동사·일반
+med_dysphagia,dysphagia,"삼킴 곤란, 연하 곤란",n,,,뇌·신경 질환
+med_inguinal_hernia,inguinal hernia,서혜부 탈장,n,,,소화기 질환
+med_pleural_effusion,pleural effusion,흉막 삼출,n,,,호흡기 질환
+med_dermatological,dermatological,피부과의,adj,,,피부
+med_dyspnea,dyspnea,호흡 곤란,n,,,호흡기 질환
+med_gluteus,gluteus,"볼기근, 둔근",n,,,근육·힘줄
+med_hemodynamic,hemodynamic,혈역학적인,adj,,,심장·혈관
+med_neutropenia,neutropenia,호중구 감소증,n,,,혈액 질환
+med_otitis_media,otitis media,중이염,n,,,눈·귀·코·목
+med_ovulate,ovulate,배란하다,v,,,동사·일반
+med_pallor,pallor,창백함,n,,,증상
+med_breathlessness,breathlessness,숨참,n,,,증상
+med_coccyx,coccyx,"꼬리뼈, 미골",n,,,뼈·관절
+med_intervertebral_disc,intervertebral disc,"추간판, 척추 사이 원반",n,,,뼈·관절
+med_prostatectomy,prostatectomy,전립샘 절제술,n,,,수술·처치
+med_angiogram,angiogram,혈관 조영 사진,n,,,심장·혈관 질환
+med_antihypertensive,antihypertensive,고혈압 치료제,n,,,약
+med_convulsion,convulsion,"경련, 발작",n,,,뇌·신경 질환
+med_duodenal,duodenal,십이지장의,adj,,,장기·몸 부위
+med_earache,earache,"귀앓이, 귀 통증",n,,,눈·귀·코·목
+med_metacarpal,metacarpal,"손허리뼈, 중수골",n,,,뼈·관절
+med_peptic_ulcer,peptic ulcer,소화성 궤양,n,,,소화기 질환
+med_subclinical,subclinical,"무증상의, 준임상의",adj,,,형용사
+med_adenoma,adenoma,"샘종, 선종",n,,,종양
+med_bursitis,bursitis,윤활낭염,n,,,근골격 질환
+med_deltoid,deltoid,"어깨세모근, 삼각근",n,,,근육·힘줄
+med_osteomyelitis,osteomyelitis,골수염,n,,,근골격 질환
+med_peritoneum,peritoneum,복막,n,,,소화기
+med_subdural_hematoma,subdural hematoma,경막하 혈종,n,,,뇌·신경
+med_antacid,antacid,제산제,n,,,소화기 질환
+med_antimalarial,antimalarial,항말라리아제,n,,,약
+med_cellulitis,cellulitis,"연조직염, 봉와직염",n,,,피부
+med_holter_monitor,Holter monitor,홀터 심전도 감시기,n,,,진단·검사
+med_instep,instep,발등,n,,,장기·몸 부위
+med_seasickness,seasickness,뱃멀미,n,,,기타 질환
+med_vasoconstriction,vasoconstriction,혈관 수축,n,,,심장·혈관 질환
+med_allergist,allergist,알레르기 전문의,n,,,병원·의료진
+med_bunion,bunion,엄지발가락 건막류,n,,,근골격 질환
+med_globulin,globulin,글로불린,n,,,진단·검사
+med_ketoacidosis,ketoacidosis,케톤산증,n,,,내분비·대사 질환
+med_osteosarcoma,osteosarcoma,골육종,n,,,기타 질환
+med_overbite,overbite,"윗니 덮임, 과개 교합",n,,,기타 질환
+med_plantar_fasciitis,plantar fasciitis,족저 근막염,n,,,근골격 질환
+med_strabismus,strabismus,사시,n,,,눈·귀·코·목
+med_troponin,troponin,트로포닌,n,,,진단·검사
+med_anticonvulsant,anticonvulsant,항경련제,n,,,약
+med_aspirate,aspirate,흡인하다,v,,,수술·처치
+med_diverticulitis,diverticulitis,게실염,n,,,소화기 질환
+med_erythrocyte,erythrocyte,적혈구,n,,,혈액
+med_halitosis,halitosis,"입 냄새, 구취",n,,,기타 질환
+med_hyperpigmentation,hyperpigmentation,과다 색소 침착,n,,,피부
+med_malabsorption,malabsorption,흡수 장애,n,,,소화기 질환
+med_pericardium,pericardium,"심장막, 심막",n,,,심장·혈관
+med_tailbone,tailbone,꼬리뼈,n,,,뼈·관절
+med_ascites,ascites,복수,n,,,소화기 질환
+med_blackhead,blackhead,"블랙헤드, 검은 여드름",n,,,피부
+med_duodenal_ulcer,duodenal ulcer,십이지장 궤양,n,,,기타 질환
+med_neuroplasticity,neuroplasticity,신경 가소성,n,,,뇌·신경
+med_paraplegia,paraplegia,하반신 마비,n,,,뇌·신경 질환
+med_precancerous,precancerous,전암성의,adj,,,종양
+med_stomachache,stomachache,"배앓이, 복통",n,,,증상
+med_subclavian,subclavian,빗장밑의,adj,,,장기·몸 부위
+med_tonsillectomy,tonsillectomy,편도 절제술,n,,,눈·귀·코·목
+med_anxiolytic,anxiolytic,항불안제,n,,,정신 건강
+med_gastrectomy,gastrectomy,위 절제술,n,,,소화기 질환
+med_neurocognitive,neurocognitive,신경 인지의,adj,,,정신 건강
+med_rheumatologist,rheumatologist,류머티즘내과 의사,n,,,근골격 질환
+med_subacute,subacute,아급성의,adj,,,증상
+med_zygomatic_bone,zygomatic bone,광대뼈,n,,,뼈·관절
+med_debridement,debridement,괴사 조직 제거,n,,,수술·처치
+med_ferritin,ferritin,페리틴,n,,,혈액
+med_fibroid,fibroid,"섬유종, 자궁 근종",n,,,산부인과
+med_monocyte,monocyte,단핵구,n,,,혈액
+med_nystagmus,nystagmus,"안구 진탕, 안진",n,,,눈·귀·코·목
+med_premenstrual_syndrome,premenstrual syndrome,월경 전 증후군,n,,,기타 질환
+med_tarsal,tarsal,발목뼈,n,,,뼈·관절
+med_candidiasis,candidiasis,칸디다증,n,,,기타 질환
+med_centenarian,centenarian,백 세 이상인 사람,n,,,발달·노화
+med_goiter,goiter,갑상샘종,n,,,내분비·대사 질환
+med_hyperventilation,hyperventilation,과호흡,n,,,호흡기 질환
+med_hyponatremia,hyponatremia,저나트륨혈증,n,,,생리·대사
+med_immunize,immunize,면역력을 주다,v,,,면역·감염
+med_tolerability,tolerability,내약성,n,,,약
+med_arthroscopy,arthroscopy,관절경 검사,n,,,수술·처치
+med_catabolism,catabolism,이화 작용,n,,,생리·대사
+med_orthotics,orthotics,"교정 깔창, 보조기",n,,,근골격 질환
+med_palpation,palpation,"촉진, 만져서 진찰함",n,,,진단·검사
+med_pleurisy,pleurisy,흉막염,n,,,호흡기 질환
+med_thoracotomy,thoracotomy,개흉술,n,,,수술·처치
+med_tricuspid_valve,tricuspid valve,삼첨판,n,,,심장·혈관
+med_ampoule,ampoule,앰풀,n,,,의료 기구
+med_cauterize,cauterize,"지지다, 소작하다",v,,,수술·처치
+med_enteral,enteral,장관의,adj,,,형용사
+med_enteral_nutrition,enteral nutrition,장관 영양,n,,,소화기
+med_hemolysis,hemolysis,용혈,n,,,혈액 질환
+med_hyperventilate,hyperventilate,과호흡하다,v,,,동사·일반
+med_hypothermic,hypothermic,저체온의,adj,,,기타 질환
+med_laparotomy,laparotomy,개복술,n,,,수술·처치
+med_myocarditis,myocarditis,심근염,n,,,심장·혈관 질환
+med_pharmacotherapy,pharmacotherapy,약물 요법,n,,,약
+med_pruritus,pruritus,"가려움증, 소양증",n,,,증상
+med_sclera,sclera,"공막, 흰자위막",n,,,피부·눈·귀·코
+med_thyroxine,thyroxine,"티록신, 갑상샘 호르몬",n,,,내분비
+med_uveitis,uveitis,포도막염,n,,,눈·귀·코·목
+med_vasodilation,vasodilation,혈관 확장,n,,,심장·혈관 질환
+med_audiologist,audiologist,청각 전문가,n,,,눈·귀·코·목
+med_gastroesophageal_reflux,gastroesophageal reflux,위식도 역류,n,,,소화기 질환
+med_proteinuria,proteinuria,단백뇨,n,,,비뇨기·신장 질환
+med_echocardiogram,echocardiogram,심장 초음파 검사,n,,,심장·혈관 질환
+med_hemostasis,hemostasis,지혈,n,,,혈액
+med_mononucleosis,mononucleosis,단핵구증,n,,,면역·감염
+med_ostomy,ostomy,장루술,n,,,소화기
+med_stress_echocardiogram,stress echocardiogram,운동 부하 심장 초음파,n,,,진단·검사
+med_temporomandibular_joint,temporomandibular joint,턱관절,n,,,기타 질환
+med_antivenom,antivenom,"항사독소, 뱀독 해독제",n,,,약
+med_dendrite,dendrite,"가지 돌기, 수상 돌기",n,,,뇌·신경
+med_metastasize,metastasize,전이하다,v,,,종양
+med_nebulizer,nebulizer,"분무기, 네뷸라이저",n,,,호흡기 질환
+med_superbug,superbug,슈퍼박테리아,n,,,면역·감염
+med_tracheostomy,tracheostomy,기관 절개술,n,,,호흡기 질환
+med_ureter,ureter,요관,n,,,비뇨·생식
+med_microsurgery,microsurgery,미세 수술,n,,,수술·처치
+med_perspire,perspire,땀을 흘리다,v,,,동사·일반
+med_thrombotic,thrombotic,혈전성의,adj,,,기타 질환
+med_thyroiditis,thyroiditis,갑상샘염,n,,,생리·대사
+med_titer,titer,역가,n,,,진단·검사
+med_diaphragmatic,diaphragmatic,"가로막의, 횡격막의",adj,,,장기·몸 부위
+med_hypercholesterolemia,hypercholesterolemia,고콜레스테롤 혈증,n,,,심장·혈관 질환
+med_trigeminal_neuralgia,trigeminal neuralgia,삼차 신경통,n,,,뇌·신경 질환
+med_intranasal,intranasal,코 안의,adj,,,형용사
+med_orthopedist,orthopedist,정형외과 의사,n,,,근골격 질환
+med_radiograph,radiograph,방사선 사진,n,,,진단·검사
+med_uvula,uvula,목젖,n,,,소화기
+med_aplastic_anemia,aplastic anemia,재생 불량성 빈혈,n,,,기타 질환
+med_craniotomy,craniotomy,"머리뼈 절개술, 개두술",n,,,수술·처치
+med_hypochondria,hypochondria,건강 염려증,n,,,정신 건강
+med_meninges,meninges,"뇌척수막, 수막",n,,,뇌·신경
+med_retinoblastoma,retinoblastoma,망막모세포종,n,,,기타 질환
+med_arteriosclerosis,arteriosclerosis,동맥 경화증,n,,,심장·혈관 질환
+med_conjunctiva,conjunctiva,결막,n,,,피부·눈·귀·코
+med_ileum,ileum,"돌창자, 회장",n,,,소화기
+med_nonsurgical,nonsurgical,비수술적인,adj,,,형용사
+med_septicemia,septicemia,패혈증,n,,,혈액 질환
+med_bedwetting,bedwetting,"야뇨, 밤오줌",n,,,비뇨기·신장 질환
+med_biosimilar,biosimilar,바이오시밀러,n,,,약
+med_endotracheal_tube,endotracheal tube,기관 내관,n,,,의료 기구
+med_hematocrit,hematocrit,적혈구 용적률,n,,,혈액
+med_hyperlipidemia,hyperlipidemia,고지혈증,n,,,심장·혈관 질환
+med_nonfatal,nonfatal,치명적이지 않은,adj,,,형용사
+med_orthostatic_hypotension,orthostatic hypotension,기립성 저혈압,n,,,심장·혈관
+med_bifocals,bifocals,이중 초점 안경,n,,,눈·귀·코·목
+med_coagulate,coagulate,응고하다,v,,,동사·일반
+med_hba1c,HbA1c,당화 혈색소,n,,,진단·검사
+med_iatrogenic,iatrogenic,"의원성의, 치료로 생긴",adj,,,증상
+med_lumpectomy,lumpectomy,종괴 절제술,n,,,종양
+med_prediabetes,prediabetes,당뇨병 전 단계,n,,,내분비·대사 질환
+med_radiographer,radiographer,방사선사,n,,,병원·의료진
+med_asbestosis,asbestosis,석면폐증,n,,,기타 질환
+med_breastbone,breastbone,"복장뼈, 흉골",n,,,뼈·관절
+med_cachexia,cachexia,악액질,n,,,증상
+med_helicobacter_pylori,Helicobacter pylori,헬리코박터 파일로리,n,,,소화기
+med_hematuria,hematuria,혈뇨,n,,,비뇨기·신장 질환
+med_premenopausal,premenopausal,폐경 전의,adj,,,형용사
+med_amniocentesis,amniocentesis,양수 검사,n,,,기타 질환
+med_keratitis,keratitis,각막염,n,,,눈·귀·코·목
+med_pericarditis,pericarditis,"심낭염, 심막염",n,,,심장·혈관 질환
+med_pleura,pleura,"가슴막, 흉막",n,,,호흡기
+med_prostatitis,prostatitis,전립샘염,n,,,산부인과
+med_antiserum,antiserum,항혈청,n,,,약
+med_cyanosis,cyanosis,청색증,n,,,호흡기 질환
+med_decongestant,decongestant,코막힘 완화제,n,,,약
+med_immunosuppressant,immunosuppressant,면역 억제제,n,,,약
+med_myasthenia_gravis,myasthenia gravis,중증 근무력증,n,,,뇌·신경
+med_phlebotomist,phlebotomist,채혈사,n,,,병원·의료진
+med_adenoids,adenoids,아데노이드,n,,,눈·귀·코·목
+med_amblyopia,amblyopia,약시,n,,,눈·귀·코·목
+med_episiotomy,episiotomy,회음 절개술,n,,,수술·처치
+med_eustachian_tube,eustachian tube,"귀관, 유스타키오관",n,,,피부·눈·귀·코
+med_exocrine,exocrine,외분비의,adj,,,내분비
+med_hemiplegia,hemiplegia,반신 마비,n,,,뇌·신경 질환
+med_keloid,keloid,"켈로이드, 흉터 덩어리",n,,,피부
+med_nephrotic_syndrome,nephrotic syndrome,신증후군,n,,,비뇨기·신장 질환
+med_pharmacologist,pharmacologist,약리학자,n,,,병원·의료진
+med_vasodilator,vasodilator,혈관 확장제,n,,,약
+med_antiplatelet,antiplatelet,항혈소판제,n,,,약
+med_electromyography,electromyography,근전도 검사,n,,,진단·검사
+med_epiglottis,epiglottis,"후두덮개, 후두개",n,,,호흡기
+med_gigantism,gigantism,거인증,n,,,내분비·대사 질환
+med_hoarseness,hoarseness,목쉼,n,,,호흡기 질환
+med_roundworm,roundworm,회충,n,,,면역·감염
+med_trapezius,trapezius,"등세모근, 승모근",n,,,근육·힘줄
+med_electroencephalogram,electroencephalogram,뇌파 검사,n,,,뇌·신경 질환
+med_exudate,exudate,삼출물,n,,,기타 질환
+med_gastroparesis,gastroparesis,위 마비,n,,,소화기
+med_gonad,gonad,생식샘,n,,,내분비
+med_hemochromatosis,hemochromatosis,혈색소증,n,,,기타 질환
+med_hyperhidrosis,hyperhidrosis,다한증,n,,,피부
+med_inhalant,inhalant,흡입제,n,,,약
+med_nosocomial_infection,nosocomial infection,병원 내 감염,n,,,면역·감염
+med_peristalsis,peristalsis,연동 운동,n,,,소화기
+med_cyanotic,cyanotic,청색증의,adj,,,피부
+med_menstruate,menstruate,월경하다,v,,,동사·일반
+med_amenorrhea,amenorrhea,무월경,n,,,산부인과
+med_hyperkalemia,hyperkalemia,고칼륨혈증,n,,,생리·대사
+med_ptosis,ptosis,눈꺼풀 처짐,n,,,눈·귀·코·목
+med_popliteal,popliteal,오금의,adj,,,장기·몸 부위
+med_silicosis,silicosis,규폐증,n,,,기타 질환
+med_auscultation,auscultation,청진,n,,,진단·검사
+med_embolic,embolic,색전성의,adj,,,기타 질환
+med_esophagitis,esophagitis,식도염,n,,,소화기
+med_quadriplegia,quadriplegia,사지 마비,n,,,뇌·신경 질환
+med_stye,stye,다래끼,n,,,눈·귀·코·목
+med_titrate,titrate,(약 용량을) 조절하다,v,,,약
+med_acromegaly,acromegaly,말단 비대증,n,,,내분비·대사 질환
+med_bronchoscopy,bronchoscopy,기관지 내시경 검사,n,,,호흡기 질환
+med_leukemic,leukemic,백혈병의,adj,,,기타 질환
+med_somnolence,somnolence,"졸림, 기면",n,,,정신 건강
+med_splenectomy,splenectomy,비장 절제술,n,,,수술·처치
+med_bedpan,bedpan,환자용 변기,n,,,의료 기구
+med_clubfoot,clubfoot,"내반족, 휜발",n,,,발달·노화
+med_hematologist,hematologist,혈액내과 의사,n,,,혈액 질환
+med_impetigo,impetigo,농가진,n,,,면역·감염
+med_polyneuropathy,polyneuropathy,다발 신경병증,n,,,뇌·신경
+med_ankylosing_spondylitis,ankylosing spondylitis,강직 척추염,n,,,근골격 질환
+med_cecum,cecum,"막창자, 맹장",n,,,소화기
+med_hantavirus,hantavirus,한타바이러스,n,,,면역·감염
+med_hypercalcemia,hypercalcemia,고칼슘혈증,n,,,생리·대사
+med_nephrologist,nephrologist,신장내과 의사,n,,,비뇨기·신장 질환
+med_cholecystectomy,cholecystectomy,담낭 절제술,n,,,소화기 질환
+med_fontanelle,fontanelle,"숫구멍, 천문",n,,,뼈·관절
+med_malocclusion,malocclusion,부정 교합,n,,,기타 질환
+med_occlude,occlude,"막다, 폐색하다",v,,,수술·처치
+med_pinkeye,pinkeye,"유행성 결막염, 눈병",n,,,눈·귀·코·목
+med_expectorant,expectorant,거담제,n,,,약
+med_glomerulonephritis,glomerulonephritis,사구체 신염,n,,,비뇨기·신장 질환
+med_nephrectomy,nephrectomy,콩팥 절제술,n,,,수술·처치
+med_bronchiectasis,bronchiectasis,기관지 확장증,n,,,호흡기 질환
+med_kyphosis,kyphosis,"척추 뒤굽음증, 후만증",n,,,근골격 질환
+med_laminectomy,laminectomy,척추 후궁 절제술,n,,,수술·처치
+med_photophobia,photophobia,"눈부심, 빛 공포증",n,,,눈·귀·코·목
+med_pulse_oximeter,pulse oximeter,산소 포화도 측정기,n,,,호흡기 질환
+med_hospitalize,hospitalize,입원시키다,v,,,수술·처치
+med_pharyngitis,pharyngitis,인두염,n,,,호흡기 질환
+med_hypokalemia,hypokalemia,저칼륨혈증,n,,,생리·대사
+med_levothyroxine,levothyroxine,레보티록신,n,,,약
+med_lipoma,lipoma,지방종,n,,,종양
+med_anesthetize,anesthetize,마취하다,v,,,수술·처치
+med_calcaneus,calcaneus,"발꿈치뼈, 종골",n,,,뼈·관절
+med_diagnostician,diagnostician,진단 전문의,n,,,의료 일반
+med_eosinophil,eosinophil,호산구,n,,,혈액
+med_esophageal_varices,esophageal varices,식도 정맥류,n,,,소화기
+med_periosteum,periosteum,"뼈막, 골막",n,,,뼈·관절
+med_polycythemia,polycythemia,적혈구 증가증,n,,,혈액 질환
+med_presbyopia,presbyopia,노안,n,,,눈·귀·코·목
+med_rhinovirus,rhinovirus,리노바이러스,n,,,면역·감염
+med_hypovolemic_shock,hypovolemic shock,저혈량 쇼크,n,,,심장·혈관
+med_intradermal,intradermal,"피내의, 피부 속의",adj,,,형용사
+med_jejunum,jejunum,"빈창자, 공장",n,,,소화기
+med_myalgia,myalgia,근육통,n,,,근골격 질환
+med_pyloric_stenosis,pyloric stenosis,날문 협착증,n,,,소화기
+med_spirometry,spirometry,폐활량 측정,n,,,호흡기 질환
+med_status_epilepticus,status epilepticus,뇌전증 지속 상태,n,,,뇌·신경
+med_tuberculin_test,tuberculin test,결핵 반응 검사,n,,,면역·감염
+med_eyewash,eyewash,세안액,n,,,약
+med_melena,melena,흑색변,n,,,소화기
+med_cardiogenic_shock,cardiogenic shock,심장성 쇼크,n,,,심장·혈관
+med_copayment,copayment,본인 부담금,n,,,병원·의료진
+med_lithotripsy,lithotripsy,쇄석술,n,,,비뇨기·신장 질환
+med_nasogastric_tube,nasogastric tube,코위관,n,,,의료 기구
+med_osteopenia,osteopenia,골감소증,n,,,내분비·대사 질환
+med_volvulus,volvulus,"창자 꼬임, 장염전",n,,,소화기
+med_antiarrhythmic,antiarrhythmic,항부정맥제,n,,,약
+med_cardioversion,cardioversion,심율동 전환,n,,,심장·혈관
+med_convalesce,convalesce,"회복하다, 요양하다",v,,,동사·일반
+med_intubate,intubate,삽관하다,v,,,수술·처치
+med_thrombolytic,thrombolytic,혈전 용해제,n,,,약
+med_lordosis,lordosis,"척추 앞굽음증, 전만증",n,,,근골격 질환
+med_nephron,nephron,"네프론, 콩팥 단위",n,,,비뇨·생식
+med_pustule,pustule,"고름 물집, 농포",n,,,피부
+med_raynaud_s_phenomenon,Raynaud's phenomenon,레이노 현상,n,,,심장·혈관
+med_thyroidectomy,thyroidectomy,갑상샘 절제술,n,,,수술·처치
+med_achalasia,achalasia,식도 이완 불능증,n,,,소화기
+med_acrophobia,acrophobia,고소 공포증,n,,,정신 건강
+med_anosmia,anosmia,후각 상실,n,,,눈·귀·코·목
+med_polyposis,polyposis,용종증,n,,,기타 질환
+med_transfuse,transfuse,수혈하다,v,,,수술·처치
+med_antipyretic,antipyretic,해열제,n,,,약
+med_antispasmodic,antispasmodic,"진경제, 경련 억제제",n,,,약
+med_colectomy,colectomy,대장 절제술,n,,,수술·처치
+med_enuresis,enuresis,유뇨증,n,,,비뇨기·신장 질환
+med_intussusception,intussusception,장 겹침증,n,,,소화기
+med_osteoblast,osteoblast,"뼈모세포, 조골세포",n,,,뼈·관절
+med_pneumoconiosis,pneumoconiosis,진폐증,n,,,호흡기 질환
+med_splenomegaly,splenomegaly,비장 비대증,n,,,기타 질환
+med_uremia,uremia,요독증,n,,,생리·대사
+med_cystoscopy,cystoscopy,방광경 검사,n,,,비뇨기·신장 질환
+med_alkalosis,alkalosis,알칼리증,n,,,생리·대사
+med_atelectasis,atelectasis,"무기폐, 폐 확장 부전",n,,,호흡기
+med_diuresis,diuresis,이뇨,n,,,비뇨기·신장 질환
+med_hyperuricemia,hyperuricemia,고요산혈증,n,,,생리·대사
+med_antiemetic,antiemetic,구토 억제제,n,,,소화기 질환
+med_bronchodilator,bronchodilator,기관지 확장제,n,,,약
+med_cholecystitis,cholecystitis,"쓸개염, 담낭염",n,,,소화기 질환
+med_diabetes_insipidus,diabetes insipidus,요붕증,n,,,생리·대사
+med_pulmonologist,pulmonologist,호흡기내과 의사,n,,,호흡기 질환
+med_emaciation,emaciation,"쇠약, 수척",n,,,증상
+med_leukopenia,leukopenia,백혈구 감소증,n,,,혈액 질환
+med_osteoclast,osteoclast,"뼈파괴세포, 파골세포",n,,,뼈·관절
+med_phlebitis,phlebitis,정맥염,n,,,심장·혈관 질환
+med_blepharitis,blepharitis,눈꺼풀염,n,,,눈·귀·코·목
+med_dysarthria,dysarthria,구음 장애,n,,,뇌·신경 질환
+med_sonographer,sonographer,초음파 검사자,n,,,병원·의료진
+med_tongue_depressor,tongue depressor,설압자,n,,,진단·검사
+med_chilblains,chilblains,동창,n,,,기타 질환
+med_glomerulus,glomerulus,"토리, 사구체",n,,,비뇨·생식
+med_hemoptysis,hemoptysis,"객혈, 피를 토함",n,,,증상
+med_hemothorax,hemothorax,혈흉,n,,,호흡기
+med_mesentery,mesentery,"창자간막, 장간막",n,,,소화기
+med_pyelonephritis,pyelonephritis,신우신염,n,,,비뇨기·신장 질환
+med_incise,incise,절개하다,v,,,수술·처치
+med_omentum,omentum,그물막,n,,,소화기
+med_hiatal_hernia,hiatal hernia,열공 탈장,n,,,소화기 질환
+med_vasovagal_syncope,vasovagal syncope,미주 신경성 실신,n,,,심장·혈관
+med_noncommunicable,noncommunicable,비전염성의,adj,,,면역·감염
+med_otitis_externa,otitis externa,외이도염,n,,,눈·귀·코·목
+med_polypharmacy,polypharmacy,다약제 복용,n,,,약
+med_hepatomegaly,hepatomegaly,간 비대,n,,,기타 질환
+med_hypocalcemia,hypocalcemia,저칼슘혈증,n,,,생리·대사
+med_noninfectious,noninfectious,비감염성의,adj,,,형용사
+med_claudication,claudication,"파행, 다리 저는 증상",n,,,심장·혈관
+med_anabolism,anabolism,동화 작용,n,,,생리·대사
+med_nocebo_effect,nocebo effect,노시보 효과,n,,,약
+med_ophthalmoscope,ophthalmoscope,검안경,n,,,진단·검사
+med_somnambulism,somnambulism,몽유병,n,,,정신 건강
+med_polyuria,polyuria,다뇨,n,,,비뇨기·신장 질환
+med_pylorus,pylorus,"날문, 유문",n,,,소화기
+med_edematous,edematous,부종이 있는,adj,,,형용사
+med_extubation,extubation,"발관, 관 빼기",n,,,호흡기
+med_basophil,basophil,호염기구,n,,,혈액
+med_geriatrician,geriatrician,노인 의학 전문의,n,,,병원·의료진
+med_misdiagnose,misdiagnose,오진하다,v,,,동사·일반
+med_gastroscopy,gastroscopy,위내시경 검사,n,,,소화기 질환
+med_synovium,synovium,"윤활막, 활막",n,,,장기·몸 부위
+med_xiphoid_process,xiphoid process,칼돌기,n,,,장기·몸 부위
+med_sphygmomanometer,sphygmomanometer,혈압계,n,,,진단·검사
+med_spirometer,spirometer,폐활량계,n,,,호흡기 질환
+med_ulcerate,ulcerate,궤양이 생기다,v,,,동사·일반
+med_zoonosis,zoonosis,인수 공통 감염병,n,,,면역·감염
+med_dysuria,dysuria,배뇨통,n,,,비뇨기·신장 질환
+med_empyema,empyema,"고름 가슴, 농흉",n,,,호흡기
+med_ambulate,ambulate,"걷다, 보행하다",v,,,수술·처치
+med_nocturia,nocturia,야간뇨,n,,,비뇨기·신장 질환
+med_ligate,ligate,"묶다, 결찰하다",v,,,수술·처치
+med_otoscope,otoscope,"이경, 귀 검사경",n,,,진단·검사
+med_glucometer,glucometer,혈당 측정기,n,,,내분비·대사 질환
+med_endocardium,endocardium,"심장 속막, 심내막",n,,,심장·혈관
+med_hypernatremia,hypernatremia,고나트륨혈증,n,,,생리·대사
+med_meniere_s_disease,Meniere's disease,메니에르병,n,,,눈·귀·코·목
+med_tonometry,tonometry,안압 측정,n,,,눈·귀·코·목
+med_sequela,sequela,후유증,n,,,치료·관리
+med_arteriole,arteriole,세동맥,n,,,심장·혈관
+med_cardiomegaly,cardiomegaly,심장 비대,n,,,기타 질환
+med_cardiotoxic,cardiotoxic,심장 독성의,adj,,,형용사
+med_bedbound,bedbound,침대에 묶인,adj,,,형용사
+med_perfuse,perfuse,관류시키다,v,,,수술·처치
+med_iritis,iritis,홍채염,n,,,눈·귀·코·목
+med_pinworm,pinworm,요충,n,,,면역·감염
+med_hematemesis,hematemesis,토혈,n,,,증상
+med_papule,papule,구진,n,,,피부
+med_labyrinthitis,labyrinthitis,"미로염, 내이염",n,,,눈·귀·코·목
+med_afebrile,afebrile,열이 없는,adj,,,면역·감염
+med_chalazion,chalazion,콩다래끼,n,,,눈·귀·코·목
+med_epiglottitis,epiglottitis,후두덮개염,n,,,눈·귀·코·목
+med_bedsore,bedsore,욕창,n,,,피부
+med_antiseizure,antiseizure,항발작의,adj,,,약
+med_hepatologist,hepatologist,간 전문의,n,,,소화기 질환
+med_catheterize,catheterize,도관을 넣다,v,,,수술·처치
+med_preauthorization,preauthorization,사전 승인,n,,,병원·의료진
+med_auscultate,auscultate,청진하다,v,,,수술·처치
+med_perfusionist,perfusionist,체외 순환사,n,,,병원·의료진
+med_bronchiole,bronchiole,세기관지,n,,,호흡기
+med_extubate,extubate,관을 빼다,v,,,동사·일반
+med_percuss,percuss,두드려 진찰하다,v,,,동사·일반
+med_thrombocyte,thrombocyte,혈소판,n,,,혈액
+med_venule,venule,세정맥,n,,,심장·혈관
