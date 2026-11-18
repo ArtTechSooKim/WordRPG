@@ -85,6 +85,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f78fa08b6e8ce1b43aaae6eccf3746d2, type: 2}
   - {fileID: 11400000, guid: 77022efca78ef1043b8d95a5f8ff2b00, type: 2}
   - {fileID: 11400000, guid: 5d52f530a0aa4354b9c84d226b791f6c, type: 2}
+  giftEvents:
+  - {fileID: 11400000, guid: 8abec4c7e30d71b44b2f70720ad895e8, type: 2}
+  mails:
+  - {fileID: 11400000, guid: 4e522d56cd6c13e4bb739f99fb9e0e99, type: 2}
   fullVersionGift:
   - item: {fileID: 11400000, guid: d06f0e6a146e8d7419259d713eb87c86, type: 2}
     count: 3

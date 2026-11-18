@@ -30,7 +30,18 @@ namespace WordRPG.UI
             {
                 settingsView.Hide();
                 StartCoroutine(TesterTravel(target));
-            }, entitlements);
+            }, entitlements, () =>
+            {
+                settingsView.Hide();
+                var gift = TesterTools.ResetGift(session, database != null ? database.SeasonalEvents : null, LocalClock());
+                if (gift == null)
+                {
+                    ShowToast("[테스터] 선물 퀴즈 데이터가 없어요", 2f);
+                    return;
+                }
+                SaveNow();
+                OpenGift(gift);
+            });
         }
 
         // 건너뛴 지역의 시작 지점으로: 어두워짐 → 그 지역을 새로 그림(이긴 보스·열린 길) → 밝아짐

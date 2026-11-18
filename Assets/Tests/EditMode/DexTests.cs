@@ -223,6 +223,7 @@ namespace WordRPG.Tests
             var seen = new HashSet<string>();
             var rewardIds = new HashSet<string>();
             var courseBooks = WordCourseTests.CourseBooks(); // 고른 단어장의 단어만 담은 에셋(#273)은 지역 도감이 아님
+            courseBooks.UnionWith(GiftEventTests.EventBooks()); // 선물 퀴즈 단어장(#274)도
             var books = AssetDatabase.FindAssets("t:WordDatabase", new[] { "Assets/Data" })
                 .Select(g => AssetDatabase.LoadAssetAtPath<WordDatabase>(AssetDatabase.GUIDToAssetPath(g)))
                 .Where(b => !courseBooks.Contains(b)).ToList();
@@ -262,6 +263,7 @@ namespace WordRPG.Tests
         {
             var database = AssetDatabase.LoadAssetAtPath<GameDatabase>("Assets/Data/GameDatabase.asset");
             var courseBooks = WordCourseTests.CourseBooks(); // 고른 단어장의 단어만 담은 에셋(#273)은 지역 도감이 아님
+            courseBooks.UnionWith(GiftEventTests.EventBooks()); // 선물 퀴즈 단어장(#274)도
             var books = AssetDatabase.FindAssets("t:WordDatabase", new[] { "Assets/Data" })
                 .Select(g => AssetDatabase.LoadAssetAtPath<WordDatabase>(AssetDatabase.GUIDToAssetPath(g)))
                 .Where(b => !courseBooks.Contains(b)).ToList();

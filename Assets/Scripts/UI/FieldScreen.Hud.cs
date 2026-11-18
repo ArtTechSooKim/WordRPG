@@ -54,12 +54,13 @@ namespace WordRPG.UI
             minimap = MinimapView.Create(hudRoot);
             minimap.Button.onClick.AddListener(OpenMap);
 
-            // 오른쪽 세로 메뉴 (Figma 'Field — 수련 (#44)'): 도감 · 수련 · 가방 · 설정
+            // 오른쪽 세로 메뉴 (Figma 'Field — 수련 (#44)' · '필드 — 메일함 버튼 (#275)'): 도감 · 수련 · 가방 · 메일함 · 설정
             var entries = new (string name, string icon, string label, UnityEngine.Events.UnityAction open)[]
             {
                 ("DexButton", "dex", "도감", OpenDex),
                 ("TrainingButton", "train", "수련", OpenTraining),
                 ("BagButton", "bag", "가방", OpenBag),
+                ("MailButton", "mail", "메일함", OpenMailbox),
                 ("SettingsButton", "settings", "설정", OpenSettings),
             };
             float menuHeight = entries.Length * 120 + (entries.Length - 1) * 16;
@@ -80,6 +81,7 @@ namespace WordRPG.UI
                 if (entries[i].name == "BagButton") // 같은 자리의 점 (#81 동료, #142 성유물)
                     foreach (var id in new[] { MenuBadges.Companion, MenuBadges.RelicNew, MenuBadges.RelicSwap })
                         AddBadge(id, (RectTransform)button.transform);
+                if (entries[i].name == "MailButton") mailDot = MakeDot((RectTransform)button.transform); // 안 읽은 메일 (#275 — 튜토리얼과 상관없이)
             }
             AddBadge(MenuBadges.Map, (RectTransform)minimap.Button.transform);
 
@@ -465,7 +467,10 @@ namespace WordRPG.UI
 
         // ------------------------------------------------------------------ 빨간 점 · 목표 한 줄 · 저장 표시 (#61)
 
-        private void AddBadge(string id, RectTransform host)
+        private void AddBadge(string id, RectTransform host) => badges[id] = MakeDot(host);
+
+        // 빨간 점 하나 (꺼진 채로)
+        private static RectTransform MakeDot(RectTransform host)
         {
             var dot = UiKit.Pill(UiKit.Panel("Badge", host, Palette.Bad, 1, 1, 1, 1));
             dot.raycastTarget = false;
@@ -476,7 +481,7 @@ namespace WordRPG.UI
             ring.gameObject.AddComponent<AutoPill>();
             ring.raycastTarget = false;
             rt.gameObject.SetActive(false);
-            badges[id] = rt;
+            return rt;
         }
 
         private void RefreshBadges()
@@ -501,6 +506,7 @@ namespace WordRPG.UI
             float scale = k < 0.3f ? 1f + 0.35f * Mathf.Sin(k / 0.3f * Mathf.PI) : 1f;
             foreach (var dot in badges.Values)
                 if (dot.gameObject.activeSelf) dot.localScale = Vector3.one * scale;
+            if (mailDot != null && mailDot.gameObject.activeSelf) mailDot.localScale = Vector3.one * scale;
         }
 
         // 목표 알약 (Figma 'Field — 정글 목표 두 줄 #147'): 누르면 지도
@@ -698,6 +704,7 @@ namespace WordRPG.UI
         private void RefreshHud()
         {
             areaLabel.text = area.DisplayName;
+            RefreshMailDot();
             hudDex = Dex.GetProgress(area.Words, session.Vocabulary);
             int gold = session.Inventory.Gold;
             if (shownGold < 0 || gold < shownGold) shownGold = gold; // 처음·돈을 쓰면 바로

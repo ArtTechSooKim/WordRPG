@@ -516,6 +516,7 @@ namespace WordRPG.EditorTools
             SetExitsIfMismatch(junglePath, (cavePath, 0, junglePath), (forestPath, 0, null)); // 동굴은 빈칸두꺼비 뒤 (#233 사용자: 열쇠보다 동굴을 먼저 가게 됨)
             SetExitsIfMismatch(cavePath, (junglePath, 0, null));
             BuildCourses();
+            BuildGiftEvents();
 
             AssetDatabase.SaveAssets();
             GameDatabaseBuilder.Refresh();
@@ -988,6 +989,66 @@ namespace WordRPG.EditorTools
             AssetDatabase.SaveAssets();
             GameDatabaseBuilder.Refresh(); // 세이브의 단어장 id → 에셋
         }
+
+        // 철마다 여는 선물 퀴즈 (#274 사용자): 12월 1~31일에 켜면 크리스마스 단어 3문제 — 기본 선물(특제 상처약 1 + 살금살금 물약 1)
+        // + 맞힌 문제마다 하나씩 더, 받기 전엔 무엇인지 비밀, 받은 뒤 개발자의 편지(사용자가 쓴 글 — 고치지 말 것).
+        // 단어 = Words/Events/christmas.csv (Claude가 고르고 뜻을 씀). eventId는 세이브에 '{id}_{연도}'로 적힘 — 출시 뒤 바꾸지 말 것
+        [MenuItem("WordRPG/Data/Build Gift Events")]
+        public static void BuildGiftEvents()
+        {
+            const string words = Root + "/Words/Events/christmas";
+            var book = AssetDatabase.LoadAssetAtPath<WordDatabase>(words + ".asset");
+            if (book == null && File.Exists(words + ".csv")) book = WordRPG.EditorTools.WordCsvImporter.Import(words + ".csv");
+            var great = AssetDatabase.LoadAssetAtPath<ItemData>(Root + "/Items/potion_great.asset");
+            var quiet = AssetDatabase.LoadAssetAtPath<ItemData>(Root + "/Items/potion_quiet.asset");
+            string folder = Root + "/Events";
+            if (!AssetDatabase.IsValidFolder(folder)) AssetDatabase.CreateFolder(Root, "Events");
+            string path = folder + "/christmas.asset";
+            var gift = AssetDatabase.LoadAssetAtPath<GiftEvent>(path);
+            if (gift == null)
+            {
+                gift = ScriptableObject.CreateInstance<GiftEvent>();
+                AssetDatabase.CreateAsset(gift, path);
+            }
+            gift.Configure("christmas", "크리스마스 선물", "메리 크리스마스!", "크리스마스 선물 퀴즈", "크리스마스 영단어",
+                12, 1, 12, 31, 3, book,
+                new[] { new ItemGift(great, 1), new ItemGift(quiet, 1) }, new[] { new ItemGift(great, 1), new ItemGift(quiet, 1) });
+            gift.ConfigureLetter(BuildMail("christmas_2026_letter", "크리스마스 편지", "개발자의 편지", "A Christmas Letter from the Developer",
+                "tree", ChristmasLetter, "Merry Christmas & Happy New Adventure!", "From. Your Game Developer"));
+            EditorUtility.SetDirty(gift);
+            AssetDatabase.SaveAssets();
+            GameDatabaseBuilder.Refresh(); // GameDatabase.SeasonalEvents
+        }
+
+        // 메일함에 오는 메일 (#275): Assets/Data/Mails/{mailId}.asset. mailId는 세이브에 적힘 — 출시 뒤 바꾸지 말 것
+        private static MailData BuildMail(string id, string subject, string tag, string title, string art, string body, string closing, string sign,
+            MailDelivery delivery = MailDelivery.ByEvent, string from = "", string to = "", params ItemGift[] gifts)
+        {
+            string folder = Root + "/Mails";
+            if (!AssetDatabase.IsValidFolder(folder)) AssetDatabase.CreateFolder(Root, "Mails");
+            string path = $"{folder}/{id}.asset";
+            var mail = AssetDatabase.LoadAssetAtPath<MailData>(path);
+            if (mail == null)
+            {
+                mail = ScriptableObject.CreateInstance<MailData>();
+                AssetDatabase.CreateAsset(mail, path);
+            }
+            mail.Configure(id, "개발자", subject, tag, title, art, body, closing, sign, gifts, delivery, from, to);
+            EditorUtility.SetDirty(mail);
+            return mail;
+        }
+
+        // 개발자의 편지 (#274 — 사용자가 쓴 글 그대로. 🎄 이모지는 글꼴에 없어 화면 위 나무 그림으로)
+        private const string ChristmasLetter =
+            "사랑하는 모험가 여러분!\n" +
+            "어느덧 한 해의 끝자락, 따뜻한 크리스마스가 찾아왔습니다.\n" +
+            "여러분은 올 한 해 어떤 모험을 하셨나요?\n" +
+            "새로운 단어를 배우고, 낯선 도전을 마주하며 한 걸음씩 성장해 온 여러분의 여정에 함께할 수 있어 기쁩니다.\n" +
+            "크리스마스는 사랑과 평화를 전하기 위해 예수님께서 이 땅에 태어나신 날입니다.\n" +
+            "게임 속에서 강한 몬스터를 물리치고 새로운 레벨에 도달하는 것도 멋진 일이지만, 현실에서는 서로를 사랑하고 작은 친절을 나누는 것이 더욱 값진 모험일지도 모릅니다.\n" +
+            "이번 크리스마스에는 여러분의 마음에도 평화가 깃들기를 바랍니다. 전쟁과 갈등으로 고통받는 사람들에게도 따뜻한 위로와 희망이 전해지기를 기도합니다.\n" +
+            "저희 게임과 함께해 주셔서 진심으로 감사합니다.\n" +
+            "여러분의 다음 모험에도 새로운 배움과 즐거움이 가득하기를!";
 
         private static void Course(string id, string name, string summary, int order, string[] samples, params CourseBook[] books)
         {

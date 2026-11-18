@@ -26,6 +26,10 @@ namespace WordRPG.EditorTools
             var companions = LoadAll<CompanionData>().OrderBy(c => c.CompanionId).ToList();
             var courses = LoadAll<WordRPG.Words.WordCourse>().OrderBy(c => c.Order).ThenBy(c => c.CourseId).ToList(); // #273
             WarnDuplicates(courses.Select(c => c.CourseId), "단어장");
+            var giftEvents = LoadAll<WordRPG.Game.GiftEvent>().OrderBy(e => e.EventId).ToList(); // #274
+            WarnDuplicates(giftEvents.Select(e => e.EventId), "선물 퀴즈");
+            var mails = LoadAll<WordRPG.Game.MailData>().OrderBy(m => m.MailId).ToList(); // #275
+            WarnDuplicates(mails.Select(m => m.MailId), "메일");
             WarnDuplicates(monsters.Select(m => m.SpeciesId), "몬스터");
             WarnDuplicates(relics.Select(r => r.RelicId), "성유물");
             WarnDuplicates(items.Select(i => i.ItemId), "아이템");
@@ -38,10 +42,10 @@ namespace WordRPG.EditorTools
                 database = ScriptableObject.CreateInstance<GameDatabase>();
                 AssetDatabase.CreateAsset(database, DatabasePath);
             }
-            database.ReplaceContents(monsters, items, areas, relics, companions, courses);
+            database.ReplaceContents(monsters, items, areas, relics, companions, courses, giftEvents, mails);
             EditorUtility.SetDirty(database);
             AssetDatabase.SaveAssets();
-            Debug.Log($"[WordRPG] GameDatabase 갱신: 몬스터 {monsters.Count}, 아이템 {items.Count}, 성유물 {relics.Count}, 지역 {areas.Count}, 동료 {companions.Count}, 단어장 {courses.Count}");
+            Debug.Log($"[WordRPG] GameDatabase 갱신: 몬스터 {monsters.Count}, 아이템 {items.Count}, 성유물 {relics.Count}, 지역 {areas.Count}, 동료 {companions.Count}, 단어장 {courses.Count}, 선물 퀴즈 {giftEvents.Count}, 메일 {mails.Count}");
             return database;
         }
 

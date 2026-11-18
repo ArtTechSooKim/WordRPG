@@ -73,6 +73,15 @@ namespace WordRPG.Tests
             foreach (var r in db.Relics) { yield return r.DisplayName; yield return r.Description; }
             foreach (var c in db.Companions) yield return c.DisplayName;
             foreach (var a in db.Areas) yield return a.DisplayName;
+            foreach (var e in db.SeasonalEvents) // 크리스마스 선물 퀴즈 (#274)
+            {
+                yield return e.DisplayName; yield return e.Title; yield return e.QuizName; yield return e.WordsName;
+            }
+            foreach (var m in db.Mails) // 메일함 (#275) — 개발자의 편지
+            {
+                yield return m.Sender; yield return m.Subject; yield return m.Tag; yield return m.Title;
+                yield return m.Body; yield return m.Closing; yield return m.Sign;
+            }
         }
 
         private static string Missing(IEnumerable<string> texts, HashSet<int> font)

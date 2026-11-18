@@ -294,6 +294,9 @@ namespace WordRPG.UI
 
         public static Sprite Icon(string name) => LoadSprite("UI/Icons/" + name);
 
+        // Resources/Art 아래 도트 그림 (예: "Event/gift_box" — 크리스마스 선물 상자 #274)
+        public static Sprite ArtSprite(string path) => LoadSprite("Art/" + path);
+
         // 아이템에 아이콘이 지정돼 있으면 그것, 없으면 itemId 이름의 PNG (Figma 아이콘 → 없으면 팩의 도트 그림)
         public static Sprite ItemIcon(ItemData item)
         {

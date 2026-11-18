@@ -119,6 +119,20 @@ ITEM_TINTS = {
 ITEM_BUILDERS = ("hard_cover", "shiny_ink", "sparkle_dust", "keepsake_meadow")
 
 # 동료 (#77, 1.1 메아리 정글): companionId → 팩 캐릭터 폴더. 얼굴(Faceset) → Companions/{id}.png, 걷기 시트 → Companions/{id}_sheet.png
+# 메일함 (#275): 메일 목록의 봉투 (안 읽음 = 봉인된 편지) — 팩 그림 그대로 Art/Event로
+EVENT_ART = {
+    "letter": "Items/Other/Letter.png",
+}
+
+
+def copy_event_art(pack_root=DEFAULT_PACK):
+    folder = os.path.join(PROJECT, "Assets", "Resources", "Art", "Event")
+    os.makedirs(folder, exist_ok=True)
+    for name, rel in EVENT_ART.items():
+        save_if_changed(Image.open(os.path.join(pack_root, rel)).convert("RGBA"), os.path.join(folder, name + ".png"))
+    print("event art", len(EVENT_ART), "->", folder)
+
+
 COMPANIONS = {
     "ara": "Actor/Characters/Cavegirl",  # 아라 — 유적에 갇혀 고대 단어를 지키던 정글 소녀
 }
@@ -1427,6 +1441,7 @@ def main():
 
     copy_relics_and_items(pack)
     copy_companions(pack)
+    copy_event_art(pack)
 
     art = Pack(pack)
     build_tiles(art)

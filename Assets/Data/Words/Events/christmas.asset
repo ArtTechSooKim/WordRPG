@@ -1,0 +1,244 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b72d5cf44eaeb8458f8605263c9da22, type: 3}
+  m_Name: christmas
+  m_EditorClassIdentifier: WordRPG::WordRPG.Words.WordDatabase
+  tier: 1
+  regionId: 
+  regionName: 
+  rewards: []
+  journal: {fileID: 0}
+  words:
+  - id: xmas_reindeer
+    english: reindeer
+    meaning: "\uC21C\uB85D"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_sleigh
+    english: sleigh
+    meaning: "\uC370\uB9E4"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_chimney
+    english: chimney
+    meaning: "\uAD74\uB69D"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_wreath
+    english: wreath
+    meaning: "\uD654\uD658"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_ornament
+    english: ornament
+    meaning: "\uC7A5\uC2DD\uD488"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_stocking
+    english: stocking
+    meaning: "\uAE34 \uC591\uB9D0"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_snowflake
+    english: snowflake
+    meaning: "\uB208\uC1A1\uC774"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_snowman
+    english: snowman
+    meaning: "\uB208\uC0AC\uB78C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_candle
+    english: candle
+    meaning: "\uC591\uCD08"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_carol
+    english: carol
+    meaning: "\uCE90\uB7F4, \uC131\uD0C4 \uB178\uB798"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_mistletoe
+    english: mistletoe
+    meaning: "\uACA8\uC6B0\uC0B4\uC774"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_fireplace
+    english: fireplace
+    meaning: "\uBCBD\uB09C\uB85C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_gingerbread
+    english: gingerbread
+    meaning: "\uC0DD\uAC15 \uACFC\uC790"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_present
+    english: present
+    meaning: "\uC120\uBB3C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_frost
+    english: frost
+    meaning: "\uC11C\uB9AC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_angel
+    english: angel
+    meaning: "\uCC9C\uC0AC"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_bell
+    english: bell
+    meaning: "\uC885"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_holiday
+    english: holiday
+    meaning: "\uD734\uC77C, \uBA85\uC808"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_eve
+    english: eve
+    meaning: "(\uCD95\uC77C\uC758) \uC804\uB0A0 \uBC24, \uC774\uBE0C"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_elf
+    english: elf
+    meaning: "\uC694\uC815"
+    partOfSpeech: n
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_wrap
+    english: wrap
+    meaning: "\uC2F8\uB2E4, \uD3EC\uC7A5\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_decorate
+    english: decorate
+    meaning: "\uAFB8\uBBF8\uB2E4, \uC7A5\uC2DD\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_celebrate
+    english: celebrate
+    meaning: "\uCD95\uD558\uD558\uB2E4, \uAE30\uB150\uD558\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_jingle
+    english: jingle
+    meaning: "\uB538\uB791\uB538\uB791 \uC6B8\uB9AC\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_sparkle
+    english: sparkle
+    meaning: "\uBC18\uC9DD\uC774\uB2E4"
+    partOfSpeech: v
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_cozy
+    english: cozy
+    meaning: "\uC544\uB291\uD55C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_merry
+    english: merry
+    meaning: "\uC990\uAC70\uC6B4, \uBA85\uB791\uD55C"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+  - id: xmas_festive
+    english: festive
+    meaning: "\uCD95\uC81C \uBD84\uC704\uAE30\uC758"
+    partOfSpeech: adj
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 

@@ -82,6 +82,13 @@
      Active는 GameSession이 정함 (만들거나 불러오면 기본부터, `ChooseCourse`) — 테스트에서 바꾸면 TearDown에서 null로. 세이브 칸 course (빈 값 = 안 고름, 예전 세이브는 불러올 때 수능·내신).
      단어 = `Assets/Data/Words/Courses/{business|medical}_tier{1|2}.csv` (id 앞글자 biz_·med_, 기본 단어장과 같은 수 150·300 — WordCourseTests). Claude가 고르고 뜻을 씀 → 사용자 검수 (시판 단어장·학원 자료는 넣지 않음, GDD 11-2).
      만들기 = `WordRPG > Data > Build Word Courses` (Create Sample Data에도 포함). 'TOEIC·토익'은 화면에 쓰지 않음 (상표)
+   - **크리스마스 선물 퀴즈** (#274, 1.4 — GDD 9-13): 데이터 `GiftEvent`(eventId christmas — 세이브에 `{id}_{연도}`로 적히니 출시 뒤 바꾸지 말 것, GameDatabase `SeasonalEvents`, 만들기 `WordRPG > Data > Build Gift Events`) ·
+     규칙 `GiftEvents`(여는 날 = 현지 날짜 12/1~12/31, 세이브마다 해마다 한 번 — WorldState 이벤트, 받는 것 = BaseGift + 맞힌 수 × RewardPerCorrect = 선물 상자 `Boxes`) · `GiftQuiz`(겹치지 않게 3문제, 문제마다 한 번, 숙련도 기록 없음) ·
+     화면 `FieldScreen.Gifts`(그 시기에 들어오면 바로 — 처음 시작 흐름·걷기 안내 중엔 끝난 뒤 #275) + `GiftQuizView`(Figma '크리스마스 선물 (#274)'). **선물은 상자를 열 때까지 비밀** — 안내·문제 화면에 아이템 이름을 쓰지 말 것 (사용자). 받은 뒤 개발자의 편지 = GiftEvent `letter`(MailData — 메일함에도 들어감, 사용자가 쓴 글이니 고치지 말 것).
+     단어 = `Assets/Data/Words/Events/christmas.csv`(id xmas_ — 지역 단어장이 아님, 테스트는 `GiftEventTests.EventBooks()`로 뺌). 그림 = Art/Event/gift_box·tree (`Tools/make_christmas_art.py`). 테스터 메뉴 [선물 퀴즈]
+   - **메일함** (#275, 1.4 — GDD 9-14): 데이터 `MailData`(mailId — 세이브에 적히니 출시 뒤 바꾸지 말 것, `Assets/Data/Mails`, GameDatabase `Mails`·`FindMail` — 새 메일은 Refresh Game Database) ·
+     보내는 때 `MailDelivery` OnLaunch(켤 때, fromDate~toDate) / ByEvent(크리스마스 편지 = 선물 퀴즈를 마치면 `GiftEvents.Claim`) · 세이브 칸 `mailbox`(`Mailbox` — 받은 날·읽음·선물 받음·지움, 지운 메일은 다시 오지 않음) ·
+     규칙 `Mails`(DeliverDue·Visible 최근 것부터·NeedsAttention·Claim·Delete = 안 받은 선물은 넣고 지움) · 화면 오른쪽 메뉴 [메일함] + 빨간 점(튜토리얼과 따로) → `MailboxView`(Figma '메일함 (#275)'·'Mail Row'), 편지 종이는 `LetterPaper`(선물 퀴즈와 같이 씀) · `FieldScreen.Mail`
    - 새 단어장은 regionId·regionName·도감 보상 `rewards`(`DexReward` 한 줄 = 보상 id·이름·징표(종류 Keepsake)·골드·wordsNeeded(0 = 다 채웠을 때)·storyOrder(징표 진열장 순서) — #147. 보상 id는 세이브에 적히니 출시 뒤 바꾸지 말 것)를 지정해야 함 (RegionDataTests가 검사)
    - 수련용 허수아비는 MonsterSpecies `trainingDummy`(맞아도 HP 그대로, 기술 없음) — 게임에 하나, 출현표에 넣지 말 것 (TrainingTests)
    - 필드 맵은 FieldArea의 글자 맵 (GDD 7·9장). 상자 수 = 내용물 수, 출입구 수 = 연결 수(서로 왕복), B ↔ 보스 지정,

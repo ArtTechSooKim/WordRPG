@@ -177,7 +177,7 @@ namespace WordRPG.UI
                                    || (tabletView != null && tabletView.IsOpen)
                                    || (stoneView != null && stoneView.IsOpen) || heroSetupRunning
                                    || (introView != null && introView.IsOpen) || TesterMenuOpen
-                                   || (characterSelect != null && characterSelect.IsOpen);
+                                   || (characterSelect != null && characterSelect.IsOpen) || GiftOpen || MailboxOpen;
         public PauseTutorial PauseTutorial => pauseTutorial;
         public bool IsPreemptRangeVisible => preemptRange != null && preemptRange.gameObject.activeSelf;
         public CompanionCutscene CompanionCutscene => companionCutscene;
@@ -313,6 +313,7 @@ namespace WordRPG.UI
             if (!string.IsNullOrEmpty(statusMessage)) ShowToast(statusMessage, 3f);
             if (entitlements != null) entitlements.Changed += GiveFullVersionGift;
             GiveFullVersionGift(); // 이미 산 사람도 한 번 (#233)
+            DeliverMail(); // 업데이트 편지 같은 메일 (#275)
             if (NeedsPrologue) StartCoroutine(Prologue()); // (못 본 입장 영상) → 모습·이름 → (새 게임이면 프롤로그) → 걷기 안내
             else if (showTutorials && !session.Tutorials.Has(TutorialProgress.Field)) StartCoroutine(FieldGuide());
             return true;
@@ -368,6 +369,7 @@ namespace WordRPG.UI
             UpdateDarkness();
             tabletView.Tick(Time.unscaledDeltaTime);
             stoneView.Tick(Time.unscaledDeltaTime);
+            giftView?.Tick(Time.unscaledDeltaTime);
             UpdateRaft();
             Sound.SetAmbience(ThemeLooks.AmbienceNow(area.Theme, walker.Rafting, Sound.CurrentMusic == AreaMusic));
 
@@ -411,6 +413,7 @@ namespace WordRPG.UI
             }
 
             if (UpdateRaftCurrent(Time.deltaTime)) return; // 어귀에 서 있으면 곧 물살에 밀림 (#235)
+            if (UpdateGiftOffer(Time.unscaledDeltaTime)) return; // 12월 크리스마스 선물 퀴즈 (#274)
             interactCooldown -= Time.deltaTime;
             UpdateConfirmButton();
             UpdateGuide();
@@ -575,6 +578,16 @@ namespace WordRPG.UI
             if (stoneView.IsOpen)
             {
                 CloseStone();
+                return;
+            }
+            if (GiftOpen)
+            {
+                giftView.Back(); // 안내 = [나중에] · 받음 = [확인] · 문제 중엔 닫지 않음 (#274)
+                return;
+            }
+            if (MailboxOpen)
+            {
+                mailboxView.HandleBack(); // 확인 창 → 편지 → 메일함 (#275)
                 return;
             }
             if (quitDialog.IsOpen) quitDialog.Hide();

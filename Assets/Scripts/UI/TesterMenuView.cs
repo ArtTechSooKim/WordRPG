@@ -13,6 +13,7 @@ namespace WordRPG.UI
     // 테스터 메뉴 (#229): 설정 > 정보 칸의 [테스터 메뉴]로 연다. 테스트 빌드(TestFlight)·에디터에만 있는 개발용 화면 —
     // 플레이어는 볼 수 없으므로 Figma에 그리지 않고 설정 화면과 같은 판·버튼으로 만든다.
     // 주인공(레벨 ±5 · 골드 +10,000 · 재료 ×10 · 살금살금 상시 · 무료 상태로 #251) · 지역까지 건너뛰기(앞 지역 보스를 이긴 것으로 + 그 지역 시작 지점으로) · 단어 발견(+25 · 모두)
+    // · 크리스마스 선물 퀴즈(#274 — 날짜와 상관없이 다시 열기)
     public class TesterMenuView
     {
         public GameObject Root { get; private set; }
@@ -30,6 +31,7 @@ namespace WordRPG.UI
         private DateTime nowUtc;
         private Action onChanged;
         private Action<FieldArea> onTravel;
+        private Action onGift;
 
         private IEnumerable<FieldArea> Areas => database != null ? database.Areas : Enumerable.Empty<FieldArea>();
 
@@ -64,15 +66,20 @@ namespace WordRPG.UI
             view.message = UiKit.Label("Message", root, "", 30, Palette.Gold, 0.03f, 0.1f, 0.97f, 0.16f,
                 TextAnchor.MiddleCenter, FontStyle.Bold, true, 20);
 
-            var close = UiKit.MakeButton("TesterCloseButton", root, "닫기", Palette.Neutral, 44, 0.05f, 0.015f, 0.95f, 0.095f);
+            var gift = UiKit.MakeButton("TesterGiftButton", root, "선물 퀴즈", Palette.Neutral, 40, 0.05f, 0.015f, 0.485f, 0.095f);
+            gift.onClick.AddListener(view.Gift);
+            var close = UiKit.MakeButton("TesterCloseButton", root, "닫기", Palette.Neutral, 44, 0.515f, 0.015f, 0.95f, 0.095f);
             close.onClick.AddListener(view.Hide);
             view.Root.SetActive(false);
             return view;
         }
 
-        // changed: 값을 바꿀 때마다 (저장·HUD). travel: 지역 버튼을 누르면 (건너뛴 뒤 그 지역 시작 지점으로)
-        public void Show(GameSession gameSession, GameDatabase gameDatabase, DateTime now, Action changed, Action<FieldArea> travel, Entitlements entitlements = null)
+        // changed: 값을 바꿀 때마다 (저장·HUD). travel: 지역 버튼을 누르면 (건너뛴 뒤 그 지역 시작 지점으로).
+        // gift: [선물 퀴즈] — 올해 받은 기록을 지우고 크리스마스 선물 퀴즈를 연다 (#274)
+        public void Show(GameSession gameSession, GameDatabase gameDatabase, DateTime now, Action changed, Action<FieldArea> travel, Entitlements entitlements = null,
+            Action gift = null)
         {
+            onGift = gift;
             owned = entitlements;
             session = gameSession;
             database = gameDatabase;
@@ -202,6 +209,18 @@ namespace WordRPG.UI
             Hide();
             travel?.Invoke(target);
             Debug.Log($"[Tester] {target.DisplayName}까지 건너뛰기 — 보스 {bosses}마리를 이긴 것으로");
+        }
+
+        private void Gift()
+        {
+            if (onGift == null)
+            {
+                message.text = "이 화면에서는 선물 퀴즈를 열 수 없어요";
+                return;
+            }
+            var open = onGift;
+            Hide();
+            open();
         }
 
         private void Changed(string text)

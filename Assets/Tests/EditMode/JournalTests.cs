@@ -27,7 +27,8 @@ namespace WordRPG.Tests
         private static IEnumerable<WordDatabase> RealBooks() =>
             AssetDatabase.FindAssets("t:WordDatabase", new[] { "Assets/Data/Words" })
                 .Select(guid => AssetDatabase.LoadAssetAtPath<WordDatabase>(AssetDatabase.GUIDToAssetPath(guid)))
-                .Where(book => !WordCourseTests.CourseBooks().Contains(book)); // 비즈니스·의학 단어장(#273)엔 기록 문장이 없음
+                .Where(book => !WordCourseTests.CourseBooks().Contains(book) // 비즈니스·의학 단어장(#273)엔 기록 문장이 없음
+                               && !GiftEventTests.EventBooks().Contains(book)); // 선물 퀴즈 단어장(#274)도
 
         private static IEnumerable<FieldArea> RealAreas() =>
             AssetDatabase.FindAssets("t:FieldArea", new[] { "Assets/Data/Areas" })

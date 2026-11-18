@@ -72,6 +72,14 @@ namespace WordRPG.Game
             owned.SetTesterFree(true);
         }
 
+        // 선물 퀴즈 다시 (#274 — 12월이 아니어도 TestFlight에서 보려고): 첫 선물 퀴즈의 올해 받은 기록을 지움. 반환 = 그 선물 퀴즈 (없으면 null)
+        public static GiftEvent ResetGift(GameSession session, IEnumerable<GiftEvent> gifts, DateTime localNow)
+        {
+            var gift = gifts?.FirstOrDefault(GiftEvents.IsPlayable);
+            if (gift != null) session.World.TesterForgetEvent(gift.ClaimId(localNow));
+            return gift;
+        }
+
         // 성유물 강화 재료(ItemKind.Material) 종류마다 count개. 반환 = 재료 종류 수
         public static int GiveMaterials(GameSession session, IEnumerable<ItemData> items, int count = MaterialStep)
         {

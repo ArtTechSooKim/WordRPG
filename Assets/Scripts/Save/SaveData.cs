@@ -138,6 +138,8 @@ namespace WordRPG.Save
         // 처음에 고른 외울 단어장 id (#273, 1.4 — WordCourse.courseId). 예전 세이브엔 없음 → 빈 문자열:
         // 이미 하던 세이브는 불러올 때 수능·내신(WordCourses.DefaultId), 막 만든 세이브는 아직 안 고름
         [SerializeField] private string course = "";
+        // 메일함 (#275, 1.4): 받은 메일·읽음·선물 받음·지움 (mailId). 예전 세이브엔 없음 → 빈 메일함
+        [SerializeField] private Mailbox mailbox = new Mailbox();
 
         public int Version => version;
         public DateTime SavedAtUtc => new DateTime(savedAtTicks, DateTimeKind.Utc);
@@ -160,8 +162,15 @@ namespace WordRPG.Save
         public int NewWordsLeft => newWordsLeft;
         public int QuietStepsLeft => quietStepsLeft;
         public string Course => course ?? "";
+        public Mailbox Mailbox => mailbox ?? new Mailbox();
 
         public SaveData() { }
+
+        public SaveData WithMailbox(Mailbox box)
+        {
+            mailbox = box ?? new Mailbox();
+            return this;
+        }
 
         public SaveData WithCourse(string courseId)
         {

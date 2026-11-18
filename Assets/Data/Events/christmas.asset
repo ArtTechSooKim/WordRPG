@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d93b3d717f586cd4da7d98e66d5f5770, type: 3}
+  m_Name: christmas
+  m_EditorClassIdentifier: WordRPG::WordRPG.Game.GiftEvent
+  eventId: christmas
+  displayName: "\uD06C\uB9AC\uC2A4\uB9C8\uC2A4 \uC120\uBB3C"
+  title: "\uBA54\uB9AC \uD06C\uB9AC\uC2A4\uB9C8\uC2A4!"
+  quizName: "\uD06C\uB9AC\uC2A4\uB9C8\uC2A4 \uC120\uBB3C \uD034\uC988"
+  wordsName: "\uD06C\uB9AC\uC2A4\uB9C8\uC2A4 \uC601\uB2E8\uC5B4"
+  startMonth: 12
+  startDay: 1
+  endMonth: 12
+  endDay: 31
+  questions: 3
+  words: {fileID: 11400000, guid: fdf725f39fba2234fae90de8a88abef2, type: 2}
+  baseGift:
+  - item: {fileID: 11400000, guid: 5d1c837450b64c04db0b503c5b52edfe, type: 2}
+    count: 1
+  - item: {fileID: 11400000, guid: eecbdb7ebef15bf4384890a80ebcc94b, type: 2}
+    count: 1
+  rewardPerCorrect:
+  - item: {fileID: 11400000, guid: 5d1c837450b64c04db0b503c5b52edfe, type: 2}
+    count: 1
+  - item: {fileID: 11400000, guid: eecbdb7ebef15bf4384890a80ebcc94b, type: 2}
+    count: 1
+  letter: {fileID: 11400000, guid: 4e522d56cd6c13e4bb739f99fb9e0e99, type: 2}

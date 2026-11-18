@@ -19,6 +19,8 @@ namespace WordRPG.Game
         [SerializeField] private List<RelicData> relics = new List<RelicData>();
         [SerializeField] private List<CompanionData> companions = new List<CompanionData>(); // #77 동료
         [SerializeField] private List<WordCourse> courses = new List<WordCourse>(); // #273 처음에 고르는 단어장 (order 순)
+        [SerializeField] private List<GiftEvent> giftEvents = new List<GiftEvent>(); // #274 철마다 여는 선물 퀴즈 (크리스마스)
+        [SerializeField] private List<MailData> mails = new List<MailData>(); // #275 메일함에 오는 메일 (세이브의 mailId → 에셋)
         [Tooltip("정식판 특전 (#233): 정식판을 사면 세이브마다 한 번 받는 아이템 (FullVersionGift)")]
         [SerializeField] private List<ItemGift> fullVersionGift = new List<ItemGift>();
 
@@ -31,6 +33,16 @@ namespace WordRPG.Game
         public IReadOnlyList<CompanionData> Companions => companions ?? (IReadOnlyList<CompanionData>)new List<CompanionData>();
 
         public IReadOnlyList<WordCourse> Courses => courses ?? (IReadOnlyList<WordCourse>)new List<WordCourse>();
+        public IReadOnlyList<GiftEvent> SeasonalEvents => giftEvents ?? (IReadOnlyList<GiftEvent>)new List<GiftEvent>();
+        public IReadOnlyList<MailData> Mails => mails ?? (IReadOnlyList<MailData>)new List<MailData>();
+
+        public MailData FindMail(string mailId)
+        {
+            if (string.IsNullOrEmpty(mailId) || mails == null) return null;
+            foreach (var mail in mails)
+                if (mail != null && mail.MailId == mailId) return mail;
+            return null;
+        }
 
         // 세이브의 단어장 id로 찾기. 없거나 모르는 id면 null (= 기본 단어장)
         public WordCourse FindCourse(string courseId)
@@ -104,9 +116,11 @@ namespace WordRPG.Game
         // 에디터 수집기 전용
         public void ReplaceContents(IEnumerable<MonsterSpecies> newMonsters, IEnumerable<ItemData> newItems,
             IEnumerable<FieldArea> newAreas = null, IEnumerable<RelicData> newRelics = null, IEnumerable<CompanionData> newCompanions = null,
-            IEnumerable<WordCourse> newCourses = null)
+            IEnumerable<WordCourse> newCourses = null, IEnumerable<GiftEvent> newGiftEvents = null, IEnumerable<MailData> newMails = null)
         {
+            mails = newMails != null ? new List<MailData>(newMails) : new List<MailData>();
             courses = newCourses != null ? new List<WordCourse>(newCourses) : new List<WordCourse>();
+            giftEvents = newGiftEvents != null ? new List<GiftEvent>(newGiftEvents) : new List<GiftEvent>();
             monsters = new List<MonsterSpecies>(newMonsters);
             items = new List<ItemData>(newItems);
             areas = newAreas != null ? new List<FieldArea>(newAreas) : new List<FieldArea>();

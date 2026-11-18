@@ -53,6 +53,7 @@ namespace WordRPG.Game
         public TutorialProgress Tutorials { get; private set; } = new TutorialProgress(); // 이미 본 안내 (#36)
         public UpdateNotices Notices { get; private set; } = new UpdateNotices();       // 이미 본 업데이트 안내 (#115)
         public PotionEffects Effects { get; private set; } = new PotionEffects();       // 효과 물약이 남긴 효과 (#146)
+        public Mailbox Mailbox { get; private set; } = new Mailbox();                    // 메일함 (#275)
         public IReadOnlyList<string> LoadWarnings => loadWarnings;
 
         // 처음에 고른 외울 단어장 (#273, GDD 9-12). 빈 id = 아직 안 고름(새 게임) → 필드에서 한 번 고르는 화면. 고른 뒤엔 바꾸지 않음
@@ -256,7 +257,7 @@ namespace WordRPG.Game
             return new SaveData(nowUtc, new HeroSaveData(Hero.Level, Hero.Exp, Hero.CurrentHp), relics,
                     Inventory, Vocabulary, Record, World).WithSkillSlots(skills, Hero.BasicSeatSlot?.Key).WithTutorials(Tutorials.Seen)
                 .WithNotices(Notices.Seen).WithCompanions(savedCompanions, PartyCompanion?.Data.CompanionId).WithHeroLook(Hero.CustomName, Hero.LookId)
-                .WithPotionEffects(Effects.NewWordsLeft, Effects.QuietStepsLeft).WithCourse(CourseId);
+                .WithPotionEffects(Effects.NewWordsLeft, Effects.QuietStepsLeft).WithCourse(CourseId).WithMailbox(Mailbox);
         }
 
         // 세이브에 있는 성유물을 찾을 수 없으면(삭제·id 변경) 빼고 경고를 남긴다. 성유물이 하나도 없으면 시작 성유물로 채운다.
@@ -316,6 +317,7 @@ namespace WordRPG.Game
             session.Tutorials = new TutorialProgress(data.Tutorials);
             session.Notices = new UpdateNotices(data.Notices);
             session.Effects = new PotionEffects(data.NewWordsLeft, data.QuietStepsLeft);
+            session.Mailbox = data.Mailbox;
             RestoreCourse(session, data, database, warnings);
             RestoreCompanions(session, data, database, warnings);
             session.loadWarnings.AddRange(warnings);
