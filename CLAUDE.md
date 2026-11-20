@@ -321,6 +321,8 @@ gh release create ios-build-0.1-1 Builds/WordRPG-iOS-0.1-build1.zip --prerelease
 - 상위 폴더 `F:\GameProject`는 별개 저장소(Spiritual-Warfare)이므로 거기서 git 명령 실행 주의
 - **파생 게임 변리사RPG** (#277, 2026-11-19 사용자): `F:\GameProject\PatentAttorneyRPG` = 비공개 저장소 `ArtTechSooKim/PatentAttorneyRPG` (이 저장소 main fefb375을 복사, 기록은 따로).
   변리사RPG 작업은 그 폴더에서 — 이 저장소에 섞지 말 것 (노트·문제는 비공개). 여기서 엔진 버그를 고치면 변리사RPG에도 필요한지 보고
+- **파생 게임 Korean Word RPG** (#278, 2026-11-20 사용자): 외국인용 한국어 단어 RPG — `F:\GameProject\KoreanWordRPG` = 공개 저장소 `ArtTechSooKim/KoreanWordRPG`
+  (이 저장소 main 4b02ee8을 복사, 기록은 따로, 처음부터 유료 1,000원·화면 영어). 작업은 그 폴더에서. 엔진 버그를 고치면 두 파생 게임에도 필요한지 보고
 - **저장소가 공개**: 애플 키(.p8)·인증서는 .gitignore로 막혀 있음. 키 번호·발급자 ID 같은 값도 저장소 문서에 적지 말 것 (GitHub 비밀값으로만)
 - **라이선스 = 독점(All Rights Reserved)** (#150 사용자, 그 전 커밋은 MIT). 공개 저장소지만 사용 허락 아님. 외부 자료를 새로 넣으면 `LICENSE`의 외부 자료 목록에 더할 것
 - **구글플레이 올림 열쇠** = `F:\WordRPG_builds\keys` (열쇠 파일 + 비밀번호가 든 설정 파일). 저장소 밖 — `F:\GameProject`도 별개 저장소라 그 안에 두지 말 것. 비밀번호를 화면·문서·로그에 내지 말 것
