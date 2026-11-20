@@ -29,6 +29,8 @@ namespace WordRPG.Game
         [SerializeField] private List<string> litStones = new List<string>();
         // 1.3 (#223, 예전 세이브엔 없음 → 빈 목록): 한 번만 일어난 일 — 어르신이 샘으로 뛰어듦 (id = "spring_leap:npcId")
         [SerializeField] private List<string> events = new List<string>();
+        // 1.4 숲 (#279, 예전 세이브엔 없음 → 빈 목록): 바로잡은 이정표 (id = "지역:x,y")
+        [SerializeField] private List<string> fixedSignposts = new List<string>();
 
         public string AreaId => hasPosition ? areaId : null;
         public IReadOnlyList<string> OpenedChests => openedChests;
@@ -121,6 +123,14 @@ namespace WordRPG.Game
         {
             if (litStones == null) litStones = new List<string>();
             if (!litStones.Contains(stoneId)) litStones.Add(stoneId);
+        }
+
+        public bool IsSignpostFixed(string signpostId) => fixedSignposts != null && fixedSignposts.Contains(signpostId);
+
+        public void MarkSignpostFixed(string signpostId)
+        {
+            if (fixedSignposts == null) fixedSignposts = new List<string>();
+            if (!fixedSignposts.Contains(signpostId)) fixedSignposts.Add(signpostId);
         }
 
         public bool HasEvent(string eventId) => events != null && events.Contains(eventId);

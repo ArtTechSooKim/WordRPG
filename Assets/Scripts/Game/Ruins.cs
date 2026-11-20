@@ -76,7 +76,7 @@ namespace WordRPG.Game
     public static class CellState
     {
         // 끝난 모습으로 그릴 칸: 연 상자 · 쓰러뜨린 보스 자리 · 사전이 놓인 받침대 · 연 보스 방 문 · 가져간 열쇠 ·
-        // 당긴 레버 · 놓인 덩굴 다리 · 푼 석판 · 동료가 깨어난 제단 · 밝힌 글자 반딧돌 (#112)
+        // 당긴 레버 · 놓인 덩굴 다리 · 푼 석판 · 동료가 깨어난 제단 · 밝힌 글자 반딧돌 (#112) · 바로잡은 이정표 · 걷힌 헷갈 안개 (#279)
         public static bool IsDone(FieldArea area, GameSession session, Vector2Int cell)
         {
             var world = session.World;
@@ -92,11 +92,13 @@ namespace WordRPG.Game
                 case FieldTile.Tablet: return Ruins.IsTabletSolved(area, world, cell);
                 case FieldTile.Shrine: return Ruins.IsAwakened(area, session);
                 case FieldTile.GlowStone: return GlowStones.IsLit(area, world, cell);
+                case FieldTile.Signpost: return Signposts.IsFixed(area, world, cell);
+                case FieldTile.Haze: return Signposts.IsHazeCleared(area, world, cell);
                 default: return false;
             }
         }
 
-        // 원래 막힌 칸이지만 이제 지나갈 수 있는 칸: 연 보스 방 문(#76) · 놓인 덩굴 다리(#80)
+        // 원래 막힌 칸이지만 이제 지나갈 수 있는 칸: 연 보스 방 문(#76) · 놓인 덩굴 다리(#80) · 걷힌 헷갈 안개(#279)
         // — 어느 칸이 그런지는 FieldTiles 표의 OpensWhenDone (#116)
         public static bool IsPassable(FieldArea area, GameSession session, Vector2Int cell) =>
             FieldTiles.Of(area.Map.Get(cell)).OpensWhenDone && IsDone(area, session, cell);

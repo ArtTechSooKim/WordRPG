@@ -225,15 +225,29 @@ namespace WordRPG.EditorTools
                 boss.FindPropertyRelative("rewardItem").objectReferenceValue = cramDoc;
             });
             // --- 두 번째 지역: 숲 (2단계 단어). 초원 마을 동쪽 출입구 — 서고 보스를 물리치면 열린다 ---
+            // 상자는 맵의 위→아래, 왼→오른 순 — 미로 상자(#279)가 사이사이에 끼어 있음 (예전 상자는 위치로 그대로 — UpgradeForestMaze)
+            var forestMaze = new[]
+            {
+                new ChestContent(greatPotion, 2),       // 미로: 이끼 언덕 끝 — 특제 상처약 2
+                new ChestContent(sparkleDust, 3),       // 미로: 고사리 능선 끝
+                new ChestContent(hardCover, 3),         // 미로: 늪가 덤불
+                new ChestContent(shinyInk, 3, 100),     // 미로: 안개 골짜기 동쪽
+                new ChestContent(null, 0, 200),         // 미로: 열쇠 공터
+            };
             Area("forest", "숲", ForestMap, forestEncounters,
                 AssetDatabase.LoadAssetAtPath<WordDatabase>(AdvancedWords),
+                forestMaze[0],
+                forestMaze[1],
                 new ChestContent(null, 0, 60, whip),     // 부엉이 골짜기 북서 끝 — 덩굴 채찍
                 new ChestContent(hardCover, 3),          // 골짜기 위 풀숲
                 new ChestContent(shinyInk, 3),           // 개울 건너 징검다리
+                forestMaze[2],
+                forestMaze[3],
                 new ChestContent(sparkleDust, 3),        // 늪 한가운데
                 new ChestContent(null, 0, 60, hourglass),// 버섯 공터 — 시간의 모래시계
                 new ChestContent(survivalJournal, 1),    // 야영지 아래 틈 — 누군가의 생존일지 (#200)
-                new ChestContent(null, 0, 150));         // 버섯 공터 아래 구석
+                new ChestContent(null, 0, 150),          // 버섯 공터 아래 구석
+                forestMaze[4]);
             var forestShop = ShopAsset("forest_shop", "숲속 쉼터 가게", forestPotions);
             AssignShopIfEmpty("Assets/Data/Areas/forest.asset", forestShop);
             SetFullVersionArea("Assets/Data/Areas/forest.asset"); // 숲부터는 정식판 (#40)
@@ -467,6 +481,7 @@ namespace WordRPG.EditorTools
             UpgradeMapIf(cavePath, CaveMap, "nS");
             InsertChestIf(libraryPath, 5, 1, diaryJournal); // 상자는 맵의 위→아래 순서라 그 자리에 끼움. 있던 상자 내용물은 그대로
             InsertChestIf(forestPath, 6, 5, survivalJournal);
+            UpgradeForestMaze(forestPath, ForestMap, forestMaze); // 1.4 숲 넓히기 (#279) — 예전 36칸 에셋을 72칸으로
             BuildNpcs(meadowPath, libraryPath, forestPath, junglePath, cavePath);
             // 샘 이동 창의 지역 순서 (#216)
             SetStoryOrder(meadowPath, 1);
@@ -694,53 +709,56 @@ namespace WordRPG.EditorTools
                 "#################D################\n";
 
         // . 흙길  : 이끼 땅(조우 없음)  , 고사리(조우)  # 짙은 덤불  ~ 늪  F 회복의 샘  C 보물상자  E 성유물 제단  S 상점  B 보스  D 출입구(초원으로)
-        // 36×44. 왼쪽 아래 출입구 옆 야영지(샘·상점·제단) → 굽이진 숲길(고사리 덤불) → 늪 · 부엉이 골짜기 · 버섯 공터 · 개울
-        // → 오른쪽 위 공터의 보스 헷갈너구리
+        // X 이정표  M 헷갈 안개(이정표를 바로잡으면 걷힘)  W 맴도는 안개(가짜 길) — #279
+        // 72×44 (#279, 1.4 — 예전 36×44를 오른쪽으로만 넓힘: 맵 좌표가 아래·왼쪽 기준이라 있던 칸의 (x, y)·상자 id가 그대로).
+        // 왼쪽 = 예전 숲: 왼쪽 아래 출입구 옆 야영지(샘·상점·제단) → 굽이진 숲길(고사리 덤불) → 늪 · 부엉이 골짜기 · 버섯 공터 · 개울
+        // → 오른쪽 위 공터의 보스 헷갈너구리. 오른쪽 = 뒤섞인 이정표 미로: 버섯 공터 오른쪽 입구 → 입구 고사리밭 ① → 늪가 덤불 ② →
+        // 이끼 언덕 ③ → 고사리 능선 ④ → 안개 골짜기 → 열쇠 공터(⑤ = 버섯 공터로 나가는 지름길). 원본 = python Tools/forest_map.py
         public const string ForestMap =
-                "#############################D######\n" +
-                "###########################:::::####\n" +
-                "########################:::::B:::::#\n" +
-                "##C,,,,#################::.......::#\n" +
-                "##,,,,,#################::.......::#\n" +
-                "##,,,,,##,,,,,C###:::::#::.......::#\n" +
-                "##,,,,,##,,,,,,###:::::##:.......:##\n" +
-                "##,,,,,##,,,,,,####:::#####:::::####\n" +
-                "##,,,,,###,#:::::##:::::###GGG###~~#\n" +
-                "##,,,,,,,,,:::::::##:::::.....###~~#\n" +
-                "##,,#,,,#,,:::::::######,,,######~~#\n" +
-                "###,,,,,,,,:::::::######,,,####,,,~#\n" +
-                "##,,,,####,,:::::#######,,,###,,,,C#\n" +
-                "##,,,#####,,,::#########,,,##,,,,~~#\n" +
-                "##,,,#####,,,:K#########,,,##,,##~~#\n" +
-                "##,,,#####,,,############......##~~#\n" +
-                "#,,##,,##,,,,#:::::~~~###:::#,,,#~~#\n" +
-                "##,,,,,,,,,,,::::::~~~##:::::,,,#~~#\n" +
-                "##,,#,,,,,,,,:~~~::~~~##::::::,,#~~#\n" +
-                "##,,,,,,,,,::~~~~~:::::#:::::,,,#~~#\n" +
-                "##,,,,#,,,,#::~~~~:#:::##:::#,,,#~~#\n" +
-                "###..#######:::::C:::::######,,,#~~#\n" +
-                "###..##:::::#::#::~~~::####....##~~#\n" +
-                "###..::::::::::::~~~~~####,,,####~~#\n" +
-                "####:::::::::##:::~~~#####,,,####~~#\n" +
-                "###..#:::::::###::########,,,####~~#\n" +
-                "###..##:::::####::########,,,####~~#\n" +
-                "###..###########:::::###..,,,#######\n" +
-                "####.....########::::::.....########\n" +
-                "#####....############,,,############\n" +
-                "#######..############,,,############\n" +
-                "#######..############,,,######,,,C##\n" +
-                "#######..##########..,,,#####,,,,,##\n" +
-                "######:...:######......#####,,,,,,,#\n" +
-                "######:...SSS###,,,#########,,,,,,,#\n" +
-                "####E:::F:SSS###,,,#########,,,,,,,#\n" +
-                "###::.......::..,,,##########,,,,,##\n" +
-                "#..::......N......############,,,,##\n" +
-                "D..::P......::##..#,,,,#,,#,,#,,,,##\n" +
-                "####::::L::::###...,,,,,,,,,,,,,,###\n" +
-                "######:::n:######..............,,,##\n" +
-                "########C##########,,,,,,,,,,,,,,,##\n" +
-                "###################,,#,,,,#,,,,,,C##\n" +
-                "####################################\n";
+                "#############################D##########################################\n" +
+                "###########################:::::#####C###############################C##\n" +
+                "########################:::::B:::::##::::#::,##,,###,,,,,,#,,,#:::::::##\n" +
+                "##C,,,,#################::.......::##:::::::,,,,,###,,,,,,,,,,,:::::::##\n" +
+                "##,,,,,#################::.......::##:::::::,,,,,X##,,,,,,,,,,,:::::::##\n" +
+                "##,,,,,##,,,,,C###:::::#::.......::###:::::::::::MM.:::::::,##,,,,,,,###\n" +
+                "##,,,,,##,,,,,,###:::::##:.......:###,,,,,:::::::MM.:::::::,##,,,##,,###\n" +
+                "##,,,,,##,,,,,,####:::#####:::::#####,,,,##::::::###,,,,,,,,,,,,,##,,,##\n" +
+                "##,,,,,###,#:::::##:::::###GGG###~~##,,,,##::::::WW#,,,,,,,,,,,,,,,,,,##\n" +
+                "##,,,,,,,,,:::::::##:::::.....###~~##,,,,,:::::::WW#,,,,,,,,,,,,,,,,,,##\n" +
+                "##,,#,,,#,,:::::::######,,,######~~##,,,,,:::::::#######WW##XMM###WW####\n" +
+                "###,,,,,,,,:::::::######,,,####,,,~##########..#########WW###MM###WW####\n" +
+                "##,,,,####,,:::::#######,,,###,,,,C######WW##..#########WW###..#########\n" +
+                "##,,,#####,,,::#########,,,##,,,,~~######WW##MM##############..#########\n" +
+                "##,,,#####,,,::#########,,,##,,##~~##C###WW#XMM###,,#,,,,,,,,,,,,#,,,,##\n" +
+                "##,,,#####,,,############......##~~##,,,,,,,,,,###,,,,,,,,,,,,,,,,,,,,##\n" +
+                "#,,##,,##,,,,#:::::~~~###:::#,,,#~~##,,,,,,,,,,###,,::::::##::::::::,,##\n" +
+                "##,,,,,,,,,,,::::::~~~##:::::,,,#~~##,,::::::,,###,,::##::##:::##:::,,##\n" +
+                "##,,#,,,,,,,,:~~~::~~~##::::::,,#~~##,,:::~~:,,####,::##:::::::##:::,,##\n" +
+                "##,,,,,,,,,::~~~~~:::::#:::::,,,#~~##,,:::~~:,,###,,::::::::::::::::,,##\n" +
+                "##,,,,#,,,,#::~~~~:#:::##:::#,,,#~~###,::::::,,###,,::::::::~:::::::,,C#\n" +
+                "###..#######:::::C:::::######,,,#~~##,,,,,,,,,,####,:::::~~~~~~~::::,,##\n" +
+                "###..##:::::#::#::~~~::####....##~~##,,,,,,,,,,###,,::::~~~~~~~~~:::,,##\n" +
+                "###..::::::::::::~~~~~####,,,####~~######..#######,,:::~~~~~~~~~~~::,,##\n" +
+                "####:::::::::##:::~~~#####,,,####~~######..#######,,:::~~~~~~~~~~~::,,##\n" +
+                "###..#:::::::###::########,,,####~~######..#######,,:::~~~~~~~~~~~::,,##\n" +
+                "###..##:::::####::########,,,####~~##WW##..########,:::~~~~~~~~~~~::,,##\n" +
+                "###..###########:::::###..,,,########WW##MM#######,,:::~~~~~~~~~~~,,,,##\n" +
+                "####.....########::::::.....#########WW#XMM#######,,::::~~~~~~~~~:,,,###\n" +
+                "#####....############,,,#############,,,,,,,,######,:::::~~~~~~~::,,,,##\n" +
+                "#######..############,,,#############,,,,,,,,#####,,::::::::~:::::,,,,##\n" +
+                "#######..############,,,######,,,C###,::##,,,,####,,::::::::::::::,,,,##\n" +
+                "#######..##########..,,,#####,,,,,####::##,,,,####,,:::##:::::::::,,,,##\n" +
+                "######:...:######......#####,,,,,,,::,:::,,,,,####,,:::##:::::::::,,,,##\n" +
+                "######:...SSS###,,,#########,,,,,,,::,,,,,,::,####,,::::::::::::::::,,##\n" +
+                "####E:::F:SSS###,,,#########,,,,,,,##,,,,,,::,####,,,,,,,,,,,,,,,,,,,,##\n" +
+                "###::.......::..,,,##########,,,,,################,,,,,,#,,#,,,,,#,,,,##\n" +
+                "#..::......N......############,,,,#######K########..####################\n" +
+                "D..::P......::##..#,,,,#,,#,,#,,,,##::#:::::::####..####################\n" +
+                "####::::L::::###...,,,,,,,,,,,,,,###::::::::::......####################\n" +
+                "######:::n:######..............,,,MM::::::::::......####################\n" +
+                "########C##########,,,,,,,,,,,,,,,MM::::::::::##########################\n" +
+                "###################,,#,,,,#,,,,,,C##X::::::::C##########################\n" +
+                "########################################################################\n";
 
         // 1.1 메아리 정글 (#80, GDD 9-6) 72×88 — 원본은 python Tools/jungle_map.py (Builds/maps/JungleMap.txt를 여기로 옮김).
         // . 진흙길  : 이끼 땅  , 짙은 풀숲(보이는 몬스터 서식지)  # 정글 나무  ~ 깊은 강·골짜기  > < ^ v 얕은 강(물살)  J 나루터(뗏목)
@@ -1314,6 +1332,72 @@ namespace WordRPG.EditorTools
             var so = new SerializedObject(book);
             Prop(so, "journal").objectReferenceValue = journal;
             so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // 1.4 숲 넓히기 (#279): 예전 숲 에셋(더 좁은 맵) → 넓힌 맵. 예전 칸은 '벽이 열림'(미로 입구·지름길 안개)과 '열쇠 → 이끼'(열쇠를 미로 끝으로)만
+        // 다를 때 바꾼다. 상자 내용물은 위치로 옮겨 담음 — 예전 자리 = 그 자리의 예전 내용물(상자 id도 위치라 연 기록과 맞음), 새 자리 = mazeChests 차례로
+        private static void UpgradeForestMaze(string areaPath, string map, ChestContent[] mazeChests)
+        {
+            var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);
+            if (area == null) return;
+            var so = new SerializedObject(area);
+            var mapProp = Prop(so, "map");
+            var oldMap = FieldMap.Parse(mapProp.stringValue);
+            var newMap = FieldMap.Parse(map);
+            if (oldMap.Width >= newMap.Width || oldMap.Height != newMap.Height) return;
+            for (int y = 0; y < oldMap.Height; y++)
+            for (int x = 0; x < oldMap.Width; x++)
+            {
+                var cell = new Vector2Int(x, y);
+                FieldTile before = oldMap.Get(cell), after = newMap.Get(cell);
+                bool same = before == after && (before != FieldTile.Door || oldMap.IsCaveMouth(cell) == newMap.IsCaveMouth(cell));
+                bool opened = before == FieldTile.Wall;
+                bool keyMoved = before == FieldTile.Key && after == FieldTile.Lawn;
+                if (same || opened || keyMoved) continue;
+                Debug.LogWarning($"[WordRPG] 숲 넓히기: 예전 칸 {cell}이(가) {before} → {after}로 바뀌어 에셋을 그대로 둠 (맵을 손으로 고쳤는지 확인)");
+                return;
+            }
+            var chests = Prop(so, "chests");
+            if (chests.arraySize != oldMap.Chests.Count) return;
+            var old = new Dictionary<Vector2Int, (UnityEngine.Object item, int count, int gold, UnityEngine.Object relic)>();
+            for (int i = 0; i < oldMap.Chests.Count; i++)
+            {
+                var c = chests.GetArrayElementAtIndex(i);
+                old[oldMap.Chests[i]] = (c.FindPropertyRelative("item").objectReferenceValue, c.FindPropertyRelative("count").intValue,
+                    c.FindPropertyRelative("gold").intValue, c.FindPropertyRelative("relic").objectReferenceValue);
+            }
+            int added = 0;
+            foreach (var cell in newMap.Chests)
+                if (!old.ContainsKey(cell)) added++;
+            if (added != mazeChests.Length)
+            {
+                Debug.LogWarning($"[WordRPG] 숲 넓히기: 새 상자 {added}개 ≠ 미로 상자 {mazeChests.Length}개");
+                return;
+            }
+            chests.arraySize = newMap.Chests.Count;
+            int next = 0;
+            for (int i = 0; i < newMap.Chests.Count; i++)
+            {
+                var c = chests.GetArrayElementAtIndex(i);
+                if (old.TryGetValue(newMap.Chests[i], out var o))
+                {
+                    c.FindPropertyRelative("item").objectReferenceValue = o.item;
+                    c.FindPropertyRelative("count").intValue = o.count;
+                    c.FindPropertyRelative("gold").intValue = o.gold;
+                    c.FindPropertyRelative("relic").objectReferenceValue = o.relic;
+                }
+                else
+                {
+                    var m = mazeChests[next++];
+                    c.FindPropertyRelative("item").objectReferenceValue = m.Item;
+                    c.FindPropertyRelative("count").intValue = m.Count;
+                    c.FindPropertyRelative("gold").intValue = m.Gold;
+                    c.FindPropertyRelative("relic").objectReferenceValue = m.Relic;
+                }
+            }
+            mapProp.stringValue = map;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            Debug.Log($"[WordRPG] 숲 넓히기 (#279): {oldMap.Width}×{oldMap.Height} → {newMap.Width}×{newMap.Height}, 상자 {oldMap.Chests.Count} → {newMap.Chests.Count}");
         }
 
         private static void UpgradeMapIf(string areaPath, string map, string added)

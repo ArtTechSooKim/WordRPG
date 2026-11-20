@@ -33,7 +33,11 @@ namespace WordRPG.Field
         // (동굴 입구 'O'는 1.2부터 출입구 Door — 그림만 큰 동굴 입구, FieldMap.IsCaveMouth #115)
         Decor,    // 꾸밈 'Q' (#86, 막힘): 둘레를 보고 상자·통나무·그루터기·바위·이끼 기둥·석상 중 하나 (FieldDecor.Variant)
         // ---- 1.2 어두운 밀림 동굴 (#112, GDD 9-7)
-        GlowStone // 글자 반딧돌 'I' (막힘): [확인] → 단어 한 문제로 밝히면 둘레가 영영 밝아짐 (GlowStones, 빛 = CaveLight)
+        GlowStone, // 글자 반딧돌 'I' (막힘): [확인] → 단어 한 문제로 밝히면 둘레가 영영 밝아짐 (GlowStones, 빛 = CaveLight)
+        // ---- 1.4 숲 넓히기 — 뒤섞인 이정표 미로 (#279, GDD 9-15)
+        Signpost, // 이정표 'X' (막힘): [확인] → 뒤섞인 글자의 바른 철자 고르기 → 바로잡으면 가장 가까운 헷갈 안개가 걷힘 (Signposts)
+        Haze,     // 헷갈 안개 'M': 맡은 이정표를 바로잡기 전엔 막힘(부딪히면 맴돌다 제자리), 바로잡으면 걸을 수 있음 — 덩굴 다리 'H'와 같은 방식
+        LoopHaze  // 맴도는 안개 'W': 늘 막힘 — 가짜 길 (부딪히면 맴돌다 제자리)
     }
 
     // 지역 분위기에 따라 같은 칸도 다르게 그린다 (초원: 나무·풀숲·물 / 서고: 책장·흩어진 책장·잉크 웅덩이 / 숲: 짙은 덤불·고사리·늪)
@@ -84,6 +88,7 @@ namespace WordRPG.Field
     //   정글 (#80): '>' '<' '^' 'v' 얕은 강(물살 방향)   'J' 나루터   'Y' 레버   'H' 덩굴 다리   'U' 유적 돌벽   ';' 유적 바닥
     //               'T' 단어 석판   'A' 유적 제단   'O' 동굴 입구(1.2부터 출입구 — 'D'와 같고 그림만 큰 동굴, #115)   'Q' 꾸밈(#86, 막힘)
     //   동굴 (#112): 'I' 글자 반딧돌 (정글의 'Y' 레버 · 'H' 덩굴 다리 · 'Q' 꾸밈도 씀)
+    //   숲 (#279): 'X' 이정표   'M' 헷갈 안개(이정표를 바로잡으면 걷힘)   'W' 맴도는 안개(가짜 길, 늘 막힘)
     // 좌표: x는 오른쪽, y는 위쪽 (맨 아래 줄이 y=0) — Unity 월드 좌표와 같은 방향
     // 이어진 S 칸 한 덩어리 = 가판대 하나 (#210)
     public readonly struct ShopBlock
@@ -110,6 +115,7 @@ namespace WordRPG.Field
         private readonly List<Vector2Int> npcSpots;                 // 인물이 서는 자리 N·n: 위→아래, 왼→오른 순 (FieldArea npcs 배정 순서, #209)
         private HashSet<Vector2Int> raftWater;   // 나루터에서 뗏목으로 갈 수 있는 깊은 물 (처음 물을 때 계산)
         private List<List<Vector2Int>> bridges;   // 이어진 덩굴 다리 칸 덩어리들
+        private List<List<Vector2Int>> hazes;     // 이어진 헷갈 안개 칸 덩어리들 (#279)
 
         public int Width { get; }
         public int Height { get; }
@@ -415,6 +421,63 @@ namespace WordRPG.Field
         }
 
         private static readonly Vector2Int[] Steps = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+
+        // 이정표가 걷어 내는 헷갈 안개 (#279): 이정표에서 가장 가까운 안개 덩어리 (레버 → 덩굴 다리와 같은 방식, 맵에 안개가 없으면 빈 목록).
+        // 거리가 같으면 먼저 찾은 덩어리 — 맵 데이터 검사(ForestMazeTests)가 이정표마다 덩어리 하나씩인지 본다
+        public IReadOnlyList<Vector2Int> HazeOf(Vector2Int signpost)
+        {
+            List<Vector2Int> best = null;
+            int bestDistance = int.MaxValue;
+            foreach (var group in Hazes())
+            foreach (var cell in group)
+            {
+                int d = Mathf.Abs(cell.x - signpost.x) + Mathf.Abs(cell.y - signpost.y);
+                if (d < bestDistance)
+                {
+                    bestDistance = d;
+                    best = group;
+                }
+            }
+            return best ?? (IReadOnlyList<Vector2Int>)Array.Empty<Vector2Int>();
+        }
+
+        // 그 안개 칸을 걷어 내는 이정표 (안개가 아니거나 맡은 이정표가 없으면 null)
+        public Vector2Int? SignpostOf(Vector2Int haze)
+        {
+            if (Get(haze) != FieldTile.Haze) return null;
+            foreach (var signpost in FindAll(FieldTile.Signpost))
+            {
+                foreach (var cell in HazeOf(signpost))
+                    if (cell == haze) return signpost;
+            }
+            return null;
+        }
+
+        private List<List<Vector2Int>> Hazes()
+        {
+            if (hazes != null) return hazes;
+            hazes = new List<List<Vector2Int>>();
+            var seen = new HashSet<Vector2Int>();
+            foreach (var start in FindAll(FieldTile.Haze))
+            {
+                if (!seen.Add(start)) continue;
+                var group = new List<Vector2Int> { start };
+                var queue = new Queue<Vector2Int>(group);
+                while (queue.Count > 0)
+                {
+                    var cell = queue.Dequeue();
+                    foreach (var step in Steps)
+                    {
+                        var next = cell + step;
+                        if (Get(next) != FieldTile.Haze || !seen.Add(next)) continue;
+                        group.Add(next);
+                        queue.Enqueue(next);
+                    }
+                }
+                hazes.Add(group);
+            }
+            return hazes;
+        }
 
         // 맵에서 그 종류의 칸 위치 (없으면 null) — 사전 받침대처럼 하나뿐인 칸
         public Vector2Int? Find(FieldTile tile)

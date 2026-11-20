@@ -18,7 +18,9 @@ namespace WordRPG.Game
         GatherEcho,    // 석판은 다 풀었고 이 지역 단어가 모자람 → 단어를 모아 메아리를 깨우자 n/60
         WakeCompanion, // 다 갖춤 → 유적 제단에서 동료를 깨우자 — 제단에 별
         // 동굴 (#113, Figma #111): 열쇠를 찾기 전까지 '반딧돌을 찾아 불을 밝혀 보자 n/8' — 별은 없음 (꺼진 반딧돌의 희미한 빛이 길잡이, 찾는 재미)
-        LightStones
+        LightStones,
+        // 숲 (#279): 열쇠가 미로 끝에 있어 아직 못 닿으면 '뒤섞인 이정표를 바로잡자 n/5' — 지금 닿는 안 바로잡은 이정표에 별 (미로 입구를 찾게)
+        FixSignposts
     }
 
     // 지금 할 일 한 줄 (#61 '목표 한 줄'): 화면에 늘 떠 있고, 미니맵·지도에 그 칸을 별로 표시한다
@@ -99,6 +101,17 @@ namespace WordRPG.Game
             {
                 int stones = GlowStones.Stones(area).Count;
                 if (stones > 0 && GlowStones.LitCount(area, session.World) < stones) return new Objective(ObjectiveKind.LightStones, null, area);
+                // 이정표 미로 (#279): 열쇠에 아직 못 닿으면 이정표부터 (열쇠 공터 안쪽의 지름길 이정표는 열쇠를 찾은 뒤라 목표에 안 나옴)
+                var key = area.Map.Find(FieldTile.Key);
+                if (key.HasValue && Signposts.All(area).Count > 0)
+                {
+                    var reach = Signposts.Reach(area, session);
+                    if (!FieldReach.Touches(reach, key.Value))
+                    {
+                        var next = Signposts.Next(area, session, reach);
+                        if (next.HasValue) return new Objective(ObjectiveKind.FixSignposts, null, area, next);
+                    }
+                }
             }
             switch (gate)
             {

@@ -66,6 +66,7 @@ namespace WordRPG.Field
         private static readonly FieldTheme[] Jungle = { FieldTheme.Jungle };
         private static readonly FieldTheme[] JungleAndCave = { FieldTheme.Jungle, FieldTheme.Cave };
         private static readonly FieldTheme[] Cave = { FieldTheme.Cave };
+        private static readonly FieldTheme[] Forest = { FieldTheme.Forest };
 
         private static readonly TileDefinition[] Table =
         {
@@ -94,6 +95,9 @@ namespace WordRPG.Field
             new TileDefinition(FieldTile.Shrine,    "A",    Use | Tag | Done,              "유적 제단",   Jungle),
             new TileDefinition(FieldTile.Decor,     "Q",    None,                          null,          JungleAndCave),
             new TileDefinition(FieldTile.GlowStone, "I",    Use | Tag | Done,              "글자 반딧돌", Cave),
+            new TileDefinition(FieldTile.Signpost,  "X",    Use | Tag | Done,              "이정표",      Forest), // #279 뒤섞인 이정표
+            new TileDefinition(FieldTile.Haze,      "M",    Done | Opens,                  null,          Forest), // 바로잡으면 걷히는 안개
+            new TileDefinition(FieldTile.LoopHaze,  "W",    None,                          null,          Forest), // 가짜 길 — 늘 막힘
         };
 
         private static readonly TileDefinition[] ByTile = BuildByTile();

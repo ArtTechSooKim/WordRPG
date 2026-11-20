@@ -26,6 +26,9 @@ namespace WordRPG.UI
         public static readonly Color32 Dock = new Color32(176, 112, 56, 255);    // 나루터
         public static readonly Color32 GlowStone = new Color32(120, 220, 255, 255); // 글자 반딧돌 (#112) — 밝히면 더 환하게
         public static readonly Color32 GlowStoneLit = new Color32(214, 248, 255, 255);
+        public static readonly Color32 Signpost = new Color32(236, 170, 90, 255);    // 이정표 (#279) — 레버처럼 멀리서도 눈에 띄게
+        public static readonly Color32 SignpostFixed = new Color32(170, 226, 110, 255);
+        private static readonly Color32 ForestMist = new Color32(150, 178, 150, 255); // 헷갈·맴도는 안개 (구분 없이 같은 색)
         public static readonly Color32 Fog = new Color32(20, 22, 34, 255); // 아직 안 가 본 칸
         private static readonly Color32 Planks = new Color32(160, 116, 60, 255); // 놓인 덩굴 다리
         private static readonly Color32 JungleWater = new Color32(38, 104, 150, 255);
@@ -83,7 +86,10 @@ namespace WordRPG.UI
                 .Set(FieldTile.Wall, new Color32(18, 52, 26, 255))
                 .Set(FieldTile.Grass, new Color32(70, 128, 58, 255))
                 .Set(FieldTile.Lawn, new Color32(48, 92, 44, 255))
-                .Set(FieldTile.Water, new Color32(60, 150, 130, 255)),
+                .Set(FieldTile.Water, new Color32(60, 150, 130, 255))
+                .Set(FieldTile.Signpost, Signpost, SignpostFixed)
+                .Set(FieldTile.Haze, ForestMist, new Color32(48, 92, 44, 255)) // 걷히면 이끼 색
+                .Set(FieldTile.LoopHaze, ForestMist),
             // 정글 (#80): 짙은 초록 바탕에 진흙길, 얕은 강은 밝은 하늘색(깊은 강보다 옅게), 유적은 돌빛
             [FieldTheme.Jungle] = Landmarks(new Color32(140, 96, 62, 255))
                 .Set(FieldTile.Wall, new Color32(14, 58, 30, 255))

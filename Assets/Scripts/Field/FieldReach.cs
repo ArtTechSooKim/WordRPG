@@ -6,11 +6,13 @@ namespace WordRPG.Field
 {
     // 시작 칸에서 갈 수 있는 칸 (걷기 + 뗏목, #80). 데이터 검사(모든 상자·출입구에 갈 수 있는지, 보스 방 문을 열어야만 보스에게 가는지)가 쓴다.
     // gatesOpen: 보스 방 문(G)을 연 것으로 / bridgesOpen: 덩굴 다리(H)를 놓은 것으로 본다. 뗏목은 나루터(J)에서 강으로 들어가고 나루터로 내린다
+    // hazeCleared (#279 숲): 그 헷갈 안개(M) 칸이 걷혔는지 — 없으면 모두 걷힌 것으로. 맴도는 안개(W)는 늘 막힘
     public static class FieldReach
     {
         private static readonly Vector2Int[] Steps = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
 
-        public static HashSet<Vector2Int> Flood(FieldMap map, bool gatesOpen = true, bool bridgesOpen = true, Vector2Int? from = null)
+        public static HashSet<Vector2Int> Flood(FieldMap map, bool gatesOpen = true, bool bridgesOpen = true, Vector2Int? from = null,
+            Func<Vector2Int, bool> hazeCleared = null)
         {
             var start = from ?? map.Start;
             var seen = new HashSet<(Vector2Int cell, bool raft)> { (start, map.IsRaftWater(start)) };
@@ -30,7 +32,8 @@ namespace WordRPG.Field
                     }
                     else
                     {
-                        bool passable = map.IsWalkable(next) || gatesOpen && tile == FieldTile.Gate || bridgesOpen && tile == FieldTile.Bridge;
+                        bool passable = map.IsWalkable(next) || gatesOpen && tile == FieldTile.Gate || bridgesOpen && tile == FieldTile.Bridge
+                                        || tile == FieldTile.Haze && (hazeCleared == null || hazeCleared(next));
                         if (passable) reached = (next, false);
                         else if (map.Get(cell) == FieldTile.Dock && map.IsRaftWater(next)) reached = (next, true);
                     }

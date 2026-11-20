@@ -198,6 +198,7 @@ namespace WordRPG.UI
             companionCutscene = CompanionCutscene.Create(hudRoot);
             tabletView = TabletQuizView.Create(hudRoot);
             stoneView = GlowStoneQuizView.Create(hudRoot); // 글자 반딧돌 문제 (#113)
+            signpostView = SignpostQuizView.Create(hudRoot); // 뒤섞인 이정표 문제 (#279)
             pauseTutorial = PauseTutorial.Create(hudRoot);
             preemptView = PreemptView.Create(hudRoot);
             BuildHeroSetup(); // 모습 고르기·이름 (#124) — 다른 창보다 위
@@ -614,6 +615,8 @@ namespace WordRPG.UI
                     return "유적 제단에서 동료를 깨우자";
                 case ObjectiveKind.LightStones:
                     return $"반딧돌을 찾아 불을 밝혀 보자 {GlowStones.LitCount(area, session.World)}/{GlowStones.Stones(area).Count}";
+                case ObjectiveKind.FixSignposts:
+                    return $"뒤섞인 이정표를 바로잡자 {Signposts.FixedCount(area, session.World)}/{Signposts.All(area).Count}";
                 default:
                     var progress = Dex.GetProgress(area.Words, session.Vocabulary);
                     return $"도감 채우기 {progress.Discovered}/{progress.Total}";

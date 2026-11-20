@@ -64,6 +64,10 @@ namespace WordRPG.UI
                 case FieldTile.Decor: return Make(t + "decor", Layer(ChestOpen, ground)); // 꾸밈 (#86) — 갈색 상자 모양
                 case FieldTile.GlowStone: // 글자 반딧돌 (#112) — 꺼지면 빈 받침, 밝히면 샘처럼 푸른 빛
                     return opened ? Make(t + "glowstone_lit", Layer(Fountain, ground)) : Make(t + "glowstone", Layer(Pedestal, ground));
+                // 숲 이정표 미로 (#279) — 그림(Tiles/Forest_Signpost·Haze·LoopHaze)이 없을 때만
+                case FieldTile.Signpost: return opened ? Make(t + "signpost_fixed", Layer(LeverPixel(true), ground)) : Make(t + "signpost", Layer(LeverPixel(false), ground));
+                case FieldTile.Haze: return opened ? Make(t + "haze_cleared", forest ? Moss : (Func<int, int, Color>)Lawn) : Make(t + "haze", Mist);
+                case FieldTile.LoopHaze: return Make(t + "loophaze", Mist);
                 default: return Make(t + "floor", ground);
             }
         }
@@ -87,6 +91,9 @@ namespace WordRPG.UI
         // ------------------------------------------------------------ 픽셀 규칙
 
         private static Color Path(int x, int y) => Noise(x, y, 7) < 0.12f ? PathDark : PathColor;
+
+        // 헷갈 안개 (#279): 옅은 연두빛 안개 (그림 Forest_Haze가 있으면 안 씀)
+        private static Color Mist(int x, int y) => Noise(x, y, 11) < 0.35f ? new Color(0.72f, 0.82f, 0.68f) : new Color(0.8f, 0.88f, 0.76f);
 
         private static Color Grass(int x, int y)
         {

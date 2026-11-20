@@ -236,6 +236,7 @@ namespace WordRPG.Field
         public string LeverId(Vector2Int position) => ChestId(position);
         public string TabletId(Vector2Int position) => ChestId(position);
         public string StoneId(Vector2Int position) => ChestId(position); // 글자 반딧돌 (#112)
+        public string SignpostId(Vector2Int position) => ChestId(position); // 뒤섞인 이정표 (#279)
 
         public AreaExit GetExit(Vector2Int position)
         {

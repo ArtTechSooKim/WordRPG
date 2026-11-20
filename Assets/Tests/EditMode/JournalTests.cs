@@ -151,12 +151,13 @@ namespace WordRPG.Tests
             var library = RealAreas().First(a => a.name == "library");
             var forest = RealAreas().First(a => a.name == "forest");
             Assert.AreEqual(6, library.ChestContents.Count);
-            Assert.AreEqual(7, forest.ChestContents.Count);
+            Assert.AreEqual(12, forest.ChestContents.Count, "숲 7 + 이정표 미로 5 (#279)");
             Assert.AreEqual(120, library.ChestContents[0].Gold, "서고 첫 상자");
             Assert.IsTrue(library.ChestContents[1].Item.IsJournal, "서고 둘째 줄의 새 상자");
             Assert.AreEqual("relic_lantern", library.ChestContents[2].Relic.RelicId, "서쪽 열람실");
-            Assert.IsTrue(forest.ChestContents[5].Item.IsJournal, "야영지 아래 새 상자");
-            Assert.AreEqual(150, forest.ChestContents[6].Gold, "버섯 공터 아래 구석");
+            // 숲은 1.4에서 넓어져(#279) 미로 상자가 사이사이에 끼므로 순서가 아니라 자리로 봄 — 상자 id도 자리 ("forest:x,y")
+            Assert.IsTrue(forest.GetChestContent(new Vector2Int(8, 2)).Item.IsJournal, "야영지 아래 새 상자");
+            Assert.AreEqual(150, forest.GetChestContent(new Vector2Int(33, 1)).Gold, "버섯 공터 아래 구석");
         }
 
         [Test]

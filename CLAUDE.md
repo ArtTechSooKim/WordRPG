@@ -129,6 +129,10 @@
      모두 밝히면 동굴 전체가 은은하게(`CaveLight.AllLitGlow`) + FieldArea `glowStoneRelic`(동굴 = 반딧돌 등잔, `GlowStones.ClaimAllLitReward`).
      목표 한 줄은 열쇠를 찾기 전까지 `ObjectiveKind.LightStones` (별 없음). 동굴 지역 = cave.asset (#115, 정글 출입구 0번 ↔ 동굴 출입구 0번)
      그림 = import_ninja_art.py `build_cave` (Cave_Wall_auto = 바위 윗면 + 밝은 테 + 절벽면), 시안 = Tools/cave_mockup.py
+   - 숲 이정표 미로 (#279, 1.4 — GDD 9-15): 숲 72×44 (예전 36칸을 **오른쪽으로만** 넓힘 — 맵 좌표가 아래·왼쪽 기준이라 위·오른쪽으로 넓혀야 상자 id·탐험 기록이 그대로).
+     맵 글자 'X' 이정표 → [확인] = 뒤섞인 철자 문제(`SpellingQuiz`·`SignpostQuiz`, 화면 `SignpostQuizView` Figma #279) · 'M' 헷갈 안개(가장 가까운 이정표가 맡음 `FieldMap.HazeOf` — 바로잡으면 걷힘) ·
+     'W' 맴도는 안개(가짜 길). 부딪히면 맴돌다 제자리 (`FieldScreen.Forest`). 규칙 `Signposts`, 세이브 `WorldState.fixedSignposts`. 열쇠는 미로 끝 → 목표 `ObjectiveKind.FixSignposts`.
+     맵 원본 = `python Tools/forest_map.py [--apply]`, 에셋 = Create Sample Data의 `UpgradeForestMaze`(상자는 위치로 옮겨 담음), 그림 = `Tools/make_signpost_art.py`
    - 통로는 두 칸 너비 (사용자 요청 #67): 새 맵은 `python Tools/widen_maps.py --only {상수} [--apply]`로 한 칸 통로를 넓힘 (상수·에셋 같이)
 6. **네이밍**: PascalCase 클래스/메서드/프로퍼티, camelCase 필드. SO 필드는 `[SerializeField] private` + 읽기 전용 프로퍼티. 클래스명은 영문, 화면 표시명은 한국어 필드(`displayName = "펜촉이"`). 주석은 한국어
 7. **Git LFS 사용 중**: 이미지·오디오·영상(mp4, #129)·폰트·네이티브 플러그인. 새 바이너리 타입 추가 시 `.gitattributes` 확인 (새로 클론하면 `git lfs install` 먼저)
@@ -279,7 +283,7 @@ Docs/                   PRD.txt, GDD.md, 아트에셋목록.md, 아이폰출시�
 .github/workflows/      ios-testflight.yml (GitHub Mac 서버에서 서명·TestFlight 업로드)
 Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow 필요), zip_ios_for_mac.py (Xcode 프로젝트 → Mac용 zip, 실행 권한 유지),
                         widen_maps.py (맵의 한 칸 통로 → 두 칸), subset_fonts.py (본문 글꼴에서 한자·가나 빼기 — 앱 크기, fontTools 필요),
-                        pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구), make_preempt_sfx.py (선제공격 '카칭' 소리 합성 #147), make_skill_sfx.py (기술마다 다른 소리: 팩 소리 겹치기 #164),
+                        pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), forest_map.py (1.4 숲 72×44 = 예전 숲 + 오른쪽 이정표 미로, 검사·미리보기·--apply #279), make_signpost_art.py (이정표·헷갈 안개 그림 #279), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구), make_preempt_sfx.py (선제공격 '카칭' 소리 합성 #147), make_skill_sfx.py (기술마다 다른 소리: 팩 소리 겹치기 #164),
                         check_android_bundle.py (구글플레이에 올리기 전 AAB 검사: 대상 API·게임 표시·뒤로 가기·권한·16KB 페이지·크기 #149),
                         make_shop_stalls.py (상점 가판대 그림: 팩 조각 조립 #210), journal_lines.py (누군가의 기록 문장 검사·CSV에 넣기 #201 · 글 파일 만들기 --text #202 · 고친 글 받아들이기 --import #204), make_journal_smudge.py (못 찾은 줄의 필기 그림 #201),
                         prepare_ambience.py (지역 환경음: 팩·CC0 녹음 다듬기 → Resources/Audio/Ambience + BGM과 섞은 미리듣기, #193), prepare_music.py (받은 곡 → 게임용: 끝 무음 빼기·반복 이음새 찾아 겹치기·음량 맞추기 → Licensed 폴더, `--later` = 아직 안 쓰는 2.0 곡을 Builds로, imageio-ffmpeg·numpy 필요 #166·#172),

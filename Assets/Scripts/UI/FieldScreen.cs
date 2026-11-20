@@ -175,7 +175,7 @@ namespace WordRPG.UI
                                    || (companionCutscene != null && companionCutscene.IsPlaying)
                                    || (pauseTutorial != null && pauseTutorial.IsShowing)
                                    || (tabletView != null && tabletView.IsOpen)
-                                   || (stoneView != null && stoneView.IsOpen) || heroSetupRunning
+                                   || (stoneView != null && stoneView.IsOpen) || (signpostView != null && signpostView.IsOpen) || heroSetupRunning
                                    || (introView != null && introView.IsOpen) || TesterMenuOpen
                                    || (characterSelect != null && characterSelect.IsOpen) || GiftOpen || MailboxOpen;
         public PauseTutorial PauseTutorial => pauseTutorial;
@@ -369,6 +369,8 @@ namespace WordRPG.UI
             UpdateDarkness();
             tabletView.Tick(Time.unscaledDeltaTime);
             stoneView.Tick(Time.unscaledDeltaTime);
+            signpostView.Tick(Time.unscaledDeltaTime);
+            UpdateHazeLoop(Time.unscaledDeltaTime);
             giftView?.Tick(Time.unscaledDeltaTime);
             UpdateRaft();
             Sound.SetAmbience(ThemeLooks.AmbienceNow(area.Theme, walker.Rafting, Sound.CurrentMusic == AreaMusic));
@@ -481,6 +483,9 @@ namespace WordRPG.UI
                     moveFrom = player.position;
                     moveTo = CellCenter(outcome.Target);
                     break;
+                case StepKind.Blocked:
+                    if (Signposts.Loops(area, session.World, outcome.Target)) BumpHaze(outcome.Target, direction); // 헷갈 안개 (#279)
+                    break;
                 case StepKind.BlockedByObject:
                     confirmHint = 0.8f; // 부딪히면 쓰지 않고 [확인] 버튼만 깜빡여 알려 준다
                     if (outcome.TargetTile == FieldTile.Boss) SayBossAfterLine();
@@ -580,6 +585,11 @@ namespace WordRPG.UI
                 CloseStone();
                 return;
             }
+            if (signpostView.IsOpen)
+            {
+                CloseSignpost();
+                return;
+            }
             if (GiftOpen)
             {
                 giftView.Back(); // 안내 = [나중에] · 받음 = [확인] · 문제 중엔 닫지 않음 (#274)
@@ -642,6 +652,7 @@ namespace WordRPG.UI
                 case FieldTile.Tablet: ReadTablet(cell); break;
                 case FieldTile.Shrine: TouchShrine(cell); break;
                 case FieldTile.GlowStone: TouchGlowStone(cell); break;
+                case FieldTile.Signpost: TouchSignpost(cell); break;
             }
         }
 
