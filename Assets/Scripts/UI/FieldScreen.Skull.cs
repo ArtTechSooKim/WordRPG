@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using WordRPG.Field;
 using WordRPG.Game;
@@ -6,35 +7,39 @@ using WordRPG.Words;
 
 namespace WordRPG.UI
 {
-    // 필드 > 힐끔해골 (#281 — 사용자 친구 의견, 규칙 ExamSkull): 의학 용어로 하는 사람이 그 지역 보스를 이기면 보석 옆에 나타남.
-    // 부끄러워 등을 돌리고 있다가 가끔 주인공 쪽을 힐끔 보고 '…키킥'. [확인] = 그 지역 장의 확인문제 3개 (창 SkullQuizView)
+    // 필드 > 힐끔해골 (#281 → #283 사용자 친구 의견, 규칙 ExamSkull): 의학 용어로 하는 사람이 그 지역 보스를 이기면
+    // 보석 가까운 벽(책장·나무·바위) 뒤에서 얼굴 반쪽만 내밀고 숨어 있음 — 가까이 오면 힐끔 더 내밀었다 숨고 '…키킥'.
+    // [확인] = '○○ 문제인데… 한번 풀어 볼래?' → [풀어보기] = 번쩍 → 해골의 방에서 3문제 (SkullQuizView).
+    // 많이 맞히면 슬금슬금 도망 → 다음 벽 뒤로. 벽 칸 안에 숨으니 길을 막지 않음
     public partial class FieldScreen
     {
         private SkullQuizView skullView;
         private ExamSkullQuiz skullQuiz;
         private SpriteRenderer skullRenderer;
-        private CharacterSheet skullSheet;
-        private Vector2Int? skullCell;
-        private Direction skullFacing = Direction.Down;
-        private float skullGlanceUntil, skullNextGlance, skullNextGiggle;
+        private Texture2D skullSheet;
+        private readonly Dictionary<(Vector2Int, int), Sprite> skullSlices = new Dictionary<(Vector2Int, int), Sprite>();
+        private List<ExamSkull.Peek> skullSpots = new List<ExamSkull.Peek>();
+        private int skullSpot = -1;
+        private float skullShow, skullGlanceUntil, skullNextGlance, skullNextGiggle;
         private bool skullBusy;
 
         public const float SkullHearDistance = 5f; // 이만큼 가까우면 힐끔·키킥
+        private const int SkullHidden = 4, SkullPeeking = 7, SkullGlance = 11; // 벽에서 내민 얼굴 폭 (16px 중)
         private static readonly string[] SkullGiggles = { "…키킥", "(힐끔)", "키, 키킥…", "…(힐끔힐끔)" };
+        private static readonly string[] SkullSneers = { "키킥… 그것도 몰라…?", "히히… 다시 공부하고 와…", "키킥… 그건 아니지…" };
 
-        public Vector2Int? SkullCell => skullCell;                                   // 테스트용
+        public ExamSkull.Peek? SkullPeek => skullSpot >= 0 && skullSpot < skullSpots.Count ? skullSpots[skullSpot] : (ExamSkull.Peek?)null; // 테스트용
         public SkullQuizView SkullView => skullView;                                 // 테스트용
         public ExamSkullQuiz SkullQuiz => skullQuiz;                                 // 테스트용
-        public Direction SkullFacing => skullFacing;                                 // 테스트용
         public bool SkullVisible => skullRenderer != null && skullRenderer.gameObject.activeSelf; // 테스트용
+        public int SkullShownPixels => Mathf.RoundToInt(skullShow);                  // 테스트용 (얼굴을 얼마나 내밀었는지)
 
-        private bool IsSkullAt(Vector2Int cell) => skullCell.HasValue && skullCell.Value == cell;
-
-        // 지역에 들어올 때 · 보스를 이긴 뒤: 있어야 하면 보석 옆에 세움
+        // 지역에 들어올 때 · 보스를 이긴 뒤: 있어야 하면 첫 벽 뒤에 숨김
         private void SetUpSkull()
         {
-            skullCell = ExamSkull.IsHere(area, session) ? ExamSkull.Spot(area, null, walker != null ? walker.Position : (Vector2Int?)null) : null;
-            if (!skullCell.HasValue)
+            skullSpots = ExamSkull.IsHere(area, session) ? ExamSkull.PeekSpots(area) : new List<ExamSkull.Peek>();
+            skullSpot = skullSpots.Count > 0 ? 0 : -1;
+            if (skullSpot < 0)
             {
                 if (skullRenderer != null) skullRenderer.gameObject.SetActive(false);
                 return;
@@ -45,32 +50,31 @@ namespace WordRPG.UI
                 go.transform.SetParent(transform, false);
                 skullRenderer = go.GetComponent<SpriteRenderer>();
                 skullRenderer.sortingOrder = 9; // 주인공(10) 바로 아래, 동굴에서는 어둠 아래라 빛 안에서만 보임 (인물과 같음)
-                skullSheet = new CharacterSheet("Art/NinjaAdventure/Npcs/" + ExamSkull.ArtId);
+                skullSheet = Resources.Load<Texture2D>("Art/NinjaAdventure/Npcs/" + ExamSkull.ArtId);
             }
             skullRenderer.gameObject.SetActive(true);
-            skullRenderer.transform.position = CellCenter(skullCell.Value);
-            skullFacing = Direction.Down;
+            skullShow = SkullPeeking;
             skullNextGlance = Time.unscaledTime + 1f;
             skullNextGiggle = Time.unscaledTime + 1.5f;
             DrawSkull();
         }
 
-        // 부끄러워 주인공 반대쪽을 보다가 1.5~3초마다 힐끔 (0.6초). 가까우면 가끔 '…키킥'
+        // 가까이 오면 1.5~3초마다 0.7초씩 얼굴을 더 내밀었다(힐끔) 숨고, 가끔 '…키킥'. 멀면 거의 숨음
         private void UpdateSkull()
         {
-            if (!skullCell.HasValue || skullRenderer == null) return;
-            var offset = walker.Position - skullCell.Value;
+            var peek = SkullPeek;
+            if (!peek.HasValue || skullRenderer == null) return;
+            var offset = walker.Position - peek.Value.Floor;
             float distance = Mathf.Abs(offset.x) + Mathf.Abs(offset.y);
-            var toward = Toward(offset);
             bool near = distance <= SkullHearDistance;
             float now = Time.unscaledTime;
-            if (skullBusy) skullFacing = toward; // 문제를 내는 동안은 마주 봄
-            else if (near && now >= skullNextGlance)
+            if (near && now >= skullNextGlance)
             {
-                skullGlanceUntil = now + 0.6f;
+                skullGlanceUntil = now + 0.7f;
                 skullNextGlance = now + Random.Range(1.5f, 3f);
             }
-            if (!skullBusy) skullFacing = near && now < skullGlanceUntil ? toward : Away(toward);
+            float target = skullBusy ? SkullGlance : !near ? SkullHidden : now < skullGlanceUntil ? SkullGlance : SkullPeeking;
+            skullShow = Mathf.MoveTowards(skullShow, target, Time.unscaledDeltaTime * 30f);
             if (near && !skullBusy && now >= skullNextGiggle && !bubble.IsVisible && !inBattle && !transitioning && !IsPanelOpen)
             {
                 bubble.Speak(skullRenderer.transform, ExamSkull.DisplayName, SkullGiggles[Random.Range(0, SkullGiggles.Length)], 1.6f);
@@ -79,29 +83,42 @@ namespace WordRPG.UI
             DrawSkull();
         }
 
+        // 벽 칸 가장자리에서 바닥 쪽으로 얼굴 몇 픽셀만: 오른쪽·왼쪽으로 내밀면 정면 그림의 그쪽 반, 위로 내밀면 머리 윗부분
         private void DrawSkull()
         {
-            if (skullSheet == null || !skullSheet.IsLoaded) return;
-            skullRenderer.sprite = skullSheet.Get(skullFacing, 0);
-            // 소름 끼치게 숨죽여 웃는 듯 작게 들썩 (힐끔 보는 동안 조금 더)
-            float shake = Time.unscaledTime < skullGlanceUntil ? 0.035f : 0.015f;
-            skullRenderer.transform.position = CellCenter(skullCell.Value) + Vector3.up * Mathf.Abs(Mathf.Sin(Time.unscaledTime * 9f)) * shake;
+            var peek = SkullPeek;
+            if (!peek.HasValue || skullSheet == null) return;
+            int px = Mathf.Clamp(Mathf.RoundToInt(skullShow), 1, 16);
+            var dir = peek.Value.Out;
+            skullRenderer.sprite = SkullSlice(dir, px);
+            var wall = peek.Value.Wall;
+            float bob = Mathf.Abs(Mathf.Sin(Time.unscaledTime * 9f)) * 0.02f; // 숨죽여 웃듯 작게 들썩
+            skullRenderer.transform.position = dir == Vector2Int.right ? new Vector3(wall.x + 1f, wall.y + 0.5f + bob, 0f)
+                : dir == Vector2Int.left ? new Vector3(wall.x, wall.y + 0.5f + bob, 0f)
+                : new Vector3(wall.x + 0.5f, wall.y + 1f + bob, 0f);
         }
 
-        private static Direction Toward(Vector2Int offset)
+        private Sprite SkullSlice(Vector2Int dir, int px)
         {
-            if (Mathf.Abs(offset.x) >= Mathf.Abs(offset.y)) return offset.x >= 0 ? Direction.Right : Direction.Left;
-            return offset.y >= 0 ? Direction.Up : Direction.Down;
+            if (skullSlices.TryGetValue((dir, px), out var cached) && cached != null) return cached;
+            int top = skullSheet.height - 16; // 정면(아래를 봄) 첫 칸
+            Rect rect;
+            Vector2 pivot;
+            if (dir == Vector2Int.right) { rect = new Rect(16 - px, top, px, 16); pivot = new Vector2(0f, 0.5f); }
+            else if (dir == Vector2Int.left) { rect = new Rect(0, top, px, 16); pivot = new Vector2(1f, 0.5f); }
+            else { rect = new Rect(0, top + 16 - px, 16, px); pivot = new Vector2(0.5f, 0f); }
+            var sprite = Sprite.Create(skullSheet, rect, pivot, 16, 0, SpriteMeshType.FullRect);
+            sprite.name = $"exam_skull_peek_{dir}_{px}";
+            skullSlices[(dir, px)] = sprite;
+            return sprite;
         }
 
-        private static Direction Away(Direction d) =>
-            d == Direction.Right ? Direction.Left : d == Direction.Left ? Direction.Right : d == Direction.Up ? Direction.Down : Direction.Up;
-
-        // 바라보는 칸(없으면 옆 칸)에 해골이 있으면 문제 창
+        // 해골이 숨은 벽 옆에서 그 벽을 보고 [확인] (바라보지 않아도 옆이면 — facingOnly=false)
         private bool TryTalkToSkull(bool facingOnly)
         {
-            if (!skullCell.HasValue || walker.Rafting) return false;
-            var offset = skullCell.Value - walker.Position;
+            var peek = SkullPeek;
+            if (!peek.HasValue || walker.Rafting) return false;
+            var offset = peek.Value.Wall - walker.Position;
             if (Mathf.Abs(offset.x) + Mathf.Abs(offset.y) != 1) return false;
             Direction? facing = null;
             foreach (var direction in new[] { Direction.Up, Direction.Down, Direction.Left, Direction.Right })
@@ -110,11 +127,15 @@ namespace WordRPG.UI
             walker.Face(facing.Value);
             playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
             interactions++;
-            OpenSkullQuiz();
+            OpenSkullInvite();
             return true;
         }
 
-        private void OpenSkullQuiz()
+        private bool IsNextToSkull() =>
+            SkullPeek.HasValue && !walker.Rafting
+            && Mathf.Abs(SkullPeek.Value.Wall.x - walker.Position.x) + Mathf.Abs(SkullPeek.Value.Wall.y - walker.Position.y) == 1;
+
+        private void OpenSkullInvite()
         {
             var pool = ExamSkull.Pool(area);
             if (pool.Count == 0) return;
@@ -122,7 +143,13 @@ namespace WordRPG.UI
             bubble.Hide();
             skullBusy = true;
             skullQuiz = new ExamSkullQuiz(pool, session.World, rng);
-            skullView.Show(PickSkull, CloseSkull);
+            skullView.ShowInvite(skullQuiz.Topic, EnterSkullRoom, CloseSkull);
+        }
+
+        private void EnterSkullRoom()
+        {
+            Sound.Play(Sfx.Encounter); // 번쩍 — 해골의 방으로 끌려감
+            skullView.EnterRoom(PickSkull, CloseSkull);
             skullView.ShowQuestion(skullQuiz.Current, 0, skullQuiz.Count, 0, "히, 히익…! 들켰다… 키킥. 이, 이거… 알아?");
         }
 
@@ -135,7 +162,7 @@ namespace WordRPG.UI
             {
                 case TabletAnswer.Wrong:
                     Sound.Play(Sfx.Wrong);
-                    skullView.MarkWrong(index, "히히… 아니야… 다시 골라 봐…");
+                    skullView.MarkWrong(index, SkullSneers[Random.Range(0, SkullSneers.Length)]);
                     break;
                 case TabletAnswer.Correct:
                     Sound.Play(Sfx.Correct);
@@ -146,7 +173,7 @@ namespace WordRPG.UI
                     }
                     saveProgress?.Invoke(); // 맞힌 문제·골드는 바로 세이브
                     skullView.MarkCorrect(index, question.CorrectAnswer, gold, skullQuiz.GoldEarned,
-                        gold > 0 ? "키킥… 맞혔어… 이거, 가져…" : "키킥… 맞혔어…");
+                        gold > 0 ? "키, 키킥… 맞혔어… 이거, 가져…" : "키킥… 맞혔어…");
                     StartCoroutine(NextSkullQuestion());
                     break;
             }
@@ -155,23 +182,51 @@ namespace WordRPG.UI
         private IEnumerator NextSkullQuestion()
         {
             yield return new WaitForSecondsRealtime(1.1f * animationScale);
-            if (skullQuiz == null || !skullView.IsOpen) yield break;
+            if (skullQuiz == null || !skullView.InRoom) yield break;
             skullQuiz.Next();
-            if (skullQuiz.IsComplete)
-                skullView.ShowComplete(skullQuiz.FirstTryCorrect, skullQuiz.Count, skullQuiz.GoldEarned, "오, 오늘은… 여기까지… 키킥. 또… 와…");
-            else
+            if (!skullQuiz.IsComplete)
+            {
                 skullView.ShowQuestion(skullQuiz.Current, skullQuiz.Index, skullQuiz.Count, skullQuiz.GoldEarned, "…키킥. 다음… 이거는?");
+                yield break;
+            }
+            bool flees = skullQuiz.Flees;
+            if (flees) Sound.Play(Sfx.Flee); // 휙 — 슬금슬금 도망
+            skullView.ShowEnd(skullQuiz.FirstTryCorrect, skullQuiz.Count, skullQuiz.GoldEarned, flees,
+                flees ? "히, 히익…! 오, 오늘은 이만…!" : "키킥… 공부 더 하고 와… 또 기다릴게…");
         }
 
+        // [안 할래]·×·[확인]·뒤로가기: 방에서 나오면 번쩍. 도망쳤으면 다음 벽 뒤로 옮겨 숨음
         private void CloseSkull()
         {
+            bool fled = skullQuiz != null && skullQuiz.Flees;
+            bool fromRoom = skullView.InRoom;
             skullView.Hide();
             skullQuiz = null;
             skullBusy = false;
+            if (fromRoom) StartCoroutine(SkullFlashBack());
+            if (fled && skullSpots.Count > 1)
+            {
+                skullSpot = (skullSpot + 1) % skullSpots.Count;
+                skullShow = SkullHidden;
+                DrawSkull();
+            }
             skullNextGiggle = Time.unscaledTime + 4f;
             interactCooldown = 0.4f;
             saveProgress?.Invoke();
             RefreshHud();
+        }
+
+        // 필드로 돌아올 때 화면이 하얗게 번쩍 (방에 들어갈 때와 짝)
+        private IEnumerator SkullFlashBack()
+        {
+            flash.gameObject.SetActive(true);
+            float duration = SkullQuizView.FlashSeconds * animationScale;
+            for (float t = 0f; t < duration; t += Time.unscaledDeltaTime)
+            {
+                flash.color = new Color(1f, 1f, 1f, 1f - t / Mathf.Max(0.001f, duration));
+                yield return null;
+            }
+            flash.gameObject.SetActive(false);
         }
     }
 }

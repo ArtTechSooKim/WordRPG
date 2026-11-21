@@ -790,7 +790,7 @@ namespace WordRPG.UI
             OpenStoneGateIfAllLit(newArea); // 예전 세이브 (#233)
             var map = area.Map;
             walker = new FieldWalker(map, position, cell => IsDoorLocked(cell) || IsPaywalled(cell), cell => IsCleared(area, cell), rafting,
-                cell => npcs.IsOccupied(cell) || bossBody.Blocks(walker.Position, cell) || IsSkullAt(cell)); // 크게 선 보스의 몸 (#267) · 힐끔해골 (#281)도 막힘
+                cell => npcs.IsOccupied(cell) || bossBody.Blocks(walker.Position, cell)); // 크게 선 보스의 몸도 막힘 (#267)
             encounterCounter = new EncounterCounter(area.EncounterRate, area.MinStepsBetweenEncounters);
             if (FirstFightPending) encounterCounter.GuaranteeWithin(EncounterCounter.FirstFightGrassSteps); // #133
             session.World.SetPosition(area.AreaId, position, rafting);

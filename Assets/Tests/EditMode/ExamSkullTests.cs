@@ -10,7 +10,8 @@ using WordRPG.Words;
 
 namespace WordRPG.Tests
 {
-    // 힐끔해골 (#281 — 사용자 친구 의견: 확인문제는 보스가 아니라 보스를 이긴 뒤 옆에서 힐끔거리는 해골이 보너스로)
+    // 힐끔해골 (#281 — 사용자 친구 의견: 확인문제는 보스가 아니라 보스를 이긴 뒤 옆에서 힐끔거리는 해골이 보너스로 ·
+    // #283: 책장 사이에서 얼굴 반만 · 말 걸면 '○○ 문제인데 한번 풀어 볼래?' · 많이 맞히면 슬금슬금 도망)
     public class ExamSkullTests
     {
         [TearDown]
@@ -57,35 +58,24 @@ namespace WordRPG.Tests
             Assert.IsFalse(ExamSkull.IsHere(area, session), "이 지역 장이 없으면 없음");
         }
 
+        // #283 친구 의견 '책장 사이에서 반 칸만 얼굴': 보석 가까운 벽 칸 뒤에서 옆 바닥 쪽으로
         [Test]
-        public void SkullStandsBesideTheGemNotNextToIt()
+        public void SkullPeeksFromBehindAWallNearTheGem()
         {
             var area = Area();
-            Assert.AreEqual(new Vector2Int(2, 3), ExamSkull.Spot(area), "보스와 같은 줄, 두 칸 떨어진 곳 (보석 옆 [확인] 자리는 비워 둠)");
-            Assert.AreEqual(new Vector2Int(6, 3), ExamSkull.Spot(area, null, new Vector2Int(2, 3)), "주인공이 서 있으면 다음 자리");
-        }
-
-        [Test]
-        public void SkullNeverCutsOffAPath()
-        {
-            //  y=2  ######B###   보스 (6,2)
-            //  y=1  #P.:..:..#   한 칸 통로 — 막으면 길이 끊기는 칸에는 서지 않음 (막다른 끝 (8,1)만 됨)
-            const string corridor = "##########\n######B###\n#P.:..:..#\n##########";
-            var area = Area(corridor);
-            var spot = ExamSkull.Spot(area);
-            Assert.AreEqual(new Vector2Int(8, 1), spot, "길을 끊지 않는 막다른 끝");
+            var spots = ExamSkull.PeekSpots(area);
+            Assert.Greater(spots.Count, 1, "도망치면 옮겨 갈 자리도");
+            Assert.AreEqual(new Vector2Int(0, 3), spots[0].Wall, "보석과 같은 줄 왼쪽 벽 (옆으로 내미는 곳 먼저)");
+            Assert.AreEqual(new Vector2Int(1, 3), spots[0].Floor);
+            Assert.AreEqual(Vector2Int.right, spots[0].Out, "오른쪽으로 얼굴을 내밂");
+            var reach = FieldReach.Flood(area.Map);
+            var walls = new HashSet<Vector2Int>();
+            foreach (var spot in spots)
             {
-                var reach = FieldReach.Flood(area.Map);
-                reach.Remove(spot.Value);
-                var seen = new HashSet<Vector2Int> { area.Map.Start };
-                var queue = new Queue<Vector2Int>(seen);
-                while (queue.Count > 0)
-                {
-                    var c = queue.Dequeue();
-                    foreach (var d in new[] { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right })
-                        if (reach.Contains(c + d) && seen.Add(c + d)) queue.Enqueue(c + d);
-                }
-                Assert.AreEqual(reach.Count, seen.Count, "해골이 막아도 다 갈 수 있음");
+                Assert.AreEqual(FieldTile.Wall, area.Map.Get(spot.Wall), "벽 칸 안 — 길을 막지 않음");
+                Assert.IsTrue(reach.Contains(spot.Floor), "얼굴이 보이는 쪽은 갈 수 있는 바닥");
+                Assert.AreNotEqual(area.Map.Start, spot.Floor);
+                Assert.IsTrue(walls.Add(spot.Wall), "벽 하나에 한 자리");
             }
         }
 
@@ -108,6 +98,7 @@ namespace WordRPG.Tests
             var world = new WorldState();
             var quiz = new ExamSkullQuiz(exams, world, new System.Random(2));
             Assert.AreEqual(3, quiz.Count);
+            Assert.AreEqual("심혈관 및 조혈계", quiz.Topic, "말 걸 때 '○○ 문제인데…' — '제n장 '을 뺀 장 이름");
 
             // 1번: 틀리고 다시 → 맞아도 골드 없음, 맞힌 문제로 안 적힘
             var first = quiz.Current;
@@ -132,10 +123,23 @@ namespace WordRPG.Tests
             Assert.IsTrue(quiz.IsComplete);
             Assert.AreEqual(2, quiz.FirstTryCorrect);
             Assert.AreEqual(2 * ExamSkull.GoldPerQuestion, quiz.GoldEarned);
+            Assert.IsTrue(quiz.Flees, "바로 맞힌 문제가 2개 이상이면 슬금슬금 도망 (#283)");
 
             // 이미 맞힌 문제는 다시 바로 맞혀도 골드 없음
             var again = new ExamSkullQuiz(exams.Where(q => world.IsExamSolved(q.Id)).ToList(), world, new System.Random(3));
             Assert.AreEqual(0, again.Answer(again.Current.CorrectIndex).gold);
+
+            // 다 틀린 뒤 맞히면 도망 안 감 (깔보며 그대로)
+            var hard = new ExamSkullQuiz(exams, new WorldState(), new System.Random(4));
+            while (!hard.IsComplete)
+            {
+                var q = hard.Current;
+                hard.Answer((q.CorrectIndex + 1) % q.Choices.Count);
+                hard.Answer(q.CorrectIndex);
+                hard.Next();
+            }
+            Assert.AreEqual(0, hard.FirstTryCorrect);
+            Assert.IsFalse(hard.Flees);
         }
 
         [Test]
@@ -149,20 +153,25 @@ namespace WordRPG.Tests
             Assert.AreEqual(0, old.SolvedExamCount, "예전 세이브는 빈 목록");
         }
 
-        // 실제 맵: 보스가 있는 네 지역 모두 보석 옆에 설 자리가 있음
+        // 실제 맵: 보스가 있는 네 지역 모두 보석 가까이 숨을 벽이 둘 이상 (도망치면 옮겨 감)
         [Test]
-        public void EveryRealBossAreaHasASpotForTheSkull()
+        public void EveryRealBossAreaHasWallsToHideBehind()
         {
             var database = AssetDatabase.LoadAssetAtPath<GameDatabase>("Assets/Data/GameDatabase.asset");
             int areas = 0;
             foreach (var area in database.Areas.Where(a => a != null && a.Boss != null))
             {
-                var spot = ExamSkull.Spot(area);
-                Assert.IsTrue(spot.HasValue, $"{area.AreaId}: 해골 자리");
+                var spots = ExamSkull.PeekSpots(area);
+                Assert.GreaterOrEqual(spots.Count, 2, $"{area.AreaId}: 숨을 벽");
                 var boss = area.Map.FindAll(FieldTile.Boss)[0];
-                int distance = Mathf.Abs(spot.Value.x - boss.x) + Mathf.Abs(spot.Value.y - boss.y);
-                Assert.That(distance, Is.InRange(ExamSkull.MinDistance, ExamSkull.MaxDistance), $"{area.AreaId}: 보석 가까이");
-                Assert.IsTrue(FieldReach.Flood(area.Map).Contains(spot.Value), $"{area.AreaId}: 갈 수 있는 칸");
+                var reach = FieldReach.Flood(area.Map);
+                foreach (var spot in spots)
+                {
+                    int distance = Mathf.Abs(spot.Wall.x - boss.x) + Mathf.Abs(spot.Wall.y - boss.y);
+                    Assert.That(distance, Is.InRange(ExamSkull.MinDistance, ExamSkull.MaxDistance), $"{area.AreaId}: 보석 가까이");
+                    Assert.IsFalse(area.Map.IsWalkable(spot.Wall), $"{area.AreaId}: 벽 안");
+                    Assert.IsTrue(reach.Contains(spot.Floor), $"{area.AreaId}: 얼굴 쪽 바닥은 갈 수 있음");
+                }
                 areas++;
             }
             Assert.AreEqual(4, areas, "서고 · 숲 · 정글 · 동굴");

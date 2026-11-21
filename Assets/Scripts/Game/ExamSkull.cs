@@ -7,15 +7,17 @@ using WordRPG.Words;
 namespace WordRPG.Game
 {
     // 힐끔해골 (#281 — 사용자 친구(의대생) 의견: "단어만 외우는 사람은 확인문제를 못 푼다 · 보스 깨면 옆에서 부끄럼 타는 해골이
-    // 힐끔힐끔 보며 소름 끼치게 웃고 있다가, 말을 걸면 문제를 던지는 것"). 의학 용어로 하는 사람만, 그 지역 보스를 이긴 뒤 보스 자리 옆에.
-    // 한 번에 3문제 (아직 못 맞힌 문제부터), 처음 바로 맞힌 문제마다 골드 — 틀려도 벌점 없이 다시 고를 수 있지만 그 문제는 골드 없음
+    // 힐끔힐끔 보며 소름 끼치게 웃고 있다가, 말을 걸면 문제를 던지는 것"). 의학 용어로 하는 사람만, 그 지역 보스를 이긴 뒤 보석 가까운 벽 뒤에서 반만 (#283).
+    // 말을 걸면 '○○ 문제인데… 한번 풀어 볼래?' → [풀어보기] = 해골의 방에서 3문제 (아직 못 맞힌 문제부터), 처음 바로 맞힌 문제마다 골드 —
+    // 틀려도 벌점 없이 다시 고를 수 있지만 그 문제는 골드 없음. 바로 맞힌 수가 FleeAt 이상이면 슬금슬금 도망 (다음 벽 뒤로)
     public static class ExamSkull
     {
         public const string DisplayName = "힐끔해골";
         public const string ArtId = "exam_skull"; // 그림 Art/NinjaAdventure/Npcs/exam_skull.png (팩 Skeleton, import_ninja_art.py)
         public const int QuestionsPerVisit = 3;
         public const int GoldPerQuestion = 20;
-        public const int MinDistance = 2, MaxDistance = 4; // 보스 몸에서 이만큼 떨어진 자리 (보석 옆 [확인] 자리는 비워 둠)
+        public const int MinDistance = 1, MaxDistance = 9; // 숨는 벽: 보석에서 이만큼 떨어진 벽 칸 (동굴 보스 방이 넓어 9 — 가까운 벽부터)
+        public const int FleeAt = 2; // 3문제 중 바로 맞힌 수가 이만큼이면 슬금슬금 도망 (다른 벽 뒤로)
 
         // 그 지역의 확인문제 (지금 단어장 기준 — 수능·비즈니스는 없음)
         public static List<ExamQuestion> Pool(FieldArea area) => WordCourses.ExamFor(area != null ? area.AreaId : null);
@@ -23,63 +25,62 @@ namespace WordRPG.Game
         public static bool IsHere(FieldArea area, GameSession session) =>
             area != null && area.Boss != null && session != null && session.World.IsBossDefeated(area.BossId) && Pool(area).Count > 0;
 
-        // 서는 자리: 보스 몸에서 2~4칸 떨어진 빈 바닥(바닥·잔디·유적 바닥, 인물 자리 아님) 중 가장 가까운 곳 —
-        // 같은 줄(옆)을 먼저, 그 칸이 막혀도 갈 수 있던 곳에 다 갈 수 있는 자리만. avoid = 주인공이 서 있는 칸
-        public static Vector2Int? Spot(FieldArea area, IReadOnlyCollection<Vector2Int> bossBody = null, Vector2Int? avoid = null)
+        // 숨는 곳 (#283 — 친구 의견 '책장 사이에서 반 칸만 얼굴'): 보석 가까운 벽 칸(서고 = 책장, 숲·정글 = 나무, 동굴 = 바위) 뒤에서
+        // 옆 바닥 쪽으로 얼굴 반쪽을 내밂. 벽 칸 안이라 길을 막지 않음. 가까운 순(옆으로 내미는 곳 먼저) · 벽 하나에 한 자리
+        public readonly struct Peek
         {
-            if (area == null || area.Boss == null) return null;
-            var map = area.Map;
-            var bosses = map.FindAll(FieldTile.Boss);
-            if (bosses.Count == 0) return null;
-            var body = new HashSet<Vector2Int>(bossBody ?? (IReadOnlyCollection<Vector2Int>)bosses);
-            body.Add(bosses[0]);
-            var reach = FieldReach.Flood(map);
-            var npcSpots = new HashSet<Vector2Int>(map.NpcSpots);
+            public Vector2Int Wall { get; }
+            public Vector2Int Floor { get; }    // 얼굴이 보이는 쪽 바닥 (여기 서서 [확인])
+            public Vector2Int Out => Floor - Wall; // 내미는 방향 (왼쪽·오른쪽·위)
 
-            var candidates = new List<(Vector2Int cell, int distance)>();
-            foreach (var cell in reach)
+            public Peek(Vector2Int wall, Vector2Int floor)
             {
-                if (body.Contains(cell) || npcSpots.Contains(cell) || (avoid.HasValue && avoid.Value == cell)) continue;
-                var tile = map.Get(cell);
-                if (tile != FieldTile.Floor && tile != FieldTile.Lawn && tile != FieldTile.RuinFloor) continue;
-                if (map.Start == cell) continue;
-                int distance = int.MaxValue;
-                foreach (var part in body) distance = Math.Min(distance, Math.Abs(part.x - cell.x) + Math.Abs(part.y - cell.y));
-                if (distance < MinDistance || distance > MaxDistance) continue;
-                candidates.Add((cell, distance));
+                Wall = wall;
+                Floor = floor;
             }
-            var boss = bosses[0];
-            candidates.Sort((a, b) =>
-            {
-                int c = a.distance.CompareTo(b.distance);
-                if (c != 0) return c;
-                c = Math.Abs(a.cell.y - boss.y).CompareTo(Math.Abs(b.cell.y - boss.y)); // 같은 줄 = 보스 '옆'
-                if (c != 0) return c;
-                c = a.cell.x.CompareTo(b.cell.x);
-                return c != 0 ? c : b.cell.y.CompareTo(a.cell.y);
-            });
-            foreach (var (cell, _) in candidates)
-                if (KeepsEverythingReachable(reach, cell, map.Start)) return cell;
-            return null;
         }
 
-        // 그 칸을 막아도 갈 수 있던 칸에 모두 갈 수 있는지
-        private static bool KeepsEverythingReachable(HashSet<Vector2Int> reach, Vector2Int blocked, Vector2Int start)
+        public static List<Peek> PeekSpots(FieldArea area)
         {
-            if (!reach.Contains(start)) return true;
-            var seen = new HashSet<Vector2Int> { start, blocked };
-            var queue = new Queue<Vector2Int>();
-            queue.Enqueue(start);
-            while (queue.Count > 0)
+            var spots = new List<Peek>();
+            if (area == null || area.Boss == null) return spots;
+            var map = area.Map;
+            var bosses = map.FindAll(FieldTile.Boss);
+            if (bosses.Count == 0) return spots;
+            var boss = bosses[0];
+            var reach = FieldReach.Flood(map);
+            var npcSpots = new HashSet<Vector2Int>(map.NpcSpots);
+            var found = new List<(Peek peek, int distance, bool side)>();
+            for (int x = boss.x - MaxDistance; x <= boss.x + MaxDistance; x++)
+            for (int y = boss.y - MaxDistance; y <= boss.y + MaxDistance; y++)
             {
-                var cell = queue.Dequeue();
-                foreach (var step in new[] { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right })
+                var wall = new Vector2Int(x, y);
+                int distance = Math.Abs(x - boss.x) + Math.Abs(y - boss.y);
+                if (distance < MinDistance || distance > MaxDistance || !map.InBounds(wall)) continue;
+                var tile = map.Get(wall);
+                if (tile != FieldTile.Wall && tile != FieldTile.RuinWall) continue;
+                foreach (var dir in new[] { Vector2Int.right, Vector2Int.left, Vector2Int.up })
                 {
-                    var next = cell + step;
-                    if (reach.Contains(next) && seen.Add(next)) queue.Enqueue(next);
+                    var floor = wall + dir;
+                    if (!reach.Contains(floor) || npcSpots.Contains(floor) || floor == map.Start) continue;
+                    var floorTile = map.Get(floor);
+                    if (floorTile != FieldTile.Floor && floorTile != FieldTile.Lawn && floorTile != FieldTile.RuinFloor) continue;
+                    found.Add((new Peek(wall, floor), distance, dir.y == 0));
+                    break; // 벽 하나에 한 자리 (오른쪽 → 왼쪽 → 위 순)
                 }
             }
-            return seen.Count == reach.Count; // seen = 막은 칸 + 그 칸 없이 닿은 칸 (막은 칸은 reach 안의 칸)
+            found.Sort((a, b) =>
+            {
+                // 옆으로 내미는 곳이 보기 좋아서 먼저 — 위로 내미는 곳은 두 칸 더 먼 셈
+                int c = (a.distance + (a.side ? 0 : 2)).CompareTo(b.distance + (b.side ? 0 : 2));
+                if (c != 0) return c;
+                c = b.side.CompareTo(a.side);
+                if (c != 0) return c;
+                c = a.peek.Wall.x.CompareTo(b.peek.Wall.x);
+                return c != 0 ? c : b.peek.Wall.y.CompareTo(a.peek.Wall.y);
+            });
+            foreach (var f in found) spots.Add(f.peek);
+            return spots;
         }
 
         // 이번에 낼 문제: 아직 못 맞힌 문제를 먼저(섞어서), 모자라면 맞힌 문제에서
@@ -120,6 +121,18 @@ namespace WordRPG.Game
         public int FirstTryCorrect { get; private set; }
         public int GoldEarned { get; private set; }
         public bool IsComplete => Index >= questions.Count;
+        public bool Flees => IsComplete && FirstTryCorrect >= ExamSkull.FleeAt; // 많이 맞히면 슬금슬금 도망 (#283)
+
+        // 말 걸 때 '○○ 문제인데…'의 ○○ = 첫 문제의 장 이름에서 '제n장 '을 뺀 것
+        public string Topic
+        {
+            get
+            {
+                string title = questions.Count > 0 ? questions[0].ChapterTitle : "";
+                int space = title.StartsWith("제", StringComparison.Ordinal) ? title.IndexOf(' ') : -1;
+                return space > 0 ? title.Substring(space + 1) : title;
+            }
+        }
 
         public ExamSkullQuiz(IReadOnlyList<ExamQuestion> pool, WorldState world, System.Random rng, int count = ExamSkull.QuestionsPerVisit)
         {
