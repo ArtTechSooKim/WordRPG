@@ -199,6 +199,7 @@ namespace WordRPG.UI
             tabletView = TabletQuizView.Create(hudRoot);
             stoneView = GlowStoneQuizView.Create(hudRoot); // 글자 반딧돌 문제 (#113)
             signpostView = SignpostQuizView.Create(hudRoot); // 뒤섞인 이정표 문제 (#279)
+            skullView = SkullQuizView.Create(hudRoot); // 힐끔해골 확인문제 (#281)
             pauseTutorial = PauseTutorial.Create(hudRoot);
             preemptView = PreemptView.Create(hudRoot);
             BuildHeroSetup(); // 모습 고르기·이름 (#124) — 다른 창보다 위
@@ -325,7 +326,8 @@ namespace WordRPG.UI
         private void UpdateConfirmButton()
         {
             bool ready = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot, bossBody).HasValue
-                         || (!walker.Rafting && npcs.FindTalkable(walker.Position, walker.Facing, false) != null);
+                         || (!walker.Rafting && npcs.FindTalkable(walker.Position, walker.Facing, false) != null)
+                         || (skullCell.HasValue && !walker.Rafting && Mathf.Abs(skullCell.Value.x - walker.Position.x) + Mathf.Abs(skullCell.Value.y - walker.Position.y) == 1);
             if (ready != confirmReady) SetConfirmReady(ready);
 
             // Ready면 숨 쉬듯 살짝, 부딪힌 직후에는 크게 깜빡

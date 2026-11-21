@@ -88,7 +88,6 @@ namespace WordRPG.UI
             BuildSkillPanel(bottom);
             BuildQuizPanel(bottom);
             BuildCardPanel(bottom);
-            BuildExamCard(root); // 확인문제 (#280): 문제를 푸는 동안 로그·아군 칸 자리에
 
             // 보스 결정타 연출 층: 어둡게 · 하얀 번쩍임 · '결정타!' (Figma 'Battle — 보스 결정타 (#41)')
             finisherShade = UiKit.Panel("FinisherShade", root, new Color(0f, 0f, 0f, 0f));
@@ -189,7 +188,6 @@ namespace WordRPG.UI
 
             var timerBack = UiKit.Pill(UiKit.Panel("TimerBack", quizPanel.transform, Palette.Track,
                 0.02f, 0.695f, 0.98f, 0.72f));
-            timerTrack = timerBack.rectTransform;
             timerFillImage = UiKit.Pill(UiKit.Panel("TimerFill", timerBack.transform, Palette.Info));
             timerFill = timerFillImage.rectTransform;
 
@@ -219,10 +217,10 @@ namespace WordRPG.UI
             chainBadge = badge.gameObject;
             chainBadge.SetActive(false);
 
-            for (int i = 0; i < ExamLayout.MaxChoices; i++) // 다섯째는 확인문제 5지선다용 (#280, 평소엔 꺼 둠)
+            for (int i = 0; i < 4; i++)
             {
                 int index = i;
-                float top = 0.68f - Mathf.Min(i, 3) * 0.1725f;
+                float top = 0.68f - i * 0.1725f;
                 var button = UiKit.MakeButton($"Choice_{i}", quizPanel.transform, "", Palette.Button, 40,
                     0, top - 0.16f, 1, top, bestFit: true);
                 UiKit.LabelOf(button).font = UiFonts.Bold; // 보기는 읽기 쉬운 본문 글꼴 (Figma Body/Large Bold)
@@ -234,59 +232,7 @@ namespace WordRPG.UI
                     if (pickedChoice == int.MinValue) pickedChoice = index;
                 });
                 choiceButtons.Add(button);
-                if (i >= 4) button.gameObject.SetActive(false);
             }
-            choiceWordAnchors = ExamLayout.Anchors(choiceButtons);
-        }
-
-        // 확인문제 카드 (#280, Figma 'Battle — 보스전 확인문제 (#280)'): 금빛 테두리 판 + '확인문제 · 제n장 …' 꼬리표 + 문제 글(본문 굵게, 길면 줄어듦)
-        private void BuildExamCard(Transform parent)
-        {
-            var card = UiKit.RoundPanel("ExamCard", parent, Palette.Panel, UiKit.RadiusLg, 0.03f, 0.36f, 0.97f, 0.612f);
-            examCard = card.gameObject;
-            var border = UiKit.Outline(UiKit.Panel("Border", card.transform, Palette.Gold), UiKit.RadiusLg, 4);
-            border.raycastTarget = false;
-            var tag = UiKit.Pill(UiKit.Panel("Tag", card.transform, Palette.Gold, 0, 1, 0, 1));
-            tag.raycastTarget = false;
-            tag.rectTransform.pivot = new Vector2(0, 1);
-            tag.rectTransform.anchoredPosition = new Vector2(24, -22);
-            var row = tag.gameObject.AddComponent<HorizontalLayoutGroup>();
-            row.padding = new RectOffset(24, 24, 6, 6);
-            row.childAlignment = TextAnchor.MiddleCenter;
-            row.childControlWidth = row.childControlHeight = true;
-            row.childForceExpandWidth = row.childForceExpandHeight = false;
-            var fit = tag.gameObject.AddComponent<ContentSizeFitter>();
-            fit.horizontalFit = fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            examTag = UiKit.OneLine(UiKit.Label("Text", tag.transform, "", 28, Palette.OnAccent, 0, 0, 1, 1, TextAnchor.MiddleCenter, FontStyle.Bold));
-            examTag.horizontalOverflow = HorizontalWrapMode.Overflow; // 꼬리표는 한 줄 (글 길이만큼 알약이 늘어남)
-            examText = UiKit.Label("Question", card.transform, "", 44, Palette.Text, 0.03f, 0.05f, 0.97f, 0.8f,
-                TextAnchor.MiddleCenter, FontStyle.Bold, true, 24);
-            examText.lineSpacing = 1.1f;
-            examCard.SetActive(false);
-        }
-
-        // 문제 칸 모양: 단어 문제(위에 단어 · 아래 보기 4) ↔ 확인문제(문제는 카드에 · 안내·시간 막대를 위로 · 보기 4~5개 한 줄씩)
-        private void ApplyQuizLayout(QuizQuestion question)
-        {
-            bool exam = question.IsExam;
-            quizPrompt.gameObject.SetActive(!exam);
-            examCard.SetActive(exam);
-            if (exam)
-            {
-                examTag.text = ExamLayout.Tag(question.Exam);
-                examText.text = question.Prompt;
-            }
-            SetAnchors(quizHint.rectTransform, 0, exam ? 0.935f : 0.735f, 1, exam ? 1f : 0.8f);
-            SetAnchors(timerTrack, 0.02f, exam ? 0.9f : 0.695f, 0.98f, exam ? 0.925f : 0.72f);
-            if (exam) ExamLayout.Column(choiceButtons, question.Choices.Count, 0, 1, 0, 0.88f, 0.02f);
-            else ExamLayout.Restore(choiceButtons, choiceWordAnchors);
-        }
-
-        private static void SetAnchors(RectTransform rect, float minX, float minY, float maxX, float maxY)
-        {
-            rect.anchorMin = new Vector2(minX, minY);
-            rect.anchorMax = new Vector2(maxX, maxY);
-            rect.offsetMin = rect.offsetMax = Vector2.zero;
         }
 
         private void BuildCardPanel(Transform parent)

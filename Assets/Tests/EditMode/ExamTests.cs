@@ -10,7 +10,7 @@ using WordRPG.Words;
 
 namespace WordRPG.Tests
 {
-    // 의학 용어 = 의대생 자료 (#280 사용자: "그대로 넣으면 됨" · 장별 확인문제를 보스전·석판·반딧돌에)
+    // 의학 용어 = 의대생 자료 (#280 사용자: "그대로 넣으면 됨") · 장별 확인문제는 힐끔해골이 냄 (#281 — 보스전·석판·반딧돌은 단어 문제 그대로)
     public class ExamTests
     {
         [TearDown]
@@ -105,29 +105,6 @@ namespace WordRPG.Tests
         }
 
         [Test]
-        public void LongQuestionsGetMoreTimeToRead()
-        {
-            float shortTime = ExamQuiz.ReadingSeconds("짧은 문제?", new[] { "a", "b", "c", "d" });
-            float longTime = ExamQuiz.ReadingSeconds(new string('가', 120), new[] { "aaaaaaaaaa", "bbbbbbbbbb", "cccccccccc", "dddddddddd" });
-            Assert.AreEqual(ExamQuiz.MinReadingSeconds, shortTime);
-            Assert.Greater(longTime, shortTime);
-            Assert.LessOrEqual(ExamQuiz.ReadingSeconds(new string('가', 1000), null), ExamQuiz.MaxReadingSeconds);
-        }
-
-        [Test]
-        public void ProviderAsksEveryQuestionOnceBeforeRepeatingAndRecordsNoMastery()
-        {
-            var pool = Enumerable.Range(1, 5).Select(i => Q($"q{i}?", $"answer{i}", 2, i)).ToList();
-            var provider = new ExamQuizProvider(pool, new System.Random(3));
-            var asked = new HashSet<string>();
-            for (int i = 0; i < 5; i++) Assert.IsTrue(asked.Add(provider.NextQuestion(QuizDirection.EnglishToMeaning).Exam.Id), "다 내기 전엔 겹치지 않음");
-            Assert.AreEqual(5, asked.Count);
-            var next = provider.NextQuestion(QuizDirection.EnglishToMeaning);
-            var change = provider.SubmitAnswer(next, true);
-            Assert.IsFalse(change.LeveledUp || change.LeveledDown, "숙련도에 안 적힘");
-        }
-
-        [Test]
         public void CourseGivesEachAreaItsChapters()
         {
             var book = ScriptableObject.CreateInstance<ExamBook>();
@@ -173,7 +150,6 @@ namespace WordRPG.Tests
                 }
                 Assert.IsFalse(q.Stem.Contains("①"), $"{q.Id}: 보기가 문제 글에 남음");
                 Assert.IsFalse(q.Stem.Contains("[보기]") || q.Stem.Contains("(보기:"), $"{q.Id}: 보기 목록이 문제 글에 남음");
-                Assert.LessOrEqual(question.ReadingSeconds, ExamQuiz.MaxReadingSeconds);
             }
             Assert.AreEqual(35, multiple, "5지선다 35개");
         }
@@ -189,12 +165,8 @@ namespace WordRPG.Tests
             foreach (var area in database.Areas.Where(a => a != null && a.Boss != null))
             {
                 var exams = medical.ExamFor(area.AreaId);
-                Assert.GreaterOrEqual(exams.Count, 40, $"{area.AreaId}: 보스전 확인문제 (세 장)");
+                Assert.GreaterOrEqual(exams.Count, 40, $"{area.AreaId}: 힐끔해골 확인문제 (세 장)");
             }
-            var jungle = database.Areas.First(a => a.AreaId == "jungle");
-            Assert.GreaterOrEqual(medical.ExamFor("jungle").Count, Ruins.Tablets(jungle).Count * TabletQuiz.QuestionsPerTablet, "석판마다 3문제");
-            var cave = database.Areas.First(a => a.AreaId == "cave");
-            Assert.GreaterOrEqual(medical.ExamFor("cave").Count, GlowStones.Stones(cave).Count, "반딧돌마다 1문제");
             Assert.IsEmpty(database.FindCourse("business").ExamFor("library"), "비즈니스는 확인문제 없음");
         }
 

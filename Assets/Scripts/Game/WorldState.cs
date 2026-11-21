@@ -31,6 +31,8 @@ namespace WordRPG.Game
         [SerializeField] private List<string> events = new List<string>();
         // 1.4 숲 (#279, 예전 세이브엔 없음 → 빈 목록): 바로잡은 이정표 (id = "지역:x,y")
         [SerializeField] private List<string> fixedSignposts = new List<string>();
+        // 힐끔해골의 확인문제를 처음 바로 맞힌 문제 id (#281 — 골드는 한 문제에 한 번). 예전 세이브는 빈 목록
+        [SerializeField] private List<string> solvedExams = new List<string>();
 
         public string AreaId => hasPosition ? areaId : null;
         public IReadOnlyList<string> OpenedChests => openedChests;
@@ -131,6 +133,15 @@ namespace WordRPG.Game
         {
             if (fixedSignposts == null) fixedSignposts = new List<string>();
             if (!fixedSignposts.Contains(signpostId)) fixedSignposts.Add(signpostId);
+        }
+
+        public bool IsExamSolved(string examId) => solvedExams != null && solvedExams.Contains(examId);
+        public int SolvedExamCount => solvedExams != null ? solvedExams.Count : 0;
+
+        public void MarkExamSolved(string examId)
+        {
+            if (solvedExams == null) solvedExams = new List<string>();
+            if (!solvedExams.Contains(examId)) solvedExams.Add(examId);
         }
 
         public bool HasEvent(string eventId) => events != null && events.Contains(eventId);

@@ -42,16 +42,7 @@ namespace WordRPG.UI
             bossBattle = boss;
             rematchBattle = rematch;
             HideToast();
-            // 의학 용어로 하는 사람의 보스전 = 이 지역 장의 확인문제 (#280 사용자 — 다시 싸우기도)
-            battle.BeginBattle(enemies, area.Words, OnBattleFinished, intro, area.Theme, boss, rematch,
-                boss ? WordCourses.ExamFor(area.AreaId) : null);
-        }
-
-        // 의학 용어 확인문제 (#280): 지금 단어장이 이 지역에 확인문제를 두었으면 그 문제를 내는 쪽 (석판·반딧돌), 아니면 null
-        private IQuizProvider ExamProvider()
-        {
-            var exams = WordCourses.ExamFor(area != null ? area.AreaId : null);
-            return exams.Count > 0 ? new ExamQuizProvider(exams, rng) : null;
+            battle.BeginBattle(enemies, area.Words, OnBattleFinished, intro, area.Theme, boss, rematch);
         }
 
         private Music AreaMusic => ThemeLooks.Of(area.Theme).Music; // 테마 표 (#118)
@@ -99,6 +90,7 @@ namespace WordRPG.UI
                 var bossCell = walker.Map.BossPosition.Value;
                 tilemap.SetTile(new Vector3Int(bossCell.x, bossCell.y, 0), TileFor(FieldTile.Boss, true));
                 DrawBigBoss(area); // 크게 서 있던 보스도 사라짐 (#233)
+                SetUpSkull(); // 의학 용어면 보석 옆에 힐끔해골 (#281)
                 var lectern = walker.Map.Find(FieldTile.Lectern);
                 if (lectern.HasValue && area.HasDictionary)
                     tilemap.SetTile(new Vector3Int(lectern.Value.x, lectern.Value.y, 0), TileFor(FieldTile.Lectern, true));

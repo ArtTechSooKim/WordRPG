@@ -176,6 +176,7 @@ namespace WordRPG.UI
                                    || (pauseTutorial != null && pauseTutorial.IsShowing)
                                    || (tabletView != null && tabletView.IsOpen)
                                    || (stoneView != null && stoneView.IsOpen) || (signpostView != null && signpostView.IsOpen) || heroSetupRunning
+                                   || (skullView != null && skullView.IsOpen)
                                    || (introView != null && introView.IsOpen) || TesterMenuOpen
                                    || (characterSelect != null && characterSelect.IsOpen) || GiftOpen || MailboxOpen;
         public PauseTutorial PauseTutorial => pauseTutorial;
@@ -371,6 +372,8 @@ namespace WordRPG.UI
             stoneView.Tick(Time.unscaledDeltaTime);
             signpostView.Tick(Time.unscaledDeltaTime);
             UpdateHazeLoop(Time.unscaledDeltaTime);
+            skullView.Tick(Time.unscaledDeltaTime);
+            UpdateSkull(); // 힐끔해골 (#281)
             giftView?.Tick(Time.unscaledDeltaTime);
             UpdateRaft();
             Sound.SetAmbience(ThemeLooks.AmbienceNow(area.Theme, walker.Rafting, Sound.CurrentMusic == AreaMusic));
@@ -528,9 +531,9 @@ namespace WordRPG.UI
         private bool TryInteract()
         {
             if (interactCooldown > 0f) return false;
-            if (TryTalkToNpc(facingOnly: true)) return true;
+            if (TryTalkToSkull(facingOnly: true) || TryTalkToNpc(facingOnly: true)) return true;
             var direction = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot, bossBody);
-            if (!direction.HasValue) return TryTalkToNpc(facingOnly: false);
+            if (!direction.HasValue) return TryTalkToSkull(facingOnly: false) || TryTalkToNpc(facingOnly: false);
             walker.Face(direction.Value);
             playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
             var cell = FieldInteraction.TargetCell(walker.Position, direction.Value, bossBody); // 보스 몸 어느 칸이든 보스 (#267)
@@ -588,6 +591,11 @@ namespace WordRPG.UI
             if (signpostView.IsOpen)
             {
                 CloseSignpost();
+                return;
+            }
+            if (skullView.IsOpen)
+            {
+                CloseSkull();
                 return;
             }
             if (GiftOpen)
@@ -782,7 +790,7 @@ namespace WordRPG.UI
             OpenStoneGateIfAllLit(newArea); // 예전 세이브 (#233)
             var map = area.Map;
             walker = new FieldWalker(map, position, cell => IsDoorLocked(cell) || IsPaywalled(cell), cell => IsCleared(area, cell), rafting,
-                cell => npcs.IsOccupied(cell) || bossBody.Blocks(walker.Position, cell)); // 크게 선 보스의 몸도 막힘 (#267)
+                cell => npcs.IsOccupied(cell) || bossBody.Blocks(walker.Position, cell) || IsSkullAt(cell)); // 크게 선 보스의 몸 (#267) · 힐끔해골 (#281)도 막힘
             encounterCounter = new EncounterCounter(area.EncounterRate, area.MinStepsBetweenEncounters);
             if (FirstFightPending) encounterCounter.GuaranteeWithin(EncounterCounter.FirstFightGrassSteps); // #133
             session.World.SetPosition(area.AreaId, position, rafting);
@@ -794,6 +802,7 @@ namespace WordRPG.UI
             scatter.Build(map, area.Theme);
             fog.Build(map, area.Theme);
             RefreshMooredRafts();
+            SetUpSkull(); // 의학 용어 + 이긴 보스 자리 옆 (#281)
             if (!inBattle) Sound.PlayMusic(AreaMusic);
             session.World.Reveal(area.AreaId, map.Width, map.Height, position);
             BuildDarkness();

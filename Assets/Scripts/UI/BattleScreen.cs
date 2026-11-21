@@ -90,17 +90,7 @@ namespace WordRPG.UI
         private static readonly Color[] IntensityColors = { Palette.Button, Palette.Guard, Palette.Evolve, Palette.Confirm };
 
         private Text quizPrompt, quizHint;
-        private RectTransform timerFill, timerTrack;
-        // 확인문제 (#280): 문제 카드 · 단어 문제 때 보기 자리 · 이번 보스전에서 낼 문제 (null = 단어 문제)
-        private GameObject examCard;
-        private Text examTag, examText;
-        private List<(Vector2 min, Vector2 max)> choiceWordAnchors;
-        private IReadOnlyList<ExamQuestion> examQuestions;
-        public bool ExamCardVisible => examCard != null && examCard.activeInHierarchy; // 테스트용
-        public string ExamCardText => examText != null ? examText.text : "";              // 테스트용
-        public int ChoiceCount => choiceButtons.FindAll(b => b.gameObject.activeInHierarchy).Count; // 테스트용
-        public bool CardVisible => cardPanel != null && cardPanel.activeInHierarchy;               // 테스트용
-        public string CardWordText => cardWord != null ? cardWord.text : "";                       // 테스트용
+        private RectTransform timerFill;
         private Image timerFillImage;
         private readonly List<Button> choiceButtons = new List<Button>();
         private GameObject chainBadge;   // 연속 문제 진행 (Figma 'Chain Badge'): ×1.5 ●●○ 2/3
@@ -264,16 +254,13 @@ namespace WordRPG.UI
         // 필드에서 조우했을 때 한 판. 결과 화면의 버튼을 누르면 화면을 닫고 onFinished(Victory · Defeat · Fled)
         // intro: 전투 로그 첫 줄 (보스전 등). 비우면 "야생 몬스터 출현!". boss면 도망칠 수 없다
         // rematch: 이긴 보스와 다시 싸움 (#236) — 보상은 경험치·골드만
-        // exam: 이번 전투의 문제를 단어 대신 확인문제로 (#280 — 의학 용어로 하는 사람의 보스전)
         public void BeginBattle(List<MonsterInstance> enemies, WordDatabase wordBook, Action<BattlePhase> onFinished,
-            string intro = null, FieldTheme theme = FieldTheme.Meadow, bool boss = false, bool rematch = false,
-            IReadOnlyList<ExamQuestion> exam = null)
+            string intro = null, FieldTheme theme = FieldTheme.Meadow, bool boss = false, bool rematch = false)
         {
             if (running) throw new InvalidOperationException("이미 전투 중입니다");
             if (!EnsureInitialized()) return;
             SetBackdrop(theme, boss);
             bossBattle = boss;
-            examQuestions = exam != null && exam.Count > 0 ? exam : null;
             rematchBattle = rematch;
             ResetFinisher();
             words = wordBook;
@@ -296,7 +283,6 @@ namespace WordRPG.UI
             var provider = new TrainingQuizProvider(books, session.Vocabulary, masteryRules, mode, rng);
             SetBackdrop(theme, false);
             bossBattle = false;
-            examQuestions = null;
             ResetFinisher();
             words = areaBook;
             running = true;
@@ -362,7 +348,6 @@ namespace WordRPG.UI
         private void StartNewBattle(List<MonsterInstance> enemies, string intro = null, IQuizProvider provider = null)
         {
             if (!session.CanFight) session.RestoreHero();
-            if (provider == null && examQuestions != null) provider = new ExamQuizProvider(examQuestions, rng); // 확인문제 보스전 (#280)
             if (provider == null)
             {
                 if (quizService == null || quizWords != words)
@@ -481,7 +466,7 @@ namespace WordRPG.UI
                     events = engine.SubmitAnswer(choice, secondsTaken);
                     session.ComboStreak = engine.Streak;
                     saveProgress?.Invoke(); // 단어 학습 기록은 답할 때마다 저장
-                    bool correct = choice >= 0 && question.IsCorrect(choice) && secondsTaken <= TimeLimit(question);
+                    bool correct = choice >= 0 && question.IsCorrect(choice) && secondsTaken <= battleConfig.AnswerTimeLimitSeconds;
                     bool more = correct && engine.Phase == BattlePhase.AnsweringQuiz; // 아직 맞혀야 할 단어가 남음
                     lastWord = question.Word.English; // 글자 소나기가 이 단어의 글자를 쏟음 (#137)
 
@@ -501,12 +486,6 @@ namespace WordRPG.UI
                         string title = choice < 0 ? "시간 초과! 오답 노트에 추가" : "오답! 오답 노트에 추가";
                         if (chainLength > 1) title = (choice < 0 ? "시간 초과" : "오답") + $" — ×{Multiplier(chainLength)} 공격 실패! 오답 노트에 추가";
                         if (fleeQuiz) title = (choice < 0 ? "시간 초과" : "오답") + " — 도망 실패! 오답 노트에 추가";
-                        if (question.IsExam) // 확인문제는 숙련도·오답 노트에 안 적힘 (#280) — 정답과 원본 답(풀이)을 보여 줌
-                        {
-                            title = (choice < 0 ? "시간 초과" : "오답") + (chainLength > 1 ? $" — ×{Multiplier(chainLength)} 공격 실패!" : "! 정답은");
-                            yield return ShowWordCard(title, ExamAnswerCard(question), "다음", Palette.Bad);
-                        }
-                        else
                         yield return ShowWordCard(title, question.Word, "다음", Palette.Bad);
                     }
                     if (!more) break;
@@ -556,11 +535,9 @@ namespace WordRPG.UI
         private IEnumerator AskQuestion(QuizQuestion question, Action<float> onDone)
         {
             ShowPanel(quizPanel);
-            ApplyQuizLayout(question); // 확인문제면 문제 카드 + 보기 한 줄씩 (#280)
             bool blanked = engine != null && engine.WordsBlanked && !engine.IsFleeQuiz; // 빈칸두꺼비와 싸우는 동안 (#237·#245)
             quizPrompt.text = blanked && question.Direction == QuizDirection.EnglishToMeaning ? WordBlanks.Mask(question.Prompt, blankRng) : question.Prompt;
-            string hint = (blanked ? "빈칸 단어 — " : "") + (quizHintPrefix ?? "")
-                + (question.IsExam ? "알맞은 답은?" : question.Direction == QuizDirection.EnglishToMeaning ? "이 단어의 뜻은?" : "알맞은 영단어는?");
+            string hint = (blanked ? "빈칸 단어 — " : "") + (quizHintPrefix ?? "") + (question.Direction == QuizDirection.EnglishToMeaning ? "이 단어의 뜻은?" : "알맞은 영단어는?");
             if (blanked) GimmickHits++;
             for (int i = 0; i < choiceButtons.Count; i++)
             {
@@ -582,8 +559,7 @@ namespace WordRPG.UI
             if (Tip(TutorialProgress.Quiz))
                 ShowTip(TutorialProgress.Quiz, $"{battleConfig.AnswerTimeLimitSeconds:0}초 안에! 빨리 맞히면 크리티컬",
                     () => quizPrompt.rectTransform, () => pickedChoice != int.MinValue, GuideHints.Gesture.None);
-            float limit = TimeLimit(question);
-            float criticalTime = battleConfig.CriticalTimeSeconds + question.ReadingSeconds; // 긴 확인문제는 읽을 시간만큼 더 (#280)
+            float limit = battleConfig.AnswerTimeLimitSeconds;
             float elapsed = 0f;
             string criticalHint = $"{hint}   ★ 크리티컬 찬스!";
             bool? shownCritical = null;
@@ -604,7 +580,7 @@ namespace WordRPG.UI
                     break;
                 }
 
-                bool critical = elapsed <= criticalTime && engine.CanStillCrit;
+                bool critical = elapsed <= battleConfig.CriticalTimeSeconds && engine.CanStillCrit;
                 if (shownCritical != critical) // 글자·색은 크리티컬이 바뀔 때만 (매 프레임 새 글자를 만들지 않게)
                 {
                     shownCritical = critical;
@@ -629,7 +605,7 @@ namespace WordRPG.UI
                         nextShuffle += ShuffleEvery;
                     }
                 }
-                if (forgetter != null && !forgotten && elapsed > criticalTime)
+                if (forgetter != null && !forgotten && elapsed > battleConfig.CriticalTimeSeconds)
                 {
                     // 크리티컬 시간 안에 못 맞힘 → 정답 버튼이 사라지고 남은 건 모두 오답 (무조건 틀림)
                     forgotten = true;
@@ -647,16 +623,6 @@ namespace WordRPG.UI
             if (blanked) ShowFilledWords(question);
             foreach (var button in choiceButtons) button.interactable = false;
             onDone(elapsed);
-        }
-
-        private float TimeLimit(QuizQuestion question) => battleConfig.AnswerTimeLimitSeconds + question.ReadingSeconds;
-
-        // 확인문제 오답 카드 (#280): 큰 글 = 정답 보기, 금빛 = 원본 정답이 보기와 다르면(풀이가 붙은 5지선다 등), 작은 글 = 어느 장 몇 번
-        private static WordEntry ExamAnswerCard(QuizQuestion question)
-        {
-            var exam = question.Exam;
-            string full = exam.Answer != question.CorrectAnswer ? exam.Answer : "";
-            return new WordEntry(exam.Id, question.CorrectAnswer, full, note: $"{ExamLayout.Tag(exam)} {exam.Number}번");
         }
 
         // 답했으면 빈칸을 채워 보여 줌 (#245 사용자) — 영어 문제는 채운 글자를 금색으로, 보기는 표시(✓ ×)가 붙으므로 단어 그대로
@@ -916,7 +882,6 @@ namespace WordRPG.UI
             dexButton.interactable = panel == skillPanel || panel == resultPanel;
             skillPanel.SetActive(panel == skillPanel);
             quizPanel.SetActive(panel == quizPanel);
-            if (examCard != null && panel != quizPanel && panel != cardPanel) examCard.SetActive(false); // 문제 카드는 풀고 정답을 볼 때까지만 (#280)
             cardPanel.SetActive(panel == cardPanel);
             resultPanel.SetActive(panel == resultPanel);
         }

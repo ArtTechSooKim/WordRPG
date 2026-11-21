@@ -164,6 +164,9 @@ NPC_SHEETS = {
     "npc_merchant_meadow": "Actor/Characters/Woman/SpriteSheet.png",
     "npc_merchant_forest": "Actor/Characters/OldMan3/SpriteSheet.png",
     "npc_merchant_jungle": "Actor/Characters/Monkey/SpriteSheet.png",
+    # 힐끔해골 (#281 — 의학 용어 확인문제를 내는 해골, 보스를 이긴 자리 옆): 몸 시트 + 문제 창 얼굴
+    "exam_skull": "Actor/Characters/Skeleton/SpriteSheet.png",
+    "exam_skull_face": "Actor/Characters/Skeleton/Faceset.png",
 }
 
 HERO_LOOKS = {

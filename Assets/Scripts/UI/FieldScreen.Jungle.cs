@@ -103,20 +103,15 @@ namespace WordRPG.UI
                 bubble.Say("이미 빈칸을 채운 석판이다.\n귀퉁이에 글이 남아 있다.\n\"말을 모두 되찾는 것이 언제나 옳은 일은 아니다.\"", 4.5f); // 스토리 3장의 단서 (#207)
                 return;
             }
-            IQuizProvider provider = ExamProvider(); // 의학 용어면 이 지역 장의 확인문제 (#280)
-            if (provider == null)
+            var books = Preemptive.QuizBooks(area.Words != null ? area.Words.Words : null,
+                TrainingBooks().ConvertAll(b => (IReadOnlyList<WordEntry>)b.Words), session.Vocabulary);
+            if (books.Count == 0)
             {
-                var books = Preemptive.QuizBooks(area.Words != null ? area.Words.Words : null,
-                    TrainingBooks().ConvertAll(b => (IReadOnlyList<WordEntry>)b.Words), session.Vocabulary);
-                if (books.Count == 0)
-                {
-                    bubble.Say("아직 읽을 수 있는 글자가 없다…\n정글에서 단어를 더 만나 보자", 3.5f);
-                    return;
-                }
-                provider = new TrainingQuizProvider(books, session.Vocabulary, battle.MasteryRules, TrainingMode.All, rng);
+                bubble.Say("아직 읽을 수 있는 글자가 없다…\n정글에서 단어를 더 만나 보자", 3.5f);
+                return;
             }
             if (moving) SnapPlayer();
-            tabletQuiz = new TabletQuiz(provider);
+            tabletQuiz = new TabletQuiz(new TrainingQuizProvider(books, session.Vocabulary, battle.MasteryRules, TrainingMode.All, rng));
             tabletCell = cell;
             tabletFilled.Clear();
             tabletBusy = false;

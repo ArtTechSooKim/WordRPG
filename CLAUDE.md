@@ -83,8 +83,10 @@
      Active는 GameSession이 정함 (만들거나 불러오면 기본부터, `ChooseCourse`) — 테스트에서 바꾸면 TearDown에서 null로. 세이브 칸 course (빈 값 = 안 고름, 예전 세이브는 불러올 때 수능·내신).
      단어 = `Assets/Data/Words/Courses/{business|medical}_tier{1|2}.csv` (id 앞글자 biz_·med_, 기본 단어장과 같은 수 150·300 — WordCourseTests). 비즈니스 = Claude가 고르고 뜻을 씀 → 사용자 검수 (시판 단어장·학원 자료는 넣지 않음, GDD 11-2 — 사용자의 토익 목록은 어려운 정도만 참고, 단어를 옮기지 않음).
      **의학 = 의대생 '의학용어 암기장' 그대로** (#280 사용자, GDD 9-16 — 원본 `Docs/의학용어_원본.html` → `python Tools/medical_course.py --apply`, 장 순서·글자 그대로 — 뜻을 고치거나 검수로 바꾸지 말 것. 설명 = 단어 칸 `note`(도감·단어 카드). 쉬운 말·같은 뜻·품사 규칙은 의학엔 안 씀).
-     **확인문제** (#280): 의대생이 장마다 만든 문제 221개 = `Assets/Data/Exams/medical_exam.csv` → `ExamBook`(임포터 `ExamCsvImporter`), 단어장 `WordCourse.exams`·`examAreas`(지역 areaId → 장 번호: 서고 2~4 · 숲 5~7 · 정글 8~10 · 동굴 11~13).
-     규칙 `ExamQuestion`(5지선다 ①~⑤·[보기] 목록을 화면용으로 읽기만) · `ExamQuiz`(보기 만들기 · 읽을 시간 `ReadingSeconds`) · `ExamQuizProvider`(겹치지 않게, 숙련도에 안 적힘). 쓰는 곳 = 보스전(`BattleScreen.BeginBattle` exam — 문제 카드·보기 한 줄씩 4~5개, `ExamLayout`) · 석판·반딧돌(`FieldScreen.ExamProvider`). `WordCourses.ExamFor(areaId)`
+     **확인문제** (#280·#281): 의대생이 장마다 만든 문제 221개 = `Assets/Data/Exams/medical_exam.csv` → `ExamBook`(임포터 `ExamCsvImporter`), 단어장 `WordCourse.exams`·`examAreas`(지역 areaId → 장 번호: 서고 2~4 · 숲 5~7 · 정글 8~10 · 동굴 11~13), `WordCourses.ExamFor(areaId)`.
+     규칙 `ExamQuestion`(5지선다 ①~⑤·[보기] 목록을 화면용으로 읽기만) · `ExamQuiz`(보기 만들기). **내는 곳은 힐끔해골뿐** (#281 사용자 — 친구(의대생) 의견: 단어만 외우는 사람은 못 풂, 보스·몹·석판·반딧돌엔 넣지 말 것):
+     의학 용어 + 그 지역 보스를 이기면 보석 옆에 서는 해골(팩 Skeleton → Npcs/exam_skull·_face) — 힐끔힐끔·'…키킥', [확인] = 3문제(`ExamSkullQuiz`), 처음 바로 맞힌 새 문제마다 20G(세이브 칸 `solvedExams`).
+     규칙 `ExamSkull`(있는지 · 자리 = 보석에서 2~4칸, 길을 끊지 않는 칸 · 고를 문제) · 화면 `FieldScreen.Skull`·`SkullQuizView`(Figma '힐끔해골 확인문제 (#281)')
      예비 = `Docs/단어_예비_비즈니스·의학.csv` (#276, 비즈니스는 자주 쓰는 말부터 · 분야 열 group / 의학은 #280부터 의대생 자료 장 순서 · group = 장 이름). **수능 중·고 공통 단어와 겹치거나 비슷한 말(파생어)은 초원·서고 단어장에만** — 숲부터 쓰는 단어장·예비에는 넣지 않음, 비즈니스는 아주 흔한 말도 (사용자, `HarderCourseWordsSkipEasySuneungWords`). 예비 안에 같은 뜻 두 번 금지 (한 단어장에 들어가면 보기가 같아짐)
      만들기 = `WordRPG > Data > Build Word Courses` (Create Sample Data에도 포함). 'TOEIC·토익'은 화면에 쓰지 않음 (상표)
    - **크리스마스 선물 퀴즈** (#274, 1.4 — GDD 9-13): 데이터 `GiftEvent`(eventId christmas — 세이브에 `{id}_{연도}`로 적히니 출시 뒤 바꾸지 말 것, GameDatabase `SeasonalEvents`, 만들기 `WordRPG > Data > Build Gift Events`) ·
@@ -243,11 +245,11 @@ Assets/
                         Ruins(유적: 석판 T 4개 + 정글 단어 60개 → 제단 A에서 동료) · Levers(레버 Y → 덩굴 다리 H) · CellState(칸의 끝난 모습·지나갈 수 있음) — #80,
                         TabletQuiz(석판 3문제: 틀리면 벌점 없이 다시, 숙련도는 처음 답만 — #81), GlowStones(글자 반딧돌: 밝힘·밝힌 수·모두 밝힌 보상 — #112·#115),
                         UpdateNotices(업데이트 안내: 업데이트한 사람만 타이틀에서 한 번 — #115), PotionEffects(효과 물약이 남긴 효과 — #146),
-                        RelicTutorials(성유물 안내 규칙: 언제 · 가장 가까운 제단과 그 앞 칸 — #142), Journals(누군가의 기록 규칙 — #201), SpringWarp(샘으로 다른 지역 가기 — #216)
+                        RelicTutorials(성유물 안내 규칙: 언제 · 가장 가까운 제단과 그 앞 칸 — #142), Journals(누군가의 기록 규칙 — #201), SpringWarp(샘으로 다른 지역 가기 — #216), ExamSkull(힐끔해골: 의학 용어 확인문제 — #281)
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
     UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투 + 보스 결정타 연출 + 전투 결산, 단독 연습 모드도 있음)
                         — 둘 다 partial로 나눔 (#93): FieldScreen.cs(상태·이동·입력) + .Places([확인] 장소)·.Jungle(정글 기믹)·.Battles(조우·전투 뒤·수련)·
-                        .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴)·.Cave(동굴 어둠·반딧돌 #112)·.RelicGuides(성유물 바꾸기·제단 안내 #142)·.Springs(샘: 회복·다른 지역으로 #216)·.Sparkles(아직 안 연 상자·열쇠 반짝임 #233) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout·.Events(사건 연출: 사건 종류마다 Show… 함수 — #119)·.SkillFx(기술 연출: 몸짓·회복·보호막·특수 — #137).
+                        .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴)·.Cave(동굴 어둠·반딧돌 #112)·.RelicGuides(성유물 바꾸기·제단 안내 #142)·.Springs(샘: 회복·다른 지역으로 #216)·.Sparkles(아직 안 연 상자·열쇠 반짝임 #233)·.Skull(힐끔해골 #281) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout·.Events(사건 연출: 사건 종류마다 Show… 함수 — #119)·.SkillFx(기술 연출: 몸짓·회복·보호막·특수 — #137).
                         새 기능은 맞는 파일에, 기능 묶음이 커지면 새 partial 파일로,
                         DexView(도감) + JournalView(누군가의 기록 #201), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기), SpringWarpView(샘 이동: 지역 고르기 #216),
                         InventoryView(소지품: 주인공·성유물·아이템(넘치면 스크롤, 놓는 순서 `ItemData.BagOrder` #147)·징표) + HeroViews(HeroInfoPage·RelicPage·RelicSlotsRow·SkillRowView),
@@ -286,7 +288,7 @@ Docs/                   PRD.txt, GDD.md, 아트에셋목록.md, 아이폰출시�
 .github/workflows/      ios-testflight.yml (GitHub Mac 서버에서 서명·TestFlight 업로드)
 Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow 필요), zip_ios_for_mac.py (Xcode 프로젝트 → Mac용 zip, 실행 권한 유지),
                         widen_maps.py (맵의 한 칸 통로 → 두 칸), subset_fonts.py (본문 글꼴에서 한자·가나 빼기 — 앱 크기, fontTools 필요),
-                        pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), forest_map.py (1.4 숲 72×44 = 예전 숲 + 오른쪽 이정표 미로, 검사·미리보기·--apply #279), make_signpost_art.py (이정표·헷갈 안개 그림 #279), medical_course.py (의대생 의학 용어 → 의학 단어장 150·300 + 예비 + 확인문제 CSV #280), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구), make_preempt_sfx.py (선제공격 '카칭' 소리 합성 #147), make_skill_sfx.py (기술마다 다른 소리: 팩 소리 겹치기 #164),
+                        pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), forest_map.py (1.4 숲 72×44 = 예전 숲 + 오른쪽 이정표 미로, 검사·미리보기·--apply #279), make_signpost_art.py (이정표·헷갈 안개 그림 #279), medical_course.py (의대생 의학 용어 → 의학 단어장 150·300 + 예비 + 확인문제 CSV #280 — 문제는 힐끔해골이 냄 #281), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구), make_preempt_sfx.py (선제공격 '카칭' 소리 합성 #147), make_skill_sfx.py (기술마다 다른 소리: 팩 소리 겹치기 #164),
                         check_android_bundle.py (구글플레이에 올리기 전 AAB 검사: 대상 API·게임 표시·뒤로 가기·권한·16KB 페이지·크기 #149),
                         make_shop_stalls.py (상점 가판대 그림: 팩 조각 조립 #210), journal_lines.py (누군가의 기록 문장 검사·CSV에 넣기 #201 · 글 파일 만들기 --text #202 · 고친 글 받아들이기 --import #204), make_journal_smudge.py (못 찾은 줄의 필기 그림 #201),
                         prepare_ambience.py (지역 환경음: 팩·CC0 녹음 다듬기 → Resources/Audio/Ambience + BGM과 섞은 미리듣기, #193), prepare_music.py (받은 곡 → 게임용: 끝 무음 빼기·반복 이음새 찾아 겹치기·음량 맞추기 → Licensed 폴더, `--later` = 아직 안 쓰는 2.0 곡을 Builds로, imageio-ffmpeg·numpy 필요 #166·#172),

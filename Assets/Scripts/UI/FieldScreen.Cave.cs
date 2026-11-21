@@ -97,20 +97,16 @@ namespace WordRPG.UI
                 bubble.Say("반딧돌이 환하게 빛나고 있다", 2.5f);
                 return;
             }
-            IQuizProvider provider = ExamProvider(); // 의학 용어면 이 지역 장의 확인문제 (#280)
-            if (provider == null)
+            var books = Preemptive.QuizBooks(area.Words != null ? area.Words.Words : null,
+                TrainingBooks().ConvertAll(b => (IReadOnlyList<WordEntry>)b.Words), session.Vocabulary);
+            if (books.Count == 0)
             {
-                var books = Preemptive.QuizBooks(area.Words != null ? area.Words.Words : null,
-                    TrainingBooks().ConvertAll(b => (IReadOnlyList<WordEntry>)b.Words), session.Vocabulary);
-                if (books.Count == 0)
-                {
-                    bubble.Say("희미하게 깜빡이는 돌이다…\n단어를 더 만나면 글자가 떠오를 것 같다", 3.5f);
-                    return;
-                }
-                provider = new TrainingQuizProvider(books, session.Vocabulary, battle.MasteryRules, TrainingMode.All, rng);
+                bubble.Say("희미하게 깜빡이는 돌이다…\n단어를 더 만나면 글자가 떠오를 것 같다", 3.5f);
+                return;
             }
             if (moving) SnapPlayer();
-            stoneQuiz = new TabletQuiz(provider, 1, QuizDirection.EnglishToMeaning);
+            stoneQuiz = new TabletQuiz(new TrainingQuizProvider(books, session.Vocabulary, battle.MasteryRules, TrainingMode.All, rng),
+                1, QuizDirection.EnglishToMeaning);
             stoneCell = cell;
             stoneLitNow = false;
             stoneView.Show(stoneQuiz.Current, GlowStones.LitCount(area, session.World), GlowStones.Stones(area).Count, PickStone, CloseStone);
