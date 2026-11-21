@@ -19,8 +19,13 @@ namespace WordRPG.Words
 
         public string CorrectAnswer => Choices[CorrectIndex];
 
+        // 확인문제 (#280): 단어가 아니라 장별 문제 — 숙련도·도감에 안 적히고, 긴 글을 읽을 시간(ReadingSeconds)을 더 준다
+        public ExamQuestion Exam { get; }
+        public bool IsExam => Exam != null;
+        public float ReadingSeconds { get; }
+
         public QuizQuestion(WordEntry word, QuizDirection direction, bool isNewWord, string prompt,
-            IReadOnlyList<string> choices, int correctIndex)
+            IReadOnlyList<string> choices, int correctIndex, ExamQuestion exam = null, float readingSeconds = 0f)
         {
             Word = word;
             Direction = direction;
@@ -28,6 +33,8 @@ namespace WordRPG.Words
             Prompt = prompt;
             Choices = choices;
             CorrectIndex = correctIndex;
+            Exam = exam;
+            ReadingSeconds = readingSeconds;
         }
 
         public bool IsCorrect(int choiceIndex) => choiceIndex == CorrectIndex;

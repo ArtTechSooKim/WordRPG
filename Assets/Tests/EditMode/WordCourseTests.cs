@@ -184,7 +184,8 @@ namespace WordRPG.Tests
                     {
                         StringAssert.StartsWith(prefix, word.Id, $"{book.name}: 단어 id는 단어장 앞글자로 (세이브 기록이 섞이지 않게)");
                         Assert.IsFalse(string.IsNullOrWhiteSpace(word.Meaning), $"{word.Id} 뜻이 비어 있음");
-                        Assert.IsTrue(PartsOfSpeech.Contains(word.PartOfSpeech), $"{word.Id} 품사");
+                        if (course.CourseId != "medical") // 의학 = 의대생 자료 그대로라 품사 칸이 없음 (#280 — 화면에도 안 나옴)
+                            Assert.IsTrue(PartsOfSpeech.Contains(word.PartOfSpeech), $"{word.Id} 품사");
                     }
                 }
                 var all = baseBooks.SelectMany(b => course.BookFor(b).OwnWords).ToList();
@@ -223,7 +224,9 @@ namespace WordRPG.Tests
         }
 
         // #276 사용자: 수능 중·하(중·고 공통 1,200)와 겹치는 말은 초원·서고 단어장에만 — 숲부터 쓰는 단어장과 예비에는 없음.
-        // 비즈니스·의학 예비(Docs/단어_예비_비즈니스·의학.csv)는 다음 버전부터 위에서 300개씩: 그 단어장과 겹치지 않고 같은 뜻도 없음
+        // 비즈니스·의학 예비(Docs/단어_예비_비즈니스·의학.csv)는 다음 버전부터 위에서 300개씩: 그 단어장과 겹치지 않고 같은 뜻도 없음.
+        // 의학(#280 사용자: 의대생이 외우는 용어 '그대로, 아무것도 건들이지 말고')은 쉬운 말·같은 뜻·품사 규칙을 빼고 id만 봄 —
+        // 같은 뜻(gastritis · gastr/itis = 위염)은 QuizGenerator가 오답 보기에서 빼므로 보기 두 개가 같아지지 않음
         [Test]
         public void HarderCourseWordsSkipEasySuneungWords()
         {
@@ -238,13 +241,14 @@ namespace WordRPG.Tests
             {
                 var course = database.FindCourse(courseId);
                 string prefix = courseId == "business" ? "biz_" : "med_";
-                foreach (var baseBook in baseBooks.Where(b => b != easyBook))
+                bool asIs = courseId == "medical";
+                foreach (var baseBook in baseBooks.Where(b => b != easyBook && !asIs))
                     foreach (var word in course.BookFor(baseBook).OwnWords)
                         Assert.IsFalse(easy.Contains(word.English.ToLowerInvariant()), $"{word.Id}: 쉬운 수능 단어는 초원·서고 단어장에만");
 
                 var used = new HashSet<string>(baseBooks.SelectMany(b => course.BookFor(b).OwnWords).Select(w => w.Id));
                 var reserve = DocsCsv(reserveFile);
-                Assert.GreaterOrEqual(reserve.Count, 2000, $"{courseId}: 예비 단어 (버전마다 300개쯤 · 6~7버전)");
+                Assert.GreaterOrEqual(reserve.Count, asIs ? 1900 : 2000, $"{courseId}: 예비 단어 (버전마다 300개쯤 · 6~7버전 — 의학은 의대생 자료 2,441 − 450)");
                 var ids = new HashSet<string>();
                 var meanings = new HashSet<string>();
                 foreach (var r in reserve)
@@ -253,8 +257,9 @@ namespace WordRPG.Tests
                     StringAssert.StartsWith(prefix, id, $"{reserveFile}: 단어 id 앞글자");
                     Assert.IsTrue(ids.Add(id), $"{reserveFile}: {id}가 두 번");
                     Assert.IsFalse(used.Contains(id), $"{reserveFile}: {id}는 이미 단어장에 있음");
-                    Assert.IsFalse(easy.Contains(english.ToLowerInvariant()), $"{reserveFile}: {english}는 쉬운 수능 단어 (초원·서고에만)");
                     Assert.IsFalse(string.IsNullOrEmpty(meaning), $"{reserveFile}: {id} 뜻");
+                    if (asIs) continue;
+                    Assert.IsFalse(easy.Contains(english.ToLowerInvariant()), $"{reserveFile}: {english}는 쉬운 수능 단어 (초원·서고에만)");
                     Assert.IsTrue(meanings.Add(meaning), $"{reserveFile}: 같은 뜻 '{meaning}'이 두 번 (한 단어장에 들어가면 보기 두 개가 같아짐)");
                     Assert.Contains(pos, PartsOfSpeech, $"{reserveFile}: {id} 품사");
                 }

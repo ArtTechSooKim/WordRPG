@@ -18,1203 +18,1356 @@ MonoBehaviour:
   rewards: []
   journal: {fileID: 0}
   words:
-  - id: med_abdomen
-    english: abdomen
-    meaning: "\uBCF5\uBD80, \uBC30"
-    partOfSpeech: n
+  - id: med_osteitis
+    english: osteitis
+    meaning: "\uACE8\uC5FC"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_artery
-    english: artery
-    meaning: "\uB3D9\uB9E5"
-    partOfSpeech: n
+    note: "oste(bone\xB7\uBF08) + itis(inflammation\xB7\uC5FC\uC99D)"
+  - id: med_gastralgia
+    english: gastralgia
+    meaning: "\uC704\uD1B5"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_vein
-    english: vein
-    meaning: "\uC815\uB9E5"
-    partOfSpeech: n
+    note: "gastr(stomach\xB7\uC704) + algia(pain\xB7\uD1B5\uC99D)"
+  - id: med_gastritis
+    english: gastritis
+    meaning: "\uC704\uC5FC"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_capillary
-    english: capillary
-    meaning: "\uBAA8\uC138 \uD608\uAD00"
-    partOfSpeech: n
+    note: "gastr(\uC704) + itis(\uC5FC\uC99D)"
+  - id: med_endocardium
+    english: endocardium
+    meaning: "\uC2EC\uB0B4\uB9C9"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_skull
-    english: skull
-    meaning: "\uB450\uAC1C\uACE8"
-    partOfSpeech: n
+    note: "endo(within\xB7\uB0B4\uBD80\uC758) + cardium(heart\xB7\uC2EC\uC7A5)"
+  - id: med_myocardium
+    english: myocardium
+    meaning: "\uC2EC\uADFC"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_spine
-    english: spine
-    meaning: "\uCC99\uCD94"
-    partOfSpeech: n
+    note: "my(\uADFC\uC721) + o(\uC5F0\uACB0\uBAA8\uC74C) + cardium(\uC2EC\uC7A5)"
+  - id: med_pericardium
+    english: pericardium
+    meaning: "\uC2EC\uC7A5\uB9C9"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_rib
-    english: rib
-    meaning: "\uAC08\uBE44\uBF08"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_pelvis
-    english: pelvis
-    meaning: "\uACE8\uBC18"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_joint
-    english: joint
-    meaning: "\uAD00\uC808"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_ligament
-    english: ligament
-    meaning: "\uC778\uB300"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_tendon
-    english: tendon
-    meaning: "\uD798\uC904"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_cartilage
-    english: cartilage
-    meaning: "\uC5F0\uACE8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_muscle
-    english: muscle
-    meaning: "\uADFC\uC721"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_nerve
-    english: nerve
-    meaning: "\uC2E0\uACBD"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_brain
-    english: brain
-    meaning: "\uB1CC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_heart
-    english: heart
-    meaning: "\uC2EC\uC7A5"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_liver
-    english: liver
-    meaning: "\uAC04"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_kidney
-    english: kidney
-    meaning: "\uC2E0\uC7A5, \uCF69\uD325"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_lung
-    english: lung
-    meaning: "\uD3D0, \uD5C8\uD30C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_stomach
-    english: stomach
-    meaning: "\uC704"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_intestine
-    english: intestine
-    meaning: "\uC7A5, \uCC3D\uC790"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_bladder
-    english: bladder
-    meaning: "\uBC29\uAD11"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_pancreas
-    english: pancreas
-    meaning: "\uCDCC\uC7A5"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_spleen
-    english: spleen
-    meaning: "\uBE44\uC7A5"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_gallbladder
-    english: gallbladder
-    meaning: "\uC4F8\uAC1C, \uB2F4\uB0AD"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_thyroid
-    english: thyroid
-    meaning: "\uAC11\uC0C1\uC0D8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_esophagus
-    english: esophagus
-    meaning: "\uC2DD\uB3C4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_trachea
-    english: trachea
-    meaning: "\uAE30\uAD00(\uC228\uD1B5)"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_throat
-    english: throat
-    meaning: "\uBAA9\uAD6C\uBA4D"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_tonsil
-    english: tonsil
-    meaning: "\uD3B8\uB3C4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_retina
-    english: retina
-    meaning: "\uB9DD\uB9C9"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_cornea
-    english: cornea
-    meaning: "\uAC01\uB9C9"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_pupil
-    english: pupil
-    meaning: "\uB3D9\uACF5"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_eardrum
-    english: eardrum
-    meaning: "\uACE0\uB9C9"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_gland
-    english: gland
-    meaning: "\uC0D8, \uBD84\uBE44\uC120"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_tissue
-    english: tissue
-    meaning: "\uC870\uC9C1"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_cell
-    english: cell
-    meaning: "\uC138\uD3EC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_organ
-    english: organ
-    meaning: "\uC7A5\uAE30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_skin
-    english: skin
-    meaning: "\uD53C\uBD80"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_bone
-    english: bone
-    meaning: "\uBF08"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_blood
-    english: blood
-    meaning: "\uD608\uC561, \uD53C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_hormone
-    english: hormone
-    meaning: "\uD638\uB974\uBAAC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_chest
-    english: chest
-    meaning: "\uAC00\uC2B4, \uD749\uBD80"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_wrist
-    english: wrist
-    meaning: "\uC190\uBAA9"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_ankle
-    english: ankle
-    meaning: "\uBC1C\uBAA9"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_elbow
-    english: elbow
-    meaning: "\uD314\uAFC8\uCE58"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_knee
-    english: knee
-    meaning: "\uBB34\uB98E"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_hip
-    english: hip
-    meaning: "\uC5C9\uB369\uC774, \uACE0\uAD00\uC808"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_shoulder
-    english: shoulder
-    meaning: "\uC5B4\uAE68"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_thigh
-    english: thigh
-    meaning: "\uD5C8\uBC85\uC9C0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_gum
-    english: gum
-    meaning: "\uC787\uBAB8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_jaw
-    english: jaw
-    meaning: "\uD131"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_tongue
-    english: tongue
-    meaning: "\uD600"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_symptom
-    english: symptom
-    meaning: "\uC99D\uC0C1"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_fever
-    english: fever
-    meaning: "\uC5F4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_cough
-    english: cough
-    meaning: "\uAE30\uCE68"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_sneeze
-    english: sneeze
-    meaning: "\uC7AC\uCC44\uAE30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_nausea
-    english: nausea
-    meaning: "\uBA54\uC2A4\uAEBC\uC6C0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_vomit
-    english: vomit
-    meaning: "\uD1A0\uD558\uB2E4"
-    partOfSpeech: v
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_diarrhea
-    english: diarrhea
-    meaning: "\uC124\uC0AC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_constipation
-    english: constipation
-    meaning: "\uBCC0\uBE44"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_fatigue
-    english: fatigue
-    meaning: "\uD53C\uB85C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_dizziness
-    english: dizziness
-    meaning: "\uC5B4\uC9C0\uB7EC\uC6C0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_headache
-    english: headache
-    meaning: "\uB450\uD1B5"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_rash
-    english: rash
-    meaning: "\uBC1C\uC9C4"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_itch
-    english: itch
-    meaning: "\uAC00\uB824\uC6C0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_swelling
-    english: swelling
-    meaning: "\uBD80\uAE30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_bruise
-    english: bruise
-    meaning: "\uBA4D"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_fracture
-    english: fracture
-    meaning: "\uACE8\uC808"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_sprain
-    english: sprain
-    meaning: "\uC0A0, \uC5FC\uC88C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_wound
-    english: wound
-    meaning: "\uC0C1\uCC98"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_bleeding
-    english: bleeding
-    meaning: "\uCD9C\uD608"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_infection
-    english: infection
-    meaning: "\uAC10\uC5FC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_inflammation
-    english: inflammation
-    meaning: "\uC5FC\uC99D"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_allergy
-    english: allergy
-    meaning: "\uC54C\uB808\uB974\uAE30"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_asthma
-    english: asthma
-    meaning: "\uCC9C\uC2DD"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_diabetes
-    english: diabetes
-    meaning: "\uB2F9\uB1E8\uBCD1"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_cancer
-    english: cancer
-    meaning: "\uC554"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_tumor
-    english: tumor
-    meaning: "\uC885\uC591"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_stroke
-    english: stroke
-    meaning: "\uB1CC\uC878\uC911"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_seizure
-    english: seizure
-    meaning: "\uBC1C\uC791"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_injury
-    english: injury
-    meaning: "\uBD80\uC0C1"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_pain
-    english: pain
-    meaning: "\uD1B5\uC99D"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_chill
-    english: chill
-    meaning: "\uC624\uD55C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_insomnia
-    english: insomnia
-    meaning: "\uBD88\uBA74\uC99D"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_obesity
-    english: obesity
-    meaning: "\uBE44\uB9CC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_flu
-    english: flu
-    meaning: "\uB3C5\uAC10"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_burn
-    english: burn
-    meaning: "\uD654\uC0C1"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_cavity
-    english: cavity
-    meaning: "\uCDA9\uCE58"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_diagnosis
-    english: diagnosis
-    meaning: "\uC9C4\uB2E8"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_treatment
-    english: treatment
-    meaning: "\uCE58\uB8CC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_therapy
-    english: therapy
-    meaning: "\uC694\uBC95"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_prescription
-    english: prescription
-    meaning: "\uCC98\uBC29\uC804"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_medication
-    english: medication
-    meaning: "\uC57D\uBB3C, \uD22C\uC57D"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_dose
-    english: dose
-    meaning: "(1\uD68C) \uBCF5\uC6A9\uB7C9"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_tablet
-    english: tablet
-    meaning: "\uC54C\uC57D, \uC815\uC81C"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_capsule
-    english: capsule
-    meaning: "\uCEA1\uC290"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_ointment
-    english: ointment
-    meaning: "\uC5F0\uACE0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_injection
-    english: injection
-    meaning: "\uC8FC\uC0AC"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_vaccine
-    english: vaccine
-    meaning: "\uBC31\uC2E0"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
-  - id: med_surgery
-    english: surgery
-    meaning: "\uC218\uC220"
-    partOfSpeech: n
-    example: 
-    exampleMeaning: 
-    story: 0
-    storyHeading: 
+    note: "peri(around\xB7\uC8FC\uC704) + cardium(heart\xB7\uC2EC\uC7A5)"
   - id: med_anesthesia
     english: anesthesia
     meaning: "\uB9C8\uCDE8"
-    partOfSpeech: n
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_patient
-    english: patient
-    meaning: "\uD658\uC790"
-    partOfSpeech: n
+    note: "an(no, not\xB7\uC544\uB2CC, \uC5C6\uB294) + esthesia(sensation\xB7\uAC10\uAC01)"
+  - id: med_dysuria
+    english: dysuria
+    meaning: "\uBC30\uB1E8\uD1B5"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_nurse
-    english: nurse
-    meaning: "\uAC04\uD638\uC0AC"
-    partOfSpeech: n
+    note: "dys(painful\xB7\uD1B5\uC99D\uC774 \uC788\uB294) + uria(urine\xB7\uC18C\uBCC0)"
+  - id: med_anuria
+    english: anuria
+    meaning: "\uBB34\uB1E8"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_physician
-    english: physician
-    meaning: "\uB0B4\uACFC \uC758\uC0AC, \uC758\uC0AC"
-    partOfSpeech: n
+    note: "an(\uC5C6\uB2E4) + uria(\uC18C\uBCC0)"
+  - id: med_osteomalacia
+    english: osteomalacia
+    meaning: "\uACE8\uC5F0\uD654\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_surgeon
-    english: surgeon
-    meaning: "\uC678\uACFC \uC758\uC0AC"
-    partOfSpeech: n
+    note: "oste(bone\xB7\uBF08) + o(\uC5F0\uACB0\uBAA8\uC74C) + malacia(softening\xB7\uBD80\uB4DC\uB7EC\uC6CC\uC9D0,
+      \uC5F0\uD654\uC99D)"
+  - id: med_nephrolithotomy
+    english: nephrolithotomy
+    meaning: "\uCF69\uD325\uC808\uAC1C\uB3CC\uC81C\uAC70\uC220"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_pharmacist
-    english: pharmacist
-    meaning: "\uC57D\uC0AC"
-    partOfSpeech: n
+    note: "nephr(kidney\xB7\uCF69\uD325) + o(\uC5F0\uACB0\uBAA8\uC74C) + lith(stone\xB7\uB3CC)
+      + otomy(incision into\xB7\uC808\uAC1C)"
+  - id: med_osteotomy
+    english: osteotomy
+    meaning: "\uACE8\uC808\uC220, \uC808\uACE8\uC220"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_pharmacy
-    english: pharmacy
-    meaning: "\uC57D\uAD6D"
-    partOfSpeech: n
+    note: "oste(\uBF08) + otomy(\uC808\uAC1C)"
+  - id: med_hemigastrectomy
+    english: hemigastrectomy
+    meaning: "\uBC18\uC704\uC808\uC81C\uC220"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_ward
-    english: ward
-    meaning: "\uBCD1\uB3D9"
-    partOfSpeech: n
+    note: "hemi(half\xB7\uC808\uBC18\uC758) + gastr(stomach\xB7\uC704) + ectomy(excision\xB7\uC808\uC81C)"
+  - id: med_hypercalcemia
+    english: hypercalcemia
+    meaning: "\uACE0\uCE7C\uC298\uD608\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_clinic
-    english: clinic
-    meaning: "\uC9C4\uB8CC\uC18C, \uC758\uC6D0"
-    partOfSpeech: n
+    note: "hyper(excessive\xB7\uACFC\uD55C, \uACFC\uB2E4\uD55C) + calc(lime\xB7\uC11D\uD68C,
+      \uCE7C\uC298) + emia(blood\xB7\uD53C)"
+  - id: med_hypernatremia
+    english: hypernatremia
+    meaning: "\uACE0\uB098\uD2B8\uB968\uD608\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_emergency_room
-    english: emergency room
-    meaning: "\uC751\uAE09\uC2E4"
-    partOfSpeech: n
+    note: "hyper(\uACFC\uB3C4\uD55C) + natr(\uB098\uD2B8\uB968) + emia(\uD53C)"
+  - id: med_emia
+    english: -emia
+    meaning: "\uD608\uC561"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_ambulance
-    english: ambulance
-    meaning: "\uAD6C\uAE09\uCC28"
-    partOfSpeech: n
+    note: 
+  - id: med_an_emia
+    english: an/emia
+    meaning: "\uBE48\uD608"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_stethoscope
-    english: stethoscope
-    meaning: "\uCCAD\uC9C4\uAE30"
-    partOfSpeech: n
+    note: 
+  - id: med_leuk_emia
+    english: leuk/emia
+    meaning: "\uBC31\uD608\uBCD1"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_thermometer
-    english: thermometer
-    meaning: "\uCCB4\uC628\uACC4"
-    partOfSpeech: n
+    note: 
+  - id: med_ectasis
+    english: -ectasis
+    meaning: "\uD655\uC7A5\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_bandage
-    english: bandage
-    meaning: "\uBD95\uB300"
-    partOfSpeech: n
+    note: 
+  - id: med_angi_ectasis
+    english: angi/ectasis
+    meaning: "\uD608\uAD00\uD655\uC7A5\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_crutch
-    english: crutch
-    meaning: "\uBAA9\uBC1C"
-    partOfSpeech: n
+    note: 
+  - id: med_bronchi_ectasis
+    english: bronchi/ectasis
+    meaning: "\uAE30\uAD00\uC9C0\uD655\uC7A5\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_wheelchair
-    english: wheelchair
-    meaning: "\uD720\uCCB4\uC5B4"
-    partOfSpeech: n
+    note: 
+  - id: med_itis
+    english: -itis
+    meaning: "\uC5FC, \uC5FC\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_stretcher
-    english: stretcher
-    meaning: "\uB4E4\uAC83"
-    partOfSpeech: n
+    note: 
+  - id: med_gastr_itis
+    english: gastr/itis
+    meaning: "\uC704\uC5FC"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_pulse
-    english: pulse
-    meaning: "\uB9E5\uBC15"
-    partOfSpeech: n
+    note: 
+  - id: med_hepat_itis
+    english: hepat/itis
+    meaning: "\uAC04\uC5FC"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_blood_pressure
-    english: blood pressure
-    meaning: "\uD608\uC555"
-    partOfSpeech: n
+    note: 
+  - id: med_lithiasis
+    english: -lithiasis
+    meaning: "\uACB0\uC11D\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_heart_rate
-    english: heart rate
-    meaning: "\uC2EC\uBC15\uC218"
-    partOfSpeech: n
+    note: 
+  - id: med_chole_lithiasis
+    english: chole/lithiasis
+    meaning: "\uB2F4\uC11D\uC99D, \uC4F8\uAC1C\uB3CC\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_temperature
-    english: temperature
-    meaning: "\uCCB4\uC628"
-    partOfSpeech: n
+    note: 
+  - id: med_nephro_lithiasis
+    english: nephro/lithiasis
+    meaning: "\uC2E0\uC11D\uC99D, \uCF69\uD325\uB3CC\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_breathe
-    english: breathe
-    meaning: "\uC228 \uC26C\uB2E4"
-    partOfSpeech: v
+    note: 
+  - id: med_oma
+    english: -oma
+    meaning: "\uC885\uC591"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_swallow
-    english: swallow
-    meaning: "\uC0BC\uD0A4\uB2E4"
-    partOfSpeech: v
+    note: 
+  - id: med_aden_oma
+    english: aden/oma
+    meaning: "\uC0D8\uC885"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_digest
-    english: digest
-    meaning: "\uC18C\uD654\uD558\uB2E4"
-    partOfSpeech: v
+    note: 
+  - id: med_carcin_oma
+    english: carcin/oma
+    meaning: "\uC554\uC885"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_recover
-    english: recover
-    meaning: "\uD68C\uBCF5\uD558\uB2E4"
-    partOfSpeech: v
+    note: 
+  - id: med_sarc_oma
+    english: sarc/oma
+    meaning: "\uC721\uC885"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_heal
-    english: heal
-    meaning: "\uB0AB\uB2E4, \uCE58\uC720\uD558\uB2E4"
-    partOfSpeech: v
+    note: 
+  - id: med_osis
+    english: -osis
+    meaning: "\uC99D, \uC99D\uC0C1"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_examine
-    english: examine
-    meaning: "\uC9C4\uCC30\uD558\uB2E4"
-    partOfSpeech: v
+    note: 
+  - id: med_arterio_scler_osis
+    english: arterio/scler/osis
+    meaning: "\uB3D9\uB9E5\uACBD\uD654\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_diagnose
-    english: diagnose
-    meaning: "\uC9C4\uB2E8\uD558\uB2E4"
-    partOfSpeech: v
+    note: 
+  - id: med_hydro_nephr_osis
+    english: hydro/nephr/osis
+    meaning: "\uBB3C\uCF69\uD325\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_prescribe
-    english: prescribe
-    meaning: "\uCC98\uBC29\uD558\uB2E4"
-    partOfSpeech: v
+    note: 
+  - id: med_neur_osis
+    english: neur/osis
+    meaning: "\uC2E0\uACBD\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_admit
-    english: admit
-    meaning: "\uC785\uC6D0\uC2DC\uD0A4\uB2E4"
-    partOfSpeech: v
+    note: 
+  - id: med_pathy
+    english: -pathy
+    meaning: "\uBCD1, \uBCD1\uC99D, \uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_discharge
-    english: discharge
-    meaning: "\uD1F4\uC6D0\uC2DC\uD0A4\uB2E4, \uBD84\uBE44\uBB3C"
-    partOfSpeech: v
+    note: 
+  - id: med_myelo_pathy
+    english: myelo/pathy
+    meaning: "\uCC99\uC218\uBCD1\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_chronic
-    english: chronic
-    meaning: "\uB9CC\uC131\uC758"
-    partOfSpeech: adj
+    note: 
+  - id: med_myo_pathy
+    english: myo/pathy
+    meaning: "\uADFC\uC721\uBCD1\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_acute
-    english: acute
-    meaning: "\uAE09\uC131\uC758"
-    partOfSpeech: adj
+    note: 
+  - id: med_ptosis
+    english: -ptosis
+    meaning: "\uD558\uC218, \uCC98\uC9D0"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_mild
-    english: mild
-    meaning: "\uAC00\uBCBC\uC6B4"
-    partOfSpeech: adj
+    note: 
+  - id: med_blepharo_ptosis
+    english: blepharo/ptosis
+    meaning: "\uB208\uAEBC\uD480\uCC98\uC9D0"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_severe
-    english: severe
-    meaning: "\uC2EC\uD55C"
-    partOfSpeech: adj
+    note: 
+  - id: med_gastro_ptosis
+    english: gastro/ptosis
+    meaning: "\uC704\uD558\uC218, \uC704\uCC98\uC9D0"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_contagious
-    english: contagious
-    meaning: "\uC804\uC5FC\uC131\uC758"
-    partOfSpeech: adj
+    note: 
+  - id: med_malacia
+    english: -malacia
+    meaning: "\uC5F0\uD654, \uC5F0\uD654\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_pregnant
-    english: pregnant
-    meaning: "\uC784\uC2E0\uD55C"
-    partOfSpeech: adj
+    note: 
+  - id: med_encephalo_malacia
+    english: encephalo/malacia
+    meaning: "\uB1CC\uC5F0\uD654\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_fatal
-    english: fatal
-    meaning: "\uCE58\uBA85\uC801\uC778"
-    partOfSpeech: adj
+    note: 
+  - id: med_osteo_malacia
+    english: osteo/malacia
+    meaning: "\uACE8(\uBF08)\uC5F0\uD654\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_side_effect
-    english: side effect
-    meaning: "\uBD80\uC791\uC6A9"
-    partOfSpeech: n
+    note: 
+  - id: med_megaly
+    english: -megaly
+    meaning: "\uAC70\uB300, \uBE44\uB300"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_first_aid
-    english: first aid
-    meaning: "\uC751\uAE09 \uCC98\uCE58"
-    partOfSpeech: n
+    note: 
+  - id: med_acro_megaly
+    english: acro/megaly
+    meaning: "\uB9D0\uB2E8\uBE44\uB300\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_checkup
-    english: checkup
-    meaning: "\uAC74\uAC15 \uAC80\uC9C4"
-    partOfSpeech: n
+    note: 
+  - id: med_hepato_megaly
+    english: hepato/megaly
+    meaning: "\uAC04\uBE44\uB300"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_x_ray
-    english: X-ray
-    meaning: "\uC5D1\uC2A4\uC120 \uC0AC\uC9C4"
-    partOfSpeech: n
+    note: 
+  - id: med_rrhexis
+    english: -rrhexis
+    meaning: "\uD30C\uC5F4"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_blood_test
-    english: blood test
-    meaning: "\uD608\uC561 \uAC80\uC0AC"
-    partOfSpeech: n
+    note: 
+  - id: med_angio_rrhexis
+    english: angio/rrhexis
+    meaning: "\uD608\uAD00\uD30C\uC5F4"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_virus
-    english: virus
-    meaning: "\uBC14\uC774\uB7EC\uC2A4"
-    partOfSpeech: n
+    note: 
+  - id: med_cardio_rrhexis
+    english: cardio/rrhexis
+    meaning: "\uC2EC\uC7A5\uD30C\uC5F4"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_bacteria
-    english: bacteria
-    meaning: "\uC138\uADE0"
-    partOfSpeech: n
+    note: 
+  - id: med_cele
+    english: -cele
+    meaning: "\uD0C8\uCD9C\uC99D, \uC090\uC9D0"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_immune
-    english: immune
-    meaning: "\uBA74\uC5ED\uC758"
-    partOfSpeech: adj
+    note: 
+  - id: med_cysto_cele
+    english: cysto/cele
+    meaning: "\uBC29\uAD11\uD0C8\uCD9C\uC99D"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_nutrition
-    english: nutrition
+    note: 
+  - id: med_hydro_cele
+    english: hydro/cele
+    meaning: "\uBB3C\uC74C\uB0AD\uC99D(\uC74C\uB0AD\uC218\uC885)"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_myelo_cele
+    english: myelo/cele
+    meaning: "\uCC99\uC218\uD0C8\uCD9C\uC99D"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_ectomy
+    english: -ectomy
+    meaning: "\uC808\uC81C\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_gastr_ectomy
+    english: gastr/ectomy
+    meaning: "\uC704\uC808\uC81C\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_my_om_ectomy
+    english: my/om/ectomy
+    meaning: "\uADFC\uC885\uC808\uC81C\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_oophor_ectomy
+    english: oophor/ectomy
+    meaning: "\uB09C\uC18C\uC808\uC81C\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_tonsill_ectomy
+    english: tonsill/ectomy
+    meaning: "\uD3B8\uB3C4\uC808\uC81C\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_plasty
+    english: -plasty
+    meaning: "\uC131\uD615\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_rhino_plasty
+    english: rhino/plasty
+    meaning: "\uCF54\uC131\uD615\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_hernio_plasty
+    english: hernio/plasty
+    meaning: "\uD5E4\uB974\uB2C8\uC544\uC131\uD615\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_blepharo_plasty
+    english: blepharo/plasty
+    meaning: "\uB208\uAEBC\uD480\uC131\uD615\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_rrhaphy
+    english: -rrhaphy
+    meaning: "\uBD09\uD569\uC220, \uAFF0\uB9F4\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_perineo_rrhaphy
+    english: perineo/rrhaphy
+    meaning: "\uD68C\uC74C\uBD09\uD569\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_teno_rrhaphy
+    english: teno/rrhaphy
+    meaning: "\uD798\uC904\uBD09\uD569\uC220, \uAFF0\uB9F4\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_scopy
+    english: -scopy
+    meaning: "\uACBD\uAC80\uC0AC, \uACBD\uC220, \uBCF4\uAC1C\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_broncho_scopy
+    english: broncho/scopy
+    meaning: "\uAE30\uAD00\uC9C0\uACBD\uAC80\uC0AC"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_cysto_scopy
+    english: cysto/scopy
+    meaning: "\uBC29\uAD11\uACBD\uAC80\uC0AC"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_procto_scopy
+    english: procto/scopy
+    meaning: "\uC9C1\uC7A5\uACBD\uAC80\uC0AC, \uACE7\uCC3D\uC790\uBCF4\uAC1C\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_stomy
+    english: -stomy
+    meaning: "\uCC3D\uB0C4\uC220, \uC5F0\uACB0\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_colo_stomy
+    english: colo/stomy
+    meaning: "\uACB0\uC7A5\uCC3D\uB0C4\uC220, \uC798\uB85D\uCC3D\uC790\uCC3D\uB0C4\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_gastro_jejuno_stomy
+    english: gastro/jejuno/stomy
+    meaning: "\uC704\uACF5\uC7A5\uC5F0\uACB0\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_tomy
+    english: -tomy
+    meaning: "\uC808\uAC1C\uC220, \uAC1C~\uC220, \uC808\uB2E8\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_hepato_tomy
+    english: hepato/tomy
+    meaning: "\uAC04\uC808\uAC1C\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_cranio_tomy
+    english: cranio/tomy
+    meaning: "\uAC1C\uB450\uC220, \uBA38\uB9AC\uBF08 \uC808\uAC1C\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_laparo_tomy
+    english: laparo/tomy
+    meaning: "\uAC1C\uBCF5\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_lithotomy
+    english: -lithotomy
+    meaning: "\uB3CC\uC81C\uAC70\uC220, \uC11D\uC81C\uAC70\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_chole_lithotomy
+    english: chole/lithotomy
+    meaning: "\uC4F8\uAC1C\uB3CC\uC81C\uAC70\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_nephro_lithotomy
+    english: nephro/lithotomy
+    meaning: "\uCF69\uD325\uC808\uAC1C\uB3CC\uC81C\uAC70\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_lithotripsy
+    english: -lithotripsy
+    meaning: "\uB3CC\uBD80\uC228\uC220, \uC1C4\uC11D\uC220, \uB3CC\uAE78\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_nephro_lithotripsy
+    english: nephro/lithotripsy
+    meaning: "\uCF69\uD325\uB3CC\uBD80\uC228\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_pexy
+    english: -pexy
+    meaning: "\uACE0\uC815\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_orchio_pexy
+    english: orchio/pexy
+    meaning: "\uACE0\uD658\uACE0\uC815\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_hystero_pexy
+    english: hystero/pexy
+    meaning: "\uC790\uAD81\uACE0\uC815\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_desis
+    english: -desis
+    meaning: "\uACE0\uC815\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_arthro_desis
+    english: arthro/desis
+    meaning: "\uAD00\uC808\uACE0\uC815\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_teno_desis
+    english: teno/desis
+    meaning: "\uD798\uC904\uACE0\uC815\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_centesis
+    english: -centesis
+    meaning: "\uCC9C\uC790"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_thora_centesis
+    english: thora/centesis
+    meaning: "\uD749\uAC15\uCC9C\uC790, \uAC00\uC2B4\uCC9C\uC790"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_arthro_centesis
+    english: arthro/centesis
+    meaning: "\uAD00\uC808\uCC9C\uC790"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_lysis
+    english: -lysis
+    meaning: "\uBC15\uB9AC\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_entero_lysis
+    english: entero/lysis
+    meaning: "\uCC3D\uC790\uBC15\uB9AC\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_neuro_lysis
+    english: neuro/lysis
+    meaning: "\uC2E0\uACBD\uBC15\uB9AC\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_gram
+    english: -gram
+    meaning: "-\uB3C4, \uC870\uC601\uC0C1, \uC601\uC0C1"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_electro_cardio_gram
+    english: electro/cardio/gram
+    meaning: "\uC2EC\uC804\uB3C4"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_electro_myo_gram
+    english: electro/myo/gram
+    meaning: "\uADFC\uC804\uB3C4"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_coronary_angio_gram
+    english: coronary angio/gram
+    meaning: "\uAD00\uC0C1\uD608\uAD00\uC870\uC601\uC0C1"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_graphy
+    english: -graphy
+    meaning: "\uC870\uC601\uC220, \uCD2C\uC601\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_angio_graphy
+    english: angio/graphy
+    meaning: "\uD608\uAD00\uC870\uC601\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_computed_tomo_graphy
+    english: computed tomo/graphy
+    meaning: "\uC804\uC0B0\uD654\uB2E8\uCE35\uCD2C\uC601\uC220"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_scope
+    english: -scope
+    meaning: "\uBCF4\uB294 \uAE30\uAD6C, -\uACBD"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_endo_scope
+    english: endo/scope
+    meaning: "\uB0B4\uC2DC\uACBD"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_ophthalmo_scope
+    english: ophthalmo/scope
+    meaning: "\uAC80\uC548\uACBD, \uB208\uBCF4\uAC1C"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_micro_scope
+    english: micro/scope
+    meaning: "\uD604\uBBF8\uACBD"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_meter
+    english: -meter
+    meaning: "\uCE21\uC815\uAE30, \uACC4\uCE21\uAE30"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_pelvi_meter
+    english: pelvi/meter
+    meaning: "\uACE8\uBC18\uACC4"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_metry
+    english: -metry
+    meaning: "\uCE21\uC815\uBC95, \uACC4\uCE21\uBC95"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_pelvi_metry
+    english: pelvi/metry
+    meaning: "\uACE8\uBC18\uCE21\uC815\uBC95"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_audio_metry
+    english: audio/metry
+    meaning: "\uCCAD\uB825\uCE21\uC815\uAC80\uC0AC"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_algia_dynia
+    english: -algia, -dynia
+    meaning: "\uD1B5"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_neur_algia
+    english: neur/algia
+    meaning: "\uC2E0\uACBD\uD1B5"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_my_algia
+    english: my/algia
+    meaning: "\uADFC\uC721\uD1B5"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_phobia
+    english: -phobia
+    meaning: "\uACF5\uD3EC\uC99D"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_hydro_phobia
+    english: hydro/phobia
+    meaning: "\uBB3C\uACF5\uD3EC\uC99D, \uACF5\uC218\uC99D"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_photo_phobia
+    english: photo/phobia
+    meaning: "\uB208\uBD80\uC2EC"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_claustro_phobia
+    english: claustro/phobia
+    meaning: "\uBC00\uD3D0\uACF5\uD3EC\uC99D"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_plegia
+    english: -plegia
+    meaning: "\uB9C8\uBE44"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_hemi_plegia
+    english: hemi/plegia
+    meaning: "\uBC18\uB9C8\uBE44"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_paresis
+    english: -paresis
+    meaning: "\uBD88\uC644\uC804\uB9C8\uBE44"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_hemi_paresis
+    english: hemi/paresis
+    meaning: "\uBC18\uBD80\uC804\uB9C8\uBE44"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_pnea
+    english: -pnea
+    meaning: "\uD638\uD761"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_a_pnea
+    english: a/pnea
+    meaning: "\uBB34\uD638\uD761"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_dys_pnea
+    english: dys/pnea
+    meaning: "\uD638\uD761\uACE4\uB780"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_ortho_pnea
+    english: ortho/pnea
+    meaning: "\uC549\uC544\uC228\uC26C\uAE30, \uC88C\uC704\uD638\uD761"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_rrhea
+    english: -rrhea
+    meaning: "\uB8E8"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_rhino_rrhea
+    english: rhino/rrhea
+    meaning: "\uCF67\uBB3C, \uBE44\uB8E8"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_oto_rrhea
+    english: oto/rrhea
+    meaning: "\uADC0\uBB3C, \uC774\uB8E8"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_rrhage_rrhagia
+    english: -rrhage, -rrhagia
+    meaning: "\uCD9C\uD608"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_hemo_rrhage
+    english: hemo/rrhage
+    meaning: "\uCD9C\uD608"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_rhino_rrhagia
+    english: rhino/rrhagia
+    meaning: "\uCF54\uD53C"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_osis_2
+    english: "-osis (\uC99D\uAC00\uC99D)"
+    meaning: "\uC99D\uAC00\uC99D"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_leuko_cyt_osis
+    english: leuko/cyt/osis
+    meaning: "\uBC31\uD608\uAD6C\uC99D\uAC00\uC99D"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_lympho_cyt_osis
+    english: lympho/cyt/osis
+    meaning: "\uC784\uD30C\uAD6C\uC99D\uAC00\uC99D"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_penia
+    english: -penia
+    meaning: "\uAC10\uC18C\uC99D"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_leuko_penia
+    english: leuko/penia
+    meaning: "\uBC31\uD608\uAD6C\uAC10\uC18C\uC99D"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_neutro_penia
+    english: neutro/penia
+    meaning: "\uD638\uC911\uC131 \uBC31\uD608\uAD6C \uAC10\uC18C\uC99D"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_plasm_plasia
+    english: -plasm, -plasia
+    meaning: "\uD615\uC131"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_neo_plasm
+    english: neo/plasm
+    meaning: "\uC2E0\uC0DD\uBB3C"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_a_plasia
+    english: a/plasia
+    meaning: "\uBB34\uD615\uC131"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_hypo_plasia
+    english: hypo/plasia
+    meaning: "\uD615\uC131\uC800\uD558\uC99D"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_hyper_plasia
+    english: hyper/plasia
+    meaning: "\uACFC\uB2E4\uD615\uC131, \uC99D\uC2DD(\uC99D)"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_dys_plasia
+    english: dys/plasia
+    meaning: "\uD615\uC131\uC774\uC0C1"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_trophy
+    english: -trophy
     meaning: "\uC601\uC591"
-    partOfSpeech: n
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_disability
-    english: disability
-    meaning: "\uC7A5\uC560"
-    partOfSpeech: n
+    note: 
+  - id: med_a_trophy
+    english: a/trophy
+    meaning: "\uC704\uCD95"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
-  - id: med_dental
-    english: dental
-    meaning: "\uCE58\uC544\uC758, \uCE58\uACFC\uC758"
-    partOfSpeech: adj
+    note: 
+  - id: med_hypo_trophy
+    english: hypo/trophy
+    meaning: "\uBC1C\uC721\uBD80\uC804"
+    partOfSpeech: 
     example: 
     exampleMeaning: 
     story: 0
     storyHeading: 
+    note: 
+  - id: med_hyper_trophy
+    english: hyper/trophy
+    meaning: "\uBE44\uB300, \uBE44\uD6C4"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_dys_trophy
+    english: dys/trophy
+    meaning: "\uC601\uC591\uC7A5\uC560"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_emesis
+    english: -emesis
+    meaning: "\uAD6C\uD1A0"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 
+  - id: med_hyper_emesis
+    english: hyper/emesis
+    meaning: "\uC785\uB367, \uACFC\uB2E4\uAD6C\uD1A0"
+    partOfSpeech: 
+    example: 
+    exampleMeaning: 
+    story: 0
+    storyHeading: 
+    note: 

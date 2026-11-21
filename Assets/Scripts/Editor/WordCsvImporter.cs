@@ -11,7 +11,7 @@ using WordRPG.Words;
 namespace WordRPG.EditorTools
 {
     // Assets/Data/Words/*.csv → 같은 이름의 WordDatabase(.asset).
-    // CSV를 저장하면 자동으로 다시 임포트된다. 헤더: id,english,meaning,pos,example,example_meaning,story,story_heading
+    // CSV를 저장하면 자동으로 다시 임포트된다. 헤더: id,english,meaning,pos,example,example_meaning,story,story_heading[,note]
     public static class WordCsvImporter
     {
         public const string WordsFolder = "Assets/Data/Words";
@@ -71,7 +71,8 @@ namespace WordRPG.EditorTools
 
                 int.TryParse(Cell(row, columns, "story"), out int story);
                 var entry = new WordEntry(Cell(row, columns, "id"), english, meaning, Cell(row, columns, "pos"),
-                    Cell(row, columns, "example"), Cell(row, columns, "example_meaning"), story, Cell(row, columns, "story_heading"));
+                    Cell(row, columns, "example"), Cell(row, columns, "example_meaning"), story, Cell(row, columns, "story_heading"),
+                    Cell(row, columns, "note"));
                 if (!ids.Add(entry.Id))
                 {
                     Debug.LogWarning($"[WordRPG] {csvPath} {r + 1}행: id '{entry.Id}' 중복이라 건너뜀");

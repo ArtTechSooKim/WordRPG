@@ -22,3 +22,5 @@ MonoBehaviour:
   - choice
   - evidence
   books: []
+  exams: {fileID: 0}
+  examAreas: []

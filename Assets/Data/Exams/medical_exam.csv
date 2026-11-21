@@ -1,0 +1,222 @@
+id,chapter,chapter_title,number,question,answer
+medexam_02_01,2,제2장 심혈관 및 조혈계,1,정상심장에서 특수전도계의 자극전도 시작부위는?,sinoatrial node
+medexam_02_02,2,제2장 심혈관 및 조혈계,2,심장박동이 정지해서 혈액을 방출할 수 없게 된 상태?,cardiac arrest
+medexam_02_03,2,제2장 심혈관 및 조혈계,3,좌심방과 우심방 사이 중격의 결손은?,atrial septal defect
+medexam_02_04,2,제2장 심혈관 및 조혈계,4,"관상동맥의 부분적 폐쇄, 심장이 많이 활동시 증세가 수반되는 병은?",angina pectoris
+medexam_02_05,2,제2장 심혈관 및 조혈계,5,심낭내 출혈에 의하여 혈액이 저류되는 것?,hemopericardium
+medexam_02_06,2,제2장 심혈관 및 조혈계,6,심장의 내면을 싸고 있는 심내막의 염증?,endocarditis
+medexam_02_07,2,제2장 심혈관 및 조혈계,7,태생기에 생긴 동맥관이 생후에도 닫히지 않는 기형은?,patent ductus arteriosus
+medexam_02_08,2,제2장 심혈관 및 조혈계,8,심근에 허혈성 변화를 가져오는 병은?,ischemic heart disease
+medexam_02_09,2,제2장 심혈관 및 조혈계,9,심장에 피를 공급하는 혈관이 막혀 그 동맥에 의해 영양분을 공급받는 부위가 괴사에 빠지는 질환은?,myocardial infarction
+medexam_02_10,2,제2장 심혈관 및 조혈계,10,심장이 혈액을 말초로 보내는 펌프와 같은 기능이 상실된 상태는?,congestive heart disease (= congestive heart failure)
+medexam_02_11,2,제2장 심혈관 및 조혈계,11,변형된 심장 판막의 외과적 재건을 통해 협착이나 부족을 개선시키는 수술은?,valvuloplasty
+medexam_02_12,2,제2장 심혈관 및 조혈계,12,부정맥 진단을 위해 심전도기를 몸에 일정시간 부착하는 검사는?,holter monitoring
+medexam_02_13,2,제2장 심혈관 및 조혈계,13,"초음파를 이용해서 심장, 대혈관의 형태, 동태를 기록하는 진단법?",echocardiography
+medexam_02_14,2,제2장 심혈관 및 조혈계,14,다른 사람의 심장을 환자에게 이식하는 외과수술은?,heart transplantation
+medexam_02_15,2,제2장 심혈관 및 조혈계,15,심실사이의 사이막(중격)에 작은 구멍이 있는 선천성 심장질환은? (① TOF ② VSD ③ ASD ④ PDA ⑤ PFO),② VSD
+medexam_02_16,2,제2장 심혈관 및 조혈계,16,"심장질환의 진단을 위한 검사로 묶인 것은? (가. heart scan 나. echocardiography 다. cardiocentesis 라. encephalography) (① 가,나,다 ② 가,다 ③ 나,라 ④ 라 ⑤ 가,나,다,라)","① 가,나,다"
+medexam_02_17,2,제2장 심혈관 및 조혈계,17,"arrythmia로 모두 묶인 것은? (가. flutter 나. fibrillation 다. palpitation 라. heart block) (① 가,나 ② 가,나,다 ③ 가,나,라 ④ 나,다,라 ⑤ 다,라)","③ 가,나,라"
+medexam_03_01,3,제3장 호흡기계,1,숨쉴 때 공기가 드나들며 후두에서 폐로 이어진 숨길은?,trachea
+medexam_03_02,3,제3장 호흡기계,2,폐 내의 이차기관지가 다시 가지를 쳐서 직경이 1mm 이하의 작은 가지는?,bronchiole
+medexam_03_03,3,제3장 호흡기계,3,"기관지 끝에 달려있으며, 가스교환이 일어나는 곳은?",alveolus
+medexam_03_04,3,제3장 호흡기계,4,사람의 입속 양쪽 구석에 퍼져 있는 림프 소절의 집합체로 면역기능에 관여하는 것은?,tonsil
+medexam_03_05,3,제3장 호흡기계,5,음식물이 식도로 넘어갈 때 기관과 후두로 들어오지 못하도록 후두를 덮는 기관은?,epiglottis
+medexam_03_06,3,제3장 호흡기계,6,폐의 표면 및 흉곽벽의 내면을 덮고 있는 이중 막은?,pleura
+medexam_03_07,3,제3장 호흡기계,7,좌우의 흉강 사이에서 양쪽폐를 분리하고 있는 조직과 기관은?,mediastinum
+medexam_03_08,3,제3장 호흡기계,8,"바이러스, 세균, 진균 감염과 알레르기비염에 의해 생긴 부비동 염증은?",sinusitis
+medexam_03_09,3,제3장 호흡기계,9,기관지의 근육과 탄력지지조직이 파괴되어 영구히 확장되는 질환은?,bronchiectasis
+medexam_03_10,3,제3장 호흡기계,10,여러 자극에 대해서 기관지가 과민한 반응을 일으켜 생기는 기관지의 가역적인 경련성 막힘은?,asthma
+medexam_03_11,3,제3장 호흡기계,11,조직이나 기관에 공기가 병적으로 축적되는 질환은?,emphysema
+medexam_03_12,3,제3장 호흡기계,12,폐에 먼지가 쌓여 생기는 직업병으로 광부에서 발생빈도가 높은 질환은?,pneumoconiosis
+medexam_03_13,3,제3장 호흡기계,13,결핵균이 폐에 들어가 염증을 일으키는 질환은?,pulmonary tuberculosis
+medexam_03_14,3,제3장 호흡기계,14,상악동염 치료를 위해 상악동에 구멍을 만드는 수술은?,caldwell-luc operation
+medexam_03_15,3,제3장 호흡기계,15,흉벽의 외과적 절개술은?,thoracotomy
+medexam_03_16,3,제3장 호흡기계,16,의식소실로 기도유지가 어려워 기도확보와 호흡조절을 목적으로 하는 처치는?,endotracheal intubation
+medexam_03_17,3,제3장 호흡기계,17,좌우측 콧구멍 사이에 있는 중간 칸막이가 한쪽으로 휘는 질환은?,deviated nasal septum (deviation of nasal septum)
+medexam_03_18,3,제3장 호흡기계,18,호흡의 깊이가 규칙적으로 증감하며 무호흡기가 교대하는 호흡은? (① orthopnea ② dyspnea ③ tachypnea ④ hyperventilation ⑤ Cheyne-Stokes respiration),⑤ Cheyne-Stokes respiration
+medexam_03_19,3,제3장 호흡기계,19,호흡기계 질환의 진단에서 들을 수 있는 비정상적인 소리가 아닌 것은? (① pleural rub ② rales ③ murmur ④ wheeze ⑤ stridor),③ murmur
+medexam_03_20,3,제3장 호흡기계,20,DPT에 속하는 질환이 아닌 것은? (① 파상풍 ② pertussis ③ 디프테리아 ④ 풍진 ⑤ tetanus),④ 풍진
+medexam_04_01,4,제4장 소화기계,1,대장의 끝에서 항문에 이르는 곧은 부분은?,rectum
+medexam_04_02,4,제4장 소화기계,2,소장의 말단부에서 대장으로 이행하는 부위에 있는 소화관은?,cecum
+medexam_04_03,4,제4장 소화기계,3,담즙을 저장하는 주머니는?,gallbladder
+medexam_04_04,4,제4장 소화기계,4,췌장과 총담관이 십이지장으로 함께 개구하여 담즙과 췌장액을 분비하는 체계의 십이지장에 닿은 끝 부분은?,ampullar of Vater
+medexam_04_05,4,제4장 소화기계,5,"입안으로 열리는 샘으로 귀밑샘, 턱밑샘, 혀밑샘의 세 종류를 이르는 것은?",salivary gland
+medexam_04_06,4,제4장 소화기계,6,이뿌리를 둘러싸고 있는 살은?,gingiva
+medexam_04_07,4,제4장 소화기계,7,위의 한 부분으로 식도와 연결이 되는 부위는?,cardia
+medexam_04_08,4,제4장 소화기계,8,복강에 장액성 액체가 괴는 병적 상태 또는 그 액체는?,ascites
+medexam_04_09,4,제4장 소화기계,9,침 배설관 내에서 탈락상피나 이물이 핵이 되어 침샘체내 또는 도관 내에 석회화 침착이 일어나 돌이 된 것은?,sialolithiasis
+medexam_04_10,4,제4장 소화기계,10,대개 간경화증이 원인으로 간문맥에 혈액이 고여 문맥압이 높아져서 생기는 것은?,esophageal varix
+medexam_04_11,4,제4장 소화기계,11,"회장의 끝부분에 호발하는 설사, 복통, 열을 동반한 원인불명의 장의 만성 염증은?",Crohn's disease
+medexam_04_12,4,제4장 소화기계,12,항문관을 둘러싸는 점막이나 항문의 외부를 덮는 피부아래에 있는 정맥의 망상조직이 부풀어서 생긴 덩어리는?,hemorrhoid
+medexam_04_13,4,제4장 소화기계,13,혈액중에 빌리루빈 양이 증가하여 피부 및 점막 내 담즙의 축적으로 황색을 나타내는 병적상태는?,jaundice
+medexam_04_14,4,제4장 소화기계,14,샅굴(사타구니)을 통하여 장이 빠져나오는 것은?,inguinal hernia
+medexam_04_15,4,제4장 소화기계,15,"위암환자의 위절제수술에서 Billroth I, Billroth II 수술의 문합술을 각각 기재하시오.",Billroth I: gastroduodenostomy / Billroth II: gastrojejunostomy
+medexam_04_16,4,제4장 소화기계,16,선천적으로 설소대가 짧은 경우에 해당하는 질환명과 이에 적합한 수술을 의학용어로 각각 쓰시오.,질환명: ankyloglossia (= tongue tie) / 수술명: frenotomy
+medexam_04_17,4,제4장 소화기계,17,소화효소의 하나인 쓸개즙을 생성하는 장기는? (① stomach ② spleen ③ liver ④ pancrease ⑤ villi),③ liver
+medexam_04_18,4,제4장 소화기계,18,"간성뇌증, 혼수동반으로 갑작스런 사망에 이르는 간염의 종류는? (① fulminant hepatitis ② autoimmune hepatitis ③ toxic hepatitis ④ alcoholic hepatitis ⑤ chronic hepatitis)",① fulminant hepatitis
+medexam_04_19,4,제4장 소화기계,19,췌장암과 관련이 없는 수술은? (① pancreatectomy ② miles' operation ③ whipple's operation ④ PPPD ⑤ pancreatoduodenectomy),② miles' operation
+medexam_05_01,5,제5장 비뇨기계,1,소변을 체외로 배설하는 기관은?,urethra
+medexam_05_02,5,제5장 비뇨기계,2,소변을 방광으로 운반하는 가늘고 긴 관은?,ureter
+medexam_05_03,5,제5장 비뇨기계,3,소변을 생산하여 배출하는 기관은?,kidney
+medexam_05_04,5,제5장 비뇨기계,4,"신장 안에 있는 깔대기 모양의 빈곳은? (보기: vesicovaginal fistula, urinary catheterization, colic, renal cell carcinoma, renal pelvis, uremia, interstitial nephritis, nephrosis, wilms' tumor, pyonephritis, ureterostomy, urethrotomy, azotemia, glomerulus, nephrostomy, cystocele, vesicorectal fistula, hypospadias, meatotomy, ureterovesicoplasty)",renal pelvis
+medexam_05_05,5,제5장 비뇨기계,5,신장의 피질에 있는 모세혈관 덩어리로 혈액성분이 여과되어 요세관으로 운반되는 곳은? (보기는 4번 문항과 동일),glomerulus
+medexam_05_06,5,제5장 비뇨기계,6,신장의 기능이 떨어져서 질소 함유 화합물이 혈액속에 지나치게 많이 들어 있는 상태는? (보기는 4번 문항과 동일),azotemia
+medexam_05_07,5,제5장 비뇨기계,7,신장의 사이질에 염증이 일어나서 차차 신장전체에 병변이 미치는 형태의 신장염은? (보기는 4번 문항과 동일),interstitial nephritis
+medexam_05_08,5,제5장 비뇨기계,8,방광이 제자리를 지키지 못하고 밑으로 처져서 내려온 것은? (보기는 4번 문항과 동일),cystocele
+medexam_05_09,5,제5장 비뇨기계,9,선천성 기형으로 요도의 개구가 음경아래쪽에 있는 경우는? (보기는 4번 문항과 동일),hypospadias
+medexam_05_10,5,제5장 비뇨기계,10,신장에서 발생하는 악성종양으로 소아에서 자주발생하는 것은? (보기는 4번 문항과 동일),Wilms' tumor
+medexam_05_11,5,제5장 비뇨기계,11,방광에서 질로 통하는 비정상적인 연결통로는? (보기는 4번 문항과 동일),vesicovaginal fistula
+medexam_05_12,5,제5장 비뇨기계,12,요도협착을 치료하기 위한 절개수술은? (보기는 4번 문항과 동일),urethrotomy
+medexam_05_13,5,제5장 비뇨기계,13,"치료, 진단의 목적으로 가느다란 긴 관을 방광에 삽입하여 소변을 뽑아내는 일은? (보기는 4번 문항과 동일)",urinary catheterization
+medexam_05_14,5,제5장 비뇨기계,14,요관의 소변을 배설하는 샛길을 영구적으로 만드는 수술은? (보기는 4번 문항과 동일),ureterostomy
+medexam_05_15,5,제5장 비뇨기계,15,복막강 내로 관을 연결하여 이 속으로 투석액을 넣어 투석하는 방법은?,peritoneal dialysis
+medexam_05_16,5,제5장 비뇨기계,16,"신장의 구조적, 기능적 단위로 한쪽신장에 100만개 있는 이것은?",nephron
+medexam_05_17,5,제5장 비뇨기계,17,신혈관 및 요관이 통과하는 신장 안쪽의 오목한 부분은? (① calyx ② cortex ③ hilum ④ renal pelvis ⑤ renal papillae),③ hilum
+medexam_05_18,5,제5장 비뇨기계,18,두 개의 신장이 하나로 붙어 있는 선천적인 질환은? (① renal ectopia ② polycystic kidney ③ horseshoe kidney ④ fused kidney ⑤ supernumerary kidney),④ fused kidney
+medexam_05_19,5,제5장 비뇨기계,19,소변 내 RBC가 검출된 경우는? (① hematuria ② glycosuria ③ uremia ④ proteinuria ⑤ nocturia),① hematuria
+medexam_05_20,5,제5장 비뇨기계,20,다음중 renal failure 환자에게 실시하는 시술은? (① urinalysis ② hemodialysis ③ transsonography ④ cystectomy ⑤ renal plasty),② hemodialysis
+medexam_06_01,6,제6장 여성생식기계,1,1. 난자가 자궁으로 운반되는 곳으로 자궁의 난소부까지 뻗는 길고 가는 관은? (그림 K),uterine tube (= fallopian tube)
+medexam_06_02,6,제6장 여성생식기계,2,2. 수정에 필요한 난자를 생성하는 곳은? (그림 J),ovary
+medexam_06_03,6,제6장 여성생식기계,3,"3. 출산 시 팽창하여 열리며, 자궁과 질 또는 산도를 잇는 연결관으로 질의 상부에 있는 곳은? (그림 E)",uterine cervix
+medexam_06_04,6,제6장 여성생식기계,4,5. 주로 자궁경부염으로 인하여 여성의 질분비물이 흘러나오는 것은?  [보기] D&C / conization / uterine myoma / colpitis(=vaginitis) / secretory phase / adenomyosis / endometriosis / placenta / Brenner tumor / ovarian tumor / leiomyoma / ectopic pregnancy / ovulation period / show / leukorrhea / fertilization / pelvic inflammatory disease / lochia / vulvovaginitis / cesarean resection,leukorrhea
+medexam_06_05,6,제6장 여성생식기계,5,"6. 외음부, 질 등의 아래쪽에 생긴 염증이 자궁, 난관, 난소, 복막 및 인접조직 등 여성생식기에 전파되는 상행염증성 질환은?  [보기] D&C / conization / uterine myoma / colpitis(=vaginitis) / secretory phase / adenomyosis / endometriosis / placenta / Brenner tumor / ovarian tumor / leiomyoma / ectopic pregnancy / ovulation period / show / leukorrhea / fertilization / pelvic inflammatory disease / lochia / vulvovaginitis / cesarean resection",pelvic inflammatory disease
+medexam_06_06,6,제6장 여성생식기계,6,7. 자궁내막 조직이 존재하여야 하는 부위 이외의 장소에 존재하는 것은?  [보기] D&C / conization / uterine myoma / colpitis(=vaginitis) / secretory phase / adenomyosis / endometriosis / placenta / Brenner tumor / ovarian tumor / leiomyoma / ectopic pregnancy / ovulation period / show / leukorrhea / fertilization / pelvic inflammatory disease / lochia / vulvovaginitis / cesarean resection,endometriosis
+medexam_06_07,6,제6장 여성생식기계,7,8. 자궁의 평활근과 결합조직섬유의 이상증식으로 발생하는 대표적 양성종양은?  [보기] D&C / conization / uterine myoma / colpitis(=vaginitis) / secretory phase / adenomyosis / endometriosis / placenta / Brenner tumor / ovarian tumor / leiomyoma / ectopic pregnancy / ovulation period / show / leukorrhea / fertilization / pelvic inflammatory disease / lochia / vulvovaginitis / cesarean resection,uterine myoma
+medexam_06_08,6,제6장 여성생식기계,8,"9. 세균, 칸디다, 트리코모나스의 감염이나 약물 등으로 질 점막에 생기는 염증은?  [보기] D&C / conization / uterine myoma / colpitis(=vaginitis) / secretory phase / adenomyosis / endometriosis / placenta / Brenner tumor / ovarian tumor / leiomyoma / ectopic pregnancy / ovulation period / show / leukorrhea / fertilization / pelvic inflammatory disease / lochia / vulvovaginitis / cesarean resection",colpitis (= vaginitis)
+medexam_06_09,6,제6장 여성생식기계,9,10. 분만 또는 월경이 일어나기 전에 나타나는 출혈?  [보기] D&C / conization / uterine myoma / colpitis(=vaginitis) / secretory phase / adenomyosis / endometriosis / placenta / Brenner tumor / ovarian tumor / leiomyoma / ectopic pregnancy / ovulation period / show / leukorrhea / fertilization / pelvic inflammatory disease / lochia / vulvovaginitis / cesarean resection,show
+medexam_06_10,6,제6장 여성생식기계,10,11. 태아와 모체 사이의 가스 및 물질 교환과 임신유지를 위한 내분비물질을 분비하는 기관은?  [보기] D&C / conization / uterine myoma / colpitis(=vaginitis) / secretory phase / adenomyosis / endometriosis / placenta / Brenner tumor / ovarian tumor / leiomyoma / ectopic pregnancy / ovulation period / show / leukorrhea / fertilization / pelvic inflammatory disease / lochia / vulvovaginitis / cesarean resection,placenta
+medexam_06_11,6,제6장 여성생식기계,11,12. 남성과 여성의 생식세포가 결합하는 과정은?  [보기] D&C / conization / uterine myoma / colpitis(=vaginitis) / secretory phase / adenomyosis / endometriosis / placenta / Brenner tumor / ovarian tumor / leiomyoma / ectopic pregnancy / ovulation period / show / leukorrhea / fertilization / pelvic inflammatory disease / lochia / vulvovaginitis / cesarean resection,fertilization
+medexam_06_12,6,제6장 여성생식기계,12,13. 분만 후 제1주 또는 제2주 사이에 나타나는 질분비물은?  [보기] D&C / conization / uterine myoma / colpitis(=vaginitis) / secretory phase / adenomyosis / endometriosis / placenta / Brenner tumor / ovarian tumor / leiomyoma / ectopic pregnancy / ovulation period / show / leukorrhea / fertilization / pelvic inflammatory disease / lochia / vulvovaginitis / cesarean resection,lochia
+medexam_06_13,6,제6장 여성생식기계,13,14. 난소종양으로 섬유성 결합조직 기질에 상피세포가 줄지어 있는 것은?  [보기] D&C / conization / uterine myoma / colpitis(=vaginitis) / secretory phase / adenomyosis / endometriosis / placenta / Brenner tumor / ovarian tumor / leiomyoma / ectopic pregnancy / ovulation period / show / leukorrhea / fertilization / pelvic inflammatory disease / lochia / vulvovaginitis / cesarean resection,Brenner tumor
+medexam_06_14,6,제6장 여성생식기계,14,15. 자궁경부를 넓혀서 자궁 속의 내막조직을 긁어내는 것?  [보기] D&C / conization / uterine myoma / colpitis(=vaginitis) / secretory phase / adenomyosis / endometriosis / placenta / Brenner tumor / ovarian tumor / leiomyoma / ectopic pregnancy / ovulation period / show / leukorrhea / fertilization / pelvic inflammatory disease / lochia / vulvovaginitis / cesarean resection,D&C (dilation and curettage)
+medexam_06_15,6,제6장 여성생식기계,15,16. 여성의 대표적인 불임수술로 난관을 폐쇄시키는 것은?,tubal ligation
+medexam_06_16,6,제6장 여성생식기계,16,17. 자궁경관의 확장이 일어나지 않는 효과가 없는 진통은?,false labor
+medexam_06_17,6,제6장 여성생식기계,17,"18. 자궁, 난관, 난소, 자궁옆 조직, 질의 일부, 골반림프절까지 포함하여 절제하는 수술은? ① LEEP ② TAH ③ TVH ④ panhysterectomy ⑤ RH",⑤ RH (radical hysterectomy)
+medexam_06_18,6,제6장 여성생식기계,18,19. 다음중 임신과 가장 관련이 먼 것은? ① pseudocyesis ② false labor ③ gravida ④ toxemia ⑤ amniocentesis,① pseudocyesis
+medexam_06_19,6,제6장 여성생식기계,19,20. menstruation시 탈락되는 자궁 조직은? ① myometrium ② epimetrium ③ endometrium ④ parametrium ⑤ perimetrium,③ endometrium
+medexam_07_01,7,제7장 남성생식기계,1,1. 정자를 만들고 남성호르몬을 분비하는 기관은? (그림 A~P),"testis (고환, 기호 I)"
+medexam_07_02,7,제7장 남성생식기계,2,2. 정액을 생산하고 저장하는 기관은? (그림 A~P),"seminal vesicle (정낭, 기호 P)"
+medexam_07_03,7,제7장 남성생식기계,3,3. 남성의 요도가 시작되는 부위를 고리모양으로 둘러싸는 장기로 정액의 액체 성분을 이루는 유백색의 액체를 요도로 분비하여 정자의 운동을 활발하게 하는 기관은? (그림 A~P),"prostate gland (전립샘, 기호 M)"
+medexam_07_04,7,제7장 남성생식기계,4,4. 정낭에 모인 정액은 이곳을 통해 요도로 연결되어 체외로 배출된다. (그림 A~P),"ejaculatory duct (사정관, 기호 O)"
+medexam_07_05,7,제7장 남성생식기계,5,5. 음경이 생리적으로 팽대 강직하게 되는 것은?  [보기] placenta previa / ectopic pregnancy / venereal disease / gonorrhea / erection / induced abortion / BPH / mammoplasty / balanoplasty / spermatic cord / abruptio placentae / phimosis / CPD / cryptorchidism / varicocele / hydrocele / missed abortion / TURP / orchiectomy / prepuce,erection
+medexam_07_06,7,제7장 남성생식기계,6,6. 음낭 내의 고환 주위의 공간 내에 무취의 담황색 액체가 괴는 상태는?  [보기] placenta previa / ectopic pregnancy / venereal disease / gonorrhea / erection / induced abortion / BPH / mammoplasty / balanoplasty / spermatic cord / abruptio placentae / phimosis / CPD / cryptorchidism / varicocele / hydrocele / missed abortion / TURP / orchiectomy / prepuce,hydrocele
+medexam_07_07,7,제7장 남성생식기계,7,7. 정상적으로 음낭으로 내려와야 하는 고환이 내려오지 않고 계속 복강에 머무는 것은?  [보기] placenta previa / ectopic pregnancy / venereal disease / gonorrhea / erection / induced abortion / BPH / mammoplasty / balanoplasty / spermatic cord / abruptio placentae / phimosis / CPD / cryptorchidism / varicocele / hydrocele / missed abortion / TURP / orchiectomy / prepuce,cryptorchidism
+medexam_07_08,7,제7장 남성생식기계,8,8. 주로 50세 이상의 남자에게 발생하는 전립선비대는?  [보기] placenta previa / ectopic pregnancy / venereal disease / gonorrhea / erection / induced abortion / BPH / mammoplasty / balanoplasty / spermatic cord / abruptio placentae / phimosis / CPD / cryptorchidism / varicocele / hydrocele / missed abortion / TURP / orchiectomy / prepuce,BPH
+medexam_07_09,7,제7장 남성생식기계,9,9. 성적접촉으로 감염되는 병은?  [보기] placenta previa / ectopic pregnancy / venereal disease / gonorrhea / erection / induced abortion / BPH / mammoplasty / balanoplasty / spermatic cord / abruptio placentae / phimosis / CPD / cryptorchidism / varicocele / hydrocele / missed abortion / TURP / orchiectomy / prepuce,venereal disease
+medexam_07_10,7,제7장 남성생식기계,10,10. 음경의 귀두를 성형하는 것은?  [보기] placenta previa / ectopic pregnancy / venereal disease / gonorrhea / erection / induced abortion / BPH / mammoplasty / balanoplasty / spermatic cord / abruptio placentae / phimosis / CPD / cryptorchidism / varicocele / hydrocele / missed abortion / TURP / orchiectomy / prepuce,balanoplasty
+medexam_07_11,7,제7장 남성생식기계,11,11. 전립선조직을 요도를 통하여 절제하는 수술은?  [보기] placenta previa / ectopic pregnancy / venereal disease / gonorrhea / erection / induced abortion / BPH / mammoplasty / balanoplasty / spermatic cord / abruptio placentae / phimosis / CPD / cryptorchidism / varicocele / hydrocele / missed abortion / TURP / orchiectomy / prepuce,TURP
+medexam_07_12,7,제7장 남성생식기계,12,12. 남자외부성기의 개구가 피부에 의해 좁아져 있는 상태는?  [보기] placenta previa / ectopic pregnancy / venereal disease / gonorrhea / erection / induced abortion / BPH / mammoplasty / balanoplasty / spermatic cord / abruptio placentae / phimosis / CPD / cryptorchidism / varicocele / hydrocele / missed abortion / TURP / orchiectomy / prepuce,phimosis
+medexam_07_13,7,제7장 남성생식기계,13,13. sterilization을 목적으로 하는 수술은? ① vasovasotomy ② circumcision ③ prostatectomy ④ vasectomy ⑤ amniotomy,④ vasectomy
+medexam_08_01,8,제8장 신경계,1,"1. 뇌의 최하부, 곧 척수의 바로 윗부분으로 생명에 직접 관계되는 폐·심장·혈관 등의 운동을 지배하는 것은?",medulla oblongata (숨뇌)
+medexam_08_02,8,제8장 신경계,2,2. 대뇌의 1/8정도 크기로 신체균형 유지와 온몸 근육의 미세조정을 통해서 정확한 운동을 원활히 하게 하는 역할을 하는 것은?,cerebellum (소뇌)
+medexam_08_03,8,제8장 신경계,3,"3. 대뇌반구의 중앙상부뇌엽으로서, 피부·심부 감각과 미각의 중추가 있고, 뒤쪽에는 지각·인지·판단 따위에 관한 연합구역이 있는 곳은?",parietal lobe (마루엽)
+medexam_08_04,8,제8장 신경계,4,4. 뉴런과 뉴런과의 접합부로 정보를 전달하는 역할을 하는 것은?  [보기] spinal cord / parasympathetic nerve / pons / dura mater / synapse / convulsion / axon / ataxia / tremor / cerebellum / sympathetic nerve / pia mater / neuroglia / trigeminal nerve / neuron / hypothalamus / stupor / amnesia,synapse
+medexam_08_05,8,제8장 신경계,5,5. 뇌와 척수를 싸고 있는 가장 안쪽에 있는 막은?  [보기] (위와 동일),pia mater
+medexam_08_06,8,제8장 신경계,6,6. 기억을 잃어버리는 것으로 특히 과거에 있었던 일을 생각해내지 못하는 것은?  [보기] (위와 동일),amnesia
+medexam_08_07,8,제8장 신경계,7,7. 신경의 기본단위는?  [보기] (위와 동일),neuron
+medexam_08_08,8,제8장 신경계,8,8. 뇌간의 중뇌와 연수 사이를 연결하는 부분은?  [보기] (위와 동일),pons
+medexam_08_09,8,제8장 신경계,9,9. 척추동물에서 생체의 내환경을 조절하는데 있어 가장 중요한 역할을 하는 것은?  [보기] (위와 동일),hypothalamus
+medexam_08_10,8,제8장 신경계,10,10. 척추의 관 속에 있는 중추 신경으로 숨뇌에서 이어져 원기둥 모양을 이루고 있는 것은?  [보기] (위와 동일),spinal cord
+medexam_08_11,8,제8장 신경계,11,11. 혼합성 신경으로 뇌신경중에서 가장 큰 것은?  [보기] (위와 동일),trigeminal nerve
+medexam_08_12,8,제8장 신경계,12,12. 신경계에만 있는 세포로 신경세포 이외의 세포를 말하는 것으로 신경조직의 지지구조물은?  [보기] (위와 동일),neuroglia
+medexam_08_13,8,제8장 신경계,13,14. 근육이 상호협조를 못하여 운동이 제대로 되지 않는 것은?  [보기] (위와 동일),ataxia
+medexam_08_14,8,제8장 신경계,14,15. 전신 또는 국소의 골격근이 자신의 의사와 관계없이 급격히 수축하는 현상은?  [보기] (위와 동일),convulsion
+medexam_08_15,8,제8장 신경계,15,16. 근육과 연결된 힘줄에 고무망치로 두드려서 유발되는 갑작스런 근육 폄에 반응하여 일어나는 근육의 수축 현상은?,deep tendon reflex
+medexam_08_16,8,제8장 신경계,16,17. 의식장애 가운데 가장 심한 것으로 심한 자극에도 반응이 없는 무의식상태는?,coma
+medexam_08_17,8,제8장 신경계,17,18. 다음 보기중 용어의 의미가 틀린 것은? ① diplegia-양측마비 ② hemiplegia-반신마비 ③ paresis-완전마비 ④ tetraplegia-사지마비 ⑤ paraplegia-하반신마비,③ paresis-완전마비 (paresis는 불완전마비)
+medexam_08_18,8,제8장 신경계,18,19. 뇌와 함께 중추신경계를 구성하는 것은? ① motor nerve ② cranial nerve ③ sensory nerve ④ spinal nerve ⑤ spinal cord,⑤ spinal cord
+medexam_08_19,8,제8장 신경계,19,"20. 신경계를 크게 분류하면 어떻게 나눌 수 있는가? ① CNS, PNS ② CNS, spinal cord ③ CNS, Brain ④ cerebrum, cerebellum ⑤ cranial nerve, spinal nerve","① CNS, PNS"
+medexam_09_01,9,제9장 근골격계,1,1. 척추골 중에서 목부분을 이루는 뼈부분을 이르는 것은?,cervical vertebra
+medexam_09_02,9,제9장 근골격계,2,2. (그림 가슴뼈 A) 가슴 한복판에 세로로 있는 뼈로 좌우의 늑골과 연결되어 가슴의 앞 벽을 이루는 A는?,sternum
+medexam_09_03,9,제9장 근골격계,3,3. (그림 어깨~팔꿈치 B) 어깨로부터 팔꿈치에 있는 뼈로 B는?,humerus
+medexam_09_04,9,제9장 근골격계,4,4. 골반을 이루는 좌우 한 쌍의 뼈? [보기] pathologic fracture / rickets / lumbago / nonunion / ischium / carpal bone / tarsal bone / phantom limb pain / scoliosis / lordosis / open reduction / genu varum / paget's disease / patella / femur / ilium / malunion / pott's disease / ewing's tumor / genu valgum / closed reduction / coxa vara,ischium
+medexam_09_05,9,제9장 근골격계,5,5. 손목을 구성하는 여덟 개의 짧은 뼈? [보기] pathologic fracture / rickets / lumbago / nonunion / ischium / carpal bone / tarsal bone / phantom limb pain / scoliosis / lordosis / open reduction / genu varum / paget's disease / patella / femur / ilium / malunion / pott's disease / ewing's tumor / genu valgum / closed reduction / coxa vara,carpal bone
+medexam_09_06,9,제9장 근골격계,6,6. 흔히 밖에서도 촉진되는 무릎관절의 앞쪽에 떨어져 존재하는 조그만 뼈? [보기] pathologic fracture / rickets / lumbago / nonunion / ischium / carpal bone / tarsal bone / phantom limb pain / scoliosis / lordosis / open reduction / genu varum / paget's disease / patella / femur / ilium / malunion / pott's disease / ewing's tumor / genu valgum / closed reduction / coxa vara,patella
+medexam_09_07,9,제9장 근골격계,7,"7. 척추질환, 외상, 추간판 이상 등으로 인해서 허리와 엉덩부위가 아픈 증상? [보기] pathologic fracture / rickets / lumbago / nonunion / ischium / carpal bone / tarsal bone / phantom limb pain / scoliosis / lordosis / open reduction / genu varum / paget's disease / patella / femur / ilium / malunion / pott's disease / ewing's tumor / genu valgum / closed reduction / coxa vara",lumbago
+medexam_09_08,9,제9장 근골격계,8,8. 뼈가 서로 붙기는 하였으나 비정상적인 형태로 붙은 것은? [보기] pathologic fracture / rickets / lumbago / nonunion / ischium / carpal bone / tarsal bone / phantom limb pain / scoliosis / lordosis / open reduction / genu varum / paget's disease / patella / femur / ilium / malunion / pott's disease / ewing's tumor / genu valgum / closed reduction / coxa vara,malunion
+medexam_09_09,9,제9장 근골격계,9,9. 척추골의 결핵으로 결핵균이 원발 병변에서 혈행성 전파하여 척추에서 발병하는 것은? [보기] pathologic fracture / rickets / lumbago / nonunion / ischium / carpal bone / tarsal bone / phantom limb pain / scoliosis / lordosis / open reduction / genu varum / paget's disease / patella / femur / ilium / malunion / pott's disease / ewing's tumor / genu valgum / closed reduction / coxa vara,pott's disease
+medexam_09_10,9,제9장 근골격계,10,10. 골기질 형성에 비해 상대적으로 무기질 침착이 안되어 발생하는 병을 총칭하는 것은? [보기] pathologic fracture / rickets / lumbago / nonunion / ischium / carpal bone / tarsal bone / phantom limb pain / scoliosis / lordosis / open reduction / genu varum / paget's disease / patella / femur / ilium / malunion / pott's disease / ewing's tumor / genu valgum / closed reduction / coxa vara,rickets
+medexam_09_11,9,제9장 근골격계,11,11. 어깨띠를 포함한 사지의 뼈들을 침범하며 주로 골간단에서 발생하는 악성종양으로 20세 이전에 여자보다 남자에게 2배정도 많이 발생하는 질환은? [보기] pathologic fracture / rickets / lumbago / nonunion / ischium / carpal bone / tarsal bone / phantom limb pain / scoliosis / lordosis / open reduction / genu varum / paget's disease / patella / femur / ilium / malunion / pott's disease / ewing's tumor / genu valgum / closed reduction / coxa vara,ewing's tumor
+medexam_09_12,9,제9장 근골격계,12,"12. 골의 질병으로 인하여 골절이 일어나는 것으로 골종양, 골연화증, 골수염, 골다공증 등의 질환으로 일어나는 것? [보기] pathologic fracture / rickets / lumbago / nonunion / ischium / carpal bone / tarsal bone / phantom limb pain / scoliosis / lordosis / open reduction / genu varum / paget's disease / patella / femur / ilium / malunion / pott's disease / ewing's tumor / genu valgum / closed reduction / coxa vara",pathologic fracture
+medexam_09_13,9,제9장 근골격계,13,13. 무릎 관절이 외측으로 활모양으로 휘어진 상태로 O형 다리라고도 하는 것은? [보기] pathologic fracture / rickets / lumbago / nonunion / ischium / carpal bone / tarsal bone / phantom limb pain / scoliosis / lordosis / open reduction / genu varum / paget's disease / patella / femur / ilium / malunion / pott's disease / ewing's tumor / genu valgum / closed reduction / coxa vara,genu varum
+medexam_09_14,9,제9장 근골격계,14,14. 척추가 옆으로 굽어진 변형으로 원인불명의 특발성 측만증과 원인이 확실한 증후성 측만증으로 나뉘는 것은? [보기] pathologic fracture / rickets / lumbago / nonunion / ischium / carpal bone / tarsal bone / phantom limb pain / scoliosis / lordosis / open reduction / genu varum / paget's disease / patella / femur / ilium / malunion / pott's disease / ewing's tumor / genu valgum / closed reduction / coxa vara,scoliosis
+medexam_09_15,9,제9장 근골격계,15,15. 피부 절개 없이 골절 부위를 복원하는 방법은? [보기] pathologic fracture / rickets / lumbago / nonunion / ischium / carpal bone / tarsal bone / phantom limb pain / scoliosis / lordosis / open reduction / genu varum / paget's disease / patella / femur / ilium / malunion / pott's disease / ewing's tumor / genu valgum / closed reduction / coxa vara,closed reduction
+medexam_09_16,9,제9장 근골격계,16,16. 뼈의 결손을 보전하거나 보강 등을 목적으로 뼛조각을 이식하는 수술은?,bone graft
+medexam_09_17,9,제9장 근골격계,17,17. 뼈의 화학적 조성에 변화가 없는 상태에서 뼈의 전체양이 병적으로 감소된 상태?,osteoporosis
+medexam_09_18,9,제9장 근골격계,18,18. 손가락의 분리수술이 필요한 경우는? ① polydactyly ② macrodactyly ③ comptodactyly ④ syndactyly ⑤ clinodactyly,④ syndactyly
+medexam_09_19,9,제9장 근골격계,19,19. 척추관절의 강직현상을 뜻하는 용어는? ① osteoarthritis ② ankylosing spondylitis ③ arthralgia ④ synarthrosis ⑤ diarthrosis,② ankylosing spondylitis
+medexam_09_20,9,제9장 근골격계,20,20. cranial bone이 아닌 것은? ① frontal bone ② Parietal bone ③ temporal bone ④ ethmoid bone ⑤ zygomatic bone,⑤ zygomatic bone
+medexam_10_01,10,제10장 피부,1,"[피부 그림 A~D] 표피를 지지하는 곳으로 혈관, 신경, 땀샘, 모낭과 모근 등이 분포하는 피부층은?","B, dermis (진피)"
+medexam_10_02,10,제10장 피부,2,"[피부 그림 A~D] 편평상피조직이며, 지속적인 각질의 생성과 탈락이 일어나는 피부층은?","A, epidermis (표피)"
+medexam_10_03,10,제10장 피부,3,[피부 그림 A~D] 지방조직이 많고 근육 표면과 피부를 연결하는 피부층은?,"C, subcutaneous tissue (피부 밑 조직, 피하조직)"
+medexam_10_04,10,제10장 피부,4,"진피의 결합조직에서 발견되며, 손상, 감염, 알레르기에 반응하는 이것은?",mast cell (비만세포)
+medexam_10_05,10,제10장 피부,5,털을 생산하는 곳으로 피부 속에 위치한 내피 안에서 털뿌리를 싸고 털의 영양을 제공하는 주머니는?,"hair follicle (모낭, 털주머니)"
+medexam_10_06,10,제10장 피부,6,"피부를 구성하는 세포중의 하나로 표피의 기저층에 존재하며, 인종의 피부 색깔을 결정하는 것은?",melanocyte (멜라닌세포)
+medexam_10_07,10,제10장 피부,7,"대개 모세혈관의 파열에 의하며, 직경 1mm이하의 약간 돋아 오른 원형의 자적색의 출혈은?",petechia (출혈점)
+medexam_10_08,10,제10장 피부,8,겨드랑이 부위의 땀이 세균성 분해에 의해 고약한 냄새를 풍기는 질환은?,osmidrosis (액취증)
+medexam_10_09,10,제10장 피부,9,피부 내 출혈로 인하여 피부 표피를 통해 쉽게 보이는 자홍색 또는 적갈색 반점을 특징으로 하는 일련의 병은?,purpura (자반증)
+medexam_10_10,10,제10장 피부,10,"발, 특히 발가락 사이와 발바닥의 만성 표재성 곰팡이증은?",tinea pedis (무좀)
+medexam_10_11,10,제10장 피부,11,"주로 어린아이들에게 나타나는 세균에 의해 농포, 수포와 딱지를 주증상으로 하는 피부병은?",impetigo (농가진)
+medexam_10_12,10,제10장 피부,12,주로 세균에 의해 손톱주위에 발생한 염증은?,paronychia (손·발톱주위염)
+medexam_10_13,10,제10장 피부,13,나균에 의하여 감염되는 만성 전염성 난치병은?,leprosy (나병)
+medexam_10_14,10,제10장 피부,14,주로 여성에게 발생하는 전신 자가면역질환의 대표적 질병은?,systemic lupus erythematosus (전신성 홍반성 낭창)
+medexam_10_15,10,제10장 피부,15,피부 표면에 있는 흉터나 흔적들을 깍아내어 없애기 위하여 동결한 표피와 필요량의 진피를 제거하는 것은?,dermabrasion (박피술)
+medexam_10_16,10,제10장 피부,16,물질을 진피 내로 주사하거나 국소적으로 바른 결과를 관찰하여 물질의 신체에 대한 반응을 결정하는 검사는?,skin test (피부반응검사)
+medexam_10_17,10,제10장 피부,17,"당뇨, 색전 등의 원인으로 혈액공급이 차단되어 조직이 죽는 현상은?",gangrene (괴저)
+medexam_10_18,10,제10장 피부,18,피부에 시행하는 검사법이 아닌 것은? ① patch test ② scratch test ③ intradermal test ④ mantoux test ⑤ friedman test,⑤ friedman test
+medexam_10_19,10,제10장 피부,19,동의어로 연결 되지 않은 것은? ① alopecia-baldness ② pruritus-itching ③ wheal-urticaria ④ macule-warts ⑤ decubitus ulcer-bed sore,"④ macule-warts (macule=반점, warts=사마귀)"
+medexam_10_20,10,제10장 피부,20,피부에 생기는 악성종양이 아닌 것은? ① angioma ② squamous cell carcinoma ③ melanoma ④ kaposi sarcoma ⑤ basal cell carcinoma,① angioma (혈관종)
+medexam_11_01,11,제11장 감각,1,망막이 안저로부터 벗겨져서 유리체강으로 떠올라와 있는 상태로 고도 근시인 경우나 외상으로 안구나 머리에 타박을 입은 경우에도 발생할 수 있는 질환은?,retinal detachment (망막박리)
+medexam_11_02,11,제11장 감각,2,눈의 수정체가 선천적 또는 백내장 등으로 제거된 상태는?,"aphakia (무수정체, 수정체없음증)"
+medexam_11_03,11,제11장 감각,3,가운데 귀 내 주머니에 피부세포와 콜레스테롤의 축척으로 대부분 만성 중이염이나 고막천공과 관련되어 생기는 것은?,cholesteatoma (진주종)
+medexam_11_04,11,제11장 감각,4,몸 밖에 음원이 없는데도 윙윙거리며 귓속에서 잡음이 들리는 병적인 상태는?,tinnitus (이명)
+medexam_11_05,11,제11장 감각,5,화농성 또는 장액성으로 인한 가운데 귀의 염증이 있는 질환은?,"otitis media (가운데귀염, 중이염)"
+medexam_11_06,11,제11장 감각,6,고령으로 인하여 청력이 소실되는 질환은?,presbycusis (노인성 난청)
+medexam_11_07,11,제11장 감각,7,음파를 달팽이관에 전달하는 가운데 귀의 귀 속 뼈와 고막의 장애로 인한 난청은?,conductive deafness (전도성 난청)
+medexam_11_08,11,제11장 감각,8,사진기의 필름역할을 하는 것으로 안구의 가장 안쪽에 있는 막으로 시각기능을 하는 기관은?,retina (망막)
+medexam_11_09,11,제11장 감각,9,안구의 형태와 투명도 유지에 중요한 역할을 하는 투명하고 혈관이 없는 젤의 형태를 가진 기관은?,"vitreous body (유리체, 초자체)"
+medexam_11_10,11,제11장 감각,10,당뇨병으로 인하여 망막에 분포되어있는 작은 혈관의 이상에 의해 망막이 파괴되어 최종적으로는 실명에 이르는 병은?,diabetic retinopathy (당뇨망막병증)
+medexam_11_11,11,제11장 감각,11,안구의 압력이 병적으로 상승하여 시신경이 장애가 되어 시력이 약해지는 병은?,glaucoma (녹내장)
+medexam_11_12,11,제11장 감각,12,다음 중 감각기계 질환과 거리가 먼 것은? ① strabismus ② glaucoma ③ cholesteatoma ④ mastoiditis ⑤ papule,"⑤ papule (구진, 피부 병터)"
+medexam_11_13,11,제11장 감각,13,다음 중 백내장 수술이 아닌 것은? ① ECCE ② ICCE ③ ACL ④ PHACO ⑤ PCL,③ ACL
+medexam_11_14,11,제11장 감각,14,녹내장을 진단하기 위해서 눈의 압력을 측정하는 방법은? ① fundoscopy ② tonometry ③ totometry ④ optometrist ⑤ ophthalmoscopy,② tonometry (안압측정법)
+medexam_12_01,12,제12장 내분비계,1,인체의 가장 큰 내분비 샘으로 티록신과 칼시토닌을 분비하는 것은?,thyroid gland (갑상샘)
+medexam_12_02,12,제12장 내분비계,2,"뇌 바닥에 있는 나비뼈내 함몰부위에 위치하고 있으며, 생식과 발육에 밀접한 관계가 있는 기관은?",hypophysis 또는 pituitary gland (뇌하수체)
+medexam_12_03,12,제12장 내분비계,3,종격내에 위치하는 기관으로 림프구와 항체 생산에 관여하고 티모신 호르몬을 분비하는 기관은?,"thymus gland (가슴샘, 흉선)"
+medexam_12_04,12,제12장 내분비계,4,위의 뒤쪽에 위치하며 랑게르한스섬에서 글루카곤 호르몬을 분비하는 기관은?,"pancreas (이자, 췌장)"
+medexam_12_05,12,제12장 내분비계,5,"(보기: exophthalmos, virilism, gigantism, hyperparathyroidism, cretinism, diabetes mellitus, addison's disease, thyroid carcinoma, conn's syndrome, goiter, myxedema, acromegaly, hypothyroidism, grave's disease, hyperinsulinism, cushing's syndrome, sheehan's syndrome, pheochromocytoma) 여성에게 남성의 2차 성징이 나타나는 것으로 여성에게서 안드로겐의 증가에 일어날 수 있는 것은?",virilism (남성화)
+medexam_12_06,12,제12장 내분비계,6,"(보기 동일) 갑상샘 과다증의 가장 일반적인 형태로 체중감소, 심계항진, 행동과다 증상이 나타나고 안구조직의 종창으로 안구돌출증이 발생하는 질환은?","grave's disease (그레이브스병, 갑상샘중독증)"
+medexam_12_07,12,제12장 내분비계,7,"(보기 동일) 영유아기에 발생하는 선천적 질환으로 신체적, 정신적 발육의 지연과 골격성장 저해가 나타나는 질환은?",cretinism (크레틴병)
+medexam_12_08,12,제12장 내분비계,8,(보기 동일) 뇌하수체에서 분비되는 부신겉질자극호르몬에 의해서 부신겉질의 과다형성이 원인인 질환은?,cushing's syndrome (쿠싱증후군)
+medexam_12_09,12,제12장 내분비계,9,"(보기 동일) 세포의 당, 전분, 지방대사를 촉진하는 인슐린 분비의 결핍으로 발생하는 질환은?",diabetes mellitus (당뇨)
+medexam_12_10,12,제12장 내분비계,10,(보기 동일) 사춘기 이전 뇌하수체 종양으로 성장호르몬이 과다분비되어 신체의 비정상적 발육으로 나타나는 질환은?,gigantism (거인증)
+medexam_12_11,12,제12장 내분비계,11,"(보기 동일) 사춘기 이후 성장호르몬의 과다분비에 의해 손, 발, 얼굴, 턱의 뼈가 비정상적으로 커지는 질환은?",acromegaly (말단비대증)
+medexam_12_12,12,제12장 내분비계,12,(보기 동일) 성인에게 나타나는 후천적 갑상샘 기능저하증으로 갑상샘의 위축과 함께 호르몬 분비가 되지 않아 피부 밑 점액성 물질 축적이 특징인 질환은?,"myxedema (점액부종, 점액수종)"
+medexam_12_13,12,제12장 내분비계,13,"(보기 동일) 내분비계 암종 중 가장 흔하며 젊은 여성에게 호발하며, 방사선요오드추적스캔, 미세침흡입, 외과적 생검술을 통해 진단하는 질환은?",thyroid carcinoma (갑상샘암)
+medexam_12_14,12,제12장 내분비계,14,(보기 동일) 알도스테론의 분비과다로 일어나는 기능항진증으로 부신겉질샘종에 의해 발생하는 질환은?,"conn's syndrome (콘증후군, 알도스테론증)"
+medexam_12_15,12,제12장 내분비계,15,"(보기 동일) 부신 속질의 종양으로 epinephrine과 norepinephrine의 과잉분비로 인해 나타나며 고혈압, 심계항진, 두통, 얼굴 홍조, 땀이 발생되는 질환은?",pheochromocytoma (크롬친화세포종)
+medexam_12_16,12,제12장 내분비계,16,부신의 과소분비로 발생하는 질환은? ① adrenal virilism ② aldosteronism ③ addison's disease ④ hypoparathyroidism ⑤ hypothyroidism,③ addison's disease (애디슨병)
+medexam_12_17,12,제12장 내분비계,17,"어린이 시기에 노쇠현상이 나타나는 것으로 체구가 작고, 수염과 치모의 결손, 피부주름이 특징인 질환은? ① cretinism ② goiter ③ hirsutism ④ aldosteronism ⑤ progeria",⑤ progeria (조로증)
+medexam_12_18,12,제12장 내분비계,18,간에 저장된 glycogen을 glucose 형태로 전환시켜 혈류로 들어가도록 자극하여 혈당을 높이는 것은? ① alpha cell ② beta cell ③ sella turcica ④ adrenal medulla ⑤ adrenal cortex,"① alpha cell (알파세포, 글루카곤 분비)"
+medexam_12_19,12,제12장 내분비계,19,"당뇨병의 한 형태로 인슐린 작용의 결함에 의해 나타나며, 주로 성인에게서 발생하고 전체 당뇨병의 90%이상을 차지하는 당뇨병은?","non-insulin dependent diabetes mellitus (비인슐린의존성 당뇨병, 제2형)"
+medexam_12_20,12,제12장 내분비계,20,항이뇨호르몬의 결핍으로 콩팥이 필요한 물과 염분을 재흡수하지 못하여 노량이 병적으로 증가하는 질환은?,diabetes insipidus (요붕증)
+medexam_13_01,13,제13장 정신 의학,1,사고 또는 지각의 대상을 알아차리는 마음의 작용을 일컫는 용어는?,cognition (인지)
+medexam_13_02,13,제13장 정신 의학,2,자극에 의해 발생한 감각을 다른 감각과 비교하거나 과거의 기억을 기초로 의미를 부여하는 과정은?,perception (지각)
+medexam_13_03,13,제13장 정신 의학,3,자아가 발전하는 과정에서 부모와 사회의 금지와 도덕 규범을 동일시하는데서 생겨나는 것은?,superego (초자아)
+medexam_13_04,13,제13장 정신 의학,4,신체적 또는 정신적으로 병적인 상태를 일컫는 것은?,disorder (장애)
+medexam_13_05,13,제13장 정신 의학,5,"(보기: incoherence, dissociative amnesia, disorientation, obsession, multiple personality, post-traumatic stress disorder, dissociative fugue, conversion disorder, somatoform disorders, amnesia, compulsion, paranoid personality disorder, delusion, narcissistic personality disorder, obsessive compulsive personality disorder, generalized anxiety disorder) 뇌의 기질적 손상 또는 심리적 원인으로 기억, 특히 과거에 있었던 일을 생각해내지 못하는 것은?",amnesia (기억상실)
+medexam_13_06,13,제13장 정신 의학,6,(보기 동일) 마음속에서 떨쳐 버리려고 해도 떠나지 않는 억눌린 생각을 무엇이라 하는가?,obsession (강박사고)
+medexam_13_07,13,제13장 정신 의학,7,(보기 동일) 이치에 맞지 않고 불필요한 것인 줄 알면서도 어쩔 수 없이 반복적으로 행하는 행위는?,compulsion (강박행위)
+medexam_13_08,13,제13장 정신 의학,8,"(보기 동일) 사고 진행이 와해되어 논리적 연결이 없고 의미적으로도 파괴된 언어들로, 단어들이 흩어진 상태는?","incoherence (지리멸렬, 사고산란)"
+medexam_13_09,13,제13장 정신 의학,9,(보기 동일) 병적인 상태에서 생기는 불합리하며 잘못된 생각 또는 신념은?,delusion (망상)
+medexam_13_10,13,제13장 정신 의학,10,"(보기 동일) 현재의 때, 장소 또는 만나고 있는 사람에 대해서 모르거나 잘 알지 못하는 상태는?",disorientation (지남력 장애)
+medexam_13_11,13,제13장 정신 의학,11,(보기 동일) 생명위협에 대한 재난 등의 충격이나 심한 감정적 스트레스를 경험했을 때 발생하는 것은?,post-traumatic stress disorder (외상 후 스트레스장애)
+medexam_13_12,13,제13장 정신 의학,12,(보기 동일) 정신적 원인이 신체증상의 형태로 나타나는 경우로 누적된 정신적 갈등이 신체적 증상으로 전환되어 나타나는 정신적 장애는?,somatoform disorders (신체형 장애)
+medexam_13_13,13,제13장 정신 의학,13,"(보기 동일) 자신의 과거나 이름, 신분, 직업 등 정체성에 대한 기억을 상실하여 예정 없는 여행이나 새로운 곳에서 생활하기도 하는 정신 장애는?",dissociative fugue (해리 둔주)
+medexam_13_14,13,제13장 정신 의학,14,"(보기 동일) 과민, 강직, 불필요한 의심, 질투, 시기 및 자기위주, 남을 비방하고 책임을 전가하는 인격적 장애는?",paranoid personality disorder (편집성 인격장애)
+medexam_13_15,13,제13장 정신 의학,15,"(보기 동일) 감정표현을 억제하고 모든 일에 합리적이고 형식적이어서 다른 사람에게 거리감을 주며 정돈, 완고함, 우유부단, 완벽주의 등이 특징인 정신장애는?",obsessive compulsive personality disorder (강박성 인격장애)
+medexam_13_16,13,제13장 정신 의학,16,자신의 성과 반대의 성을 가진 것으로 생각하거나 결정하고 행동하는 정신의 장애는? ① transsexualism ② homosexuality ③ sexual masochism ④ sexual sadism ⑤ pedophilia,① transsexualism (성전환증)
+medexam_13_17,13,제13장 정신 의학,17,"Thiamine 결핍과 만성적 음주가 원인으로 정상적 의식 상태에서 장기, 단기 기억력 장애가 나타나는 것은? ① dementia ② amnestic disorder ③ delirium ④ paraphilia ⑤ korsakoff's psychosis",② amnestic disorder (기억상실장애)
+medexam_13_18,13,제13장 정신 의학,18,반사회적 사고나 감정을 이용하는 대신에 실제 행동양상에 초점을 맞춰 치료하는 심리요법은? ① group therapy ② play therapy ③ family therapy ④ psychoanalysis ⑤ behavior therapy,⑤ behavior therapy (행동요법)
+medexam_13_19,13,제13장 정신 의학,19,출생 후 30개월 이내에 발병하며 현실에서 멀어지고 자기 내면세계에 틀어박히는 정신장애로 주위 사람들과의 소통이 어려운 정신발달장애는?,autism (자폐증)
+medexam_13_20,13,제13장 정신 의학,20,혼수상태로 유도한 후 환자의 마음속 깊이 억압되어 있던 기억을 떠올리게 하거나 정신치료의 빠른 회복을 위해 사용하는 정신치료 방법은?,hypnotherapy (최면요법)

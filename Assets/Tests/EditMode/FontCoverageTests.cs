@@ -65,6 +65,15 @@ namespace WordRPG.Tests
                     yield return w.Meaning;
                     yield return w.Example;
                     yield return w.ExampleMeaning;
+                    yield return w.Note; // 설명 (#280 의학 용어 풀이)
+                }
+            }
+            foreach (var guid in AssetDatabase.FindAssets("t:ExamBook")) // 확인문제 (#280)
+            {
+                var exams = AssetDatabase.LoadAssetAtPath<ExamBook>(AssetDatabase.GUIDToAssetPath(guid));
+                foreach (var q in exams.Questions)
+                {
+                    yield return q.ChapterTitle; yield return q.Question; yield return q.Answer;
                 }
             }
             var db = AssetDatabase.LoadAssetAtPath<GameDatabase>("Assets/Data/GameDatabase.asset");

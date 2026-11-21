@@ -27,8 +27,15 @@ namespace WordRPG.UI
         private int shaking = -1;
         private float shakeTime;
         private Vector2 shakeHome;
+        // 확인문제 (#280 의학 용어 — Figma '석판 확인문제 (#280)'): 긴 문제 글 + 보기 한 줄씩
+        private ExamLayout.LabelLook meaningWord, meaningExam, blankWord, blankExam;
+        private List<(Vector2 min, Vector2 max)> gridAnchors;
+        private bool examLook;
 
         public bool IsOpen => root != null && root.activeSelf;
+        public bool IsExam => IsOpen && examLook;
+        public int ChoiceCount { get { int n = 0; foreach (var c in choices) if (c.gameObject.activeSelf) n++; return n; } }
+        public string ChoiceText(int index) => UiKit.LabelOf(choices[index]).text;
         public string Meaning => IsOpen ? meaning.text : "";
         public string Blank => IsOpen ? blank.text : "";
         public string Counter => IsOpen ? counter.text : "";
@@ -89,8 +96,8 @@ namespace WordRPG.UI
             view.stamp.localEulerAngles = new Vector3(0, 0, 10);
             Outlined(UiKit.Display(UiKit.OneLine(UiKit.Label("Text", view.stamp, "정답!", 72, Palette.Good, 0, 0, 1, 1))));
 
-            // 2×2 선택지 (Figma 'Answer Choice', 엄지 쪽)
-            for (int i = 0; i < 4; i++)
+            // 2×2 선택지 (Figma 'Answer Choice', 엄지 쪽) + 확인문제 5지선다용 다섯째 (평소엔 꺼 둠)
+            for (int i = 0; i < ExamLayout.MaxChoices; i++)
             {
                 int index = i;
                 float minX = i % 2 == 0 ? 0.065f : 0.509f, maxY = i < 2 ? 0.245f : 0.156f;
@@ -101,7 +108,18 @@ namespace WordRPG.UI
                 button.colors = colors;
                 button.onClick.AddListener(() => view.onPick?.Invoke(index));
                 view.choices.Add(button);
+                if (i >= 4) button.gameObject.SetActive(false);
             }
+            view.gridAnchors = ExamLayout.Anchors(view.choices);
+            view.meaningWord = ExamLayout.LabelLook.Of(view.meaning);
+            view.meaningExam = ExamLayout.Question(view.meaning, 42, 22, new Vector2(0.04f, 0.33f), new Vector2(0.96f, 0.95f), Palette.Text);
+            view.blankWord = ExamLayout.LabelLook.Of(view.blank);
+            view.blankExam = view.blankWord;
+            view.blankExam.Min = new Vector2(0.04f, 0.2f);
+            view.blankExam.Max = new Vector2(0.96f, 0.34f);
+            view.blankExam.Font = UiFonts.Bold;
+            view.blankExam.Size = view.blankExam.MaxSize = 44;
+            view.blankExam.MinSize = 22;
             view.done = UiKit.MakeButton("TabletDone", rect, "확인", Palette.Gold, 44, 0.222f, 0.125f, 0.778f, 0.1875f);
             UiKit.LabelOf(view.done).color = Palette.OnAccent;
             view.done.onClick.AddListener(() => view.onClose?.Invoke());
@@ -122,10 +140,11 @@ namespace WordRPG.UI
 
         public void ShowQuestion(QuizQuestion question, int solved, string footnote)
         {
+            SetExamLook(question.IsExam, question.Choices.Count);
             meaning.text = question.Prompt;
-            meaning.fontSize = 100;
-            blank.text = BlankFor(question.CorrectAnswer);
-            ask.text = "빈칸에 들어갈 영단어는?";
+            if (!question.IsExam) meaning.fontSize = 100;
+            blank.text = question.IsExam ? "" : BlankFor(question.CorrectAnswer);
+            ask.text = question.IsExam ? ExamLayout.Tag(question.Exam) + " — 알맞은 답은?" : "빈칸에 들어갈 영단어는?";
             note.text = footnote;
             SetProgress(solved, solved + 1);
             stamp.gameObject.SetActive(false);
@@ -172,6 +191,9 @@ namespace WordRPG.UI
         public void ShowComplete(IReadOnlyList<string> filled, string footnote)
         {
             StopShake();
+            bool exam = examLook;
+            SetExamLook(false, 4);
+            if (exam) blank.resizeTextMinSize = 22; // 확인문제 답은 길어서 (#280)
             meaning.text = "빈칸이 모두\n채워졌다!";
             meaning.fontSize = 84;
             blank.text = string.Join(" · ", filled);
@@ -209,6 +231,16 @@ namespace WordRPG.UI
         {
             if (shaking >= 0) choices[shaking].GetComponent<RectTransform>().anchoredPosition = shakeHome;
             shaking = -1;
+        }
+
+        // 확인문제 모양 ↔ 단어 문제 모양 (#280)
+        private void SetExamLook(bool exam, int choiceCount)
+        {
+            examLook = exam;
+            (exam ? meaningExam : meaningWord).ApplyTo(meaning);
+            (exam ? blankExam : blankWord).ApplyTo(blank);
+            if (exam) ExamLayout.Column(choices, choiceCount, 0.065f, 0.935f, 0.075f, 0.465f, 0.012f);
+            else ExamLayout.Restore(choices, gridAnchors);
         }
 
         private void SetProgress(int filled, int current)

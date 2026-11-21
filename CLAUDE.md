@@ -30,7 +30,7 @@
   적 6종 + 보스 2 (+ 1.1 메아리 정글 — 2026-10 출시, 가지 release-1.1: 숲 보스 공터 위 출입구, 적 3종 + 빈칸두꺼비, 동료 아라)
   (+ 1.2 어두운 밀림 동굴 — 2026-11-04 앱스토어 출시 #153, 빌드 1.2 (3): 정글 강 가운데 섬의 'O' 출입구(입장 조건 없음), 적 4종 + 말줄임덩굴, 설계 GDD 9-7) (+ 1.3 말을 잃어 가는 사람들·보스 기믹·지역 음악 — 2026-11-11 앱스토어 출시 #263, 빌드 1.3 (7)). 단어 = 2022 개정 교육과정 영어과 기본 어휘(교육부 고시, 저작권 없음 — GDD 11-2)에서 **단어장 2개를 지역들이 같이 씀**(#147 사용자: 초원·서고 = 중·고 공통 150 `tier1_common` · 숲·정글·동굴 = 고급 300 `tier2_advanced`, 전체 2,198개 중 450개).
   남은 단어는 `Docs/단어_예비_중고공통.csv`(1050)·`Docs/단어_예비_고급.csv`(698) — 위에서부터, 버전마다 300개쯤 (6~7버전까지, GDD 9-8). 단어장에서 빠진 단어의 세이브 기록은 그대로 남음.
-  비즈니스·의학 단어장도 예비가 있음 `Docs/단어_예비_비즈니스.csv`(2151)·`Docs/단어_예비_의학.csv`(2128) — 새 지역 단어장을 만들 때 같은 수만큼 위에서부터 (#276, GDD 9-12).
+  비즈니스·의학 단어장도 예비가 있음 `Docs/단어_예비_비즈니스.csv`(2151)·`Docs/단어_예비_의학.csv`(1991 — 의대생 자료 #280) — 새 지역 단어장을 만들 때 같은 수만큼 위에서부터 (#276, GDD 9-12).
   뜻은 Claude 초안 + 사용자 검수. 맵은 2026-10-03에 넓이 4배. 보스 방은 열쇠 + 그 단어장 단어 N개 발견으로 열림(#76, #147: 서고 40 · 숲 40 · 정글 80 · 유적 100 · 동굴 120)
 
 ## 기술 규칙 (반드시 준수)
@@ -81,8 +81,11 @@
      데이터 `WordCourse`(courseId suneung·business·medical — 출시 뒤 바꾸지 말 것, GameDatabase `courses`) = 기본 단어장 → 대신 쓰는 단어장 `CourseBook`.
      지역의 단어는 `WordDatabase.Words`가 `WordCourses.Active`를 보고 바꿔 줌 (전투·도감·보스 문·사전·석판·수련 모두 그대로 따라감) — 에셋 자체 단어는 `OwnWords`(누군가의 기록 문장).
      Active는 GameSession이 정함 (만들거나 불러오면 기본부터, `ChooseCourse`) — 테스트에서 바꾸면 TearDown에서 null로. 세이브 칸 course (빈 값 = 안 고름, 예전 세이브는 불러올 때 수능·내신).
-     단어 = `Assets/Data/Words/Courses/{business|medical}_tier{1|2}.csv` (id 앞글자 biz_·med_, 기본 단어장과 같은 수 150·300 — WordCourseTests). Claude가 고르고 뜻을 씀 → 사용자 검수 (시판 단어장·학원 자료는 넣지 않음, GDD 11-2 — 사용자의 토익 목록은 어려운 정도만 참고, 단어를 옮기지 않음).
-     예비 = `Docs/단어_예비_비즈니스·의학.csv` (#276, 자주 쓰는 말부터 · 분야 열 group · 의학은 의사가 검수를 도움). **수능 중·고 공통 단어와 겹치거나 비슷한 말(파생어)은 초원·서고 단어장에만** — 숲부터 쓰는 단어장·예비에는 넣지 않음, 비즈니스는 아주 흔한 말도 (사용자, `HarderCourseWordsSkipEasySuneungWords`). 예비 안에 같은 뜻 두 번 금지 (한 단어장에 들어가면 보기가 같아짐)
+     단어 = `Assets/Data/Words/Courses/{business|medical}_tier{1|2}.csv` (id 앞글자 biz_·med_, 기본 단어장과 같은 수 150·300 — WordCourseTests). 비즈니스 = Claude가 고르고 뜻을 씀 → 사용자 검수 (시판 단어장·학원 자료는 넣지 않음, GDD 11-2 — 사용자의 토익 목록은 어려운 정도만 참고, 단어를 옮기지 않음).
+     **의학 = 의대생 '의학용어 암기장' 그대로** (#280 사용자, GDD 9-16 — 원본 `Docs/의학용어_원본.html` → `python Tools/medical_course.py --apply`, 장 순서·글자 그대로 — 뜻을 고치거나 검수로 바꾸지 말 것. 설명 = 단어 칸 `note`(도감·단어 카드). 쉬운 말·같은 뜻·품사 규칙은 의학엔 안 씀).
+     **확인문제** (#280): 의대생이 장마다 만든 문제 221개 = `Assets/Data/Exams/medical_exam.csv` → `ExamBook`(임포터 `ExamCsvImporter`), 단어장 `WordCourse.exams`·`examAreas`(지역 areaId → 장 번호: 서고 2~4 · 숲 5~7 · 정글 8~10 · 동굴 11~13).
+     규칙 `ExamQuestion`(5지선다 ①~⑤·[보기] 목록을 화면용으로 읽기만) · `ExamQuiz`(보기 만들기 · 읽을 시간 `ReadingSeconds`) · `ExamQuizProvider`(겹치지 않게, 숙련도에 안 적힘). 쓰는 곳 = 보스전(`BattleScreen.BeginBattle` exam — 문제 카드·보기 한 줄씩 4~5개, `ExamLayout`) · 석판·반딧돌(`FieldScreen.ExamProvider`). `WordCourses.ExamFor(areaId)`
+     예비 = `Docs/단어_예비_비즈니스·의학.csv` (#276, 비즈니스는 자주 쓰는 말부터 · 분야 열 group / 의학은 #280부터 의대생 자료 장 순서 · group = 장 이름). **수능 중·고 공통 단어와 겹치거나 비슷한 말(파생어)은 초원·서고 단어장에만** — 숲부터 쓰는 단어장·예비에는 넣지 않음, 비즈니스는 아주 흔한 말도 (사용자, `HarderCourseWordsSkipEasySuneungWords`). 예비 안에 같은 뜻 두 번 금지 (한 단어장에 들어가면 보기가 같아짐)
      만들기 = `WordRPG > Data > Build Word Courses` (Create Sample Data에도 포함). 'TOEIC·토익'은 화면에 쓰지 않음 (상표)
    - **크리스마스 선물 퀴즈** (#274, 1.4 — GDD 9-13): 데이터 `GiftEvent`(eventId christmas — 세이브에 `{id}_{연도}`로 적히니 출시 뒤 바꾸지 말 것, GameDatabase `SeasonalEvents`, 만들기 `WordRPG > Data > Build Gift Events`) ·
      규칙 `GiftEvents`(여는 날 = 현지 날짜 12/1~12/31, 세이브마다 해마다 한 번 — WorldState 이벤트, 받는 것 = BaseGift + 맞힌 수 × RewardPerCorrect = 선물 상자 `Boxes`) · `GiftQuiz`(겹치지 않게 3문제, 문제마다 한 번, 숙련도 기록 없음) ·
@@ -283,7 +286,7 @@ Docs/                   PRD.txt, GDD.md, 아트에셋목록.md, 아이폰출시�
 .github/workflows/      ios-testflight.yml (GitHub Mac 서버에서 서명·TestFlight 업로드)
 Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow 필요), zip_ios_for_mac.py (Xcode 프로젝트 → Mac용 zip, 실행 권한 유지),
                         widen_maps.py (맵의 한 칸 통로 → 두 칸), subset_fonts.py (본문 글꼴에서 한자·가나 빼기 — 앱 크기, fontTools 필요),
-                        pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), forest_map.py (1.4 숲 72×44 = 예전 숲 + 오른쪽 이정표 미로, 검사·미리보기·--apply #279), make_signpost_art.py (이정표·헷갈 안개 그림 #279), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구), make_preempt_sfx.py (선제공격 '카칭' 소리 합성 #147), make_skill_sfx.py (기술마다 다른 소리: 팩 소리 겹치기 #164),
+                        pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), forest_map.py (1.4 숲 72×44 = 예전 숲 + 오른쪽 이정표 미로, 검사·미리보기·--apply #279), make_signpost_art.py (이정표·헷갈 안개 그림 #279), medical_course.py (의대생 의학 용어 → 의학 단어장 150·300 + 예비 + 확인문제 CSV #280), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구), make_preempt_sfx.py (선제공격 '카칭' 소리 합성 #147), make_skill_sfx.py (기술마다 다른 소리: 팩 소리 겹치기 #164),
                         check_android_bundle.py (구글플레이에 올리기 전 AAB 검사: 대상 API·게임 표시·뒤로 가기·권한·16KB 페이지·크기 #149),
                         make_shop_stalls.py (상점 가판대 그림: 팩 조각 조립 #210), journal_lines.py (누군가의 기록 문장 검사·CSV에 넣기 #201 · 글 파일 만들기 --text #202 · 고친 글 받아들이기 --import #204), make_journal_smudge.py (못 찾은 줄의 필기 그림 #201),
                         prepare_ambience.py (지역 환경음: 팩·CC0 녹음 다듬기 → Resources/Audio/Ambience + BGM과 섞은 미리듣기, #193), prepare_music.py (받은 곡 → 게임용: 끝 무음 빼기·반복 이음새 찾아 겹치기·음량 맞추기 → Licensed 폴더, `--later` = 아직 안 쓰는 2.0 곡을 Builds로, imageio-ffmpeg·numpy 필요 #166·#172),

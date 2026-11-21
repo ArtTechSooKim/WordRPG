@@ -23,6 +23,25 @@ namespace WordRPG.Words
         }
     }
 
+    // 확인문제를 내는 지역 (#280): 그 지역의 보스전·석판·반딧돌이 이 장들의 문제를 낸다
+    [Serializable]
+    public class CourseExamArea
+    {
+        [Tooltip("FieldArea의 areaId (library · forest · jungle · cave)")]
+        [SerializeField] private string areaId;
+        [Tooltip("ExamBook 문제의 장 번호")]
+        [SerializeField] private List<int> chapters = new List<int>();
+
+        public string AreaId => areaId;
+        public IReadOnlyList<int> Chapters => chapters;
+
+        public CourseExamArea(string areaId, params int[] chapters)
+        {
+            this.areaId = areaId;
+            this.chapters = new List<int>(chapters);
+        }
+    }
+
     // 처음에 고르는 외울 단어장 (#273 사용자, GDD 9-12): 수능·내신 / 비즈니스 / 의학 용어.
     // 지역·도감 보상·누군가의 기록은 그대로, 지역의 단어만 이 단어장의 것으로 바뀐다 (WordDatabase.Words).
     // books가 비어 있으면 기본 단어장 그대로 (= 수능·내신)
@@ -38,6 +57,9 @@ namespace WordRPG.Words
         [Tooltip("고르는 화면에 보여 줄 예시 단어 id 3개 (이 단어장의 단어)")]
         [SerializeField] private List<string> sampleWordIds = new List<string>();
         [SerializeField] private List<CourseBook> books = new List<CourseBook>();
+        [Tooltip("확인문제 (#280 의학 용어 = 의대생이 장마다 만든 문제). 비면 없음")]
+        [SerializeField] private ExamBook exams;
+        [SerializeField] private List<CourseExamArea> examAreas = new List<CourseExamArea>();
 
         public string CourseId => courseId;
         public string DisplayName => displayName;
@@ -45,6 +67,17 @@ namespace WordRPG.Words
         public int Order => order;
         public IReadOnlyList<string> SampleWordIds => sampleWordIds;
         public IReadOnlyList<CourseBook> Books => books;
+        public ExamBook Exams => exams;
+        public IReadOnlyList<CourseExamArea> ExamAreas => examAreas;
+
+        // 그 지역의 확인문제 (없으면 빈 목록)
+        public List<ExamQuestion> ExamFor(string areaId)
+        {
+            if (exams == null || string.IsNullOrEmpty(areaId)) return new List<ExamQuestion>();
+            foreach (var area in examAreas)
+                if (area != null && area.AreaId == areaId) return exams.InChapters(area.Chapters);
+            return new List<ExamQuestion>();
+        }
 
         // 기본 단어장 대신 쓰는 단어장 (없으면 null = 기본 그대로)
         public WordDatabase BookFor(WordDatabase baseBook)
@@ -79,6 +112,13 @@ namespace WordRPG.Words
             return null;
         }
 
+        // 샘플 데이터 생성 전용 (#280)
+        public void ConfigureExams(ExamBook book, IEnumerable<CourseExamArea> areas)
+        {
+            exams = book;
+            examAreas = areas != null ? new List<CourseExamArea>(areas) : new List<CourseExamArea>();
+        }
+
         // 샘플 데이터 생성 전용. 런타임에서는 호출하지 않는다
         public void Configure(string id, string name, string summary, int sortOrder, IEnumerable<string> samples, IEnumerable<CourseBook> courseBooks)
         {
@@ -98,5 +138,8 @@ namespace WordRPG.Words
         public const string DefaultId = "suneung";
 
         public static WordCourse Active { get; set; }
+
+        // 지금 단어장으로 그 지역에서 낼 확인문제 (#280 — 수능·비즈니스는 없음)
+        public static List<ExamQuestion> ExamFor(string areaId) => Active != null ? Active.ExamFor(areaId) : new List<ExamQuestion>();
     }
 }

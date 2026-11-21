@@ -22,6 +22,8 @@ Copyright (c) 2026 아트텍수 (ArtTechSoo). All rights reserved.
 - 글꼴 Jua, Noto Sans KR: SIL Open Font License 1.1
   Assets/Resources/UI/Fonts/OFL-Jua.txt, OFL-NotoSansKR.txt, Tools/FontSource/OFL-NotoSansKR.txt
 - 단어 목록: 교육부 2022 개정 교육과정 영어과 기본 어휘
+- 의학 용어 단어·설명·장별 확인문제: 의대생이 만든 '의학용어 암기장' — 작성자의 자료
+  Docs/의학용어_원본.html → Assets/Data/Words/Courses/medical_*, Assets/Data/Exams, Docs/단어_예비_의학.csv
 - 일부 음악: AI 생성(ElevenLabs Music, Higgsfield를 통해), 각 제공자의 약관. 저장소에는 없고 앱에만 들어감
 - Unity 엔진과 패키지: 각 제공자의 약관
 

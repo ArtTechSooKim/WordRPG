@@ -30,8 +30,15 @@ namespace WordRPG.UI
         private float shakeTime, time;
         private Vector2 shakeHome;
         private bool lit;
+        // 확인문제 (#280 의학 용어 — Figma '반딧돌 확인문제 (#280)'): 떠오른 글 = 문제(밝게 읽히게), 보기 한 줄씩
+        private ExamLayout.LabelLook wordLook, wordExam, meaningLook, meaningExam;
+        private List<(Vector2 min, Vector2 max)> gridAnchors;
+        private bool examLook;
 
         public bool IsOpen => root != null && root.activeSelf;
+        public bool IsExam => IsOpen && examLook;
+        public int ChoiceCount { get { int n = 0; foreach (var c in choices) if (c.gameObject.activeSelf) n++; return n; } }
+        public string ChoiceText(int index) => UiKit.LabelOf(choices[index]).text;
         public bool IsLit => IsOpen && lit;               // 맞혀서 밝아진 모습 (테스트용)
         public string Word => IsOpen ? word.text : "";
         public string Meaning => IsOpen ? meaning.text : "";
@@ -75,7 +82,7 @@ namespace WordRPG.UI
                 TextAnchor.MiddleLeft));
 
             // 2×2 뜻 고르기 (Figma 'Answer Choice', 엄지 쪽 — 석판 문제와 같은 자리)
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < ExamLayout.MaxChoices; i++) // 다섯째는 확인문제 5지선다용 (#280, 평소엔 꺼 둠)
             {
                 int index = i;
                 float minX = i % 2 == 0 ? 0.065f : 0.509f, maxY = i < 2 ? 0.245f : 0.156f;
@@ -86,7 +93,18 @@ namespace WordRPG.UI
                 button.colors = colors;
                 button.onClick.AddListener(() => view.onPick?.Invoke(index));
                 view.choices.Add(button);
+                if (i >= 4) button.gameObject.SetActive(false);
             }
+            view.gridAnchors = ExamLayout.Anchors(view.choices);
+            view.wordLook = ExamLayout.LabelLook.Of(view.word);
+            view.wordExam = ExamLayout.Question(view.word, 42, 22, new Vector2(0.04f, 0.4f), new Vector2(0.96f, 0.95f), BrightWord);
+            view.meaningLook = ExamLayout.LabelLook.Of(view.meaning);
+            view.meaningExam = view.meaningLook;
+            view.meaningExam.Font = UiFonts.Bold;
+            view.meaningExam.Min = new Vector2(0.04f, 0.25f);
+            view.meaningExam.Max = new Vector2(0.96f, 0.41f);
+            view.meaningExam.Size = view.meaningExam.MaxSize = 44;
+            view.meaningExam.MinSize = 22;
             view.done = UiKit.MakeButton("StoneDone", rect, "확인", Palette.Gold, 44, 0.222f, 0.125f, 0.778f, 0.1875f);
             UiKit.LabelOf(view.done).color = Palette.OnAccent;
             view.done.onClick.AddListener(() => view.onClose?.Invoke());
@@ -103,10 +121,15 @@ namespace WordRPG.UI
             lit = false;
             time = 0f;
             counter.text = $"밝힌 반딧돌 {litCount} / {total}";
+            examLook = question.IsExam;
+            (examLook ? wordExam : wordLook).ApplyTo(word);
+            (examLook ? meaningExam : meaningLook).ApplyTo(meaning);
+            if (examLook) ExamLayout.Column(choices, question.Choices.Count, 0.065f, 0.935f, 0.075f, 0.49f, 0.012f);
+            else ExamLayout.Restore(choices, gridAnchors);
             word.text = question.Prompt;
-            word.color = FaintWord;
+            word.color = examLook ? BrightWord : FaintWord; // 확인문제는 긴 글이라 처음부터 밝게 (Figma)
             meaning.text = "";
-            ask.text = "반딧돌에 떠오른 글자 — 뜻은?";
+            ask.text = examLook ? ExamLayout.Tag(question.Exam) + " — 알맞은 답은?" : "반딧돌에 떠오른 글자 — 뜻은?";
             ask.color = Palette.TextDim;
             note.text = "틀려도 괜찮아요 — 다시 고르면 돼요";
             edge.color = Edge;

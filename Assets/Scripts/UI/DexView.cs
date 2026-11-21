@@ -244,6 +244,7 @@ namespace WordRPG.UI
             text.Append($"{word.English}");
             if (word.PartOfSpeech.Length > 0) text.Append($"  ({word.PartOfSpeech})");
             text.Append($"\n{word.Meaning}");
+            if (word.Note.Length > 0) text.Append($"\n{word.Note}"); // 설명 (#280 의학 용어 풀이)
             if (word.Example.Length > 0)
             {
                 text.Append($"\n{word.Example}");

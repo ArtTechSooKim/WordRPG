@@ -148,20 +148,21 @@ namespace WordRPG.Battle
             RequirePhase(BattlePhase.AnsweringQuiz);
             var events = new List<BattleEvent>();
 
+            float reading = CurrentQuestion.ReadingSeconds; // 긴 확인문제는 읽을 시간만큼 더 (#280)
             bool correct = choiceIndex >= 0
-                           && secondsTaken <= config.AnswerTimeLimitSeconds
+                           && secondsTaken <= config.AnswerTimeLimitSeconds + reading
                            && CurrentQuestion.IsCorrect(choiceIndex);
 
             var mastery = quiz.SubmitAnswer(CurrentQuestion, correct);
             masteryChanges.Add(mastery);
-            Summary.RecordAnswer(CurrentQuestion.Word, CurrentQuestion.IsNewWord, correct);
+            Summary.RecordAnswer(CurrentQuestion.IsExam ? null : CurrentQuestion.Word, CurrentQuestion.IsNewWord, correct); // 확인문제는 단어 결산에 안 넣음 (#280)
             if (IsFleeQuiz) return AnswerFleeQuiz(correct, mastery, events);
             if (correct)
             {
                 CorrectAnswers++;
                 Streak++;
                 ChainCorrect++;
-                chainAllFast &= secondsTaken <= config.CriticalTimeSeconds;
+                chainAllFast &= secondsTaken <= config.CriticalTimeSeconds + reading;
             }
             else
             {

@@ -18,11 +18,21 @@ MonoBehaviour:
     \uC601\uC5B4 \uC6A9\uC5B4"
   order: 3
   sampleWordIds:
-  - med_fever
-  - med_artery
-  - med_diagnosis
+  - med_gastritis
+  - med_myocardium
+  - med_osteitis
   books:
   - replaces: {fileID: 11400000, guid: 89d1f80701129f84bad1df742f174dae, type: 2}
     book: {fileID: 11400000, guid: e62ee21dd092be041b6aa40767f6e164, type: 2}
   - replaces: {fileID: 11400000, guid: 5f371803871f9dd499e7cfff437b0665, type: 2}
     book: {fileID: 11400000, guid: 654920aba76abf645bc945bf67d5b82a, type: 2}
+  exams: {fileID: 11400000, guid: 21c9c2434f07cb3438e153259e4d793a, type: 2}
+  examAreas:
+  - areaId: library
+    chapters: 020000000300000004000000
+  - areaId: forest
+    chapters: 050000000600000007000000
+  - areaId: jungle
+    chapters: 08000000090000000a000000
+  - areaId: cave
+    chapters: 0b0000000c0000000d000000

@@ -1002,8 +1002,20 @@ namespace WordRPG.EditorTools
             Course("suneung", "수능·내신 영단어", "교과서·수능에 나오는 기본 영단어", 1, new[] { "access", "choice", "evidence" });
             Course("business", "비즈니스 영단어", "회사·업무에서 자주 쓰는 영어", 2, new[] { "biz_invoice", "biz_deadline", "biz_negotiate" },
                 new CourseBook(common, Book(words + "Courses/business_tier1")), new CourseBook(advanced, Book(words + "Courses/business_tier2")));
-            Course("medical", "의학 용어", "병원·의학 공부에 나오는 영어 용어", 3, new[] { "med_fever", "med_artery", "med_diagnosis" },
+            var medical = Course("medical", "의학 용어", "병원·의학 공부에 나오는 영어 용어", 3, new[] { "med_gastritis", "med_myocardium", "med_osteitis" },
                 new CourseBook(common, Book(words + "Courses/medical_tier1")), new CourseBook(advanced, Book(words + "Courses/medical_tier2")));
+            // 의학 용어 확인문제 (#280 사용자: 의대생이 장마다 만든 문제 → 보스전·석판·반딧돌). 보스가 있는 지역마다 세 장씩, 이야기 순서대로
+            string examPath = Root + "/Exams/medical_exam";
+            var exams = AssetDatabase.LoadAssetAtPath<ExamBook>(examPath + ".asset");
+            if (exams == null && File.Exists(examPath + ".csv")) exams = WordRPG.EditorTools.ExamCsvImporter.Import(examPath + ".csv");
+            medical.ConfigureExams(exams, new[]
+            {
+                new CourseExamArea("library", 2, 3, 4),   // 심혈관 · 호흡기 · 소화기
+                new CourseExamArea("forest", 5, 6, 7),    // 비뇨기 · 여성생식기 · 남성생식기
+                new CourseExamArea("jungle", 8, 9, 10),   // 신경계 · 근골격계 · 피부 (석판도)
+                new CourseExamArea("cave", 11, 12, 13),   // 감각 · 내분비계 · 정신 의학 (반딧돌도)
+            });
+            EditorUtility.SetDirty(medical);
             AssetDatabase.SaveAssets();
             GameDatabaseBuilder.Refresh(); // 세이브의 단어장 id → 에셋
         }
@@ -1068,7 +1080,7 @@ namespace WordRPG.EditorTools
             "저희 게임과 함께해 주셔서 진심으로 감사합니다.\n" +
             "여러분의 다음 모험에도 새로운 배움과 즐거움이 가득하기를!";
 
-        private static void Course(string id, string name, string summary, int order, string[] samples, params CourseBook[] books)
+        private static WordCourse Course(string id, string name, string summary, int order, string[] samples, params CourseBook[] books)
         {
             string folder = Root + "/Courses";
             if (!AssetDatabase.IsValidFolder(folder)) AssetDatabase.CreateFolder(Root, "Courses");
@@ -1081,6 +1093,7 @@ namespace WordRPG.EditorTools
             }
             course.Configure(id, name, summary, order, samples, books);
             EditorUtility.SetDirty(course);
+            return course;
         }
 
         private static void BuildNpcs(string meadowPath, string libraryPath, string forestPath, string junglePath, string cavePath)

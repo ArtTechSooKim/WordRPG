@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace WordRPG.Words
 {
-    // 단어 1개. CSV 한 줄과 1:1 대응 (id, english, meaning, pos, example, exampleMeaning, story, storyHeading)
+    // 단어 1개. CSV 한 줄과 1:1 대응 (id, english, meaning, pos, example, exampleMeaning, story, storyHeading, note)
     [Serializable]
     public class WordEntry
     {
@@ -18,6 +18,8 @@ namespace WordRPG.Words
         [SerializeField] private int story;
         [Tooltip("이 줄부터 시작하는 묶음의 제목. 비어 있으면 앞 묶음이 이어짐")]
         [SerializeField] private string storyHeading;
+        [Tooltip("설명 (#280 의학 용어: 'oste(bone·뼈) + itis(inflammation·염증)' 같은 풀이). 도감·단어 카드에 보임")]
+        [SerializeField] private string note;
 
         public string Id => id;
         public string English => english;
@@ -27,11 +29,12 @@ namespace WordRPG.Words
         public string ExampleMeaning => exampleMeaning;
         public int Story => story;
         public string StoryHeading => storyHeading ?? "";
+        public string Note => note ?? "";
 
         private WordEntry() { } // Unity 직렬화용
 
         public WordEntry(string id, string english, string meaning, string partOfSpeech = "",
-            string example = "", string exampleMeaning = "", int story = 0, string storyHeading = "")
+            string example = "", string exampleMeaning = "", int story = 0, string storyHeading = "", string note = "")
         {
             this.english = english.Trim();
             this.id = string.IsNullOrWhiteSpace(id) ? this.english.ToLowerInvariant() : id.Trim();
@@ -41,6 +44,7 @@ namespace WordRPG.Words
             this.exampleMeaning = (exampleMeaning ?? "").Trim();
             this.story = story;
             this.storyHeading = (storyHeading ?? "").Trim();
+            this.note = (note ?? "").Trim();
         }
 
         // "버리다, 포기하다" → ["버리다", "포기하다"]. 오답 보기 중복 판정에 사용

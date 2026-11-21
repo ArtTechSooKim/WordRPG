@@ -26,3 +26,5 @@ MonoBehaviour:
     book: {fileID: 11400000, guid: 643fddd87b1fab34093939b5031e99f8, type: 2}
   - replaces: {fileID: 11400000, guid: 5f371803871f9dd499e7cfff437b0665, type: 2}
     book: {fileID: 11400000, guid: ea576440ba6160e4c8e138c7e9cda429, type: 2}
+  exams: {fileID: 0}
+  examAreas: []
