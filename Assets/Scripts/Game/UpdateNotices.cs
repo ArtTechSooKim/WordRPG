@@ -32,7 +32,8 @@ namespace WordRPG.Game
 
         // 1.4: 처음 시작할 때 외울 단어장 고르기 (#273). 하던 모험은 수능·내신 그대로 (고르기는 새 게임에서 한 번 — 사용자 결정)
         public static readonly UpdateNotice Courses = new UpdateNotice("update_1_4_courses",
-            "업데이트 해주셔서 감사합니다", "이제 처음 시작할 때 외울 단어장을 고를 수 있어요!\n수능·내신 · 비즈니스 · 의학 용어\n지금 하던 모험은 수능·내신 단어로 이어져요");
+            "1.4 업데이트 안내", // 2026-11-21 사용자 문구 (#282)
+            "이제 처음 시작할 때 외울 단어장을 고를 수 있어요!\n수능·내신 · 비즈니스 · 의학 용어\n지금 하던 모험은 수능·내신 단어로 이어져요\n숲이 두 배로 넓어졌어요 — 뒤섞인 이정표를 바로잡아 보세요!");
 
         public static readonly IReadOnlyList<UpdateNotice> All = new[] { Cave, People, Courses };
 

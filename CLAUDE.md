@@ -88,7 +88,7 @@
      의학 용어 + 그 지역 보스를 이기면 보석 옆에 서는 해골(팩 Skeleton → Npcs/exam_skull·_face) — 힐끔힐끔·'…키킥', [확인] = 3문제(`ExamSkullQuiz`), 처음 바로 맞힌 새 문제마다 20G(세이브 칸 `solvedExams`).
      규칙 `ExamSkull`(있는지 · 자리 = 보석에서 2~4칸, 길을 끊지 않는 칸 · 고를 문제) · 화면 `FieldScreen.Skull`·`SkullQuizView`(Figma '힐끔해골 확인문제 (#281)')
      예비 = `Docs/단어_예비_비즈니스·의학.csv` (#276, 비즈니스는 자주 쓰는 말부터 · 분야 열 group / 의학은 #280부터 의대생 자료 장 순서 · group = 장 이름). **수능 중·고 공통 단어와 겹치거나 비슷한 말(파생어)은 초원·서고 단어장에만** — 숲부터 쓰는 단어장·예비에는 넣지 않음, 비즈니스는 아주 흔한 말도 (사용자, `HarderCourseWordsSkipEasySuneungWords`). 예비 안에 같은 뜻 두 번 금지 (한 단어장에 들어가면 보기가 같아짐)
-     만들기 = `WordRPG > Data > Build Word Courses` (Create Sample Data에도 포함). 'TOEIC·토익'은 화면에 쓰지 않음 (상표)
+     만들기 = `WordRPG > Data > Build Word Courses` (Create Sample Data에도 포함). 'TOEIC·토익'은 앱 이름·단어장 이름·로고처럼 공식인 것처럼 보이는 곳에는 쓰지 않음 (상표) — 비즈니스 단어장 설명 한 줄 '회사·업무에서 자주 쓰는 토익 영어'처럼 서술하는 말은 됨 (#282 사용자). 토익 기출 문제·지문은 넣지 않음
    - **크리스마스 선물 퀴즈** (#274, 1.4 — GDD 9-13): 데이터 `GiftEvent`(eventId christmas — 세이브에 `{id}_{연도}`로 적히니 출시 뒤 바꾸지 말 것, GameDatabase `SeasonalEvents`, 만들기 `WordRPG > Data > Build Gift Events`) ·
      규칙 `GiftEvents`(여는 날 = 현지 날짜 12/1~12/31, 세이브마다 해마다 한 번 — WorldState 이벤트, 받는 것 = BaseGift + 맞힌 수 × RewardPerCorrect = 선물 상자 `Boxes`) · `GiftQuiz`(겹치지 않게 3문제, 문제마다 한 번, 숙련도 기록 없음) ·
      화면 `FieldScreen.Gifts`(그 시기에 들어오면 바로 — 처음 시작 흐름·걷기 안내 중엔 끝난 뒤 #275) + `GiftQuizView`(Figma '크리스마스 선물 (#274)'). **선물은 상자를 열 때까지 비밀** — 안내·문제 화면에 아이템 이름을 쓰지 말 것 (사용자). 받은 뒤 개발자의 편지 = GiftEvent `letter`(MailData — 메일함에도 들어감, 사용자가 쓴 글이니 고치지 말 것).

@@ -1000,7 +1000,8 @@ namespace WordRPG.EditorTools
             var common = Book(words + "tier1_common");
             var advanced = Book(words + "tier2_advanced");
             Course("suneung", "수능·내신 영단어", "교과서·수능에 나오는 기본 영단어", 1, new[] { "access", "choice", "evidence" });
-            Course("business", "비즈니스 영단어", "회사·업무에서 자주 쓰는 영어", 2, new[] { "biz_invoice", "biz_deadline", "biz_negotiate" },
+            // 설명의 '토익' = #282 사용자 결정 (상표라 쓰지 않기로 했던 #273 규칙을 알고도 넣음 — 심사에서 걸리면 '영어'로 되돌림)
+            Course("business", "비즈니스 영단어", "회사·업무에서 자주 쓰는 토익 영어", 2, new[] { "biz_invoice", "biz_deadline", "biz_negotiate" },
                 new CourseBook(common, Book(words + "Courses/business_tier1")), new CourseBook(advanced, Book(words + "Courses/business_tier2")));
             var medical = Course("medical", "의학 용어", "병원·의학 공부에 나오는 영어 용어", 3, new[] { "med_gastritis", "med_myocardium", "med_osteitis" },
                 new CourseBook(common, Book(words + "Courses/medical_tier1")), new CourseBook(advanced, Book(words + "Courses/medical_tier2")));

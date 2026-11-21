@@ -307,6 +307,8 @@ namespace WordRPG.Tests
             Assert.IsNull(started, "두 번째 안내가 떠 있는 동안에도 시작하지 않음");
             FindButton(dialog, "DialogConfirmButton").onClick.Invoke();
             Assert.IsTrue(title.IsDialogOpen, "그다음 1.4 단어장 고르기 안내 (#273)");
+            StringAssert.Contains("1.4 업데이트 안내", AllText(dialog), "제목 (#282 사용자 문구)");
+            StringAssert.Contains("숲이 두 배로 넓어졌어요", AllText(dialog), "숲 미로 한 줄 (#282)");
             CollectionAssert.Contains(system.Load().Data.Notices, UpdateNotices.Courses.Id);
             FindButton(dialog, "DialogConfirmButton").onClick.Invoke();
             Assert.IsFalse(title.IsDialogOpen);
