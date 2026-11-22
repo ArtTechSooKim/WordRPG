@@ -12,7 +12,8 @@ namespace WordRPG.Game
     // 틀려도 벌점 없이 다시 고를 수 있지만 그 문제는 골드 없음. 바로 맞힌 수가 FleeAt 이상이면 슬금슬금 도망 (다음 벽 뒤로)
     public static class ExamSkull
     {
-        public const string DisplayName = "힐끔해골";
+        // 화면에 띄우는 이름 = '???' (#284 사용자·친구 의견: 이름이 붙어 있으면 이상함 — 정체 모를 해골). '힐끔해골'은 개발 문서에서만 부르는 이름
+        public const string DisplayName = "???";
         public const string ArtId = "exam_skull"; // 그림 Art/NinjaAdventure/Npcs/exam_skull.png (팩 Skeleton, import_ninja_art.py)
         public const int QuestionsPerVisit = 3;
         public const int GoldPerQuestion = 20;

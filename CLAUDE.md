@@ -85,7 +85,7 @@
      **의학 = 의대생 '의학용어 암기장' 그대로** (#280 사용자, GDD 9-16 — 원본 `Docs/의학용어_원본.html` → `python Tools/medical_course.py --apply`, 장 순서·글자 그대로 — 뜻을 고치거나 검수로 바꾸지 말 것. 설명 = 단어 칸 `note`(도감·단어 카드). 쉬운 말·같은 뜻·품사 규칙은 의학엔 안 씀).
      **확인문제** (#280·#281): 의대생이 장마다 만든 문제 221개 = `Assets/Data/Exams/medical_exam.csv` → `ExamBook`(임포터 `ExamCsvImporter`), 단어장 `WordCourse.exams`·`examAreas`(지역 areaId → 장 번호: 서고 2~4 · 숲 5~7 · 정글 8~10 · 동굴 11~13), `WordCourses.ExamFor(areaId)`.
      규칙 `ExamQuestion`(5지선다 ①~⑤·[보기] 목록을 화면용으로 읽기만) · `ExamQuiz`(보기 만들기). **내는 곳은 힐끔해골뿐** (#281 사용자 — 친구(의대생) 의견: 단어만 외우는 사람은 못 풂, 보스·몹·석판·반딧돌엔 넣지 말 것):
-     의학 용어 + 그 지역 보스를 이기면 보석 가까운 벽(책장·나무·바위) 뒤에서 얼굴 반만 내민 해골(팩 Skeleton → Npcs/exam_skull·_face, #283) — 힐끔·'…키킥'.
+     의학 용어 + 그 지역 보스를 이기면 보석 가까운 벽(책장·나무·바위) 뒤에서 얼굴 반만 내민 해골(팩 Skeleton → Npcs/exam_skull·_face, #283) — 힐끔·'…키킥'. 화면 이름표는 '???' (#284 사용자 — 화면 글에 '해골'이라고 쓰지 말 것, `ExamSkull.DisplayName`).
      [확인] = '○○ 문제인데… 한번 풀어 볼래?' → [풀어보기] = 번쩍 → 해골의 방 3문제(`ExamSkullQuiz`), 틀리면 깔봄, 처음 바로 맞힌 새 문제마다 20G(세이브 칸 `solvedExams`), 바로 맞힌 게 2개 이상이면 슬금슬금 도망 → 다음 벽.
      규칙 `ExamSkull`(있는지 · 숨는 벽 `PeekSpots` · 고를 문제) · 화면 `FieldScreen.Skull`·`SkullQuizView`(Figma '힐끔해골 — 말 걸기 (#283)'·'힐끔해골의 방 — 문제 (#283)')
      예비 = `Docs/단어_예비_비즈니스·의학.csv` (#276, 비즈니스는 자주 쓰는 말부터 · 분야 열 group / 의학은 #280부터 의대생 자료 장 순서 · group = 장 이름). **수능 중·고 공통 단어와 겹치거나 비슷한 말(파생어)은 초원·서고 단어장에만** — 숲부터 쓰는 단어장·예비에는 넣지 않음, 비즈니스는 아주 흔한 말도 (사용자, `HarderCourseWordsSkipEasySuneungWords`). 예비 안에 같은 뜻 두 번 금지 (한 단어장에 들어가면 보기가 같아짐)

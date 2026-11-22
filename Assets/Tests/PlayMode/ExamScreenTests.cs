@@ -61,6 +61,14 @@ namespace WordRPG.Tests
             return (area, session);
         }
 
+        // #284 사용자·친구 의견: 이름표는 '???' — 화면에 '힐끔해골'·'해골'이라고 쓰지 않음 (정체 모를 해골)
+        private static void AssertNoSkullName(FieldScreen field)
+        {
+            var shown = field.GetComponentsInChildren<UnityEngine.UI.Text>(false);
+            Assert.IsTrue(System.Array.Exists(shown, t => t.text == "???"), "이름 자리는 '???'");
+            Assert.IsFalse(System.Array.Exists(shown, t => t.text.Contains("해골")), "화면 글에 '해골' 없음");
+        }
+
         private static FieldScreen Field(FieldArea area, GameSession session)
         {
             var field = new GameObject("SkullFieldUnderTest").AddComponent<FieldScreen>();
@@ -90,6 +98,7 @@ namespace WordRPG.Tests
             Assert.IsTrue(view.IsInviting, "말 걸기 카드");
             StringAssert.Contains("심혈관 및 조혈계 문제인데", view.InviteLine);
             StringAssert.Contains("한번 풀어 볼래?", view.InviteLine);
+            AssertNoSkullName(field);
             ActiveButton(field.transform, "SkullLeave").onClick.Invoke();
             yield return null;
             Assert.IsFalse(view.IsOpen, "안 하면 그냥 닫힘");
@@ -104,6 +113,7 @@ namespace WordRPG.Tests
             yield return null;
             Assert.IsTrue(view.InRoom, "번쩍 → 해골의 방");
             Assert.IsTrue(field.IsPanelOpen);
+            AssertNoSkullName(field);
             var quiz = field.SkullQuiz;
             Assert.AreEqual(3, quiz.Count);
 
