@@ -11,7 +11,8 @@ namespace WordRPG.Game
         NeedWords, // 열쇠는 있지만 이 지역 단어를 덜 발견함 → "보스를 상대하려면 새로운 단어로 힘을 모아야해"
         Ready,     // 둘 다 갖춤 → [확인]하면 열림 (반딧돌 문은 다 밝힌 순간 저절로)
         Open,      // 열었거나, 이미 보스를 물리침 (예전 세이브 — 다시 막지 않는다)
-        NeedStones // 반딧돌 문 (#233, 동굴): 글자 반딧돌을 아직 다 못 밝힘
+        NeedStones, // 반딧돌 문 (#233, 동굴): 글자 반딧돌을 아직 다 못 밝힘
+        NeedSignposts // 이정표 미로 (#291, 숲): 열쇠는 있지만 뒤섞인 이정표를 아직 다 못 바로잡음
     }
 
     // 보스 방 문 (#76, 2026-10-16 사용자 결정): 맵에 숨겨 둔 열쇠(K)를 찾고 + 그 지역 단어를 40개 발견해야 보스 방(G)이 열린다.
@@ -45,11 +46,18 @@ namespace WordRPG.Game
                 return BossGateState.Open;
             if (OpensWithStones(area)) return GlowStones.AllLit(area, session.World) ? BossGateState.Ready : BossGateState.NeedStones;
             if (!HasKey(area, session)) return BossGateState.NeedKey;
+            // #291 사용자: 숲 보스를 이기면 '이정표를 되찾아 고맙다'고 하는데 다 안 바로잡아도 보스에게 갈 수 있어 이상함 → 이정표를 모두 바로잡아야 열림
+            // (열쇠 공터 안쪽의 지름길 이정표 ⑤까지 — 열쇠 바로 옆이라 열쇠를 주우면 별이 그쪽을 가리킴)
+            if (!AllSignpostsFixed(area, session)) return BossGateState.NeedSignposts;
             if (WordsFound(area, session) < area.BossGateWords) return BossGateState.NeedWords;
             return BossGateState.Ready;
         }
 
         public static bool IsOpen(FieldArea area, GameSession session) => State(area, session) == BossGateState.Open;
+
+        // 이정표가 없는 지역은 늘 참
+        public static bool AllSignpostsFixed(FieldArea area, GameSession session) =>
+            Signposts.FixedCount(area, session.World) >= Signposts.All(area).Count;
 
         // 다 갖췄으면 문을 연다. 반환값: 이번에 열었는지
         public static bool TryOpen(FieldArea area, GameSession session)

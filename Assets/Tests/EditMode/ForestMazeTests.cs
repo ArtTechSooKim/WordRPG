@@ -108,7 +108,30 @@ namespace WordRPG.Tests
             var other = Session();
             other.Record.RecordBattle(true, 1, 0);
             BossGate.TakeKey(area, other); // 예전 세이브: 넓히기 전에 이미 열쇠를 주움
-            Assert.AreEqual(ObjectiveKind.GatherWords, Objectives.Current(other, area).Kind, "열쇠가 있으면 이정표는 목표가 아님");
+            var left = Objectives.Current(other, area);
+            Assert.AreEqual(ObjectiveKind.FixSignposts, left.Kind, "열쇠가 있어도 이정표가 남으면 이정표부터 (#291)");
+            Assert.AreEqual(Post, left.Cell);
+        }
+
+        // #291 사용자: 숲 보스를 이기면 '이정표를 되찾아 고맙다'는데 다 안 바로잡아도 보스에게 갈 수 있었음 → 보스 방 문은 이정표를 모두 바로잡아야 열림
+        [Test]
+        public void TheBossGateOpensOnlyAfterEverySignpostIsFixed()
+        {
+            var area = Area();
+            var session = Session();
+            BossGate.TakeKey(area, session);
+            session.Vocabulary.Discover(area.Words.Words[0].Id, DateTime.UtcNow); // 단어 1개 = 이 지역 문 조건
+            Assert.AreEqual(BossGateState.NeedSignposts, BossGate.State(area, session), "열쇠·단어가 있어도 이정표가 먼저");
+            Assert.IsFalse(BossGate.TryOpen(area, session));
+            Assert.IsFalse(BossGate.AllSignpostsFixed(area, session));
+            Signposts.Fix(area, session.World, Post);
+            Assert.IsTrue(BossGate.AllSignpostsFixed(area, session));
+            Assert.AreEqual(BossGateState.Ready, BossGate.State(area, session));
+            Assert.IsTrue(BossGate.TryOpen(area, session));
+
+            var beaten = Session(); // 예전 세이브: 이정표 미로가 생기기 전에 보스를 이김 — 다시 막지 않음
+            beaten.World.MarkBossDefeated(area.BossId);
+            Assert.AreEqual(BossGateState.Open, BossGate.State(area, beaten));
         }
 
         [Test]

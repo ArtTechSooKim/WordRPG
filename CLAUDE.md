@@ -140,7 +140,7 @@
      그림 = import_ninja_art.py `build_cave` (Cave_Wall_auto = 바위 윗면 + 밝은 테 + 절벽면), 시안 = Tools/cave_mockup.py
    - 숲 이정표 미로 (#279, 1.4 — GDD 9-15): 숲 72×44 (예전 36칸을 **오른쪽으로만** 넓힘 — 맵 좌표가 아래·왼쪽 기준이라 위·오른쪽으로 넓혀야 상자 id·탐험 기록이 그대로).
      맵 글자 'X' 이정표 → [확인] = 뒤섞인 철자 문제(`SpellingQuiz`·`SignpostQuiz`, 화면 `SignpostQuizView` Figma #279) · 'M' 헷갈 안개(가장 가까운 이정표가 맡음 `FieldMap.HazeOf` — 바로잡으면 걷힘) ·
-     'W' 맴도는 안개(가짜 길). 부딪히면 맴돌다 제자리 (`FieldScreen.Forest`). 이정표·석판·반딧돌의 단어 = `FieldScreen.PuzzleWords`(같이 쓰는 한 바퀴 — 문제마다 새 TrainingQuizProvider를 만들면 같은 단어가 또 나옴 #290). 규칙 `Signposts`, 세이브 `WorldState.fixedSignposts`. 열쇠는 미로 끝 → 목표 `ObjectiveKind.FixSignposts`.
+     'W' 맴도는 안개(가짜 길). 부딪히면 맴돌다 제자리 (`FieldScreen.Forest`). 이정표·석판·반딧돌의 단어 = `FieldScreen.PuzzleWords`(같이 쓰는 한 바퀴 — 문제마다 새 TrainingQuizProvider를 만들면 같은 단어가 또 나옴 #290). 규칙 `Signposts`, 세이브 `WorldState.fixedSignposts`. 열쇠는 미로 끝 → 목표 `ObjectiveKind.FixSignposts`. 보스 방 문은 열쇠 + 이정표 5개 모두(⑤ 지름길까지) + 단어 40 (`BossGate` NeedSignposts #291 사용자: 숲 보스 뒤 '이정표를 되찾아 고맙다'와 맞게).
      맵 원본 = `python Tools/forest_map.py [--apply]`, 에셋 = Create Sample Data의 `UpgradeForestMaze`(상자는 위치로 옮겨 담음), 그림 = `Tools/make_signpost_art.py`
    - 통로는 두 칸 너비 (사용자 요청 #67): 새 맵은 `python Tools/widen_maps.py --only {상수} [--apply]`로 한 칸 통로를 넓힘 (상수·에셋 같이)
 6. **네이밍**: PascalCase 클래스/메서드/프로퍼티, camelCase 필드. SO 필드는 `[SerializeField] private` + 읽기 전용 프로퍼티. 클래스명은 영문, 화면 표시명은 한국어 필드(`displayName = "펜촉이"`). 주석은 한국어

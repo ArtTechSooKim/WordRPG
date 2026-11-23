@@ -70,6 +70,10 @@ namespace WordRPG.UI
                     bubble.Say("반딧돌을 모두 밝히면 열릴 것 같다", 3.5f,
                         $"반딧돌 {GlowStones.LitCount(area, session.World)} / {GlowStones.Stones(area).Count}");
                     break;
+                case BossGateState.NeedSignposts: // #291
+                    bubble.Say("문 너머 길도 뒤섞여 있다…\n이정표를 모두 바로잡아야 할 것 같다", 3.5f,
+                        $"이정표 {Signposts.FixedCount(area, session.World)} / {Signposts.All(area).Count}");
+                    break;
                 case BossGateState.NeedWords:
                     bubble.Say("보스를 상대하려면 새로운 단어로 힘을 모아야해", 4f,
                         $"{area.Words.RegionName} 단어 {BossGate.WordsFound(area, session)} / {area.BossGateWords}");
@@ -98,7 +102,8 @@ namespace WordRPG.UI
             }
             tilemap.SetTile(new Vector3Int(cell.x, cell.y, 0), TileFor(FieldTile.Key, true));
             Sound.Play(Sfx.Evolve);
-            ShowToast($"{UiKit.WithJosa(area.BossKey.DisplayName, "을", "를")} 찾았다!\n보스 방 문을 열 수 있을 것 같다", 3f);
+            ShowToast($"{UiKit.WithJosa(area.BossKey.DisplayName, "을", "를")} 찾았다!\n" +
+                (BossGate.AllSignpostsFixed(area, session) ? "보스 방 문을 열 수 있을 것 같다" : "남은 이정표도 바로잡아야 할 것 같다"), 3f); // #291
             AfterFieldChange();
         }
 

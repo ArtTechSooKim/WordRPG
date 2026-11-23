@@ -97,11 +97,13 @@ namespace WordRPG.Game
         {
             var gate = BossGate.State(area, session);
             if (gate == BossGateState.NeedStones) return new Objective(ObjectiveKind.LightStones, null, area); // 반딧돌 문 (#233)
+            if (gate == BossGateState.NeedSignposts) // 열쇠는 주웠고 이정표가 남음 (#291) — 닿는 이정표에 별
+                return new Objective(ObjectiveKind.FixSignposts, null, area, Signposts.Next(area, session));
             if (gate == BossGateState.NeedKey)
             {
                 int stones = GlowStones.Stones(area).Count;
                 if (stones > 0 && GlowStones.LitCount(area, session.World) < stones) return new Objective(ObjectiveKind.LightStones, null, area);
-                // 이정표 미로 (#279): 열쇠에 아직 못 닿으면 이정표부터 (열쇠 공터 안쪽의 지름길 이정표는 열쇠를 찾은 뒤라 목표에 안 나옴)
+                // 이정표 미로 (#279): 열쇠에 아직 못 닿으면 이정표부터 (열쇠 공터 안쪽의 지름길 이정표는 열쇠를 주운 뒤 위의 NeedSignposts에서)
                 var key = area.Map.Find(FieldTile.Key);
                 if (key.HasValue && Signposts.All(area).Count > 0)
                 {
