@@ -68,6 +68,8 @@ namespace WordRPG.UI
                 case FieldTile.Signpost: return opened ? Make(t + "signpost_fixed", Layer(LeverPixel(true), ground)) : Make(t + "signpost", Layer(LeverPixel(false), ground));
                 case FieldTile.Haze: return opened ? Make(t + "haze_cleared", forest ? Moss : (Func<int, int, Color>)Lawn) : Make(t + "haze", Mist);
                 case FieldTile.LoopHaze: return Make(t + "loophaze", Mist);
+                case FieldTile.SecretHaze: return opened ? Make(t + "secrethaze_cleared", forest ? Moss : (Func<int, int, Color>)Lawn) : Make(t + "secrethaze", Mist); // #292
+                case FieldTile.BossHaze: return opened ? Make(t + "bosshaze_cleared", forest ? Moss : (Func<int, int, Color>)Lawn) : Make(t + "bosshaze", Mist); // #292
                 default: return Make(t + "floor", ground);
             }
         }

@@ -294,7 +294,8 @@ namespace WordRPG.Tests
             var map = forest.Map;
             var posts = Signposts.All(forest);
             var fixedPosts = new HashSet<Vector2Int>();
-            bool Cleared(Vector2Int cell) => map.SignpostOf(cell) is Vector2Int p && fixedPosts.Contains(p);
+            bool Cleared(Vector2Int cell) => map.Get(cell) == FieldTile.SecretHaze ? fixedPosts.Count == posts.Count // 숨은 안개 = 이정표 모두 (#292 열쇠 공터)
+                : map.SignpostOf(cell) is Vector2Int p && fixedPosts.Contains(p);
             var key = map.Find(FieldTile.Key).Value;
             Assert.IsFalse(FieldReach.Touches(FieldReach.Flood(map, false, true, null, Cleared), key), "이정표를 안 바로잡으면 열쇠에 못 감");
             while (true)

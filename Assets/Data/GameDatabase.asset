@@ -65,6 +65,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 768fa7c9e98d0ef48bcfa114628de9e5, type: 2}
   - {fileID: 11400000, guid: 2f0f21b4f39acf14fab8b7273b5e1a17, type: 2}
   - {fileID: 11400000, guid: a2d06106feb91f048ad3b3d9f1f26ff0, type: 2}
+  - {fileID: 11400000, guid: b758bb72f156e1440b3c094ed887d973, type: 2}
   relics:
   - {fileID: 11400000, guid: 0a6bb6350c64997468755f814f9f9371, type: 2}
   - {fileID: 11400000, guid: 06210a911078d3644a1fbbd663124d76, type: 2}

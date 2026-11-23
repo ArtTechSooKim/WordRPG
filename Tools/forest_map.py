@@ -15,6 +15,8 @@
 #   'X' 이정표 — [확인] → 글자가 뒤섞인 단어의 바른 철자 고르기 (틀려도 벌점 없이 다시) → 바로잡으면 가장 가까운 'M' 덩어리가 걷힘
 #   'M' 헷갈 안개 — 바로잡기 전엔 막힘(부딪히면 안개 속을 맴돌다 제자리), 맡은 이정표를 바로잡으면 걸을 수 있음 (덩굴 다리 'H'와 같은 방식)
 #   'W' 맴도는 안개 — 늘 막힘, 가짜 길 (부딪히면 제자리)
+#   'V' 숨은 안개 (#292) — 가짜 길과 똑같이 보이고 막힘, 이정표를 모두 바로잡으면 걷힘 → 북쪽 열쇠 공터 (보스 방 열쇠)
+#   'Z' 보스 뒤 숨은 안개 (#292) — 가짜 길과 똑같이 보이고 막힘, 숲 보스를 이긴 뒤 걷힘 → 오른쪽 끝 출입구 = 비밀의 숲 (황금 너구리)
 # 검사: 줄 길이 · 이정표를 차례로 바로잡으면 모두 닿음 · 바로잡기 전엔 열쇠에 못 감 · 안개 덩어리마다 맡은 이정표 하나 ·
 #       모든 상자·열쇠가 닿음 · 문을 안 열면 보스에게 못 감 · 예전 칸은 위 세 곳만 바뀜
 import os
@@ -128,6 +130,20 @@ def build(old_rows):
     put(L(0), 42, "X")                      # 이정표 ⑤ (지름길)
     places.append(("열쇠 공터", L(5), 40))
     roughen(g)
+    # 비밀 공터 둘 (#292 사용자: 열쇠 공터와 너구리 공터를 따로 — 콘텐츠를 한 번에 소비하지 않게). 다듬기(roughen) 뒤라 미로 모양은 그대로
+    # ① 열쇠 공터 (사용자: 1.3 때 열쇠 자리의 위쪽): 가운데 이끼밭 위 고사리밭 → 숨은 안개 'V' → 북쪽 벽 속 공터. 보스 방 열쇠가 미로 끝에서 이리로
+    put(L(5), 37, ":")                      # 미로 끝 공터의 열쇠 받침대 → 이끼 (공터·상자·지름길 이정표 ⑤는 그대로)
+    rect(11, 1, 19, 1, ":")
+    rect(9, 2, 21, 3, ":")
+    put(15, 2, "K")
+    rect(10, 4, 11, 4, "V")
+    places.append(("열쇠 공터", 15, 2))
+    # ② 너구리 공터 가는 길 (사용자: 오른쪽): 안개 골짜기 오른쪽 아래 → 보스 뒤 숨은 안개 'Z' → 맵 오른쪽 끝 출입구 (숲의 세 번째 출입구 —
+    #    앞의 둘(정글 0 · 초원 1)보다 아래라 번호가 안 밀림)
+    rect(68, 37, 69, 38, "Z")
+    rect(68, 39, 70, 40, ".")
+    put(71, 39, "D")
+    places.append(("비밀의 숲으로", 66, 40))
     return g, places
 
 
@@ -217,7 +233,7 @@ def haze_of(g, post):
     return best or []
 
 
-def flood(g, open_haze, gate_open=False):
+def flood(g, open_haze, gate_open=False, secret_open=False, boss_open=False):
     start = cells(g, "P")[0]
     seen, q = {start}, deque([start])
     while q:
@@ -227,7 +243,7 @@ def flood(g, open_haze, gate_open=False):
             if not (0 <= n[0] < W and 0 <= n[1] < H) or n in seen:
                 continue
             c = g[n[1]][n[0]]
-            if c in WALK or (c == "M" and n in open_haze) or (c == "G" and gate_open):
+            if c in WALK or (c == "M" and n in open_haze) or (c == "G" and gate_open) or (c == "V" and secret_open) or (c == "Z" and boss_open):
                 seen.add(n)
                 q.append(n)
     return seen
@@ -267,16 +283,24 @@ def check(g, old_rows):
     if len(fixed) != len(posts):
         problems.append(f"닿지 않는 이정표: {[p for p in posts if p not in fixed]}")
     all_open = {c for p in posts for c in haze_of(g, p)}
-    reach = flood(g, all_open)
+    reach = flood(g, all_open, secret_open=True, boss_open=True)
     for c in cells(g, "C") + cells(g, "K") + cells(g, "F") + cells(g, "E") + cells(g, "L") + cells(g, "G"):
         if not touches(reach, c):
             problems.append(f"닿지 않음 {g[c[1]][c[0]]} {c}")
     if not any(touches(reach, c) for c in cells(g, "S")):
         problems.append("상점에 못 감")
     for d in cells(g, "D"):
-        if d not in flood(g, all_open, gate_open=True):
+        if d not in flood(g, all_open, gate_open=True, secret_open=True, boss_open=True):
             problems.append(f"출입구 {d}")
-    full = flood(g, all_open, gate_open=True)
+    secret_door = (71, 39)
+    if secret_door in flood(g, all_open, gate_open=True, secret_open=True):
+        problems.append("숲 보스를 이기기 전에 비밀의 숲 출입구에 감")
+    if g[39][71] != "D" or cells(g, "D")[-1] != secret_door:
+        problems.append("비밀의 숲 출입구가 맨 뒤 번호가 아님")
+    key = cells(g, "K")[0]
+    if touches(flood(g, all_open, gate_open=True, boss_open=True), key):
+        problems.append("이정표를 다 바로잡기 전에 열쇠 공터에 감")
+    full = flood(g, all_open, gate_open=True, secret_open=True, boss_open=True)
     lonely = [(x, y) for y in range(H) for x in range(OLD_W, W) if g[y][x] in WALK and (x, y) not in full]
     if lonely:
         problems.append(f"외딴 칸 {len(lonely)}개: {lonely[:6]}")
@@ -290,6 +314,7 @@ def check(g, old_rows):
         problems.append("이정표를 안 바로잡아도 열쇠에 감")
     # 예전 칸
     allowed = {(35, 33), (35, 34), (34, 40), (35, 40), (34, 41), (35, 41), (14, 14)}
+    allowed |= {(x, y) for y in range(1, 5) for x in range(9, 22) if old_rows[y][x] == "#"}  # 열쇠 공터 (#292) — 벽을 파기만 함
     for y in range(H):
         for x in range(OLD_W):
             if old_rows[y][x] != g[y][x] and (x, y) not in allowed:
@@ -303,7 +328,7 @@ COLORS = {
     "P": (176, 146, 98), "N": (176, 146, 98), "n": (120, 160, 80), "D": (240, 220, 140),
     "F": (90, 180, 230), "S": (200, 120, 60), "E": (230, 200, 90), "L": (180, 140, 220), "C": (230, 180, 60),
     "B": (200, 70, 70), "G": (150, 100, 60), "K": (240, 240, 250),
-    "X": (240, 150, 60), "M": (205, 235, 215), "W": (215, 205, 235),
+    "X": (240, 150, 60), "M": (205, 235, 215), "W": (215, 205, 235), "V": (250, 230, 150), "Z": (250, 200, 120),
 }
 
 

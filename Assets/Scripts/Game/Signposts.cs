@@ -23,18 +23,44 @@ namespace WordRPG.Game
             return area.Map.HazeOf(signpost);
         }
 
-        // 헷갈 안개 칸이 걷혔는지 (맡은 이정표를 바로잡았는지)
+        // 헷갈 안개 칸이 걷혔는지 (맡은 이정표를 바로잡았는지). 숨은 안개 'V'(#292)는 이정표를 모두 바로잡았는지,
+        // 보스 뒤 숨은 안개 'Z'(#292)는 그 지역 보스를 이기고 가까이 가서 걷히는 모습을 봤는지 (WorldState 이벤트)
         public static bool IsHazeCleared(FieldArea area, WorldState world, Vector2Int haze)
         {
+            var tile = area.Map.Get(haze);
+            if (tile == FieldTile.SecretHaze) return All(area).Count > 0 && AllFixed(area, world);
+            if (tile == FieldTile.BossHaze) return BossHazeOpen(area, world) && world.HasEvent(BossHazeEventId(area));
             var signpost = area.Map.SignpostOf(haze);
             return signpost.HasValue && IsFixed(area, world, signpost.Value);
         }
 
-        // 부딪히면 맴도는 칸인지: 맴도는 안개, 또는 아직 안 걷힌 헷갈 안개
+        // 부딪히면 맴도는 칸인지: 맴도는 안개, 또는 아직 안 걷힌 헷갈 안개·숨은 안개
         public static bool Loops(FieldArea area, WorldState world, Vector2Int cell)
         {
             var tile = area.Map.Get(cell);
-            return tile == FieldTile.LoopHaze || tile == FieldTile.Haze && !IsHazeCleared(area, world, cell);
+            return tile == FieldTile.LoopHaze || (tile == FieldTile.Haze || tile == FieldTile.SecretHaze || tile == FieldTile.BossHaze) && !IsHazeCleared(area, world, cell);
+        }
+
+        // 이정표를 모두 바로잡았는지 (이정표가 없는 지역은 참) — 보스 방 문(#291) · 숨은 안개(#292)
+        public static bool AllFixed(FieldArea area, WorldState world) => FixedCount(area, world) >= All(area).Count;
+
+        // 숨은 안개 칸 (#292) — 마지막 이정표를 바로잡으면 걷히는 모습을 보여 줌
+        public static List<Vector2Int> SecretHaze(FieldArea area) => area.Map.FindAll(FieldTile.SecretHaze);
+
+        // 보스 뒤 숨은 안개 (#292 사용자: 너구리 공터는 숲 보스를 이긴 뒤 — 콘텐츠를 한 번에 소비하지 않게).
+        // 보스를 이기면 걷힐 수 있고, 가까이 가면 걷히는 모습을 한 번 보여 준 뒤(이벤트) 지나갈 수 있음
+        public static List<Vector2Int> BossHaze(FieldArea area) => area.Map.FindAll(FieldTile.BossHaze);
+        public static bool BossHazeOpen(FieldArea area, WorldState world) => area.Boss != null && world.IsBossDefeated(area.BossId);
+        public static string BossHazeEventId(FieldArea area) => "boss_haze:" + area.AreaId;
+        public const int BossHazeNoticeRange = 4; // 이만큼 가까이 오면 걷힘
+
+        // 지금 걷힐 차례인지: 보스를 이겼고 아직 안 걷혔고 주인공이 가까이 옴
+        public static bool BossHazeDue(FieldArea area, WorldState world, Vector2Int hero)
+        {
+            if (!BossHazeOpen(area, world) || world.HasEvent(BossHazeEventId(area))) return false;
+            foreach (var cell in BossHaze(area))
+                if (Mathf.Abs(cell.x - hero.x) + Mathf.Abs(cell.y - hero.y) <= BossHazeNoticeRange) return true;
+            return false;
         }
 
         public static int FixedCount(FieldArea area, WorldState world)

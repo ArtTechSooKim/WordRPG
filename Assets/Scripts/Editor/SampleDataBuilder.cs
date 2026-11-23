@@ -482,6 +482,14 @@ namespace WordRPG.EditorTools
             InsertChestIf(libraryPath, 5, 1, diaryJournal); // 상자는 맵의 위→아래 순서라 그 자리에 끼움. 있던 상자 내용물은 그대로
             InsertChestIf(forestPath, 6, 5, survivalJournal);
             UpgradeForestMaze(forestPath, ForestMap, forestMaze); // 1.4 숲 넓히기 (#279) — 예전 36칸 에셋을 72칸으로
+            // 비밀 공터 둘 (#292): 이정표를 모두 바로잡으면 숨은 안개(V)가 걷혀 북쪽 열쇠 공터(보스 방 열쇠가 미로 끝에서 이리로) ·
+            // 숲 보스를 이긴 뒤 오른쪽 끝 보스 뒤 숨은 안개(Z)가 걷혀 세 번째 출입구 → 비밀의 숲
+            UpgradeMapIf(forestPath, ForestMap, "VZDK.:");
+            // 비밀의 숲 (#292, GDD 9-17): 숲 보스 뒤 오른쪽 끝 출입구로 오는 공터 — 황금 너구리가 하루 한 번. 몬스터는 없음 (이끼 땅뿐)
+            const string secretPath = "Assets/Data/Areas/secret_forest.asset";
+            Area("secret_forest", "비밀의 숲", SecretForestMap, forestEncounters, AssetDatabase.LoadAssetAtPath<WordDatabase>(AdvancedWords));
+            SetFullVersionArea(secretPath); // 숲 안이라 정식판
+            SetSecretForest(secretPath);
             BuildNpcs(meadowPath, libraryPath, forestPath, junglePath, cavePath);
             // 샘 이동 창의 지역 순서 (#216)
             SetStoryOrder(meadowPath, 1);
@@ -489,6 +497,7 @@ namespace WordRPG.EditorTools
             SetStoryOrder(forestPath, 3);
             SetStoryOrder(junglePath, 4);
             SetStoryOrder(cavePath, 5);
+            SetStoryOrder(secretPath, 6); // 샘 이동 창에선 맨 뒤 (#292 — 숨은 곳)
             SetAsksReview(cavePath); // 동굴 보스를 이긴 뒤 후기 부탁 (#252)
             // 보스 대사 (#207, 스토리 문서 5장)
             SetBossLines(libraryPath, "잊어버리면… 아플 일도 없어!", "기억을 돌려줘! 아픈 기억도 우리 것이야.",
@@ -527,7 +536,8 @@ namespace WordRPG.EditorTools
             SetExitDoorIf(forestPath, 0, 0, 1);         // 정글의 'O'(위쪽)가 출입구가 되어 정글의 숲 출입구는 0번 → 1번 (#115)
             SetExitsIfMismatch(meadowPath, (libraryPath, 0, null), (forestPath, 1, libraryPath));
             SetExitsIfMismatch(libraryPath, (meadowPath, 0, null));
-            SetExitsIfMismatch(forestPath, (junglePath, 1, forestPath), (meadowPath, 1, null));
+            SetExitsIfMismatch(forestPath, (junglePath, 1, forestPath), (meadowPath, 1, null), (secretPath, 0, null)); // 숲 2 = 비밀의 숲 (#292)
+            SetExitsIfMismatch(secretPath, (forestPath, 2, null));
             SetExitsIfMismatch(junglePath, (cavePath, 0, junglePath), (forestPath, 0, null)); // 동굴은 빈칸두꺼비 뒤 (#233 사용자: 열쇠보다 동굴을 먼저 가게 됨)
             SetExitsIfMismatch(cavePath, (junglePath, 0, null));
             BuildCourses();
@@ -711,16 +721,17 @@ namespace WordRPG.EditorTools
 
         // . 흙길  : 이끼 땅(조우 없음)  , 고사리(조우)  # 짙은 덤불  ~ 늪  F 회복의 샘  C 보물상자  E 성유물 제단  S 상점  B 보스  D 출입구(초원으로)
         // X 이정표  M 헷갈 안개(이정표를 바로잡으면 걷힘)  W 맴도는 안개(가짜 길) — #279
+        // V 숨은 안개(이정표를 모두 바로잡으면 걷힘 → 북쪽 열쇠 공터 K)  Z 보스 뒤 숨은 안개(숲 보스를 이긴 뒤 → 오른쪽 끝 D = 비밀의 숲) — #292
         // 72×44 (#279, 1.4 — 예전 36×44를 오른쪽으로만 넓힘: 맵 좌표가 아래·왼쪽 기준이라 있던 칸의 (x, y)·상자 id가 그대로).
         // 왼쪽 = 예전 숲: 왼쪽 아래 출입구 옆 야영지(샘·상점·제단) → 굽이진 숲길(고사리 덤불) → 늪 · 부엉이 골짜기 · 버섯 공터 · 개울
         // → 오른쪽 위 공터의 보스 헷갈너구리. 오른쪽 = 뒤섞인 이정표 미로: 버섯 공터 오른쪽 입구 → 입구 고사리밭 ① → 늪가 덤불 ② →
         // 이끼 언덕 ③ → 고사리 능선 ④ → 안개 골짜기 → 열쇠 공터(⑤ = 버섯 공터로 나가는 지름길). 원본 = python Tools/forest_map.py
         public const string ForestMap =
                 "#############################D##########################################\n" +
-                "###########################:::::#####C###############################C##\n" +
-                "########################:::::B:::::##::::#::,##,,###,,,,,,#,,,#:::::::##\n" +
-                "##C,,,,#################::.......::##:::::::,,,,,###,,,,,,,,,,,:::::::##\n" +
-                "##,,,,,#################::.......::##:::::::,,,,,X##,,,,,,,,,,,:::::::##\n" +
+                "###########:::::::::#######:::::#####C###############################C##\n" +
+                "#########::::::K::::::##:::::B:::::##::::#::,##,,###,,,,,,#,,,#:::::::##\n" +
+                "##C,,,,##:::::::::::::##::.......::##:::::::,,,,,###,,,,,,,,,,,:::::::##\n" +
+                "##,,,,,###VV############::.......::##:::::::,,,,,X##,,,,,,,,,,,:::::::##\n" +
                 "##,,,,,##,,,,,C###:::::#::.......::###:::::::::::MM.:::::::,##,,,,,,,###\n" +
                 "##,,,,,##,,,,,,###:::::##:.......:###,,,,,:::::::MM.:::::::,##,,,##,,###\n" +
                 "##,,,,,##,,,,,,####:::#####:::::#####,,,,##::::::###,,,,,,,,,,,,,##,,,##\n" +
@@ -753,13 +764,51 @@ namespace WordRPG.EditorTools
                 "######:...SSS###,,,#########,,,,,,,::,,,,,,::,####,,::::::::::::::::,,##\n" +
                 "####E:::F:SSS###,,,#########,,,,,,,##,,,,,,::,####,,,,,,,,,,,,,,,,,,,,##\n" +
                 "###::.......::..,,,##########,,,,,################,,,,,,#,,#,,,,,#,,,,##\n" +
-                "#..::......N......############,,,,#######K########..####################\n" +
-                "D..::P......::##..#,,,,#,,#,,#,,,,##::#:::::::####..####################\n" +
-                "####::::L::::###...,,,,,,,,,,,,,,###::::::::::......####################\n" +
-                "######:::n:######..............,,,MM::::::::::......####################\n" +
+                "#..::......N......############,,,,#######:########..################ZZ##\n" +
+                "D..::P......::##..#,,,,#,,#,,#,,,,##::#:::::::####..################ZZ##\n" +
+                "####::::L::::###...,,,,,,,,,,,,,,###::::::::::......################...D\n" +
+                "######:::n:######..............,,,MM::::::::::......################...#\n" +
                 "########C##########,,,,,,,,,,,,,,,MM::::::::::##########################\n" +
                 "###################,,#,,,,#,,,,,,C##X::::::::C##########################\n" +
                 "########################################################################\n";
+
+        // 비밀의 숲 (#292, GDD 9-17) 32×30 — 숲 보스를 이긴 뒤 숲 오른쪽 끝 보스 뒤 숨은 안개(Z)가 걷혀 그 너머 출입구로 오는 곳.
+        // 사용자: '나무로 둘러싸인 넓은 공터'. : 이끼 땅(조우 없음)  . 흙길  ~ 연못  F 회복의 샘  D 출입구(왼쪽 끝 = 숲 오른쪽 끝으로). 원본 = python Tools/secret_forest_map.py
+        public const string SecretForestMap =
+                "################################\n" +
+                "################################\n" +
+                "################################\n" +
+                "################################\n" +
+                "################################\n" +
+                "#############:::::##############\n" +
+                "###########:::::::::############\n" +
+                "#########:::::::::::::##########\n" +
+                "########::::::::::::::::########\n" +
+                "#####::::::::##:::::##::::######\n" +
+                "####:::::::::##:::::##:::::#####\n" +
+                "####::::F::::::::::::::::::#####\n" +
+                "###:::::::::::::::::::::::::####\n" +
+                "##::::::::::::::::::::::::::####\n" +
+                "##::::::::::::::::::::::::::####\n" +
+                "D.P.......::::::::::::::::::####\n" +
+                "#.........::::::::::::::::::####\n" +
+                "##::::::::::::::::::::::::::####\n" +
+                "##::::::::::::::::::::::::::####\n" +
+                "##:::::::::::::::::::::::#######\n" +
+                "###::~~~~~:::::::::::::::#######\n" +
+                "####~~~~~~~::::::::::::::::#####\n" +
+                "####~~~~~~~:::::::::::::::######\n" +
+                "#####~~~~~:::::##::::::::#######\n" +
+                "######:::::::::##::::::::#######\n" +
+                "#######:::::::::::::::::########\n" +
+                "#########:::::::::::::##########\n" +
+                "################################\n" +
+                "################################\n" +
+                "################################\n";
+
+        // 황금 너구리가 도망가 서는 자리 (맵 좌표 — 입구 앞 → 오른쪽 위 → 오른쪽 아래 → 연못 옆) · 잡으면 주는 골드 (#292 사용자: 100 · 150 · 200 · 1000)
+        public static readonly Vector2Int[] GoldRaccoonSpots = { new Vector2Int(10, 11), new Vector2Int(24, 17), new Vector2Int(22, 6), new Vector2Int(12, 8) };
+        public static readonly int[] GoldRaccoonGold = { 100, 150, 200, 1000 };
 
         // 1.1 메아리 정글 (#80, GDD 9-6) 72×88 — 원본은 python Tools/jungle_map.py (Builds/maps/JungleMap.txt를 여기로 옮김).
         // . 진흙길  : 이끼 땅  , 짙은 풀숲(보이는 몬스터 서식지)  # 정글 나무  ~ 깊은 강·골짜기  > < ^ v 얕은 강(물살)  J 나루터(뗏목)
@@ -1238,6 +1287,23 @@ namespace WordRPG.EditorTools
             if (area == null) return;
             var so = new SerializedObject(area);
             Prop(so, "asksReviewAfterBoss").boolValue = true;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // 비밀의 숲 (#292): 숲 그림 · 조우 없음 · 황금 너구리 자리와 골드 (처음 만들 때만 — 인스펙터에서 바꾼 값은 유지)
+        private static void SetSecretForest(string areaPath)
+        {
+            var area = AssetDatabase.LoadAssetAtPath<FieldArea>(areaPath);
+            if (area == null || area.GoldRaccoonSpots.Count > 0) return;
+            var so = new SerializedObject(area);
+            Prop(so, "theme").enumValueIndex = (int)FieldTheme.Forest;
+            Prop(so, "encounterRate").floatValue = 0f;
+            var spots = Prop(so, "goldRaccoonSpots");
+            spots.arraySize = GoldRaccoonSpots.Length;
+            for (int i = 0; i < GoldRaccoonSpots.Length; i++) spots.GetArrayElementAtIndex(i).vector2IntValue = GoldRaccoonSpots[i];
+            var gold = Prop(so, "goldRaccoonGold");
+            gold.arraySize = GoldRaccoonGold.Length;
+            for (int i = 0; i < GoldRaccoonGold.Length; i++) gold.GetArrayElementAtIndex(i).intValue = GoldRaccoonGold[i];
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 

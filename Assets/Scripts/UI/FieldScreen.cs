@@ -374,6 +374,7 @@ namespace WordRPG.UI
             UpdateHazeLoop(Time.unscaledDeltaTime);
             skullView.Tick(Time.unscaledDeltaTime);
             UpdateSkull(); // 힐끔해골 (#281)
+            UpdateRaccoon(); // 황금 너구리 춤·들썩임 (#292)
             giftView?.Tick(Time.unscaledDeltaTime);
             UpdateRaft();
             Sound.SetAmbience(ThemeLooks.AmbienceNow(area.Theme, walker.Rafting, Sound.CurrentMusic == AreaMusic));
@@ -531,9 +532,9 @@ namespace WordRPG.UI
         private bool TryInteract()
         {
             if (interactCooldown > 0f) return false;
-            if (TryTalkToSkull(facingOnly: true) || TryTalkToNpc(facingOnly: true)) return true;
+            if (TryCatchRaccoon(facingOnly: true) || TryTalkToSkull(facingOnly: true) || TryTalkToNpc(facingOnly: true)) return true;
             var direction = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot, bossBody);
-            if (!direction.HasValue) return TryTalkToSkull(facingOnly: false) || TryTalkToNpc(facingOnly: false);
+            if (!direction.HasValue) return TryCatchRaccoon(facingOnly: false) || TryTalkToSkull(facingOnly: false) || TryTalkToNpc(facingOnly: false);
             walker.Face(direction.Value);
             playerRenderer.sprite = PlayerArt.Get(walker.Facing, 0);
             var cell = FieldInteraction.TargetCell(walker.Position, direction.Value, bossBody); // 보스 몸 어느 칸이든 보스 (#267)
@@ -791,7 +792,7 @@ namespace WordRPG.UI
             OpenStoneGateIfAllLit(newArea); // 예전 세이브 (#233)
             var map = area.Map;
             walker = new FieldWalker(map, position, cell => IsDoorLocked(cell) || IsPaywalled(cell), cell => IsCleared(area, cell), rafting,
-                cell => npcs.IsOccupied(cell) || bossBody.Blocks(walker.Position, cell)); // 크게 선 보스의 몸도 막힘 (#267)
+                cell => npcs.IsOccupied(cell) || bossBody.Blocks(walker.Position, cell) || IsRaccoonAt(cell)); // 크게 선 보스의 몸도 막힘 (#267) · 황금 너구리 (#292)
             encounterCounter = new EncounterCounter(area.EncounterRate, area.MinStepsBetweenEncounters);
             if (FirstFightPending) encounterCounter.GuaranteeWithin(EncounterCounter.FirstFightGrassSteps); // #133
             session.World.SetPosition(area.AreaId, position, rafting);
@@ -804,6 +805,7 @@ namespace WordRPG.UI
             fog.Build(map, area.Theme);
             RefreshMooredRafts();
             SetUpSkull(); // 의학 용어 + 이긴 보스 자리 옆 (#281)
+            SetUpRaccoon(position); // 비밀의 숲 황금 너구리 — 오늘 아직 남아 있으면 앞에 나타남 (#292)
             if (!inBattle) Sound.PlayMusic(AreaMusic);
             session.World.Reveal(area.AreaId, map.Width, map.Height, position);
             BuildDarkness();

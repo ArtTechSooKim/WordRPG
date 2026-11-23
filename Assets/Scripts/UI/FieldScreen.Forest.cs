@@ -103,8 +103,74 @@ namespace WordRPG.UI
             else Sound.PlayJingle(Sfx.GateOpen); // 길이 열림 — 덩굴 다리와 같은 소리
             ShowToast(all ? "숲의 이정표를 모두 바로잡았다!" : "헷갈 안개가 걷혔다!", 2.5f);
             yield return WaitUnscaled(0.4f);
+            if (all) yield return RevealSecretPath(); // 비밀의 숲 가는 길 (#292)
             transitioning = false;
             AfterFieldChange();
+        }
+
+        public int SecretPathsRevealed { get; private set; } // 테스트용
+        public int BossHazeReveals { get; private set; }     // 테스트용
+
+        // 서 있을 때 (UpdateNpcs): 숲 보스를 이긴 뒤 오른쪽 끝 보스 뒤 숨은 안개에 가까이 오면 한 번 걷힘 (#292 — 보스 직후 연출로 알려 주지 않고 찾는 재미)
+        private void MaybeRevealBossHaze()
+        {
+            if (cutsceneRunning || springJumping) return;
+            if (!Signposts.BossHazeDue(area, session.World, walker.Position)) return;
+            StartCoroutine(RevealBossHaze());
+        }
+
+        private IEnumerator RevealBossHaze()
+        {
+            transitioning = true;
+            if (moving) SnapPlayer(); // 달려오다가도 그 칸에 서서 봄
+            session.World.MarkEvent(Signposts.BossHazeEventId(area));
+            SaveNow();
+            var cells = Signposts.BossHaze(area);
+            var hero = walker.Position;
+            cells.Sort((a, b) => (a - hero).sqrMagnitude.CompareTo((b - hero).sqrMagnitude)); // 가까운 쪽부터
+            yield return WaitUnscaled(0.2f);
+            foreach (var cell in cells)
+            {
+                tilemap.SetTile(new Vector3Int(cell.x, cell.y, 0), TileFor(FieldTile.BossHaze, true));
+                StartCoroutine(FieldFx.Play(transform, CellCenter(cell), Fx.SmokeRing, 1.3f, animationScale, 12, tint: new Color(1f, 0.9f, 0.55f)));
+                Sound.Play(Sfx.VineGrow);
+                yield return WaitUnscaled(0.14f);
+            }
+            Sound.PlayJingle(Sfx.GateOpen);
+            BossHazeReveals++;
+            bubble.Say("어? 안개가 스르르 걷혔다…\n저 너머에서 금빛이 반짝인다", 3.5f);
+            yield return WaitUnscaled(0.4f);
+            transitioning = false;
+            AfterFieldChange();
+        }
+
+        // 마지막 이정표를 바로잡으면 (#292 사용자: 이정표로 밝아진 안개로 드러난 입구): 카메라가 숨은 안개로 가서 안개가 걷히는 모습 → 주인공에게 돌아옴
+        private IEnumerator RevealSecretPath()
+        {
+            var secret = Signposts.SecretHaze(area);
+            if (secret.Count == 0) yield break;
+            yield return WaitUnscaled(1.2f); // '모두 바로잡았다'를 읽을 시간
+            var center = Vector3.zero;
+            foreach (var cell in secret) center += CellCenter(cell);
+            center /= secret.Count;
+            var key = area.Map.Find(FieldTile.Key);
+            if (key.HasValue) center = (center + CellCenter(key.Value)) * 0.5f; // 열쇠 공터 (#292) — 안개와 열쇠 받침대가 같이 보이게
+            yield return PanCamera(center, 0.9f);
+            yield return WaitUnscaled(0.3f);
+            secret.Sort((a, b) => b.y.CompareTo(a.y)); // 위(골짜기 쪽)부터
+            foreach (var cell in secret)
+            {
+                tilemap.SetTile(new Vector3Int(cell.x, cell.y, 0), TileFor(FieldTile.SecretHaze, true));
+                StartCoroutine(FieldFx.Play(transform, CellCenter(cell), Fx.SmokeRing, 1.3f, animationScale, 12, tint: new Color(1f, 0.93f, 0.7f)));
+                Sound.Play(Sfx.VineGrow);
+                yield return WaitUnscaled(0.14f);
+            }
+            Sound.PlayJingle(Sfx.GateOpen);
+            ShowToast("이정표들이 한곳을 가리킨다…\n숨겨진 길이 드러났다!", 3f);
+            SecretPathsRevealed++;
+            minimap.Redraw();
+            yield return WaitUnscaled(1.5f);
+            yield return PanCamera(null, 0.7f);
         }
 
         // 안개에 부딪힘 (#279): 안개 속으로 한 발 들어갔다가 흐려지며 제자리로 — 같은 자리를 맴도는 느낌
@@ -144,7 +210,8 @@ namespace WordRPG.UI
             player.position = home;
             SetPlayerAlpha(1f);
             transitioning = false;
-            bool decoy = walker.Map.Get(cell) == FieldTile.LoopHaze;
+            var bumped = walker.Map.Get(cell);
+            bool decoy = bumped == FieldTile.LoopHaze || bumped == FieldTile.SecretHaze || bumped == FieldTile.BossHaze; // 숨은 안개도 가짜 길처럼 (#292)
             bool nearFixed = false;
             foreach (var signpost in Signposts.All(area))
                 if ((signpost - cell).sqrMagnitude <= 64 && Signposts.IsFixed(area, session.World, signpost)) nearFixed = true;

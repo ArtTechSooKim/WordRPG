@@ -185,6 +185,12 @@ namespace WordRPG.Field
         [Tooltip("보스의 사전 이름 (예: 숲의 사전). 맵의 받침대 'L'에 이 지역 보스를 물리치면 놓이고, 이 지역 단어장의 단어를 하루 한 번 하나씩 알려 준다 (#45)")]
         [SerializeField] private string dictionaryName;
 
+        [Header("황금 너구리 — 비밀의 숲 (#292)")]
+        [Tooltip("황금 너구리가 도망가 서는 자리 (맵 좌표 — x = 왼쪽부터, y = 아래부터, 차례대로). 비우면 너구리 없음. 하루 한 번 처음 자리부터 (GoldRaccoon)")]
+        [SerializeField] private List<Vector2Int> goldRaccoonSpots = new List<Vector2Int>();
+        [Tooltip("자리마다 잡으면 주는 골드 — 자리 수와 같게. 마지막 자리 = 동전이 파바바박 터지고 사라짐 (#292 사용자: 100 · 150 · 200 · 1000)")]
+        [SerializeField] private List<int> goldRaccoonGold = new List<int>();
+
         [NonSerialized] private FieldMap parsed;
         [NonSerialized] private string parsedFrom;
 
@@ -214,6 +220,8 @@ namespace WordRPG.Field
         public CompanionData ShrineCompanion => shrineCompanion;
         public int ShrineWords => shrineWords;
         public RelicData GlowStoneRelic => glowStoneRelic;
+        public IReadOnlyList<Vector2Int> GoldRaccoonSpots => goldRaccoonSpots ?? (IReadOnlyList<Vector2Int>)Array.Empty<Vector2Int>();
+        public IReadOnlyList<int> GoldRaccoonGold => goldRaccoonGold ?? (IReadOnlyList<int>)Array.Empty<int>();
 
         // 맵 텍스트가 바뀌면 다시 해석 (인스펙터에서 고치면서 플레이할 수 있게)
         public FieldMap Map

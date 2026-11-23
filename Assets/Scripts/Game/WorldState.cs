@@ -33,6 +33,9 @@ namespace WordRPG.Game
         [SerializeField] private List<string> fixedSignposts = new List<string>();
         // 힐끔해골의 확인문제를 처음 바로 맞힌 문제 id (#281 — 골드는 한 문제에 한 번). 예전 세이브는 빈 목록
         [SerializeField] private List<string> solvedExams = new List<string>();
+        // 황금 너구리 (#292 비밀의 숲): 마지막으로 잡은 날("yyyy-MM-dd" — 사전과 같은 현지 날짜)과 그날 잡은 횟수. 예전 세이브는 빈 값 = 오늘 아직 안 잡음
+        [SerializeField] private string goldRaccoonDay;
+        [SerializeField] private int goldRaccoonCaught;
 
         public string AreaId => hasPosition ? areaId : null;
         public IReadOnlyList<string> OpenedChests => openedChests;
@@ -156,6 +159,15 @@ namespace WordRPG.Game
 #if WORDRPG_TESTER || UNITY_EDITOR
         public void TesterForgetEvent(string eventId) => events?.Remove(eventId); // 테스터 메뉴 [무료 상태로] — 특전을 다시 받게 (#251)
 #endif
+
+        public string GoldRaccoonDay => goldRaccoonDay;
+        public int GoldRaccoonCaught => goldRaccoonCaught;
+
+        public void SetGoldRaccoon(string day, int caught)
+        {
+            goldRaccoonDay = day;
+            goldRaccoonCaught = caught;
+        }
 
         // 그 지역 사전을 마지막으로 읽은 날 ("yyyy-MM-dd", 없으면 null)
         public string DictionaryReadDay(string area)

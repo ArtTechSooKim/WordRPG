@@ -56,8 +56,7 @@ namespace WordRPG.Game
         public static bool IsOpen(FieldArea area, GameSession session) => State(area, session) == BossGateState.Open;
 
         // 이정표가 없는 지역은 늘 참
-        public static bool AllSignpostsFixed(FieldArea area, GameSession session) =>
-            Signposts.FixedCount(area, session.World) >= Signposts.All(area).Count;
+        public static bool AllSignpostsFixed(FieldArea area, GameSession session) => Signposts.AllFixed(area, session.World);
 
         // 다 갖췄으면 문을 연다. 반환값: 이번에 열었는지
         public static bool TryOpen(FieldArea area, GameSession session)

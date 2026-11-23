@@ -112,7 +112,7 @@ namespace WordRPG.UI
         // 색은 도착 지역 느낌. null = 지역 사이 길이 아님 (서고 입구·동굴처럼 원래 그림을 쓰는 출입구)
         public static Color? ExitGlow(FieldTheme theme, FieldTheme? target)
         {
-            if (!target.HasValue || target.Value == theme) return null;
+            if (!target.HasValue) return null; // 같은 테마끼리도 (숲 ↔ 비밀의 숲 #292 — 예전엔 같은 테마 길이 없었음)
             bool overland = theme == FieldTheme.Meadow || theme == FieldTheme.Forest || theme == FieldTheme.Jungle;
             if (!overland) return null;
             switch (target.Value)

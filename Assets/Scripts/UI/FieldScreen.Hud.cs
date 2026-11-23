@@ -327,8 +327,10 @@ namespace WordRPG.UI
         {
             bool ready = FieldInteraction.FindTarget(walker.Map, walker.Position, walker.Facing, IsClearedBossSpot, bossBody).HasValue
                          || (!walker.Rafting && npcs.FindTalkable(walker.Position, walker.Facing, false) != null)
-                         || IsNextToSkull(); // 벽 뒤 힐끔해골 (#283)
+                         || IsNextToSkull() // 벽 뒤 힐끔해골 (#283)
+                         || IsNextToRaccoon(); // 황금 너구리 (#292)
             if (ready != confirmReady) SetConfirmReady(ready);
+            SetConfirmText(IsNextToRaccoon() ? "잡기" : "확인"); // #292 사용자: 너구리 옆에선 [잡기] (순간이지만 디테일)
 
             // Ready면 숨 쉬듯 살짝, 부딪힌 직후에는 크게 깜빡
             float scale = 1f;
@@ -339,6 +341,13 @@ namespace WordRPG.UI
             }
             else if (ready) scale = 1f + Mathf.Sin(Time.unscaledTime * 4f) * 0.04f;
             confirmImage.rectTransform.localScale = Vector3.one * scale;
+        }
+
+        public string ConfirmText => confirmLabel != null ? confirmLabel.text : ""; // 테스트용
+
+        private void SetConfirmText(string text)
+        {
+            if (confirmLabel != null && confirmLabel.text != text) confirmLabel.text = text;
         }
 
         private void SetConfirmReady(bool ready)

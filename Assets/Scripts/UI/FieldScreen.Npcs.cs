@@ -32,6 +32,8 @@ namespace WordRPG.UI
             MaybeStartSpringLeap();
             MaybeStartEntryCutscene(); // 처음 들어온 지역에서 인물이 달려와 알려 줌 (#234)
             MaybeStartGiftScene(); // 가까이 오면 선물 (#236 서고 사서)
+            MaybeStartRaccoonEntry(); // 비밀의 숲에 들어오면 황금 너구리가 춤추다 도망 (#292)
+            MaybeRevealBossHaze(); // 숲 보스를 이긴 뒤 오른쪽 끝 숨은 안개에 가까이 오면 걷힘 (#292)
             UpdateShopPitch();
         }
 

@@ -44,9 +44,10 @@ namespace WordRPG.Tests
             var meadow = db.FindArea("meadow");
             var library = db.FindArea("library");
 
-            // 1.0의 숲 맵 = 지금 맵에서 맨 위 줄의 정글 출입구(D)만 없던 것
+            // 1.0의 숲 맵 = 지금 맵에서 맨 위 줄의 정글 출입구(D)와 오른쪽 끝 비밀의 숲 출입구(#292, 39번째 줄)가 없던 것
             var rows = SampleDataBuilder.ForestMap.Split('\n');
             rows[0] = rows[0].Replace('D', '#');
+            rows[39] = rows[39].Replace('D', '#');
             var oldForest = FieldMap.Parse(string.Join("\n", rows));
             Assert.AreEqual(1, oldForest.Doors.Count, "1.0 숲 출입구는 초원 쪽 하나");
             var campDoor = oldForest.Doors[0];

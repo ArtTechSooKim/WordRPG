@@ -6,6 +6,8 @@
 #       Forest_Haze.png           헷갈 안개 (바로잡기 전) — 이웃 칸과 이어지는 무늬, 가운데 옅은 소용돌이
 #       Forest_Haze_done.png      걷힌 안개 = 이끼 땅 + 남은 안개 몇 점
 #       Forest_LoopHaze.png       맴도는 안개 (가짜 길) — 헷갈 안개와 똑같이 (미리 알 수 없게)
+#       Forest_SecretHaze(_done).png  숨은 안개 (#292) — 가짜 길과 똑같이, 이정표를 모두 바로잡으면 걷힌 모습 (열쇠 공터 가는 길)
+#       Forest_BossHaze(_done).png    보스 뒤 숨은 안개 (#292) — 가짜 길과 똑같이, 숲 보스를 이긴 뒤 걷힌 모습 (비밀의 숲 가는 길)
 #   + _캡처/279_이정표_그림.png (8배 미리보기)
 # 효과는 은은하게 (사용자 — 주변 색 ± 한두 톤), 외곽선은 팩과 같은 짙은 색
 import math
@@ -130,6 +132,10 @@ def main():
         "Forest_Haze": haze(base),
         "Forest_Haze_done": cleared(base),
         "Forest_LoopHaze": haze(base),
+        "Forest_SecretHaze": haze(base),
+        "Forest_SecretHaze_done": cleared(base),
+        "Forest_BossHaze": haze(base),
+        "Forest_BossHaze_done": cleared(base),
     }
     for name, img in out.items():
         img.save(os.path.join(TILES, name + ".png"))

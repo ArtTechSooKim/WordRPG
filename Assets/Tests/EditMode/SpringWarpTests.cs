@@ -63,7 +63,7 @@ namespace WordRPG.Tests
             foreach (var area in areas.Values) See(world, area);
             world.MarkBossDefeated(areas["library"].BossId);
             var list = SpringWarp.Destinations(areas.Values.OrderBy(area => area.AreaId), areas["cave"], world, true);
-            CollectionAssert.AreEqual(new[] { "meadow", "library", "forest", "jungle" }, list.Select(area => area.AreaId));
+            CollectionAssert.AreEqual(new[] { "meadow", "library", "forest", "jungle", "secret_forest" }, list.Select(area => area.AreaId)); // 비밀의 숲(#292)은 맨 뒤
         }
 
         // #232 사용자: 샘 길은 서고 보스(까먹대왕)를 물리친 뒤에 열림 — 그 전엔 샘을 봤어도 갈 곳 없음 (어르신이 알려 주는 이야기 순서)

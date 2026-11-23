@@ -93,7 +93,9 @@ namespace WordRPG.Game
                 case FieldTile.Shrine: return Ruins.IsAwakened(area, session);
                 case FieldTile.GlowStone: return GlowStones.IsLit(area, world, cell);
                 case FieldTile.Signpost: return Signposts.IsFixed(area, world, cell);
-                case FieldTile.Haze: return Signposts.IsHazeCleared(area, world, cell);
+                case FieldTile.Haze:
+                case FieldTile.SecretHaze:
+                case FieldTile.BossHaze: return Signposts.IsHazeCleared(area, world, cell); // 숨은 안개 = 이정표 모두 · 보스 뒤 (#292)
                 default: return false;
             }
         }

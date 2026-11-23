@@ -142,6 +142,73 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // #292 사용자: 이정표를 모두 바로잡으면 숨은 안개가 걷혀 비밀의 숲 가는 길이 드러남 (그 전엔 가짜 길과 똑같이 맴돎)
+        //  y=3  #..MM...#   헷갈 안개 (3,3)(4,3)
+        //  y=2  ###V#X..#   숨은 안개 (3,2) · 이정표 (5,2)
+        //  y=1  #.....P.#
+        [UnityTest]
+        public IEnumerator FixingEverySignpostRevealsTheSecretPath()
+        {
+            var area = Area().Set("map", "#########\n#..MM...#\n###V#X..#\n#.....P.#\n#########");
+            var session = Session(area);
+            var field = Field(area, session);
+            yield return null;
+
+            yield return HoldStick(field, Direction.Left, () => field.PlayerCell.x <= 3, 2f);
+            yield return HoldStick(field, Direction.Up, () => field.HazeLoops > 0, 2f);
+            Assert.AreEqual(new Vector2Int(3, 1), field.PlayerCell, "바로잡기 전엔 숨은 안개도 맴돌다 제자리");
+            yield return WaitFor(() => !field.IsInBattle, 2f);
+            StringAssert.Contains("맴돌다 제자리", field.Bubble.Text, "가짜 길과 같은 말 (미리 알 수 없게)");
+
+            yield return HoldStick(field, Direction.Right, () => field.PlayerCell.x >= 5, 2f);
+            yield return FaceStick(field, Direction.Up);
+            yield return PressConfirm(field);
+            Assert.IsTrue(field.SignpostView.IsOpen);
+            ActiveButton(field.transform, $"SignpostChoice_{field.SignpostQuestion.CorrectIndex}").onClick.Invoke();
+            yield return null;
+            ActiveButton(field.transform, "SignpostDone").onClick.Invoke();
+            yield return WaitFor(() => field.SecretPathsRevealed == 1 && !field.IsInBattle, 5f);
+            Assert.AreEqual(1, field.SecretPathsRevealed, "마지막 이정표 → 숨은 길이 드러나는 연출");
+            StringAssert.Contains("숨겨진 길", field.ToastMessage);
+            yield return WaitFor(() => !field.IsInBattle, 3f);
+
+            yield return HoldStick(field, Direction.Left, () => field.PlayerCell.x <= 3, 2f);
+            yield return HoldStick(field, Direction.Up, () => field.PlayerCell.y >= 3, 2f);
+            Assert.AreEqual(new Vector2Int(3, 3), field.PlayerCell, "걷힌 숨은 안개를 지나감");
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
+        // #292 사용자: 너구리 공터는 숲 보스를 이긴 뒤 — 오른쪽 끝 숨은 안개에 가까이 가면 스르르 걷히고(한 번) 지나감
+        //  y=3  #ZZ....B#   보스 뒤 숨은 안개 (1,3)(2,3) · 이긴 보스 자리 (7,3)
+        //  y=2  #.......#
+        //  y=1  #......P#
+        [UnityTest]
+        public IEnumerator TheBossHazeClearsWhenYouComeCloseAfterTheBoss()
+        {
+            var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 3);
+            var boss = TestData.Species("raccoon", new MonsterStats(60, 1, 5), new MonsterStats(0, 0, 0), bite).Set("displayName", "헷갈너구리");
+            var area = Area().Set("map", "#########\n#ZZ....B#\n#.......#\n#......P#\n#########").Set("boss", new BossEncounter(boss, 3));
+            var session = Session(area);
+            session.World.MarkBossDefeated(area.BossId);
+            var field = Field(area, session);
+            yield return null;
+            Assert.AreEqual(0, field.BossHazeReveals, "멀면 아직");
+
+            yield return HoldStick(field, Direction.Left, () => field.BossHazeReveals > 0 || field.PlayerCell.x <= 1, 3f);
+            yield return WaitFor(() => field.BossHazeReveals == 1 && !field.IsInBattle, 3f);
+            Assert.AreEqual(1, field.BossHazeReveals, "가까이 오면 걷힘");
+            StringAssert.Contains("금빛", field.Bubble.Text, "너구리 공터를 귀띔");
+            Assert.IsTrue(session.World.HasEvent(Signposts.BossHazeEventId(area)), "한 번만 (세이브)");
+
+            yield return HoldStick(field, Direction.Left, () => field.PlayerCell.x <= 1, 3f);
+            yield return HoldStick(field, Direction.Up, () => field.PlayerCell.y >= 3, 3f);
+            Assert.AreEqual(new Vector2Int(1, 3), field.PlayerCell, "걷힌 숨은 안개를 지나감");
+            Assert.AreEqual(1, field.BossHazeReveals);
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator SignpostNeedsWordsYouHaveSeen()
         {

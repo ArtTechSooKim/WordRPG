@@ -140,8 +140,15 @@
      그림 = import_ninja_art.py `build_cave` (Cave_Wall_auto = 바위 윗면 + 밝은 테 + 절벽면), 시안 = Tools/cave_mockup.py
    - 숲 이정표 미로 (#279, 1.4 — GDD 9-15): 숲 72×44 (예전 36칸을 **오른쪽으로만** 넓힘 — 맵 좌표가 아래·왼쪽 기준이라 위·오른쪽으로 넓혀야 상자 id·탐험 기록이 그대로).
      맵 글자 'X' 이정표 → [확인] = 뒤섞인 철자 문제(`SpellingQuiz`·`SignpostQuiz`, 화면 `SignpostQuizView` Figma #279) · 'M' 헷갈 안개(가장 가까운 이정표가 맡음 `FieldMap.HazeOf` — 바로잡으면 걷힘) ·
-     'W' 맴도는 안개(가짜 길). 부딪히면 맴돌다 제자리 (`FieldScreen.Forest`). 이정표·석판·반딧돌의 단어 = `FieldScreen.PuzzleWords`(같이 쓰는 한 바퀴 — 문제마다 새 TrainingQuizProvider를 만들면 같은 단어가 또 나옴 #290). 규칙 `Signposts`, 세이브 `WorldState.fixedSignposts`. 열쇠는 미로 끝 → 목표 `ObjectiveKind.FixSignposts`. 보스 방 문은 열쇠 + 이정표 5개 모두(⑤ 지름길까지) + 단어 40 (`BossGate` NeedSignposts #291 사용자: 숲 보스 뒤 '이정표를 되찾아 고맙다'와 맞게).
+     'W' 맴도는 안개(가짜 길). 부딪히면 맴돌다 제자리 (`FieldScreen.Forest`). 이정표·석판·반딧돌의 단어 = `FieldScreen.PuzzleWords`(같이 쓰는 한 바퀴 — 문제마다 새 TrainingQuizProvider를 만들면 같은 단어가 또 나옴 #290). 규칙 `Signposts`, 세이브 `WorldState.fixedSignposts`. 열쇠는 미로 끝(#292부터 이정표를 모두 바로잡으면 드러나는 북쪽 열쇠 공터) → 목표 `ObjectiveKind.FixSignposts`. 보스 방 문은 열쇠 + 이정표 5개 모두(⑤ 지름길까지) + 단어 40 (`BossGate` NeedSignposts #291 사용자: 숲 보스 뒤 '이정표를 되찾아 고맙다'와 맞게).
      맵 원본 = `python Tools/forest_map.py [--apply]`, 에셋 = Create Sample Data의 `UpgradeForestMaze`(상자는 위치로 옮겨 담음), 그림 = `Tools/make_signpost_art.py`
+   - **비밀 공터 둘 · 황금 너구리** (#292 사용자 — GDD 9-17, 콘텐츠를 한 번에 소비하지 않게 따로): 둘 다 가짜 길 'W'와 똑같이 보이는 숨은 안개(부딪히면 맴돎).
+     ① 'V' = 이정표를 **모두** 바로잡으면 걷힘(`Signposts.AllFixed`, 마지막 이정표 뒤 카메라 연출 `FieldScreen.RevealSecretPath`) → 예전 숲 북쪽 **열쇠 공터**(1.3 열쇠 자리의 위 — 보스 방 열쇠 K가 미로 끝에서 이리로).
+     ② 'Z' = 숲 보스를 이긴 뒤 가까이(4칸) 가면 한 번 스르르 걷힘(WorldState 이벤트 `boss_haze:{areaId}`, `Signposts.BossHazeDue`, `FieldScreen.RevealBossHaze` — 보스 직후 연출로 알려 주지 않음) →
+     오른쪽 끝 세 번째 출입구 ↔ 지역 `secret_forest`(areaId — 출시 뒤 바꾸지 말 것, 왼쪽 끝으로 들어옴, '나무로 둘러싸인 넓은 공터' 32×30, 몬스터 없음, 샘 하나, 정식판, storyOrder 6). 같은 테마 출입구도 길 + 빛 (`FieldArt.ExitGlow`).
+     황금 너구리 = FieldArea `goldRaccoonSpots`(맵 좌표, 차례대로)·`goldRaccoonGold`(100·150·200·1000 — 사용자), 규칙 `GoldRaccoon`(하루 한 번 = 현지 날짜, 세이브 칸 `goldRaccoonDay`·`goldRaccoonCaught` — 중간에 나가면 다음 자리부터),
+     화면 `FieldScreen.GoldRaccoon`: 들어오면 0.5초 뒤 앞에서 춤 → 다음 자리로 도망(카메라가 따라감) → 옆에서 [잡기](너구리 옆이면 [확인] 글자가 바뀜) = 동전 '띠링' + 골드 → 또 춤·도망 ×3 → 마지막 = 동전 파바바박 + 춤추며 사라짐. **너구리는 말하지 않음**(말풍선 없음, 사용자).
+     그림 = 팩 GoldRacoon 시트·Coin2 → Field/gold_raccoon·coin_spin (`import_ninja_art.py` FIELD_EXTRAS), 안개 = make_signpost_art.py. 맵 원본 = `forest_map.py`·`secret_forest_map.py [--apply]`(너구리 자리도). 테스터 메뉴 '비밀의 숲'으로 건너뛰면 너구리를 처음부터
    - 통로는 두 칸 너비 (사용자 요청 #67): 새 맵은 `python Tools/widen_maps.py --only {상수} [--apply]`로 한 칸 통로를 넓힘 (상수·에셋 같이)
 6. **네이밍**: PascalCase 클래스/메서드/프로퍼티, camelCase 필드. SO 필드는 `[SerializeField] private` + 읽기 전용 프로퍼티. 클래스명은 영문, 화면 표시명은 한국어 필드(`displayName = "펜촉이"`). 주석은 한국어
 7. **Git LFS 사용 중**: 이미지·오디오·영상(mp4, #129)·폰트·네이티브 플러그인. 새 바이너리 타입 추가 시 `.gitattributes` 확인 (새로 클론하면 `git lfs install` 먼저)
@@ -252,11 +259,11 @@ Assets/
                         Ruins(유적: 석판 T 4개 + 정글 단어 60개 → 제단 A에서 동료) · Levers(레버 Y → 덩굴 다리 H) · CellState(칸의 끝난 모습·지나갈 수 있음) — #80,
                         TabletQuiz(석판 3문제: 틀리면 벌점 없이 다시, 숙련도는 처음 답만 — #81), GlowStones(글자 반딧돌: 밝힘·밝힌 수·모두 밝힌 보상 — #112·#115),
                         UpdateNotices(업데이트 안내: 업데이트한 사람만 타이틀에서 한 번 — #115), PotionEffects(효과 물약이 남긴 효과 — #146),
-                        RelicTutorials(성유물 안내 규칙: 언제 · 가장 가까운 제단과 그 앞 칸 — #142), Journals(누군가의 기록 규칙 — #201), SpringWarp(샘으로 다른 지역 가기 — #216), ExamSkull(힐끔해골: 의학 용어 확인문제 — #281)
+                        RelicTutorials(성유물 안내 규칙: 언제 · 가장 가까운 제단과 그 앞 칸 — #142), Journals(누군가의 기록 규칙 — #201), SpringWarp(샘으로 다른 지역 가기 — #216), ExamSkull(힐끔해골: 의학 용어 확인문제 — #281), GoldRaccoon(비밀의 숲 황금 너구리: 하루 한 번 — #292)
     Save/               SaveData(JSON 형식), SaveSystem(임시파일+백업으로 안전 저장)
     UI/                 FieldScreen(필드·지역 이동·HUD·가상 스틱 + 왼쪽 [확인]), BattleScreen(필드 위에 덮이는 전투 + 보스 결정타 연출 + 전투 결산, 단독 연습 모드도 있음)
                         — 둘 다 partial로 나눔 (#93): FieldScreen.cs(상태·이동·입력) + .Places([확인] 장소)·.Jungle(정글 기믹)·.Battles(조우·전투 뒤·수련)·
-                        .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴)·.Cave(동굴 어둠·반딧돌 #112)·.RelicGuides(성유물 바꾸기·제단 안내 #142)·.Springs(샘: 회복·다른 지역으로 #216)·.Sparkles(아직 안 연 상자·열쇠 반짝임 #233)·.Skull(힐끔해골 #281) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout·.Events(사건 연출: 사건 종류마다 Show… 함수 — #119)·.SkillFx(기술 연출: 몸짓·회복·보호막·특수 — #137).
+                        .Roamers(보이는 몬스터·선제공격)·.World(타일 그리기)·.Hud(HUD·안내·메뉴)·.Cave(동굴 어둠·반딧돌 #112)·.RelicGuides(성유물 바꾸기·제단 안내 #142)·.Springs(샘: 회복·다른 지역으로 #216)·.Sparkles(아직 안 연 상자·열쇠 반짝임 #233)·.Skull(힐끔해골 #281)·.GoldRaccoon(황금 너구리 #292) / BattleScreen.cs(전투 흐름) + .Menus·.Result·.Fx·.Layout·.Events(사건 연출: 사건 종류마다 Show… 함수 — #119)·.SkillFx(기술 연출: 몸짓·회복·보호막·특수 — #137).
                         새 기능은 맞는 파일에, 기능 묶음이 커지면 새 partial 파일로,
                         DexView(도감) + JournalView(누군가의 기록 #201), RelicAltarView(성유물 제단·강화) + AwakeningCutscene(각성 연출), ShopView(상점), SkillLearnView(기술 배우기·바꾸기), SpringWarpView(샘 이동: 지역 고르기 #216),
                         InventoryView(소지품: 주인공·성유물·아이템(넘치면 스크롤, 놓는 순서 `ItemData.BagOrder` #147)·징표) + HeroViews(HeroInfoPage·RelicPage·RelicSlotsRow·SkillRowView),
@@ -295,7 +302,7 @@ Docs/                   PRD.txt, GDD.md, 아트에셋목록.md, 아이폰출시�
 .github/workflows/      ios-testflight.yml (GitHub Mac 서버에서 서명·TestFlight 업로드)
 Tools/                  import_ninja_art.py (에셋 팩 → 프로젝트, Pillow 필요), zip_ios_for_mac.py (Xcode 프로젝트 → Mac용 zip, 실행 권한 유지),
                         widen_maps.py (맵의 한 칸 통로 → 두 칸), subset_fonts.py (본문 글꼴에서 한자·가나 빼기 — 앱 크기, fontTools 필요),
-                        pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), forest_map.py (1.4 숲 72×44 = 예전 숲 + 오른쪽 이정표 미로, 검사·미리보기·--apply #279), make_signpost_art.py (이정표·헷갈 안개 그림 #279), medical_course.py (의대생 의학 용어 → 의학 단어장 150·300 + 예비 + 확인문제 CSV #280 — 문제는 힐끔해골이 냄 #281), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구), make_preempt_sfx.py (선제공격 '카칭' 소리 합성 #147), make_skill_sfx.py (기술마다 다른 소리: 팩 소리 겹치기 #164),
+                        pixellab_client.py (PixelLab AI 도트: Ninja 그림을 예시로 16px 64장·4방향 — 키는 환경변수, 저장소에 적지 말 것, 결과는 _캡처/PixelLab #94), trim_wordbooks.py (지역 단어장 150개로 + 예비 단어장, wordfreq 필요), desert_map.py (3장 사막 144×176 맵 생성 + 미리보기), jungle_map.py (1.1 메아리 정글 72×88 맵 초안 + 미리보기), cave_map.py (1.2 어두운 밀림 동굴 50×62 맵 초안 + 미리보기·어둠 미리보기, GDD 9-7), cave_mockup.py (동굴 그림 시안: 팩 타일 임시 합성 + 어둠 → _캡처/111_동굴시안, #111), forest_map.py (1.4 숲 72×44 = 예전 숲 + 오른쪽 이정표 미로, 검사·미리보기·--apply #279 + 숨은 안개 V(열쇠 공터)·Z(비밀의 숲) #292), secret_forest_map.py (비밀의 숲 공터 32×30 + 황금 너구리 자리 #292), make_signpost_art.py (이정표·헷갈 안개 그림 #279), medical_course.py (의대생 의학 용어 → 의학 단어장 150·300 + 예비 + 확인문제 CSV #280 — 문제는 힐끔해골이 냄 #281), store_screenshots.py (앱스토어 스크린샷 = PlayMode StoreScreenshots[Explicit] 화면 + 문구), make_preempt_sfx.py (선제공격 '카칭' 소리 합성 #147), make_skill_sfx.py (기술마다 다른 소리: 팩 소리 겹치기 #164),
                         check_android_bundle.py (구글플레이에 올리기 전 AAB 검사: 대상 API·게임 표시·뒤로 가기·권한·16KB 페이지·크기 #149),
                         make_shop_stalls.py (상점 가판대 그림: 팩 조각 조립 #210), journal_lines.py (누군가의 기록 문장 검사·CSV에 넣기 #201 · 글 파일 만들기 --text #202 · 고친 글 받아들이기 --import #204), make_journal_smudge.py (못 찾은 줄의 필기 그림 #201),
                         prepare_ambience.py (지역 환경음: 팩·CC0 녹음 다듬기 → Resources/Audio/Ambience + BGM과 섞은 미리듣기, #193), prepare_music.py (받은 곡 → 게임용: 끝 무음 빼기·반복 이음새 찾아 겹치기·음량 맞추기 → Licensed 폴더, `--later` = 아직 안 쓰는 2.0 곡을 Builds로, imageio-ffmpeg·numpy 필요 #166·#172),

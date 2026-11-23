@@ -89,7 +89,9 @@ namespace WordRPG.UI
                 .Set(FieldTile.Water, new Color32(60, 150, 130, 255))
                 .Set(FieldTile.Signpost, Signpost, SignpostFixed)
                 .Set(FieldTile.Haze, ForestMist, new Color32(48, 92, 44, 255)) // 걷히면 이끼 색
-                .Set(FieldTile.LoopHaze, ForestMist),
+                .Set(FieldTile.LoopHaze, ForestMist)
+                .Set(FieldTile.SecretHaze, ForestMist, new Color32(48, 92, 44, 255)) // 숨은 안개 (#292) — 걷히기 전엔 가짜 길과 같은 색
+                .Set(FieldTile.BossHaze, ForestMist, new Color32(48, 92, 44, 255)),
             // 정글 (#80): 짙은 초록 바탕에 진흙길, 얕은 강은 밝은 하늘색(깊은 강보다 옅게), 유적은 돌빛
             [FieldTheme.Jungle] = Landmarks(new Color32(140, 96, 62, 255))
                 .Set(FieldTile.Wall, new Color32(14, 58, 30, 255))

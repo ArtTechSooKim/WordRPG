@@ -98,6 +98,8 @@ namespace WordRPG.Field
             new TileDefinition(FieldTile.Signpost,  "X",    Use | Tag | Done,              "이정표",      Forest), // #279 뒤섞인 이정표
             new TileDefinition(FieldTile.Haze,      "M",    Done | Opens,                  null,          Forest), // 바로잡으면 걷히는 안개
             new TileDefinition(FieldTile.LoopHaze,  "W",    None,                          null,          Forest), // 가짜 길 — 늘 막힘
+            new TileDefinition(FieldTile.SecretHaze, "V",   Done | Opens,                  null,          Forest), // #292 이정표를 모두 바로잡으면 걷힘 (그 전엔 가짜 길과 똑같음)
+            new TileDefinition(FieldTile.BossHaze,  "Z",    Done | Opens,                  null,          Forest), // #292 보스를 이긴 뒤 가까이 가면 걷힘 (비밀의 숲)
         };
 
         private static readonly TileDefinition[] ByTile = BuildByTile();

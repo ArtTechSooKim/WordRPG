@@ -100,6 +100,7 @@ namespace WordRPG.Tests
             Assert.IsTrue(FieldArt.ExitGlow(FieldTheme.Forest, FieldTheme.Meadow).HasValue, "숲 → 초원");
             Assert.IsTrue(FieldArt.ExitGlow(FieldTheme.Forest, FieldTheme.Jungle).HasValue, "숲 → 정글");
             Assert.IsTrue(FieldArt.ExitGlow(FieldTheme.Jungle, FieldTheme.Forest).HasValue, "정글 → 숲");
+            Assert.IsTrue(FieldArt.ExitGlow(FieldTheme.Forest, FieldTheme.Forest).HasValue, "숲 ↔ 비밀의 숲 (#292) — 흐린 네모 대신 이어진 길 + 빛");
             Assert.IsFalse(FieldArt.ExitGlow(FieldTheme.Meadow, FieldTheme.Library).HasValue, "서고 입구는 원래 그림(동굴 입구)");
             Assert.IsFalse(FieldArt.ExitGlow(FieldTheme.Library, FieldTheme.Meadow).HasValue, "서고 안 출입구도 원래 그림");
             Assert.IsFalse(FieldArt.ExitGlow(FieldTheme.Meadow, null).HasValue);

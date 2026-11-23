@@ -133,6 +133,21 @@ def copy_event_art(pack_root=DEFAULT_PACK):
     print("event art", len(EVENT_ART), "->", folder)
 
 
+# 비밀의 숲 황금 너구리 (#292): 걷기 시트(4방향 × 4장, 주인공과 같은 배치) · 도는 동전(10px × 4장) → Field/
+FIELD_EXTRAS = {
+    "gold_raccoon": "Actor/Monsters/GoldRacoon/SpriteSheet.png",
+    "coin_spin": "Items/Treasure/Coin2.png",
+}
+
+
+def copy_field_extras(pack_root=DEFAULT_PACK):
+    folder = os.path.join(OUT, "Field")
+    os.makedirs(folder, exist_ok=True)
+    for name, rel in FIELD_EXTRAS.items():
+        save_if_changed(Image.open(os.path.join(pack_root, rel)).convert("RGBA"), os.path.join(folder, name + ".png"))
+    print("field extras", len(FIELD_EXTRAS), "->", folder)
+
+
 COMPANIONS = {
     "ara": "Actor/Characters/Cavegirl",  # 아라 — 유적에 갇혀 고대 단어를 지키던 정글 소녀
 }
@@ -1445,6 +1460,7 @@ def main():
     copy_relics_and_items(pack)
     copy_companions(pack)
     copy_event_art(pack)
+    copy_field_extras(pack)
 
     art = Pack(pack)
     build_tiles(art)

@@ -114,6 +114,7 @@ namespace WordRPG.Game
                 }
                 if (area.ShrineCompanion != null) session.AddCompanion(area.ShrineCompanion);
             }
+            if (GoldRaccoon.LivesIn(target)) session.World.SetGoldRaccoon(null, 0); // 비밀의 숲으로 건너뛰면 황금 너구리를 처음부터 (#292 — 폰에서 여러 번 시험)
             session.RestoreHero();
             return bosses;
         }
