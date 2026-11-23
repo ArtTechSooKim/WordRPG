@@ -85,6 +85,7 @@
      Active는 GameSession이 정함 (만들거나 불러오면 기본부터, `ChooseCourse`) — 테스트에서 바꾸면 TearDown에서 null로. 세이브 칸 course (빈 값 = 안 고름, 예전 세이브는 불러올 때 수능·내신).
      단어 = `Assets/Data/Words/Courses/{business|medical}_tier{1|2}.csv` (id 앞글자 biz_·med_, 기본 단어장과 같은 수 150·300 — WordCourseTests). 비즈니스 = Claude가 고르고 뜻을 씀 → 사용자 검수 (시판 단어장·학원 자료는 넣지 않음, GDD 11-2 — 사용자의 토익 목록은 어려운 정도만 참고, 단어를 옮기지 않음).
      **의학 = 의대생 '의학용어 암기장' 그대로** (#280 사용자, GDD 9-16 — 원본 `Docs/의학용어_원본.html` → `python Tools/medical_course.py --apply`, 장 순서·글자 그대로 — 뜻을 고치거나 검수로 바꾸지 말 것. 설명 = 단어 칸 `note`(도감·단어 카드). 쉬운 말·같은 뜻·품사 규칙은 의학엔 안 씀).
+     단어 문제 시간 = 단어장 `extraAnswerSeconds`(#289 사용자 — 의학 +5초: 전투 10 → 15 · 선제공격 6 → 11, 크리티컬 3초는 그대로) → `WordCourses.ExtraAnswerSeconds`를 `BattleConfig.AnswerTimeLimitSeconds`·`Preemptive.AnswerSeconds`가 더함.
      **확인문제** (#280·#281): 의대생이 장마다 만든 문제 221개 = `Assets/Data/Exams/medical_exam.csv` → `ExamBook`(임포터 `ExamCsvImporter`), 단어장 `WordCourse.exams`·`examAreas`(지역 areaId → 장 번호: 서고 2~4 · 숲 5~7 · 정글 8~10 · 동굴 11~13), `WordCourses.ExamFor(areaId)`.
      규칙 `ExamQuestion`(5지선다 ①~⑤·[보기] 목록을 화면용으로 읽기만) · `ExamQuiz`(보기 만들기). **내는 곳은 힐끔해골뿐** (#281 사용자 — 친구(의대생) 의견: 단어만 외우는 사람은 못 풂, 보스·몹·석판·반딧돌엔 넣지 말 것):
      의학 용어 + 그 지역 보스를 이기면 보석 가까운 벽(책장·나무·바위) 뒤에서 얼굴 반만 내민 해골(팩 Skeleton → Npcs/exam_skull·_face, #283) — 힐끔·'…키킥'. 화면 이름표는 '???' (#284 사용자 — 화면 글에 '해골'이라고 쓰지 말 것, `ExamSkull.DisplayName`).

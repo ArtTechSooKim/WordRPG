@@ -1017,6 +1017,7 @@ namespace WordRPG.EditorTools
                 new CourseExamArea("jungle", 8, 9, 10),   // 신경계 · 근골격계 · 피부 (석판도)
                 new CourseExamArea("cave", 11, 12, 13),   // 감각 · 내분비계 · 정신 의학 (반딧돌도)
             });
+            medical.ConfigureAnswerTime(5f); // #289 사용자: 의학 용어는 어려워서 단어 문제 시간 +5초 (전투 10 → 15 · 선제공격 6 → 11)
             EditorUtility.SetDirty(medical);
             AssetDatabase.SaveAssets();
             GameDatabaseBuilder.Refresh(); // 세이브의 단어장 id → 에셋

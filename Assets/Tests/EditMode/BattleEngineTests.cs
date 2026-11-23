@@ -108,6 +108,32 @@ namespace WordRPG.Tests
             Assert.AreEqual(2, battle.WrongAnswers);
         }
 
+        // #289 사용자: 의학 용어는 어려워서 단어 문제 시간 +5초 — 단어장이 더 주는 시간만큼 늦게 맞혀도 정답
+        [Test]
+        public void ACourseCanGiveMoreTimeToAnswer()
+        {
+            var course = UnityEngine.ScriptableObject.CreateInstance<WordCourse>();
+            course.ConfigureAnswerTime(5f);
+            WordCourses.Active = course;
+            try
+            {
+                var battle = Start(new[] { Hero(), Hero() }, new[] { Slime() });
+                battle.SelectSkill(strike, battle.Enemies[0]);
+                battle.SubmitAnswer(Correct, 14f);
+                Assert.Less(battle.Enemies[0].Hp, 20, "10초 + 5초 안이면 정답");
+                Assert.AreEqual(0, battle.WrongAnswers);
+
+                battle.SelectSkill(strike, battle.Enemies[0]);
+                battle.SubmitAnswer(Correct, 15.5f);
+                Assert.AreEqual(1, battle.WrongAnswers, "더 준 시간도 넘기면 시간 초과");
+            }
+            finally
+            {
+                WordCourses.Active = null;
+                UnityEngine.Object.DestroyImmediate(course);
+            }
+        }
+
         [Test]
         public void QuizDirectionComesFromSkill()
         {

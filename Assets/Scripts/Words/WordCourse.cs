@@ -60,6 +60,8 @@ namespace WordRPG.Words
         [Tooltip("확인문제 (#280 의학 용어 = 의대생이 장마다 만든 문제). 비면 없음")]
         [SerializeField] private ExamBook exams;
         [SerializeField] private List<CourseExamArea> examAreas = new List<CourseExamArea>();
+        [Tooltip("단어 문제 시간에 더하는 초 — 전투 문제·선제공격 (#289 사용자: 의학 용어는 어려워서 +5초)")]
+        [SerializeField] private float extraAnswerSeconds;
 
         public string CourseId => courseId;
         public string DisplayName => displayName;
@@ -69,6 +71,7 @@ namespace WordRPG.Words
         public IReadOnlyList<CourseBook> Books => books;
         public ExamBook Exams => exams;
         public IReadOnlyList<CourseExamArea> ExamAreas => examAreas;
+        public float ExtraAnswerSeconds => extraAnswerSeconds;
 
         // 그 지역의 확인문제 (없으면 빈 목록)
         public List<ExamQuestion> ExamFor(string areaId)
@@ -119,6 +122,9 @@ namespace WordRPG.Words
             examAreas = areas != null ? new List<CourseExamArea>(areas) : new List<CourseExamArea>();
         }
 
+        // 샘플 데이터 생성 전용 (#289)
+        public void ConfigureAnswerTime(float extraSeconds) => extraAnswerSeconds = extraSeconds;
+
         // 샘플 데이터 생성 전용. 런타임에서는 호출하지 않는다
         public void Configure(string id, string name, string summary, int sortOrder, IEnumerable<string> samples, IEnumerable<CourseBook> courseBooks)
         {
@@ -141,5 +147,8 @@ namespace WordRPG.Words
 
         // 지금 단어장으로 그 지역에서 낼 확인문제 (#280 — 수능·비즈니스는 없음)
         public static List<ExamQuestion> ExamFor(string areaId) => Active != null ? Active.ExamFor(areaId) : new List<ExamQuestion>();
+
+        // 지금 단어장이 단어 문제 시간에 더하는 초 (#289 — 의학 용어 +5). BattleConfig.AnswerTimeLimitSeconds·Preemptive.AnswerSeconds가 더해 씀
+        public static float ExtraAnswerSeconds => Active != null ? Math.Max(0f, Active.ExtraAnswerSeconds) : 0f;
     }
 }

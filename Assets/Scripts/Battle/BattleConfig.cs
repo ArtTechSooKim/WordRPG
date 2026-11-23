@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using WordRPG.Words;
 
 namespace WordRPG.Battle
 {
@@ -34,7 +35,8 @@ namespace WordRPG.Battle
 
         private static readonly float[] DefaultIntensity = { 1f, 1.2f, 1.5f, 2f };
 
-        public float AnswerTimeLimitSeconds => answerTimeLimitSeconds;
+        // 단어장이 시간을 더 줄 수 있음 (#289 — 의학 용어 +5초, WordCourse.extraAnswerSeconds). 크리티컬 시간은 그대로
+        public float AnswerTimeLimitSeconds => answerTimeLimitSeconds + WordCourses.ExtraAnswerSeconds;
         public float CriticalTimeSeconds => criticalTimeSeconds;
         public float CriticalMultiplier => criticalMultiplier;
         public float Variance => variance;

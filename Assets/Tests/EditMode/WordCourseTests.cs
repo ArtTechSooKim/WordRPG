@@ -110,6 +110,25 @@ namespace WordRPG.Tests
             Assert.IsTrue(loaded.NeedsCourseChoice);
         }
 
+        // #289 사용자: 의학 용어는 어려워서 단어 문제 시간 +5초 (전투 10 → 15 · 선제공격 6 → 11). 다른 단어장은 그대로
+        [Test]
+        public void MedicalTermsGetFiveMoreSecondsToAnswer()
+        {
+            var database = RealDatabase();
+            var config = new WordRPG.Battle.BattleConfig();
+            Assert.AreEqual(10f, config.AnswerTimeLimitSeconds, "기본 단어장");
+            Assert.AreEqual(6f, WordRPG.Battle.Preemptive.AnswerSeconds);
+            foreach (var id in new[] { "suneung", "business" })
+            {
+                WordCourses.Active = database.FindCourse(id);
+                Assert.AreEqual(10f, config.AnswerTimeLimitSeconds, id);
+            }
+            WordCourses.Active = database.FindCourse("medical");
+            Assert.AreEqual(15f, config.AnswerTimeLimitSeconds);
+            Assert.AreEqual(11f, WordRPG.Battle.Preemptive.AnswerSeconds);
+            Assert.AreEqual(3f, config.CriticalTimeSeconds, "크리티컬 시간은 그대로");
+        }
+
         [Test]
         public void ANewSessionStartsFromTheBasicWords()
         {

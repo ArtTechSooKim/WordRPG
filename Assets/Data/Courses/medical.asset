@@ -36,3 +36,4 @@ MonoBehaviour:
     chapters: 08000000090000000a000000
   - areaId: cave
     chapters: 0b0000000c0000000d000000
+  extraAnswerSeconds: 5

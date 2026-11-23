@@ -11,7 +11,8 @@ namespace WordRPG.Battle
     public static class Preemptive
     {
         public const float DamageRatio = 0.2f;
-        public const float AnswerSeconds = 6f;
+        public const float BaseAnswerSeconds = 6f;
+        public static float AnswerSeconds => BaseAnswerSeconds + WordCourses.ExtraAnswerSeconds; // 단어장이 더 주는 시간 (#289 — 의학 용어 +5초)
 
         // 맞히면 줄 피해 (QTE 결과 화면에 미리 띄우는 숫자 — #74)
         public static int Damage(MonsterInstance target)
