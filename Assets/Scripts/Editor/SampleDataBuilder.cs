@@ -1232,7 +1232,8 @@ namespace WordRPG.EditorTools
             EditorUtility.SetDirty(pilgrim);
             var miner = Npc("npc_miner", "광부", 0,
                 new NpcStage("나가는 길은 저쪽으로 쭉 가서…", NpcMotionKind.Stand),
-                new NpcStage("동굴이 환해졌어! 다시 일할 수 있겠다!", NpcMotionKind.Stand, cave));
+                // #292 사용자: 비밀의 숲(황금 너구리)은 숲에선 비밀 — 동굴 보스 뒤 광부가 귀띔 (그때는 숲 보스를 이겨 너구리 공터 길이 열려 있음)
+                new NpcStage("동굴이 환해졌어! 다시 일할 수 있겠다!\n그거 알아?\n숲에 금을 뱉어내는 너구리가 있대!", NpcMotionKind.Stand, cave)); // 줄을 직접 나눔 — '있대!'만 셋째 줄로 떨어지지 않게
 
             SetNpcs(meadowPath, elder, chief, child);
             // 서고 보스 뒤 [돌아가기]는 초원 시작 지점으로 (#232 사용자)

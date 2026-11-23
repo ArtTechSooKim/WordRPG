@@ -194,6 +194,16 @@ namespace WordRPG.Tests
                 Assert.AreEqual(source.Get(new Vector2Int(x, y)), secret.Map.Get(new Vector2Int(x, y)), $"에셋 맵 = 원본 상수 ({x},{y})");
         }
 
+        // #292 사용자: 너구리 공터는 숲에선 비밀 — 동굴 보스 뒤 광부가 귀띔 (동굴은 숲 보스 뒤에만 갈 수 있으니 그때는 길이 열려 있음)
+        [Test]
+        public void TheCaveMinerTellsAboutTheGoldRaccoonAfterTheCaveBoss()
+        {
+            var miner = AssetDatabase.LoadAssetAtPath<NpcData>("Assets/Data/Npcs/npc_miner.asset");
+            var cave = Load("cave");
+            StringAssert.DoesNotContain("너구리", NpcLines.Current(miner, area => false, 300).Line, "동굴 보스 전엔 말을 잃어 귀띔 못 함");
+            StringAssert.Contains("금을 뱉어내는 너구리", NpcLines.Current(miner, area => area == cave, 0).Line);
+        }
+
         // #292 사용자: 열쇠 공터(이정표 모두) · 너구리 공터(숲 보스 뒤)를 따로 — 콘텐츠를 한 번에 소비하지 않게
         [Test]
         public void TheKeyGladeNeedsEverySignpostAndTheRaccoonDoorNeedsTheBoss()

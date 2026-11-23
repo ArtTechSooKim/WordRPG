@@ -144,7 +144,7 @@
      맵 원본 = `python Tools/forest_map.py [--apply]`, 에셋 = Create Sample Data의 `UpgradeForestMaze`(상자는 위치로 옮겨 담음), 그림 = `Tools/make_signpost_art.py`
    - **비밀 공터 둘 · 황금 너구리** (#292 사용자 — GDD 9-17, 콘텐츠를 한 번에 소비하지 않게 따로): 둘 다 가짜 길 'W'와 똑같이 보이는 숨은 안개(부딪히면 맴돎).
      ① 'V' = 이정표를 **모두** 바로잡으면 걷힘(`Signposts.AllFixed`, 마지막 이정표 뒤 카메라 연출 `FieldScreen.RevealSecretPath`) → 예전 숲 북쪽 **열쇠 공터**(1.3 열쇠 자리의 위 — 보스 방 열쇠 K가 미로 끝에서 이리로).
-     ② 'Z' = 숲 보스를 이긴 뒤 가까이(4칸) 가면 한 번 스르르 걷힘(WorldState 이벤트 `boss_haze:{areaId}`, `Signposts.BossHazeDue`, `FieldScreen.RevealBossHaze` — 보스 직후 연출로 알려 주지 않음) →
+     ② 'Z' = 숲 보스를 이긴 뒤 가까이(4칸) 가면 한 번 스르르 걷힘(WorldState 이벤트 `boss_haze:{areaId}`, `Signposts.BossHazeDue`, `FieldScreen.RevealBossHaze` — 보스 직후 연출로 알려 주지 않음, 숲에선 비밀이고 귀띔은 동굴 보스 뒤 광부 말) →
      오른쪽 끝 세 번째 출입구 ↔ 지역 `secret_forest`(areaId — 출시 뒤 바꾸지 말 것, 왼쪽 끝으로 들어옴, '나무로 둘러싸인 넓은 공터' 32×30, 몬스터 없음, 샘 하나, 정식판, storyOrder 6). 같은 테마 출입구도 길 + 빛 (`FieldArt.ExitGlow`).
      황금 너구리 = FieldArea `goldRaccoonSpots`(맵 좌표, 차례대로)·`goldRaccoonGold`(100·150·200·1000 — 사용자), 규칙 `GoldRaccoon`(하루 한 번 = 현지 날짜, 세이브 칸 `goldRaccoonDay`·`goldRaccoonCaught` — 중간에 나가면 다음 자리부터),
      화면 `FieldScreen.GoldRaccoon`: 들어오면 0.5초 뒤 앞에서 춤 → 다음 자리로 도망(카메라가 따라감) → 옆에서 [잡기](너구리 옆이면 [확인] 글자가 바뀜) = 동전 '띠링' + 골드 → 또 춤·도망 ×3 → 마지막 = 동전 파바바박 + 춤추며 사라짐. **너구리는 말하지 않음**(말풍선 없음, 사용자).

@@ -24,7 +24,8 @@ MonoBehaviour:
   - bossOf: {fileID: 11400000, guid: 3eaceaca8882957449f036b992066ba9, type: 2}
     wordsNeeded: 0
     line: "\uB3D9\uAD74\uC774 \uD658\uD574\uC84C\uC5B4! \uB2E4\uC2DC \uC77C\uD560
-      \uC218 \uC788\uACA0\uB2E4!"
+      \uC218 \uC788\uACA0\uB2E4!\n\uADF8\uAC70 \uC54C\uC544?\n\uC232\uC5D0 \uAE08\uC744
+      \uBC49\uC5B4\uB0B4\uB294 \uB108\uAD6C\uB9AC\uAC00 \uC788\uB300!"
     motion: 0
     pace: 1
   springLeapAfter: {fileID: 0}
