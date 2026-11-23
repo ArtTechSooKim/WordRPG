@@ -532,6 +532,7 @@ namespace WordRPG.EditorTools
             SetExitsIfMismatch(cavePath, (junglePath, 0, null));
             BuildCourses();
             BuildGiftEvents();
+            BuildUpdateMails();
 
             AssetDatabase.SaveAssets();
             GameDatabaseBuilder.Refresh();
@@ -1049,6 +1050,17 @@ namespace WordRPG.EditorTools
             EditorUtility.SetDirty(gift);
             AssetDatabase.SaveAssets();
             GameDatabaseBuilder.Refresh(); // GameDatabase.SeasonalEvents
+        }
+
+        // 업데이트 안내 메일 (#286 사용자: 1.4 안내가 처음엔 창으로 잘 나오는데 메일함에도 남았으면) — 글은 UpdateNotices의 제목·설명 그대로.
+        // 업데이트 안내를 본 세이브에만 옴 (Mails.DeliverUpdateNotes). 새 안내에 MailId를 붙이면 여기서 메일 에셋이 생김
+        [MenuItem("WordRPG/Data/Build Update Mails")]
+        public static void BuildUpdateMails()
+        {
+            foreach (var notice in UpdateNotices.WithMail())
+                BuildMail(notice.MailId, notice.Title, "업데이트 안내", notice.Title, "", notice.Message, "", "", MailDelivery.AfterUpdateNotice);
+            AssetDatabase.SaveAssets();
+            GameDatabaseBuilder.Refresh(); // GameDatabase.Mails
         }
 
         // 메일함에 오는 메일 (#275): Assets/Data/Mails/{mailId}.asset. mailId는 세이브에 적힘 — 출시 뒤 바꾸지 말 것

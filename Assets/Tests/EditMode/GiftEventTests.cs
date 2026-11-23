@@ -102,7 +102,7 @@ namespace WordRPG.Tests
 
             var none = Session();
             var basic = GiftEvents.Claim(none, gift, 0, December);
-            Assert.IsEmpty(none.Mailbox.All, "편지가 없는 선물 퀴즈면 메일도 없음");
+            Assert.IsEmpty(none.Mailbox.All.Where(m => !m.Deleted), "편지가 없는 선물 퀴즈면 메일도 없음 (새 게임이 건너뛴 업데이트 안내 기록은 빼고 #286)");
             Assert.AreEqual(1, none.Inventory.GetCount(great), "하나도 못 맞혀도 기본 선물");
             Assert.AreEqual(1, none.Inventory.GetCount(quiet));
             Assert.AreEqual(2, basic.Count);

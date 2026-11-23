@@ -105,12 +105,13 @@ namespace WordRPG.Game
         }
 
         // level을 안 주면 HeroData의 시작 레벨. 시작 성유물을 가지고(앞에서부터 끼운 채로) 시작한다.
-        // 업데이트 안내는 모두 본 것으로 (#115 — 새로 시작한 사람은 업데이트한 사람이 아님)
+        // 업데이트 안내는 모두 본 것으로 (#115 — 새로 시작한 사람은 업데이트한 사람이 아님), 안내 메일도 받지 않음 (#286)
         public static GameSession NewGame(HeroData heroData, int? level = null)
         {
             var session = new GameSession(CreateHero(heroData, level ?? heroData.StartLevel), new Inventory(), new VocabularyProgress(),
                 new PlayerRecord(), new WorldState());
             session.Notices.MarkAll();
+            foreach (var notice in UpdateNotices.WithMail()) session.Mailbox.Skip(notice.MailId);
             return session;
         }
 

@@ -8,12 +8,15 @@ namespace WordRPG.Game
         public string Id { get; }
         public string Title { get; }
         public string Message { get; }
+        // 메일함에도 남길 때 그 메일 id (#286 사용자: 안내 창을 닫아도 메일함에서 다시 읽게). 비우면 창만. 세이브에 적히니 출시 뒤 바꾸지 말 것
+        public string MailId { get; }
 
-        public UpdateNotice(string id, string title, string message)
+        public UpdateNotice(string id, string title, string message, string mailId = null)
         {
             Id = id;
             Title = title;
             Message = message;
+            MailId = mailId;
         }
     }
 
@@ -33,7 +36,8 @@ namespace WordRPG.Game
         // 1.4: 처음 시작할 때 외울 단어장 고르기 (#273). 하던 모험은 수능·내신 그대로 (고르기는 새 게임에서 한 번 — 사용자 결정)
         public static readonly UpdateNotice Courses = new UpdateNotice("update_1_4_courses",
             "1.4 업데이트 안내", // 2026-11-21 사용자 문구 (#282)
-            "이제 처음 시작할 때 외울 단어장을 고를 수 있어요!\n수능·내신 · 비즈니스 · 의학 용어\n지금 하던 모험은 수능·내신 단어로 이어져요\n숲이 두 배로 넓어졌어요 — 뒤섞인 이정표를 바로잡아 보세요!");
+            "이제 처음 시작할 때 외울 단어장을 고를 수 있어요!\n수능·내신 · 비즈니스 · 의학 용어\n지금 하던 모험은 수능·내신 단어로 이어져요\n숲이 두 배로 넓어졌어요 — 뒤섞인 이정표를 바로잡아 보세요!",
+            "update_1_4"); // 메일함에도 (#286) — 메일 글은 이 제목·설명 그대로 (SampleDataBuilder.BuildUpdateMails)
 
         public static readonly IReadOnlyList<UpdateNotice> All = new[] { Cave, People, Courses };
 
@@ -54,6 +58,13 @@ namespace WordRPG.Game
         public void MarkAll()
         {
             foreach (var notice in All) seen.Add(notice.Id);
+        }
+
+        // 메일함에도 남기는 안내 (#286)
+        public static IEnumerable<UpdateNotice> WithMail()
+        {
+            foreach (var notice in All)
+                if (!string.IsNullOrEmpty(notice.MailId)) yield return notice;
         }
 
         // 아직 안 본 안내 중 가장 오래된 것 (없으면 null)

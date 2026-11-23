@@ -10,7 +10,9 @@ namespace WordRPG.Game
     public enum MailDelivery
     {
         ByEvent = 0,  // 다른 일이 보냄 (예: 크리스마스 선물 퀴즈를 마치면 개발자의 편지 — GiftEvent.Letter)
-        OnLaunch = 1  // 게임을 켜면 (fromDate ~ toDate 사이에만, 비우면 언제나) — 업데이트 편지·선물
+        OnLaunch = 1,  // 게임을 켜면 (fromDate ~ toDate 사이에만, 비우면 언제나) — 업데이트 편지·선물
+        // 업데이트 안내(UpdateNotice.MailId)를 본 세이브에만 = 업데이트한 사람 (#286 — 안내 창을 닫아도 메일함에 남게). 새 게임은 받지 않음
+        AfterUpdateNotice = 2
     }
 
     [CreateAssetMenu(fileName = "NewMail", menuName = "WordRPG/Mail", order = 31)]
@@ -153,6 +155,13 @@ namespace WordRPG.Game
             mails.Add(new MailState(mailId, localNow));
             return true;
         }
+
+        // 이 세이브엔 보내지 않을 메일: 지운 메일과 같이 기록만 남김 (#286 — 새 게임은 업데이트 안내 메일을 받지 않음)
+        public void Skip(string mailId)
+        {
+            if (!Deliver(mailId, default)) return;
+            Find(mailId).MarkDeleted();
+        }
     }
 
     // 메일함 규칙 (#275)
@@ -165,6 +174,17 @@ namespace WordRPG.Game
             int count = 0;
             foreach (var mail in mails)
                 if (mail != null && mail.IsDue(localNow) && session.Mailbox.Deliver(mail.MailId, localNow)) count++;
+            return count;
+        }
+
+        // 업데이트 안내를 본 세이브(= 업데이트한 사람)에 그 안내 메일 (#286). 새 게임은 시작할 때 Skip해 둬서 오지 않음.
+        // 필드를 열 때 — 타이틀에서 안내 창을 본 뒤 메일함에 들어와 있음. 반환 = 새로 받은 수
+        public static int DeliverUpdateNotes(GameSession session, DateTime localNow)
+        {
+            if (session == null) return 0;
+            int count = 0;
+            foreach (var notice in UpdateNotices.WithMail())
+                if (session.Notices.Has(notice.Id) && session.Mailbox.Deliver(notice.MailId, localNow)) count++;
             return count;
         }
 

@@ -148,7 +148,51 @@ namespace WordRPG.Tests
                     Assert.AreSame(line.Item, database.FindItem(line.Item.ItemId), $"{mail.MailId}: 선물 {line.Item.ItemId}가 GameDatabase에 없음");
                 if (mail.Delivery == MailDelivery.ByEvent)
                     Assert.IsTrue(database.SeasonalEvents.Any(e => e.Letter == mail), $"{mail.MailId}: 보내는 곳이 없는 메일 (OnLaunch로 하거나 선물 퀴즈 편지로)");
+                if (mail.Delivery == MailDelivery.AfterUpdateNotice)
+                {
+                    var notice = UpdateNotices.WithMail().FirstOrDefault(n => n.MailId == mail.MailId);
+                    Assert.IsNotNull(notice, $"{mail.MailId}: 이 메일을 단 업데이트 안내가 없음");
+                    Assert.AreEqual(notice.Title, mail.Title, $"{mail.MailId}: 안내 창과 같은 제목 (WordRPG > Data > Build Update Mails)");
+                    Assert.AreEqual(notice.Message, mail.Body, $"{mail.MailId}: 안내 창과 같은 글 (WordRPG > Data > Build Update Mails)");
+                }
             }
+            foreach (var notice in UpdateNotices.WithMail())
+                Assert.IsNotNull(database.FindMail(notice.MailId), $"{notice.Id}: 메일 {notice.MailId} 에셋 없음 (WordRPG > Data > Build Update Mails)");
+        }
+
+        // #286 사용자: 1.4 업데이트 안내가 처음엔 창으로 잘 나오는데 메일함에도 남았으면 — 업데이트한 사람(안내를 본 세이브)만, 새 게임은 받지 않음
+        [Test]
+        public void UpdateNoticeStaysInTheMailboxOnlyForPlayersWhoUpdated()
+        {
+            var notice = UpdateNotices.Courses;
+            Assert.AreEqual("update_1_4", notice.MailId);
+            var letter = Mail(notice.MailId, MailDelivery.AfterUpdateNotice);
+            var find = Finder(letter);
+
+            // 1.3 세이브 (안내도 메일함도 없음) → 1.4를 켬
+            var json = JsonUtility.ToJson(GameSession.NewGame(HeroData).ToSaveData(DateTime.UtcNow));
+            json = System.Text.RegularExpressions.Regex.Replace(json, "\"notices\":\\[[^\\]]*\\]", "\"notices\":[\"update_1_2_cave\",\"update_1_3_people\"]");
+            int at = json.IndexOf(",\"mailbox\"", StringComparison.Ordinal);
+            json = json.Remove(at, json.IndexOf("]}", at, StringComparison.Ordinal) + 2 - at);
+            var updated = GameSession.FromSaveData(JsonUtility.FromJson<SaveData>(json), null, HeroData);
+            Assert.AreEqual(0, Mails.DeliverUpdateNotes(updated, Today), "타이틀에서 안내를 보기 전엔 없음");
+            Assert.AreSame(notice, updated.Notices.NextUnseen());
+
+            updated.Notices.Mark(notice.Id); // 타이틀에서 안내 창
+            Assert.AreEqual(1, Mails.DeliverUpdateNotes(updated, Today), "필드에 들어오면 메일함에");
+            Assert.AreEqual(0, Mails.DeliverUpdateNotes(updated, Today), "한 번만");
+            Assert.AreEqual(notice.MailId, Mails.Visible(updated, find).Single().mail.MailId);
+            Assert.IsTrue(Mails.NeedsAttention(updated, find), "안 읽음 → 빨간 점");
+            Mails.Delete(updated, letter);
+            Assert.AreEqual(0, Mails.DeliverUpdateNotes(updated, Today), "지우면 다시 오지 않음");
+
+            // 새 게임: 안내도 메일도 없음 (세이브를 거쳐도)
+            var fresh = GameSession.NewGame(HeroData);
+            Assert.AreEqual(0, Mails.DeliverUpdateNotes(fresh, Today));
+            var reloaded = GameSession.FromSaveData(JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(fresh.ToSaveData(DateTime.UtcNow))), null, HeroData);
+            Assert.AreEqual(0, Mails.DeliverUpdateNotes(reloaded, Today));
+            Assert.IsEmpty(Mails.Visible(reloaded, find));
+            Assert.IsFalse(Mails.NeedsAttention(reloaded, find));
         }
     }
 }

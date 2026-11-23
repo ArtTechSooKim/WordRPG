@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1abbb729d4ef5b04a8d1980f9a943cc0, type: 3}
+  m_Name: update_1_4
+  m_EditorClassIdentifier: WordRPG::WordRPG.Game.MailData
+  mailId: update_1_4
+  sender: "\uAC1C\uBC1C\uC790"
+  subject: "1.4 \uC5C5\uB370\uC774\uD2B8 \uC548\uB0B4"
+  tag: "\uC5C5\uB370\uC774\uD2B8 \uC548\uB0B4"
+  title: "1.4 \uC5C5\uB370\uC774\uD2B8 \uC548\uB0B4"
+  art: 
+  body: "\uC774\uC81C \uCC98\uC74C \uC2DC\uC791\uD560 \uB54C \uC678\uC6B8 \uB2E8\uC5B4\uC7A5\uC744
+    \uACE0\uB97C \uC218 \uC788\uC5B4\uC694!\n\uC218\uB2A5\xB7\uB0B4\uC2E0 \xB7 \uBE44\uC988\uB2C8\uC2A4
+    \xB7 \uC758\uD559 \uC6A9\uC5B4\n\uC9C0\uAE08 \uD558\uB358 \uBAA8\uD5D8\uC740
+    \uC218\uB2A5\xB7\uB0B4\uC2E0 \uB2E8\uC5B4\uB85C \uC774\uC5B4\uC838\uC694\n\uC232\uC774
+    \uB450 \uBC30\uB85C \uB113\uC5B4\uC84C\uC5B4\uC694 \u2014 \uB4A4\uC11E\uC778
+    \uC774\uC815\uD45C\uB97C \uBC14\uB85C\uC7A1\uC544 \uBCF4\uC138\uC694!"
+  closing: 
+  sign: 
+  attachments: []
+  delivery: 2
+  fromDate: 
+  toDate: 

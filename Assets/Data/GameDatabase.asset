@@ -89,6 +89,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8abec4c7e30d71b44b2f70720ad895e8, type: 2}
   mails:
   - {fileID: 11400000, guid: 4e522d56cd6c13e4bb739f99fb9e0e99, type: 2}
+  - {fileID: 11400000, guid: f5b2246c37b165a41aa670939e5b2316, type: 2}
   fullVersionGift:
   - item: {fileID: 11400000, guid: d06f0e6a146e8d7419259d713eb87c86, type: 2}
     count: 3

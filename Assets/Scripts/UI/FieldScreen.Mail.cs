@@ -17,11 +17,12 @@ namespace WordRPG.UI
 
         private MailData FindMail(string mailId) => database != null ? database.FindMail(mailId) : null;
 
-        // 필드를 열 때 한 번: 업데이트 편지 같은 OnLaunch 메일
+        // 필드를 열 때 한 번: 업데이트 편지 같은 OnLaunch 메일 + 타이틀에서 본 업데이트 안내 (#286 — 창을 닫아도 메일함에 남게)
         private void DeliverMail()
         {
             if (database == null || session == null) return;
-            if (Mails.DeliverDue(session, database.Mails, LocalClock()) > 0) SaveNow();
+            int arrived = Mails.DeliverDue(session, database.Mails, LocalClock()) + Mails.DeliverUpdateNotes(session, LocalClock());
+            if (arrived > 0) SaveNow();
             RefreshMailDot();
         }
 

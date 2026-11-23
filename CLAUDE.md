@@ -60,7 +60,9 @@
      `FieldScreen.HeroSetup`, 1.0 세이브도). `Hero.Rename`(규칙 `HeroNames`: 한글·영어·숫자 8글자)·`SetLook`, 그림은 `PlayerArt.SetLook`.
      이름 뒤 조사는 꼭 `UiKit.WithJosa` (플레이어가 지은 이름이라 받침이 정해져 있지 않음)
    - 업데이트 안내 (#115): `UpdateNotices`(세이브 칸 notices) — 예전 세이브로 켠 사람(= 업데이트한 사람)만 타이틀에서 한 번 (`TitleScreen.ShowUpdateNotice`,
-     `ConfirmDialog.ShowNotice` [확인] 하나). 새 게임은 모두 본 것으로 시작, 튜토리얼과 따로. 다음 업데이트 안내는 `UpdateNotices.All` 맨 뒤에 새 id로 (지금 1.2 동굴 · 1.3 인물 #213 · 1.4 단어장 고르기 #273 — 이스터에그는 안내에 쓰지 않음)
+     `ConfirmDialog.ShowNotice` [확인] 하나). 새 게임은 모두 본 것으로 시작, 튜토리얼과 따로. 다음 업데이트 안내는 `UpdateNotices.All` 맨 뒤에 새 id로 (지금 1.2 동굴 · 1.3 인물 #213 · 1.4 단어장 고르기 #273 — 이스터에그는 안내에 쓰지 않음).
+     메일함에도 남기려면 안내에 `mailId`(#286 — 1.4 = update_1_4, 출시 뒤 바꾸지 말 것) → `WordRPG > Data > Build Update Mails`가 같은 글로 메일 에셋(`MailDelivery.AfterUpdateNotice`)을 만듦 →
+     안내를 본 세이브만 필드에서 받음(`Mails.DeliverUpdateNotes`), 새 게임은 `Mailbox.Skip`으로 받지 않음 (MailTests가 글이 같은지 검사)
    - 말을 잃어 가는 사람들 = NPC (#209, GDD 9-10): 맵 글자 N(바닥)·n(잔디) = 서는 자리 (칸 종류는 바닥·잔디, `FieldMap.NpcSpots`), FieldArea `npcs`를 맵 순서로. 데이터 `NpcData`(npcId, 출시 뒤 바꾸지 말 것) + 단계 `NpcStage`(조건 = 보스 처치·찾은 단어 수 → 말·움직임·빠르기 `pace` #211 — 1 = 보통, 성격에 맞게), 규칙 `NpcLines`·`NpcMotion`(순수), 화면 `FieldNpcs`·`FieldScreen.Npcs`. 세이브 칸 없음.
      그림 Art/NinjaAdventure/Npcs/{npcId}.png (import_ninja_art.py NPC_SHEETS). 대사는 말풍선 한두 줄, 목표·보상·빨간 점 없음 (사용자). 데이터 기준 = `SampleDataBuilder.BuildNpcs`.
      인물 컷씬 (#234 숲 나무꾼): NpcData `entryLines`(그 지역에 처음 들어오면 달려와 알려 줌) · `bossThanksLines`·`exitCallLines`·`exitStoryLines`(보스 뒤 보스가 연 길 옆에서 배웅 — 주인공이 한 칸 뒤따라 같이 걸어감 `WalkTogether` #245) → `FieldScreen.Cutscenes`, 한 번만 = WorldState 이벤트. 대사를 기다리는 코루틴은 `WaitLine`(시간이 다 되거나 [확인]으로 다음 줄 #245 사용자 — 부르는 쪽은 그동안 `transitioning`을 켜서 [확인]이 옆 물건을 누르지 않게 #251)
