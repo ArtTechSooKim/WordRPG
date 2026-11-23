@@ -15,6 +15,7 @@ namespace WordRPG.UI
         private const string StripPath = "Art/NinjaAdventure/Ui/bubble";
         private const string ExclaimPath = "Art/NinjaAdventure/Ui/bubble_exclaim";
         private const float PixelSize = 100f / 16f; // UI 한 칸(도트 1px) = 6.25 — 필드 타일과 같은 비율
+        private const int MainSize = 72, MainMinSize = 36; // 새 단어 영어 글자 크기 (한 줄로 줄일 수 있는 데까지)
         public const float MaxWidth = 700f;         // 넘으면 줄을 바꿈 (#231 — 예전 920은 화면 너비만 한 띠가 되었음)
         private const float TailHeight = 3 * PixelSize;
         private const float TailHalfWidth = 3 * PixelSize;
@@ -90,8 +91,7 @@ namespace WordRPG.UI
                 bodyImage.type = Image.Type.Sliced;
             }
             bubble.head = UiKit.Display(UiKit.OneLine(UiKit.Label("Head", bubble.body, "", 38, HeadColor, 0, 1, 1, 1)));
-            bubble.main = UiKit.Display(UiKit.OneLine(UiKit.Label("Main", bubble.body, "", 72, MainColor, 0, 1, 1, 1, TextAnchor.MiddleCenter,
-                FontStyle.Normal, true, 36)));
+            bubble.main = UiKit.Display(UiKit.OneLine(UiKit.Label("Main", bubble.body, "", MainSize, MainColor, 0, 1, 1, 1, TextAnchor.MiddleCenter)));
             bubble.sub = UiKit.OneLine(UiKit.Label("Sub", bubble.body, "", 36, SubColor, 0, 1, 1, 1)); // 줄 높이가 커서 잘리지 않게
             bubble.foot = UiKit.OneLine(UiKit.Label("Foot", bubble.body, "", 26, FootColor, 0, 1, 1, 1));
 
@@ -140,9 +140,19 @@ namespace WordRPG.UI
         private void ShowText(string headline, string mainText, string subText, string footnote, float seconds)
         {
             const float padX = 44f, padTop = 30f, padBottom = 30f, gap = 2f, inset = padX - 8f;
+            // 새 단어(가운데 큰 글): 몸통 최대 너비에 한 줄로 들어가는 가장 큰 크기 — 가장 작게도 안 들어가면 그 크기로 줄을 바꾸고 칸도 그만큼 높게
+            // (#287: bestFit이 긴 의학 용어를 세 줄로 꺾어 아래 뜻 위로 넘쳤음)
+            bool mainWraps = false;
+            if (!string.IsNullOrEmpty(mainText))
+            {
+                int size = OneLineFit.LargestOneLine(main, mainText, new Vector2(MaxWidth - inset * 2f, 1000f), MainSize, MainMinSize);
+                mainWraps = size == 0;
+                main.fontSize = mainWraps ? MainMinSize : size;
+                main.horizontalOverflow = mainWraps ? HorizontalWrapMode.Wrap : HorizontalWrapMode.Overflow;
+            }
             var lines = new (Text label, string text, float height)[]
             {
-                (head, headline, 50f), (main, mainText, 86f), (sub, subText, 0f), (foot, footnote, 0f),
+                (head, headline, 50f), (main, mainText, mainWraps ? 0f : 86f), (sub, subText, 0f), (foot, footnote, 0f),
             };
             float width = 0f;
             foreach (var (label, text, _) in lines)

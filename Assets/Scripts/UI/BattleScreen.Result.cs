@@ -344,11 +344,13 @@ namespace WordRPG.UI
             {
                 var row = UiKit.Rect($"Word_{i}", card, 0, 1, 1, 1);
                 PinTop(row, 28, rowY, 28, 56);
+                // 한 줄 칸이라 두 줄이 되면 아래 줄과 겹침 → 한 줄로, 가장 작게도 넘치면 끝을 '...' (#287 의학 용어 — 전체는 도감에)
                 var english = UiKit.Display(UiKit.OneLine(UiKit.Label("English", row, list[i].English, 46, Palette.Text, 0, 0, 0.38f, 1,
                     TextAnchor.MiddleLeft, FontStyle.Normal, true, 26)));
                 english.rectTransform.offsetMax = new Vector2(-12, 0);
-                UiKit.OneLine(UiKit.Label("Meaning", row, list[i].Meaning, 36, Palette.TextDim, 0.38f, 0, 1, 1, TextAnchor.MiddleLeft,
-                    FontStyle.Normal, true, 22));
+                OneLineFit.Apply(english, -1, OneLineFit.WhenTooLong.Ellipsis);
+                OneLineFit.Apply(UiKit.OneLine(UiKit.Label("Meaning", row, list[i].Meaning, 36, Palette.TextDim, 0.38f, 0, 1, 1, TextAnchor.MiddleLeft,
+                    FontStyle.Normal, true, 22)), -1, OneLineFit.WhenTooLong.Ellipsis);
                 resultDynamic.Add(row.gameObject);
                 rowY += 60f;
             }

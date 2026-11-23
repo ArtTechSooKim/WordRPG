@@ -98,8 +98,8 @@ namespace WordRPG.UI
 
             // 영단어 (이미 본 단어)
             UiKit.OneLine(UiKit.Label("Ask", view.rootRect, "이 단어의 뜻은?", 32, Palette.TextDim, 0.04f, 0.45f, 0.96f, 0.474f));
-            view.word = Outlined(UiKit.Display(UiKit.Label("Word", view.rootRect, "", 132, Palette.Text, 0.04f, 0.36f, 0.96f, 0.447f,
-                TextAnchor.MiddleCenter, FontStyle.Normal, true, 56)));
+            view.word = OneLineFit.Apply(Outlined(UiKit.Display(UiKit.Label("Word", view.rootRect, "", 132, Palette.Text, 0.04f, 0.36f, 0.96f, 0.447f,
+                TextAnchor.MiddleCenter, FontStyle.Normal, true, 56)))); // 한 줄에 들어가면 한 줄로 (#287)
             view.wordRect = view.word.rectTransform;
 
             // 2×2 선택지 (Figma 'Answer Choice', 엄지가 닿는 아래쪽)
@@ -110,6 +110,7 @@ namespace WordRPG.UI
                 var button = UiKit.MakeButton($"PreemptChoice_{i}", view.rootRect, "", Palette.Button, 42, minX, maxY - 0.107f, minX + 0.456f, maxY,
                     bestFit: true);
                 UiKit.LabelOf(button).font = UiFonts.Bold;
+                OneLineFit.Apply(UiKit.LabelOf(button), OneLineFit.ReadableMin(42));
                 var colors = button.colors;
                 colors.disabledColor = Color.white; // 정답/오답 색이 흐려지지 않게
                 button.colors = colors;

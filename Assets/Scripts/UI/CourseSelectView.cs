@@ -21,7 +21,10 @@ namespace WordRPG.UI
         private readonly List<Image> cardEdges = new List<Image>();
         private readonly List<Text> cardTitles = new List<Text>();
         private RectTransform cards;
+        private ChipRowFit chipFit;
         private Action<WordCourse> chosen;
+
+        private const int ChipFontSize = 26, ChipMinFontSize = 18, ChipPadding = 22, ChipSpacing = 12;
 
         public static CourseSelectView Create(Transform parent)
         {
@@ -84,6 +87,8 @@ namespace WordRPG.UI
             foreach (Transform child in cards) UnityEngine.Object.Destroy(child.gameObject);
             cardEdges.Clear();
             cardTitles.Clear();
+            chipFit = ChipRowFit.On(cards.gameObject, ChipFontSize, ChipMinFontSize);
+            chipFit.Clear();
             // Figma: 카드 높이 260 · 사이 28 (단어장이 3개일 때 카드 영역을 꽉 채움)
             int count = Mathf.Max(3, courses.Count);
             float slot = 1f / count, gap = 0.03f;
@@ -113,14 +118,16 @@ namespace WordRPG.UI
                 string id = course.CourseId;
                 card.onClick.AddListener(() => Select(id));
             }
+            chipFit.Refit(true);
         }
 
-        // 예시 단어 칩 3개: 'invoice · 청구서' — 글자 길이만큼 (가로 레이아웃)
-        private static void BuildSampleWords(Transform card, WordCourse course, IReadOnlyList<WordDatabase> baseBooks)
+        // 예시 단어 칩 3개: 'invoice · 청구서' — 글자 길이만큼 (가로 레이아웃). 줄을 바꾸지 않고, 넘치면 모든 카드의 칩 글자를 같이 줄임 (#287)
+        private void BuildSampleWords(Transform card, WordCourse course, IReadOnlyList<WordDatabase> baseBooks)
         {
             var row = UiKit.Rect("SampleWords", card, 0.042f, 0.12f, 0.958f, 0.33f);
+            chipFit.AddRow(row, ChipSpacing);
             var layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
-            layout.spacing = 12;
+            layout.spacing = ChipSpacing;
             layout.childAlignment = TextAnchor.MiddleLeft;
             layout.childControlWidth = layout.childControlHeight = true;
             layout.childForceExpandWidth = false;
@@ -132,14 +139,19 @@ namespace WordRPG.UI
                 var chip = UiKit.Pill(UiKit.Panel($"Word_{wordId}", row, Palette.Panel));
                 chip.raycastTarget = false;
                 var inner = chip.gameObject.AddComponent<HorizontalLayoutGroup>();
-                inner.padding = new RectOffset(22, 22, 4, 4);
+                inner.padding = new RectOffset(ChipPadding, ChipPadding, 4, 4);
                 inner.childAlignment = TextAnchor.MiddleCenter;
                 inner.childControlWidth = inner.childControlHeight = true;
                 inner.childForceExpandWidth = false;
-                UiKit.OneLine(UiKit.Label("Text", chip.transform, $"{word.English} · {FirstMeaning(word.Meaning)}", 26, Palette.Text,
+                var text = UiKit.OneLine(UiKit.Label("Text", chip.transform, $"{word.English} · {FirstMeaning(word.Meaning)}", ChipFontSize, Palette.Text,
                     0, 0, 1, 1, TextAnchor.MiddleCenter, FontStyle.Bold));
+                chipFit.AddChip(text, ChipPadding * 2);
             }
         }
+
+        // 예시 단어 칩들이 모두 한 줄 안에 들어가 있는지 · 지금 칩 글자 크기 (테스트용)
+        public bool SampleWordsFit => chipFit != null && chipFit.EveryRowFits();
+        public int SampleWordFontSize => chipFit != null ? chipFit.FontSize : ChipFontSize;
 
         // 뜻이 여럿이면 첫 뜻만 ("이익, 혜택" → "이익")
         public static string FirstMeaning(string meaning)

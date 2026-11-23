@@ -63,12 +63,13 @@ namespace WordRPG.UI
 
             var stone = UiKit.RoundPanel("Stone", slab.transform, StoneDark, UiKit.RadiusMd, 0.043f, 0.156f, 0.957f, 0.79f);
             stone.raycastTarget = false;
-            view.word = UiKit.Display(UiKit.Label("Word", stone.transform, "", 104, FaintWord, 0.04f, 0.45f, 0.96f, 0.95f,
-                TextAnchor.MiddleCenter, FontStyle.Normal, true, 48));
+            // 단어·뜻·보기: 한 줄에 들어가면 한 줄로 (#287)
+            view.word = OneLineFit.Apply(UiKit.Display(UiKit.Label("Word", stone.transform, "", 104, FaintWord, 0.04f, 0.45f, 0.96f, 0.95f,
+                TextAnchor.MiddleCenter, FontStyle.Normal, true, 48)));
             view.glow = view.word.gameObject.AddComponent<Outline>(); // 글자 둘레 청록 빛
             view.glow.effectDistance = new Vector2(4f, -4f);
-            view.meaning = UiKit.Display(UiKit.Label("Meaning", stone.transform, "", 60, Palette.Gold, 0.04f, 0.27f, 0.96f, 0.48f,
-                TextAnchor.MiddleCenter, FontStyle.Normal, true, 32));
+            view.meaning = OneLineFit.Apply(UiKit.Display(UiKit.Label("Meaning", stone.transform, "", 60, Palette.Gold, 0.04f, 0.27f, 0.96f, 0.48f,
+                TextAnchor.MiddleCenter, FontStyle.Normal, true, 32)));
             view.ask = UiKit.OneLine(UiKit.Label("Ask", stone.transform, "", 32, Palette.TextDim, 0.04f, 0.06f, 0.96f, 0.25f,
                 TextAnchor.MiddleCenter, FontStyle.Bold));
             view.note = UiKit.OneLine(UiKit.Label("Note", slab.transform, "", 26, Palette.TextDim, 0.043f, 0.03f, 0.957f, 0.12f,
@@ -81,6 +82,7 @@ namespace WordRPG.UI
                 float minX = i % 2 == 0 ? 0.065f : 0.509f, maxY = i < 2 ? 0.245f : 0.156f;
                 var button = UiKit.MakeButton($"StoneChoice_{i}", rect, "", Palette.Button, 40, minX, maxY - 0.078f, minX + 0.426f, maxY, bestFit: true);
                 UiKit.LabelOf(button).font = UiFonts.Bold;
+                OneLineFit.Apply(UiKit.LabelOf(button), OneLineFit.ReadableMin(40));
                 var colors = button.colors;
                 colors.disabledColor = Color.white;
                 button.colors = colors;

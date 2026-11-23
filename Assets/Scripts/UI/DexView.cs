@@ -198,6 +198,7 @@ namespace WordRPG.UI
                 discovered ? Palette.Text : Palette.TextDim, 0.13f, 0, wrong ? 0.5f : 0.66f, 1, TextAnchor.MiddleLeft,
                 discovered ? FontStyle.Bold : FontStyle.Normal, true, 22);
             if (!discovered) UiKit.Display(name);
+            OneLineFit.Apply(name); // 긴 의학 용어도 한 줄에 들어가면 한 줄로 (#287)
             // 오답 노트에 있는 단어: 빨간 '오답' 알약 (맞히면 사라짐, #48)
             if (wrong)
             {

@@ -128,6 +128,7 @@ namespace WordRPG.UI
                 int index = i;
                 var button = UiKit.MakeButton($"SkullChoice_{i}", view.room.transform, "", Palette.Button, 40, 0.065f, 0.4f, 0.935f, 0.45f, bestFit: true);
                 UiKit.LabelOf(button).font = UiFonts.Bold;
+                OneLineFit.Apply(UiKit.LabelOf(button), OneLineFit.ReadableMin(40)); // 한 줄에 들어가면 한 줄로 (#287)
                 var colors = button.colors;
                 colors.disabledColor = Color.white; // 정답·오답·꺼짐 색이 흐려지지 않게
                 button.colors = colors;

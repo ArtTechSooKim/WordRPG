@@ -182,8 +182,8 @@ namespace WordRPG.UI
         private void BuildQuizPanel(Transform parent)
         {
             quizPanel = UiKit.Stretch("QuizPanel", parent).gameObject;
-            quizPrompt = UiKit.Display(UiKit.Label("Prompt", quizPanel.transform, "", 84, Palette.Text, 0, 0.8f, 1, 1,
-                TextAnchor.MiddleCenter, FontStyle.Normal, true, 30));
+            quizPrompt = OneLineFit.Apply(UiKit.Display(UiKit.Label("Prompt", quizPanel.transform, "", 84, Palette.Text, 0, 0.8f, 1, 1,
+                TextAnchor.MiddleCenter, FontStyle.Normal, true, 30))); // 한 줄에 들어가면 한 줄로 (#287)
             quizHint = UiKit.OneLine(UiKit.Label("Hint", quizPanel.transform, "", 30, Palette.TextDim, 0, 0.735f, 1, 0.8f)); // 줄 높이 때문에 잘리지 않게
 
             var timerBack = UiKit.Pill(UiKit.Panel("TimerBack", quizPanel.transform, Palette.Track,
@@ -224,6 +224,7 @@ namespace WordRPG.UI
                 var button = UiKit.MakeButton($"Choice_{i}", quizPanel.transform, "", Palette.Button, 40,
                     0, top - 0.16f, 1, top, bestFit: true);
                 UiKit.LabelOf(button).font = UiFonts.Bold; // 보기는 읽기 쉬운 본문 글꼴 (Figma Body/Large Bold)
+                OneLineFit.Apply(UiKit.LabelOf(button), OneLineFit.ReadableMin(40)); // 'computed' / 'tomo/graphy'처럼 꺾이지 않게 (#287)
                 var choiceColors = button.colors;
                 choiceColors.disabledColor = Color.white; // 정답/오답 색이 흐려지지 않게
                 button.colors = choiceColors;
@@ -248,10 +249,10 @@ namespace WordRPG.UI
             cardBorder.raycastTarget = false;
             cardTitle = UiKit.Display(UiKit.Label("Title", cardPanel.transform, "", 44, Palette.Gold, 0, 0.8f, 1, 0.97f,
                 TextAnchor.MiddleCenter, FontStyle.Normal, true, 24));
-            cardWord = UiKit.Display(UiKit.Label("Word", cardPanel.transform, "", 92, Palette.Text, 0.03f, 0.56f, 0.97f, 0.8f,
-                TextAnchor.MiddleCenter, FontStyle.Normal, true, 36));
-            cardMeaning = UiKit.Display(UiKit.Label("Meaning", cardPanel.transform, "", 56, Palette.Gold, 0.03f, 0.38f, 0.97f, 0.57f,
-                TextAnchor.MiddleCenter, FontStyle.Normal, true, 26));
+            cardWord = OneLineFit.Apply(UiKit.Display(UiKit.Label("Word", cardPanel.transform, "", 92, Palette.Text, 0.03f, 0.56f, 0.97f, 0.8f,
+                TextAnchor.MiddleCenter, FontStyle.Normal, true, 36)));
+            cardMeaning = OneLineFit.Apply(UiKit.Display(UiKit.Label("Meaning", cardPanel.transform, "", 56, Palette.Gold, 0.03f, 0.38f, 0.97f, 0.57f,
+                TextAnchor.MiddleCenter, FontStyle.Normal, true, 26)));
             cardExtra = UiKit.Label("Extra", cardPanel.transform, "", 30, Palette.TextDim, 0.05f, 0.2f, 0.95f, 0.38f,
                 TextAnchor.UpperCenter, FontStyle.Normal, true, 20);
             cardConfirm = UiKit.MakeButton("CardConfirmButton", cardPanel.transform, "확인", Palette.Gold, 44,

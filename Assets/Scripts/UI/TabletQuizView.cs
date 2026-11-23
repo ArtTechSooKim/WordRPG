@@ -74,10 +74,11 @@ namespace WordRPG.UI
 
             var carved = UiKit.RoundPanel("Carved", slab.transform, StoneDark, UiKit.RadiusMd, 0.043f, 0.13f, 0.957f, 0.775f);
             carved.raycastTarget = false;
-            view.meaning = Outlined(UiKit.Display(UiKit.Label("Meaning", carved.transform, "", 100, Palette.Text, 0.04f, 0.5f, 0.96f, 0.95f,
-                TextAnchor.MiddleCenter, FontStyle.Normal, true, 48)));
-            view.blank = UiKit.Display(UiKit.Label("Blank", carved.transform, "", 68, Palette.Gold, 0.04f, 0.27f, 0.96f, 0.52f,
-                TextAnchor.MiddleCenter, FontStyle.Normal, true, 36));
+            // 뜻·빈칸·보기: 한 줄에 들어가면 한 줄로 (#287 — '~하기로 되어 있는,' / '~ 때문인'처럼 꺾이지 않게)
+            view.meaning = OneLineFit.Apply(Outlined(UiKit.Display(UiKit.Label("Meaning", carved.transform, "", 100, Palette.Text, 0.04f, 0.5f, 0.96f, 0.95f,
+                TextAnchor.MiddleCenter, FontStyle.Normal, true, 48))));
+            view.blank = OneLineFit.Apply(UiKit.Display(UiKit.Label("Blank", carved.transform, "", 68, Palette.Gold, 0.04f, 0.27f, 0.96f, 0.52f,
+                TextAnchor.MiddleCenter, FontStyle.Normal, true, 36)));
             view.ask = UiKit.OneLine(UiKit.Label("Ask", carved.transform, "빈칸에 들어갈 영단어는?", 32, Palette.TextDim, 0.04f, 0.06f, 0.96f, 0.25f,
                 TextAnchor.MiddleCenter, FontStyle.Bold));
             view.note = UiKit.OneLine(UiKit.Label("Note", slab.transform, "", 26, Palette.TextDim, 0.043f, 0.02f, 0.957f, 0.11f,
@@ -96,6 +97,7 @@ namespace WordRPG.UI
                 float minX = i % 2 == 0 ? 0.065f : 0.509f, maxY = i < 2 ? 0.245f : 0.156f;
                 var button = UiKit.MakeButton($"TabletChoice_{i}", rect, "", Palette.Button, 42, minX, maxY - 0.078f, minX + 0.426f, maxY, bestFit: true);
                 UiKit.LabelOf(button).font = UiFonts.Bold;
+                OneLineFit.Apply(UiKit.LabelOf(button), OneLineFit.ReadableMin(42));
                 var colors = button.colors;
                 colors.disabledColor = Color.white; // 정답·오답·꺼짐 색이 흐려지지 않게
                 button.colors = colors;

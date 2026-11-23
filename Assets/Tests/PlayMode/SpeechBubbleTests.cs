@@ -181,5 +181,35 @@ namespace WordRPG.Tests
             Lay();
             Assert.IsFalse(bubble.IsVisible);
         }
+
+        // #287: 사전의 새 단어(가운데 큰 영어)는 한 줄에 들어가면 글자를 줄여 한 줄 · 가장 작게도 안 들어가면 줄을 바꾸고 칸도 그만큼 높게
+        // (예전: bestFit이 긴 의학 용어를 세 줄로 꺾어 아래 뜻 위로 넘쳤음)
+        [UnityTest]
+        public IEnumerator NewWordStaysOnOneLineOrGetsRoomForMoreLines()
+        {
+            Text Child(string name) => System.Array.Find(bubble.Root.GetComponentsInChildren<Text>(true), t => t.name == name);
+            bubble.ShowWord("새로운 단어를 발견했다!", "trans/urethral prostat/ectomy", "경요도 전립샘절제술", "도감에 등록됐어요", 5f);
+            Lay();
+            yield return null;
+            Canvas.ForceUpdateCanvases();
+            var main = Child("Main");
+            Assert.AreEqual(HorizontalWrapMode.Overflow, main.horizontalOverflow, "한 줄로");
+            Assert.Less(main.fontSize, 72, "줄여서");
+            Assert.LessOrEqual(main.preferredWidth, main.rectTransform.rect.width + 1f, "칸 안에");
+
+            bubble.ShowWord("새로운 단어를 발견했다!", "Submandibular gland (submaxillary gland, Wharton's duct)", "하악선(턱밑샘, 와튼관)", "도감에 등록됐어요", 5f);
+            Lay();
+            yield return null;
+            Canvas.ForceUpdateCanvases();
+            Assert.AreEqual(HorizontalWrapMode.Wrap, main.horizontalOverflow, "가장 작게도 안 들어가면 줄을 바꿈");
+            Assert.LessOrEqual(main.preferredHeight, main.rectTransform.rect.height + 1f, "바꾼 줄만큼 칸이 높음");
+            var sub = Child("Sub").rectTransform;
+            Assert.LessOrEqual(sub.offsetMax.y, main.rectTransform.offsetMin.y + 0.5f, "뜻은 영어 아래 — 겹치지 않음");
+
+            bubble.ShowWord("새로운 단어를 발견했다!", "due", "~하기로 되어 있는, ~ 때문인", "", 5f);
+            Lay();
+            yield return null;
+            Assert.AreEqual(72, main.fontSize, "짧은 단어는 원래 크기");
+        }
     }
 }
