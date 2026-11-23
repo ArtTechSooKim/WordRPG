@@ -44,7 +44,7 @@ namespace WordRPG.UI
             foreach (var book in books)
             foreach (var word in book)
                 realWords.Add(word.English.ToLowerInvariant());
-            signpostQuiz = new SignpostQuiz(new TrainingQuizProvider(books, session.Vocabulary, battle.MasteryRules, TrainingMode.All, rng), rng, realWords);
+            signpostQuiz = new SignpostQuiz(PuzzleWords(books), rng, realWords); // 이정표마다 다른 단어 (#290)
             signpostCell = cell;
             signpostFixedNow = false;
             signpostView.Show(signpostQuiz.Current, Signposts.FixedCount(area, session.World), Signposts.All(area).Count, PickSignpost, CloseSignpost);

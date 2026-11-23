@@ -111,7 +111,7 @@ namespace WordRPG.UI
                 return;
             }
             if (moving) SnapPlayer();
-            tabletQuiz = new TabletQuiz(new TrainingQuizProvider(books, session.Vocabulary, battle.MasteryRules, TrainingMode.All, rng));
+            tabletQuiz = new TabletQuiz(PuzzleWords(books)); // 석판끼리도 같은 단어가 겹치지 않게 (#290)
             tabletCell = cell;
             tabletFilled.Clear();
             tabletBusy = false;

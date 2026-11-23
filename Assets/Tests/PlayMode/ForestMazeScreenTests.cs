@@ -114,6 +114,34 @@ namespace WordRPG.Tests
             yield return null;
         }
 
+        // #290 사용자: 이정표에 같은 단어가 또 나옴 → 본 단어를 한 바퀴 다 낼 때까지 겹치지 않음 (닫았다 다시 열어도)
+        [UnityTest]
+        public IEnumerator EverySignpostVisitAsksADifferentWord()
+        {
+            var area = Area();
+            var session = Session(area); // 본 단어 6개 — 모두 철자 문제로 낼 수 있음
+            var field = Field(area, session);
+            yield return null;
+            yield return HoldStick(field, Direction.Up, () => field.PlayerCell.y >= 3);
+            yield return HoldStick(field, Direction.Left, () => field.PlayerCell.x <= 5, 2f);
+            var asked = new List<string>();
+            for (int visit = 0; visit < 6; visit++)
+            {
+                yield return FaceStick(field, Direction.Down);
+                yield return PressConfirm(field);
+                yield return WaitFor(() => field.SignpostView.IsOpen, 2f);
+                Assert.IsTrue(field.SignpostView.IsOpen, $"{visit + 1}번째 이정표 문제 창");
+                asked.Add(field.SignpostQuestion.Word.Id);
+                ActiveButton(field.transform, "SignpostClose").onClick.Invoke();
+                yield return null;
+                Assert.IsFalse(field.SignpostView.IsOpen);
+                yield return new WaitForSecondsRealtime(0.6f); // 닫은 뒤 [확인] 쉬는 시간
+            }
+            CollectionAssert.AllItemsAreUnique(asked, "본 단어 6개를 다 낼 때까지 같은 단어가 또 나오지 않음: " + string.Join(", ", asked));
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator SignpostNeedsWordsYouHaveSeen()
         {

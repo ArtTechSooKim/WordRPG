@@ -105,8 +105,7 @@ namespace WordRPG.UI
                 return;
             }
             if (moving) SnapPlayer();
-            stoneQuiz = new TabletQuiz(new TrainingQuizProvider(books, session.Vocabulary, battle.MasteryRules, TrainingMode.All, rng),
-                1, QuizDirection.EnglishToMeaning);
+            stoneQuiz = new TabletQuiz(PuzzleWords(books), 1, QuizDirection.EnglishToMeaning); // 반딧돌끼리도 다른 단어 (#290)
             stoneCell = cell;
             stoneLitNow = false;
             stoneView.Show(stoneQuiz.Current, GlowStones.LitCount(area, session.World), GlowStones.Stones(area).Count, PickStone, CloseStone);

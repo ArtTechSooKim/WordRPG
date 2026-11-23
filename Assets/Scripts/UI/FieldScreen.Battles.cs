@@ -364,6 +364,26 @@ namespace WordRPG.UI
             return books;
         }
 
+        // 필드 문제(이정표·석판·반딧돌)가 같이 쓰는 '이미 본 단어 한 바퀴' (#290 사용자: 이정표에 같은 단어가 또 나옴).
+        // 문제를 열 때마다 새로 만들면 바퀴가 처음부터라 다른 이정표·석판에 같은 단어가 또 나왔음 → 본 단어를 한 바퀴 다 낼 때까지 겹치지 않게.
+        // 문제를 낼 단어장(Preemptive.QuizBooks — 지역이 바뀌면 달라짐)이나 세션이 바뀔 때만 새로 (앱을 다시 켜면 처음부터, 세이브 칸 없음)
+        private TrainingQuizProvider puzzleWords;
+        private List<IReadOnlyList<WordEntry>> puzzleBooks;
+        private VocabularyProgress puzzleVocabulary;
+
+        private TrainingQuizProvider PuzzleWords(List<IReadOnlyList<WordEntry>> books)
+        {
+            bool same = puzzleWords != null && puzzleVocabulary == session.Vocabulary && puzzleBooks.Count == books.Count;
+            for (int i = 0; same && i < books.Count; i++) same = ReferenceEquals(puzzleBooks[i], books[i]);
+            if (!same)
+            {
+                puzzleWords = new TrainingQuizProvider(books, session.Vocabulary, battle.MasteryRules, TrainingMode.All, rng);
+                puzzleBooks = books;
+                puzzleVocabulary = session.Vocabulary;
+            }
+            return puzzleWords;
+        }
+
         private MonsterSpecies TrainingDummy()
         {
             if (database == null) return null;
