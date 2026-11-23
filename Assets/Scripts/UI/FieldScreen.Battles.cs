@@ -141,6 +141,7 @@ namespace WordRPG.UI
             string afterLine = bossArea.Boss.AfterLine; // 되찾은 것 + 다음 단서 한 줄 (#207)
             if (afterLine.Length > 0 && area == bossArea)
             {
+                bossAfterLineSaidIn = area.AreaId; // 곧바로 보석에 부딪혀도 다시 안 나옴 (#288)
                 transitioning = true;
                 bubble.Say(afterLine, BossAfterLineSeconds);
                 yield return WaitLine(BossAfterLineSeconds);

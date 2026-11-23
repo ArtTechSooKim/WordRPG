@@ -116,7 +116,7 @@ namespace WordRPG.Tests
             yield return null;
         }
 
-        // 보스 대사 (#207): 전투 기록 칸에 보스·주인공 한 줄씩, 이긴 뒤 머리 위에 글, 다시 찾아가도 그 글
+        // 보스 대사 (#207): 전투 기록 칸에 보스·주인공 한 줄씩, 이긴 뒤 머리 위에 글 (다시 찾아가면 그 글 — #288부터 지역에 들어와 한 번)
         [UnityTest]
         public IEnumerator BossSpeaksAndLeavesALineToReadAgain()
         {
@@ -145,13 +145,13 @@ namespace WordRPG.Tests
             yield return WaitFor(() => field.Bubble.ShowsText);
             StringAssert.Contains("책 속의 글자가 돌아왔다", field.Bubble.Text, "이긴 뒤 머리 위에");
 
-            // 보스 자리의 보석에 부딪히면 다시 나옴 (전에 이긴 사람도 읽을 수 있음 — #251부터 밟을 수 없어서)
+            // 이긴 직후 보석에 부딪혀도 또 나오지 않음 (#288 사용자: 여운 글이 너무 잦음 — 지역에 들어와 한 번,
+            // 다른 지역에 다녀오면 다시: BossAfterLineShowsOncePerVisit)
             yield return new WaitForSecondsRealtime(0.5f);
             field.Bubble.Hide();
             yield return HoldStick(field, Direction.Up, () => field.Bubble.ShowsText, 1f);
             Assert.AreEqual(new Vector2Int(2, 1), field.PlayerCell, "보석은 막힘");
-            Assert.IsTrue(field.Bubble.ShowsText, "부딪히면 글이 보임");
-            StringAssert.Contains("책 속의 글자가 돌아왔다", field.Bubble.Text);
+            Assert.IsFalse(field.Bubble.ShowsText, "이긴 뒤 이미 본 글은 이번 방문에선 다시 안 나옴");
 
             Object.Destroy(field.gameObject);
             yield return null;
@@ -559,6 +559,59 @@ namespace WordRPG.Tests
             Assert.AreEqual(0, session.Inventory.GetCount(ink), "재료는 안 받음");
             Assert.IsFalse(session.Hero.Owns(crown), "보스 성유물은 다시 안 줌");
             StringAssert.Contains("다시 물리쳤다", field.ToastMessage);
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
+        // #288 사용자: 보석에 부딪힐 때마다 승리 뒤 글(여운)이 나와서 너무 잦음 → 그 지역에 들어와 한 번만, 다른 지역에 다녀오면 다시
+        [UnityTest]
+        public IEnumerator BossAfterLineShowsOncePerVisit()
+        {
+            const string After = "책 속의 글자가 돌아왔다.";
+            var hero = Hero();
+            var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
+            var king = TestData.Species("king", new MonsterStats(40, 1, 50), new MonsterStats(0, 0, 0), bite).Set("displayName", "까먹대왕");
+            //   y=2 #.B.#  ← 보석 (2,2)
+            //   y=1 #.P.#
+            //   y=0 ##D##  ← 바깥으로 (2,0)
+            var lair = Area("lair", "보스 방", "#####\n#.B.#\n#.P.#\n##D##", hero).Set("boss", new BossEncounter(king, 3).Set("afterLine", After));
+            var outside = Area("outside", "바깥 들판", OutsideMap, hero);
+            lair.Set("exits", new List<AreaExit> { new AreaExit(outside, 0) });
+            outside.Set("exits", new List<AreaExit> { new AreaExit(lair, 0) });
+            var session = GameSession.NewGame(Player(), 1);
+            session.World.MarkBossDefeated(lair.BossId);
+            var field = CreateField(lair, session);
+            yield return null;
+            yield return null;
+
+            // 처음 부딪히면 여운
+            yield return FaceStick(field, Direction.Up);
+            yield return HoldStick(field, Direction.Up, () => field.Bubble.IsVisible, maxSeconds: 1f);
+            Assert.IsTrue(field.Bubble.IsVisible, "처음 부딪히면 승리 뒤 글");
+            StringAssert.Contains(After, field.Bubble.Text);
+            Assert.IsTrue(field.BossAfterLineSaidHere);
+            field.Bubble.Hide();
+
+            // 또 부딪혀도 안 나옴
+            yield return HoldStick(field, Direction.Up, () => field.Bubble.IsVisible, maxSeconds: 0.6f);
+            Assert.IsFalse(field.Bubble.IsVisible, "같은 방문에선 다시 안 나옴");
+            Assert.AreEqual(new Vector2Int(2, 1), field.PlayerCell);
+
+            // 바깥 들판에 다녀오면 다시
+            yield return HoldStick(field, Direction.Down, () => field.CurrentArea == outside, maxSeconds: 2f);
+            yield return WaitFor(() => field.CurrentArea == outside && !field.IsInBattle);
+            Assert.AreSame(outside, field.CurrentArea);
+            Assert.IsFalse(field.BossAfterLineSaidHere);
+            yield return new WaitForSecondsRealtime(0.1f);
+            yield return HoldStick(field, Direction.Down, () => field.IsMoving);
+            yield return HoldStick(field, Direction.Up, () => field.CurrentArea == lair, maxSeconds: 2f);
+            yield return WaitFor(() => field.CurrentArea == lair && !field.IsInBattle);
+            Assert.AreSame(lair, field.CurrentArea);
+            field.Bubble.Hide();
+            yield return HoldStick(field, Direction.Up, () => field.PlayerCell == new Vector2Int(2, 1), maxSeconds: 1f);
+            yield return HoldStick(field, Direction.Up, () => field.Bubble.IsVisible, maxSeconds: 1f);
+            Assert.IsTrue(field.Bubble.IsVisible, "다른 지역에 다녀오면 다시 나옴");
+            StringAssert.Contains(After, field.Bubble.Text);
             Object.Destroy(field.gameObject);
             yield return null;
         }

@@ -786,6 +786,7 @@ namespace WordRPG.UI
         // rafting: 뗏목에 탄 채로 (세이브가 강 위였을 때, #80)
         private void EnterArea(FieldArea newArea, Vector2Int position, bool rafting = false)
         {
+            if (newArea.AreaId != bossAfterLineSaidIn) bossAfterLineSaidIn = null; // 다른 지역에 가면 보스의 승리 뒤 글을 다시 볼 수 있음 (#288)
             area = newArea;
             OpenStoneGateIfAllLit(newArea); // 예전 세이브 (#233)
             var map = area.Map;

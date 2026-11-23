@@ -87,7 +87,7 @@ namespace WordRPG.Field
         [SerializeField] private string bossLine;
         [Tooltip("이어서 주인공이 하는 말")]
         [SerializeField] private string heroLine;
-        [Tooltip("이긴 뒤 주인공 머리 위에 나오는 글. 다시 찾아가 [확인]해도 나옴")]
+        [Tooltip("이긴 뒤 주인공 머리 위에 나오는 글. 보석에 부딪혀도 나옴 — 그 지역에 들어와 한 번만 (#288)")]
         [SerializeField] private string afterLine;
         [Tooltip("필드에 서 있는 보스 그림 크기 (칸, 가로·세로). 0이면 B 칸 하나에 작게 (#233 사용자: 보스 방에 꽉 차게 — 위엄)")]
         [SerializeField] private Vector2 fieldSize;

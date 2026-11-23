@@ -192,10 +192,17 @@ namespace WordRPG.UI
         private bool rematchBattle;
         public int Rematches { get; private set; } // 테스트용
 
-        // 보석에 부딪히면 승리 뒤 글을 다시 (#207 — 전에 이긴 사람도 읽을 수 있게. #251부터 밟을 수 없어서 부딪힐 때)
+        // 보석에 부딪히면 승리 뒤 글을 다시 (#207 — 전에 이긴 사람도 읽을 수 있게. #251부터 밟을 수 없어서 부딪힐 때).
+        // 그 지역에 들어와 한 번만 (#288 사용자: 여운을 주는 글인데 부딪힐 때마다 나와서 너무 잦음) — 다른 지역에 다녀오면 다시.
+        // 보스를 막 이겼을 때 나온 글도 그 한 번으로 침 (AfterBossVictory). 앱을 다시 켜면 처음 들어온 것으로 침
+        private string bossAfterLineSaidIn; // 승리 뒤 글을 이미 보여 준 지역 (지역을 옮기면 지움)
+        public bool BossAfterLineSaidHere => bossAfterLineSaidIn == area?.AreaId; // 테스트용
+
         private void SayBossAfterLine()
         {
             if (bubble.IsVisible || area.Boss == null || area.Boss.AfterLine.Length == 0 || !session.World.IsBossDefeated(area.BossId)) return;
+            if (BossAfterLineSaidHere) return;
+            bossAfterLineSaidIn = area.AreaId;
             bubble.Say(area.Boss.AfterLine, BossAfterLineSeconds, "[확인]을 누르면 다시 싸울 수 있어요");
             bubbleKeepUntil = Time.unscaledTime + 1.5f;
         }
