@@ -49,6 +49,37 @@ namespace WordRPG.Field
         }
     }
 
+    // 컷씬 대화 한 줄에서 하는 일 (#293 — 에셋에 번호로 저장, 새 종류는 맨 뒤)
+    public enum NpcSceneStep
+    {
+        Npc,  // 인물이 말함
+        Hero, // 주인공이 말함
+        Gift  // (말 대신) 인물이 선물을 건넴 — 받은 것은 알림으로
+    }
+
+    // 컷씬 대화 한 줄 (#293 초원 촌장 — 인물과 주인공이 주고받음). {이름} = 플레이어 이름
+    [Serializable]
+    public class NpcSceneLine
+    {
+        [SerializeField] private NpcSceneStep step;
+        [SerializeField] private string text;
+
+        public NpcSceneStep Step => step;
+        public string Text => text;
+
+        private NpcSceneLine() { } // Unity 직렬화용
+
+        public NpcSceneLine(NpcSceneStep step, string text)
+        {
+            this.step = step;
+            this.text = text ?? "";
+        }
+
+        public static NpcSceneLine Npc(string text) => new NpcSceneLine(NpcSceneStep.Npc, text);
+        public static NpcSceneLine Hero(string text) => new NpcSceneLine(NpcSceneStep.Hero, text);
+        public static NpcSceneLine Gift() => new NpcSceneLine(NpcSceneStep.Gift, "");
+    }
+
     // 말을 잃어 가는 사람들 (#209, GDD 9-10): 맵 글자 N(바닥)·n(잔디) 자리에 FieldArea npcs 순서대로 선다.
     // 그림 = Art/NinjaAdventure/Npcs/{npcId}.png. 세이브에 적히지 않음 — 말은 보스 처치·찾은 단어로 정해짐
     [CreateAssetMenu(fileName = "NewNpc", menuName = "WordRPG/Npc", order = 32)]
@@ -82,6 +113,13 @@ namespace WordRPG.Field
         [SerializeField] private FieldArea giftBeforeBossOf;
         [SerializeField] private List<string> giftLines = new List<string>();
 
+        [Header("첫 승리 뒤 (#293 — 초원 촌장)")]
+        [Tooltip("새 게임에서 처음 전투를 이기면 (이 인물이 그 지역에 있을 때): 달려와 차례로 주고받은 뒤 제자리로. 그다음 목표 갱신 안내. 비면 없음")]
+        [SerializeField] private List<NpcSceneLine> firstWinLines = new List<NpcSceneLine>();
+        [Tooltip("대화의 Gift 줄에서 건네는 아이템")]
+        [SerializeField] private ItemData firstWinGift;
+        [SerializeField] private int firstWinGiftCount = 1;
+
         public string NpcId => npcId;
         public string DisplayName => displayName;
         public int FrameWidth => frameWidth;
@@ -100,6 +138,10 @@ namespace WordRPG.Field
         public int GiftCount => giftCount;
         public FieldArea GiftBeforeBossOf => giftBeforeBossOf;
         public IReadOnlyList<string> GiftLines => giftLines;
+        public IReadOnlyList<NpcSceneLine> FirstWinLines => firstWinLines;
+        public bool BriefsAfterFirstWin => firstWinLines != null && firstWinLines.Count > 0;
+        public ItemData FirstWinGift => firstWinGift;
+        public int FirstWinGiftCount => Mathf.Max(1, firstWinGiftCount);
 
         // 샘플 데이터 생성 전용. 런타임에서는 호출하지 않는다
         public void Configure(string id, string name, int animalFrameWidth, IEnumerable<NpcStage> newStages)
@@ -126,6 +168,14 @@ namespace WordRPG.Field
             giftCount = count;
             giftBeforeBossOf = beforeBossOf;
             giftLines = new List<string>(lines);
+        }
+
+        // 샘플 데이터 생성 전용 (#293)
+        public void SetFirstWinScene(ItemData gift, int count, params NpcSceneLine[] lines)
+        {
+            firstWinGift = gift;
+            firstWinGiftCount = count;
+            firstWinLines = new List<NpcSceneLine>(lines);
         }
 
         // 샘플 데이터 생성 전용 (#223)

@@ -23,7 +23,7 @@ MonoBehaviour:
     motion: 4
     pace: 1
   - bossOf: {fileID: 0}
-    wordsNeeded: 25
+    wordsNeeded: 10
     line: "\uCCAB \uAE00\uC790\uAC00 \uC0DD\uAC01\uB0AC\uC5B4\uC694! \uADF8\uB2E4\uC74C\uC740\u2026"
     motion: 4
     pace: 1
@@ -48,3 +48,6 @@ MonoBehaviour:
   giftCount: 1
   giftBeforeBossOf: {fileID: 0}
   giftLines: []
+  firstWinLines: []
+  firstWinGift: {fileID: 0}
+  firstWinGiftCount: 1

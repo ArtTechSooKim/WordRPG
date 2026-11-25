@@ -31,7 +31,7 @@ namespace WordRPG.Tests
 
         // courses: 단어장 고르기를 시험할 때 — 이 지역의 단어장을 대신할 단어장들 (#273). 없으면 GameDatabase 없이 (= 기본 단어장으로 바로)
         private FieldScreen CreateField(GameSession session, bool intro = false, float encounterRate = 1f, int minSteps = 0, bool tutorials = true,
-            System.Func<WordDatabase, WordCourse[]> courses = null)
+            System.Func<WordDatabase, WordCourse[]> courses = null, NpcData npc = null, string map = Map)
         {
             var bite = TestData.Skill("bite", SkillKind.Damage, SkillTarget.SingleEnemy, 1);
             var enemy = TestData.Species("slime", new MonsterStats(8, 1, 1), new MonsterStats(0, 0, 0), bite).Set("displayName", "잉크 슬라임");
@@ -42,9 +42,10 @@ namespace WordRPG.Tests
             var words = ScriptableObject.CreateInstance<WordDatabase>().Set("regionId", "test").Set("regionName", "테스트");
             words.ReplaceWords(TestData.SampleWords());
             var area = ScriptableObject.CreateInstance<FieldArea>()
-                .Set("areaId", "library").Set("displayName", "잊혀진 서고").Set("map", Map)
+                .Set("areaId", "library").Set("displayName", "잊혀진 서고").Set("map", map)
                 .Set("encounters", table).Set("words", words).Set("boss", new BossEncounter(king, 3))
                 .Set("encounterRate", encounterRate).Set("minStepsBetweenEncounters", minSteps);
+            if (npc != null) area.Set("npcs", new List<NpcData> { npc });
             GameDatabase database = null;
             if (courses != null)
             {
@@ -441,6 +442,76 @@ namespace WordRPG.Tests
             Assert.AreEqual(1f, star.localScale.x, 0.001f, "닫으면 원래대로");
             Assert.Less(objective.GetSiblingIndex(), objective.parent.childCount - 1, "원래 순서로");
             Assert.IsTrue(session.Tutorials.Has(TutorialProgress.Goal), "한 번만");
+            Object.Destroy(field.gameObject);
+            yield return null;
+        }
+
+        // #293 사용자 (처음 1분 — 초원에 할 게 없음): 첫 승리 뒤 촌장이 급하게 달려와 주인공과 주고받고 상처약을 건넴 → 제자리로 → '목표 갱신!'
+        //   y=3  #,,,,,,B#    ← 풀숲 (조우 100%)
+        //   y=2  #.......#
+        //   y=1  #P.....N#    ← 시작 (1,1), 촌장 (7,1)
+        [UnityTest]
+        public IEnumerator AfterTheFirstWinTheChiefRunsOverThenTheGoalUpdates()
+        {
+            var potion = TestData.Item("potion").Set("displayName", "상처약");
+            var chief = ScriptableObject.CreateInstance<NpcData>();
+            chief.Configure("npc_chief", "촌장", 0, new[] { new NpcStage("자네 이름이… 펜…", NpcMotionKind.Stand) });
+            chief.SetFirstWinScene(potion, 1,
+                NpcSceneLine.Npc("허억… 허억… 자네!"), NpcSceneLine.Hero("무슨 일이신가요?"),
+                NpcSceneLine.Npc("서고로 가서 까먹대왕을 물리쳐 주게나!"), NpcSceneLine.Gift(), NpcSceneLine.Npc("부디 조심하게나!"));
+            var session = NewSession();
+            session.Hero.SetLook("boy");
+            session.Hero.Rename("아린");
+            var field = CreateField(session, tutorials: false, npc: chief, map: "#########\n#,,,,,,B#\n#.......#\n#P.....N#\n#########");
+            yield return null;
+            yield return HoldStick(field, Direction.Up, () => field.IsInBattle, 5f);
+            Assert.IsTrue(field.IsInBattle, "풀숲에서 첫 전투");
+            yield return WaitFor(() => field.Battle.IsRunning, 3f);
+            yield return PlayUntilResult(field.Battle, answerCorrectly: true);
+            var heroCell = field.PlayerCell;
+            FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
+            yield return WaitFor(() => field.IsCutsceneRunning, 3f);
+            Assert.IsTrue(field.IsCutsceneRunning, "이기면 촌장 컷씬");
+            Assert.IsFalse(field.PauseTutorial.IsShowing, "목표 안내는 컷씬 뒤");
+            bool besideWhenTalking = true;
+            for (float t = 0; t < 8f && field.IsCutsceneRunning; t += Time.unscaledDeltaTime)
+            {
+                var offset = field.Npcs.Views[0].Motion.Cell - field.PlayerCell;
+                if (field.Bubble.IsVisible && field.Bubble.FromNpc && (Mathf.Abs(offset.x) != 1 || offset.y != 0)) besideWhenTalking = false;
+                yield return null;
+            }
+            Assert.IsFalse(field.IsCutsceneRunning, "끝남");
+            Assert.IsTrue(besideWhenTalking, "촌장은 주인공 바로 왼쪽·오른쪽에서 말함 (아래에 서면 말풍선이 주인공을 가림)");
+            CollectionAssert.AreEqual(new[]
+            {
+                "촌장: 허억… 허억… 자네!", "아린: 무슨 일이신가요?", "촌장: 서고로 가서 까먹대왕을 물리쳐 주게나!", "선물: potion", "촌장: 부디 조심하게나!"
+            }, field.CutsceneLog, "주인공도 한 줄 — 이름표는 플레이어가 지은 이름, 상처약은 그 자리에서");
+            Assert.AreEqual(1, session.Inventory.GetCount(potion), "상처약 하나");
+            Assert.AreEqual(heroCell, field.PlayerCell, "주인공은 그 자리 그대로");
+            Assert.AreEqual(new Vector2Int(7, 1), field.Npcs.Views[0].Motion.Cell, "촌장은 제자리로");
+            Assert.IsTrue(session.World.HasEvent(FieldScreen.FirstWinEventId(chief)), "한 번만");
+
+            yield return WaitFor(() => field.PauseTutorial.IsShowing, 3f);
+            StringAssert.Contains("목표 갱신!\n잊혀진 서고로 이동하여 까먹대왕 처치하기", field.PauseTutorial.Message);
+            Assert.IsTrue(field.ObjectivePulsing, "목표 한 줄이 밝아졌다 어두워졌다 (#233 그대로)");
+            ActiveButton(field.transform, "TutorialNextButton").onClick.Invoke();
+            yield return null;
+            Assert.IsFalse(field.PauseTutorial.IsShowing);
+            Assert.IsTrue(session.Tutorials.Has(TutorialProgress.Goal));
+
+            // 두 번째 승리 뒤엔 아무것도 없음
+            int played = field.CutscenesPlayed;
+            yield return HoldStick(field, Direction.Right, () => field.IsInBattle, 5f);
+            if (field.IsInBattle)
+            {
+                yield return WaitFor(() => field.Battle.IsRunning, 3f);
+                yield return PlayUntilResult(field.Battle, answerCorrectly: true);
+                FindButton(field.Battle.transform, "ResultButton_Primary").onClick.Invoke();
+                yield return new WaitForSecondsRealtime(0.5f);
+                Assert.AreEqual(played, field.CutscenesPlayed, "촌장은 다시 안 옴");
+                Assert.IsFalse(field.PauseTutorial.IsShowing);
+            }
+            Assert.AreEqual(1, session.Inventory.GetCount(potion), "상처약도 한 번만");
             Object.Destroy(field.gameObject);
             yield return null;
         }

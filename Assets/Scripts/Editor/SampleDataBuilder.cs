@@ -1178,10 +1178,25 @@ namespace WordRPG.EditorTools
             var chief = Npc("npc_chief", "촌장", 0,
                 new NpcStage("자네 이름이… 펜… 아니, 뭐였더라?", NpcMotionKind.Pace, null, 0, 0.7f), // 뒷짐 지고 느긋하게
                 new NpcStage("{이름}! 그래, 그 이름이야!", NpcMotionKind.Stand, library));
+            // #293 사용자 (처음 1분 — 초원에 할 게 없음): 새 게임 첫 승리 뒤 촌장이 급하게 달려와 까먹대왕 이야기 + 상처약 → 목표 갱신.
+            // 대사 = 사용자가 쓴 글 그대로 (한 따옴표 = 말풍선 하나). 줄은 직접 나눔 — '말이야.' '주게나!'만 둘째 줄로 떨어지지 않게
+            chief.SetFirstWinScene(AssetDatabase.LoadAssetAtPath<ItemData>($"{Root}/Items/potion.asset"), 1,
+                NpcSceneLine.Npc("허억… 허억… 자네! 잠깐만 기다려 보게!"),
+                NpcSceneLine.Npc("이상하구먼…\n벌써 까먹을 나이는 아닌데 말이야."),
+                NpcSceneLine.Npc("분명 뭔가 중요한 일이 있었던 것 같은데…\n도무지 기억이 나질 않아."),
+                NpcSceneLine.Hero("무슨 일이신가요?"),
+                NpcSceneLine.Npc("아무래도 까먹대왕이 다시 나타난 것 같네!"),
+                NpcSceneLine.Npc("그 녀석이 나타나면 주변 사람들의\n기억까지 사라진다고 들었지."),
+                NpcSceneLine.Npc("부탁이네.\n서고로 가서 까먹대왕을 물리쳐 주게나!"),
+                NpcSceneLine.Npc("자네가 아니면\n이 일을 해결할 사람이 없을 것 같네."),
+                NpcSceneLine.Gift(),
+                NpcSceneLine.Npc("이건 내 작은 성의일세.\n앞으로의 여정에 도움이 될 걸세."),
+                NpcSceneLine.Npc("부디 조심하게나!"));
+            EditorUtility.SetDirty(chief);
             // #222 사용자: '첫 글자가 뭐였지?'는 부탁(서브퀘스트)처럼 들림 → 땅에 이름을 쓰는 아이의 혼잣말, 단어를 찾을수록 한 글자씩
             var child = Npc("npc_child", "아이", 0,
                 new NpcStage("땅에 내 이름을 쓰는 중이에요. 첫 글자가… 음…", NpcMotionKind.Sit),
-                new NpcStage("첫 글자가 생각났어요! 그다음은…", NpcMotionKind.Sit, null, 25),
+                new NpcStage("첫 글자가 생각났어요! 그다음은…", NpcMotionKind.Sit, null, 10), // #293 사용자: 25 → 10 (단어를 찾으면 마을이 빨리 반응하게)
                 new NpcStage("제 이름 두 글자가 생각났어요. 마지막 하나가 뭐였더라…", NpcMotionKind.Sit, null, 50), // #232 사용자
                 new NpcStage("이제 세 글자 다 썼어요!", NpcMotionKind.Wander, null, 75, 1.6f)); // 신나서 뛰어다님
             // #236 사용자 ㉑: 까먹대왕을 조심하라며 상처약 하나 (사서 말투 — 존댓말)

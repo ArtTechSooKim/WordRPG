@@ -31,3 +31,6 @@ MonoBehaviour:
   giftCount: 1
   giftBeforeBossOf: {fileID: 0}
   giftLines: []
+  firstWinLines: []
+  firstWinGift: {fileID: 0}
+  firstWinGiftCount: 1

@@ -23,6 +23,7 @@ namespace WordRPG.UI
         private bool lineSkip, lineSkipped;        // [확인]을 눌렀다 · 방금 말을 [확인]으로 넘겼다 (#245)
 
         public int CutscenesPlayed { get; private set; } // 테스트용
+        public readonly List<string> CutsceneLog = new List<string>(); // 테스트용: 컷씬에서 한 말 '이름: 말' · 건넨 선물 '선물: itemId' 차례로
         public bool IsCutsceneRunning => cutsceneRunning;
 
         public static string EntryEventId(NpcData npc) => "npc_entry:" + npc.NpcId;
@@ -51,11 +52,7 @@ namespace WordRPG.UI
             session.World.MarkEvent(GiftEventId(npc.Data));
             FaceEachOther(npc);
             yield return SayLines(npc, npc.Data.GiftLines);
-            session.Inventory.Add(npc.Data.GiftItem, npc.Data.GiftCount);
-            Sound.Play(Sfx.Coin);
-            string gift = npc.Data.GiftCount > 1 ? $"{npc.Data.GiftItem.DisplayName} {npc.Data.GiftCount}개를" : UiKit.WithJosa(npc.Data.GiftItem.DisplayName, "을", "를");
-            ShowToast($"{gift} 받았다!", 2.5f);
-            RefreshHud();
+            GiveCutsceneGift(npc.Data.GiftItem, npc.Data.GiftCount);
             EndCutscene();
         }
         public static string BossEventId(NpcData npc) => "npc_boss:" + npc.NpcId;
@@ -102,17 +99,7 @@ namespace WordRPG.UI
             session.World.MarkEvent(BossEventId(npc.Data));
             SaveNow();
 
-            // 화면 밖에서 달려옴: 제자리 → 주인공 길에서 주인공 앞 RunInFrom칸 자리로 옮겨 놓고 그다음부터 달림
-            var beside = BesideHero(npc.Motion.Cell);
-            var road = FieldReach.PathTo(walker.Map, npc.Motion.Cell, beside, CutsceneCanStand);
-            if (road.Count > RunInFrom)
-            {
-                var from = road[road.Count - RunInFrom - 1];
-                npc.Motion.Teleport(from, Direction.Down);
-                npcs.Redraw(npc);
-                road = road.GetRange(road.Count - RunInFrom, RunInFrom);
-            }
-            yield return WalkNpc(npc, road, NpcRunStep);
+            yield return RunInBesideHero(npc);
             FaceEachOther(npc);
             yield return SayLines(npc, npc.Data.BossThanksLines);
 
@@ -125,16 +112,101 @@ namespace WordRPG.UI
                 FaceEachOther(npc);
             }
             yield return SayLines(npc, npc.Data.ExitStoryLines);
+            yield return WalkAwayHome(npc);
+            EndCutscene();
+        }
 
-            // 화면 밖으로 걸어가 제자리로
+        // 화면 밖에서 달려옴: 제자리 → 주인공 길에서 주인공 앞 RunInFrom칸 자리로 옮겨 놓고 그다음부터 달림
+        private IEnumerator RunInBesideHero(NpcView npc, bool sidesFirst = false)
+        {
+            var beside = BesideHero(npc.Motion.Cell, sidesFirst);
+            var road = FieldReach.PathTo(walker.Map, npc.Motion.Cell, beside, CutsceneCanStand);
+            if (road.Count > RunInFrom)
+            {
+                var from = road[road.Count - RunInFrom - 1];
+                npc.Motion.Teleport(from, Direction.Down);
+                npcs.Redraw(npc);
+                road = road.GetRange(road.Count - RunInFrom, RunInFrom);
+            }
+            yield return WalkNpc(npc, road, NpcRunStep);
+        }
+
+        // 화면 밖으로 걸어가 제자리로
+        private IEnumerator WalkAwayHome(NpcView npc)
+        {
             var away = FieldReach.PathTo(walker.Map, npc.Motion.Cell, npc.Motion.Home, CutsceneCanStand);
             if (away.Count > RunInFrom) away = away.GetRange(0, RunInFrom);
             yield return WalkNpc(npc, away, NpcWalkStep);
             npc.Motion.Teleport(npc.Motion.Home, Direction.Down);
             npc.Motion.Release();
             npcs.Redraw(npc);
+        }
+
+        public static string FirstWinEventId(NpcData npc) => "npc_first_win:" + npc.NpcId;
+
+        // 첫 승리 뒤 알려 줄 인물 (그 지역에 있고 아직 안 했으면, 없으면 null — #293)
+        private NpcView FirstWinBriefer()
+        {
+            if (npcs == null) return null;
+            foreach (var view in npcs.Views)
+                if (view.Data.BriefsAfterFirstWin && !session.World.HasEvent(FirstWinEventId(view.Data))) return view;
+            return null;
+        }
+
+        // 첫 승리 뒤 (#293 사용자 — 초원 촌장): 화면 밖에서 급하게 달려와 주인공과 주고받음 → 중간에 선물 → 걸어서 제자리로.
+        // 그다음 목표 갱신 안내는 GoalReminder가 이어서
+        private IEnumerator FirstWinCutscene(NpcView npc)
+        {
+            BeginCutscene();
+            session.World.MarkEvent(FirstWinEventId(npc.Data));
+            SaveNow();
+            yield return RunInBesideHero(npc, sidesFirst: true); // 나란히 — 촌장 말풍선이 주인공을 가리지 않게
+            FaceEachOther(npc);
+            foreach (var line in npc.Data.FirstWinLines)
+            {
+                switch (line.Step)
+                {
+                    case NpcSceneStep.Npc:
+                        yield return SayLine(npc.Body, npc.Data.DisplayName, line.Text);
+                        break;
+                    case NpcSceneStep.Hero:
+                        yield return SayLine(player, session.Hero.DisplayName, line.Text);
+                        break;
+                    case NpcSceneStep.Gift:
+                        bubble.Hide();
+                        GiveCutsceneGift(npc.Data.FirstWinGift, npc.Data.FirstWinGiftCount);
+                        yield return WaitLine(1f);
+                        break;
+                }
+            }
+            bubble.Hide();
+            yield return WalkAwayHome(npc);
             EndCutscene();
         }
+
+        private void GiveCutsceneGift(Items.ItemData item, int count)
+        {
+            if (item == null) return;
+            CutsceneLog.Add("선물: " + item.ItemId);
+            session.Inventory.Add(item, count);
+            Sound.Play(Sfx.Coin);
+            string gift = count > 1 ? $"{item.DisplayName} {count}개를" : UiKit.WithJosa(item.DisplayName, "을", "를");
+            ShowToast($"{gift} 받았다!", 2.5f);
+            RefreshHud();
+            SaveNow();
+        }
+
+        // 한 사람의 말 한 줄 (말풍선은 그 사람 머리 위, 이름표 = 그 사람 이름)
+        private IEnumerator SayLine(Transform speaker, string name, string line)
+        {
+            string text = NpcLines.Render(line, session.Hero.DisplayName);
+            float seconds = LineSeconds(text);
+            CutsceneLog.Add($"{name}: {text}");
+            bubble.Speak(speaker, name, text, seconds + 0.4f);
+            yield return WaitLine(seconds);
+        }
+
+        private static float LineSeconds(string text) => Mathf.Clamp(0.9f + text.Length * 0.075f, 1.4f, 4f);
 
         // 인물이 앞서고 주인공이 한 칸 뒤를 따라 같이 걷는다 (카메라는 주인공을 따라가므로 인물이 화면 안에 남음).
         // 인물이 먼 쪽 자리로 가고 주인공은 가는 길에 있는 가까운 쪽에 서며, 주인공이 서 있는 칸으로는 인물이 오지 않음 (#245 사용자: 겹침)
@@ -206,12 +278,23 @@ namespace WordRPG.UI
             return path;
         }
 
-        // 주인공 옆 칸 중 인물이 오는 쪽에 가까운 곳
-        private Vector2Int BesideHero(Vector2Int npcCell)
+        // 주인공 옆 칸 중 인물이 오는 쪽에 가까운 곳.
+        // sidesFirst = 왼쪽·오른쪽을 먼저 (#293: 위아래로 서면 아래 사람의 말풍선이 위 사람을 가림)
+        private Vector2Int BesideHero(Vector2Int npcCell, bool sidesFirst = false)
+        {
+            if (sidesFirst)
+            {
+                var side = ClosestBesideHero(npcCell, Direction.Right, Direction.Left);
+                if (side != walker.Position) return side;
+            }
+            return ClosestBesideHero(npcCell, Direction.Right, Direction.Left, Direction.Down, Direction.Up);
+        }
+
+        private Vector2Int ClosestBesideHero(Vector2Int npcCell, params Direction[] directions)
         {
             Vector2Int best = walker.Position;
             float bestDistance = float.MaxValue;
-            foreach (var direction in new[] { Direction.Right, Direction.Left, Direction.Down, Direction.Up })
+            foreach (var direction in directions)
             {
                 var cell = walker.Position + direction.ToOffset();
                 if (!CutsceneCanStand(cell) && cell != npcCell) continue;
@@ -260,13 +343,7 @@ namespace WordRPG.UI
 
         private IEnumerator SayLines(NpcView npc, IReadOnlyList<string> lines)
         {
-            foreach (var line in lines)
-            {
-                string text = NpcLines.Render(line, session.Hero.DisplayName);
-                float seconds = Mathf.Clamp(0.9f + text.Length * 0.075f, 1.4f, 4f);
-                bubble.Speak(npc.Body, npc.Data.DisplayName, text, seconds + 0.4f);
-                yield return WaitLine(seconds);
-            }
+            foreach (var line in lines) yield return SayLine(npc.Body, npc.Data.DisplayName, line);
             bubble.Hide();
         }
 

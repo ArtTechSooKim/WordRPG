@@ -251,5 +251,42 @@ namespace WordRPG.Tests
             Assert.IsFalse(pilgrim.SeesOffAfterBoss, "보스 뒤 배웅은 없음");
             Assert.AreEqual(1, jungle.Npcs.Distinct().Count(npc => npc.BriefsOnEntry), "정글에 알려 주는 인물은 하나 (개구리는 아님)");
         }
+
+        // #293 사용자 (처음 1분 — 초원에 할 게 없음): 첫 승리 뒤 촌장이 달려와 까먹대왕 이야기 + 상처약. 대사는 사용자가 쓴 글 그대로
+        [Test]
+        public void TheMeadowChiefBriefsAfterTheFirstWinWithThePotion()
+        {
+            var meadow = AssetDatabase.LoadAssetAtPath<FieldArea>("Assets/Data/Areas/meadow.asset");
+            var chief = meadow.Npcs.Single(npc => npc.NpcId == "npc_chief");
+            Assert.IsTrue(chief.BriefsAfterFirstWin);
+            Assert.AreEqual(1, meadow.Npcs.Count(npc => npc.BriefsAfterFirstWin), "초원에 알려 주는 인물은 촌장 하나");
+            var lines = chief.FirstWinLines;
+            Assert.AreEqual(11, lines.Count, "촌장 9줄 · 주인공 1줄 · 상처약");
+            Assert.AreEqual("허억… 허억… 자네! 잠깐만 기다려 보게!", lines[0].Text);
+            Assert.AreEqual(NpcSceneStep.Hero, lines[3].Step, "넷째 줄은 주인공");
+            Assert.AreEqual("무슨 일이신가요?", lines[3].Text);
+            Assert.AreEqual(NpcSceneStep.Gift, lines[8].Step, "'자네가 아니면…' 다음에 상처약을 건넴");
+            Assert.AreEqual("부디 조심하게나!", lines.Last().Text);
+            Assert.AreEqual(1, lines.Count(l => l.Step == NpcSceneStep.Gift), "선물은 한 번");
+            Assert.IsTrue(lines.Where(l => l.Step != NpcSceneStep.Gift).All(l => !string.IsNullOrEmpty(l.Text)));
+            Assert.AreEqual("potion", chief.FirstWinGift.ItemId);
+            Assert.AreEqual(1, chief.FirstWinGiftCount);
+            Assert.IsNull(chief.GiftItem, "가까이 가면 주는 선물(사서)과는 따로 — 겹쳐서 두 번 주지 않게");
+            Assert.IsFalse(RealAreas().Where(a => a != meadow).SelectMany(a => a.Npcs).Any(npc => npc.BriefsAfterFirstWin),
+                "첫 승리는 초원에서만 (다른 지역 인물은 없음)");
+        }
+
+        // #293 사용자: 아이가 첫 글자를 기억해 내는 때 = 초원 단어 25개 → 10개 (단어를 찾으면 마을이 빨리 반응하게)
+        [Test]
+        public void TheChildRemembersTheFirstLetterAfterTenWords()
+        {
+            var child = AssetDatabase.LoadAssetAtPath<NpcData>("Assets/Data/Npcs/npc_child.asset");
+            CollectionAssert.AreEqual(new[] { 0, 10, 50, 75 }, child.Stages.Select(s => s.WordsNeeded).ToArray());
+            Assert.AreEqual("첫 글자가 생각났어요! 그다음은…", child.Stages[1].Line);
+        }
+
+        private static FieldArea[] RealAreas() =>
+            AssetDatabase.FindAssets("t:FieldArea", new[] { "Assets/Data/Areas" })
+                .Select(guid => AssetDatabase.LoadAssetAtPath<FieldArea>(AssetDatabase.GUIDToAssetPath(guid))).ToArray();
     }
 }

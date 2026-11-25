@@ -185,7 +185,8 @@ namespace WordRPG.UI
             transitioning = false;
         }
 
-        // 첫 승리 뒤 (#124 사용자: "까먹대왕이라는 목표를 한번 상기"): 목표 한 줄이 가리키는 보스를 큰 안내로 한 번
+        // 첫 승리 뒤 (#124 사용자: "까먹대왕이라는 목표를 한번 상기"): 목표 한 줄이 가리키는 보스를 큰 안내로 한 번.
+        // #293부터 초원에선 촌장이 먼저 달려와 이야기하고 상처약을 줌 (FieldScreen.Cutscenes FirstWinCutscene) → 안내는 '목표 갱신!'
         private IEnumerator GoalReminder()
         {
             var goal = Objectives.Current(session, area);
@@ -195,6 +196,13 @@ namespace WordRPG.UI
             if (boss == null) yield break;
             if (database != null && goal.Destination != SpringWarp.FirstBossArea(database.Areas)) yield break; // #234: 숲 등은 그 지역 인물이 알려 줌
             yield return new WaitForSecondsRealtime(0.3f * animationScale);
+            // #293 사용자: 그 지역에 알려 줄 인물(초원 촌장)이 있으면 먼저 달려와 이야기 → 그다음 '목표 갱신'
+            var briefer = FirstWinBriefer();
+            if (briefer != null)
+            {
+                yield return FirstWinCutscene(briefer);
+                yield return new WaitForSecondsRealtime(0.2f * animationScale);
+            }
             // 목표 한 줄을 막 위로 올려 [확인]을 누를 때까지 글자·별이 밝아졌다 어두워졌다 (#233 사용자: 글을 안 읽어도 어디를 보라는지 알게)
             int order = objectivePill.GetSiblingIndex();
             objectivePill.SetAsLastSibling();
@@ -202,7 +210,9 @@ namespace WordRPG.UI
             var pulse = StartCoroutine(PulseObjective());
             yield return pauseTutorial.Tell(new[]
             {
-                $"목표는 {goal.Destination.DisplayName}의 {UiKit.WithJosa(boss.DisplayName, "을", "를")} 물리치는 것입니다!\n미니맵 아래에 목표가 있으니 잘 확인해주세요!"
+                briefer != null
+                    ? $"목표 갱신!\n{UiKit.WithJosa(goal.Destination.DisplayName, "으로", "로")} 이동하여 {boss.DisplayName} 처치하기\n미니맵 아래에 목표가 있으니 잘 확인해주세요!"
+                    : $"목표는 {goal.Destination.DisplayName}의 {UiKit.WithJosa(boss.DisplayName, "을", "를")} 물리치는 것입니다!\n미니맵 아래에 목표가 있으니 잘 확인해주세요!"
             });
             StopCoroutine(pulse);
             ObjectivePulsing = false;

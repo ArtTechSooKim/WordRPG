@@ -40,3 +40,6 @@ MonoBehaviour:
   - "\uAE4C\uBA39\uB300\uC655\uC744 \uBB3C\uB9AC\uCE58\uB7EC \uAC00\uC694?"
   - "\uAE4C\uBA39\uB300\uC655\uC740 \uB2E8\uC5B4\uB97C \uC78A\uAC8C \uD558\uB2C8\uAE4C
     \uC870\uC2EC\uD574\uC694! \uC774\uAC70 \uAC00\uC838\uAC00\uC694."
+  firstWinLines: []
+  firstWinGift: {fileID: 0}
+  firstWinGiftCount: 1
